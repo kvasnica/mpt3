@@ -118,7 +118,7 @@ classdef IterableBehavior < handle
 	methods(Hidden, Sealed=true)
 		% private APIs
 		
-		function rejectArray(obj)
+		function str = rejectArray(obj)
 			% Throw an error if object is an array.
 			%
 			% This helper is to be used in all methods which do not support
@@ -131,7 +131,9 @@ classdef IterableBehavior < handle
 			%    end
 			
 			if numel(obj)>1
-				error('This method does not support arrays. Use the forEach() method.');
+				str = 'This method does not support arrays. Use the forEach() method.';
+			else
+				str = '';
 			end
 		end
 	end
