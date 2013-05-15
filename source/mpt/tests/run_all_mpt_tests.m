@@ -96,6 +96,17 @@ end
 % display results
 n_error = length(find(with_error));
 n_warning = length(find(with_warning));
+if n_error>0 && ~options.rerunfailed
+	failed = test_files(with_error);
+	fprintf('\n%s\n', repmat('=', 1, 60));
+	fprintf('Failed tests:\n\n');
+	for i = 1:length(failed)
+		[~, testname] = fileparts(failed{i});
+		fprintf('%s\n', testname);
+	end
+	fprintf('%s\n', repmat('=', 1, 60));
+end
+
 fprintf('\n');
 fprintf('   Total: %d\n', length(test_files));
 fprintf('  Failed: %d', n_error);
