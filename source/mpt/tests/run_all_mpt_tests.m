@@ -72,7 +72,7 @@ start_time = clock;
 with_error = false(1, length(test_files));
 with_warning = false(1, length(test_files));
 previous_dir = '';
-start_time = clock;
+runtime = 0;
 for i = 1:length(test_files)
 	this_dir = fileparts(test_files{i});
 	
@@ -83,7 +83,8 @@ for i = 1:length(test_files)
 		fprintf('\n%s\n', repmat('-', 1, 60));
 		fprintf('Tests for %s:\n\n', shortdirname);
 	end
-	status = run_test(test_files{i}, options);
+	[status, et] = run_test(test_files{i}, options);
+	runtime = runtime + et;
 	switch status
 		case 'error',
 			with_error(i) = true;
@@ -91,7 +92,6 @@ for i = 1:length(test_files)
 			with_warning(i) = true;
 	end
 end
-stop_time = clock;
 
 % display results
 n_error = length(find(with_error));
@@ -106,7 +106,7 @@ if n_error>0 && usejava('jvm')
 end
 fprintf('\n');
 fprintf('Warnings: %d\n', n_warning);
-fprintf(' Runtime: %.1f seconds\n\n', etime(stop_time, start_time));
+fprintf(' Runtime: %.1f seconds\n\n', runtime);
 
 % store the list of failed tests for re-run
 test_files = test_files(with_error);
@@ -134,11 +134,12 @@ end
 end
 
 %-------------------------------
-function outcome = run_test(testfile, options)
+function [outcome, runtime] = run_test(testfile, options)
 % executes a single test
 %
 
 outcome = 'ok';
+runtime = 0;
 cwd = pwd;
 [testpath, testname] = fileparts(testfile);
 cd(testpath);
@@ -159,18 +160,18 @@ warning('on');
 t = clock;
 try
 	out = evalc(testname);
-	et = etime(clock, t);
+	runtime = etime(clock, t);
 	if ~options.onlyerrors
 		if ~isempty(findstr(out, 'Warning: '))
 			outcome = 'warning';
 		else
 			outcome = 'ok';
 		end
-		fprintf('%s (%.1f)\n', outcome, et);
+		fprintf('%s (%.1f)\n', outcome, runtime);
 	end
 
 catch
-	et = etime(clock, t);
+	runtime = etime(clock, t);
 	flag = true;
 	L = lasterror;
 	% display a link pointing directly to the problematic line
@@ -179,9 +180,9 @@ catch
 	end
 	if usejava('jvm')
 		fprintf('<a href="matlab:opentoline(''%s'', %d, 0)">error</a> (%.1f)\n', ...
-			L.stack(1).file, L.stack(1).line, et);
+			L.stack(1).file, L.stack(1).line, runtime);
 	else
-		fprintf('error (%.1f)!!!!!!\n', et);
+		fprintf('error (%.1f) !!!!!!\n', runtime);
 	end
 	outcome = 'error';
 end
