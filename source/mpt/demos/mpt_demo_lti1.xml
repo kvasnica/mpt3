@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_lti1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Simulation of LTISystem
+	</info>
+	
+    <syntax>mpt_demo_lti1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Simulation of LTI systems.
+	</descr>
+
+    <example>
+        <descr>Define an LTI system <i>x^+ = A x + B u</i>, <i>y = C x</i></descr>
+        <cmd>A = [1 1; 0 1]; B = [1; 0.5]; C = [1 0];</cmd>
+        <cmd> lti = LTISystem('A', A, 'B', B, 'C', C) </cmd>
+        <descr> Set the initial state of the system </descr>
+        <cmd> lti.initialize([1; 1.5]); </cmd>
+
+        <descr> Ask for the states </descr>
+        <cmd> x = lti.getStates() </cmd>
+
+        <descr> Update the system's state using some control action. </descr>        
+        <cmd>  u = 0.5; </cmd>
+        <descr> The following updates the internal state </descr> 
+        <cmd> lti.update(u); </cmd>
+
+        <descr> Ask for the updated states </descr>
+        <cmd> x = lti.getStates() </cmd>
+
+        <descr> The state-update and current output can also be directly obtained from update(): </descr>
+        <cmd> u = -0.6; </cmd>
+        <cmd> [next_x, current_y] = lti.update(u) </cmd>
+    </example>
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_lti2</related>
+    <related>mpt_demo_lti3</related>
+    <related>mpt_demo_lti4</related>
+    <related>mpt_demo_lti5</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

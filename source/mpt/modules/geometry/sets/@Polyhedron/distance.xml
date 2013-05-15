@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>distance</function>
+  
+  <info>
+    Compute the distance between the given point/polyhedron and this polyhedron.
+  </info>
+  <syntax>dist = P.distance(x)</syntax>
+  <syntax>ret  = P.distance(S)</syntax>
+  <syntax>dist = distance(P, x)</syntax>
+  <syntax>ret  = distance(P, S)</syntax>
+
+  <descr> 
+      Compute the distance between the polyhedron <tt>P</tt> and the point <tt>x</tt> or the polyhedron <tt>S</tt>.      
+      <ol>
+          <li>
+    		By providing real vector <i>x</i>, the distance between <i>x</i> and <i>P</i> is computed by
+    		solving the optimization problem
+    		<latex>
+      			$$\min \{\|x-y\|_{2}^{2}\ |\ y \in P \}$$
+    		</latex>
+            and the distance is returned as real number.
+        </li>
+        <li>
+    		If polyhedron <i>S</i> is specified as the argument, the distance between <i>S</i> and <i>P</i> is
+    		computed by solving the following optimization problem
+    		<latex>
+      			$$\min \{\|x-y\|_{2}^{2}\ |\ y \in P,\ x \in S\}$$
+    		</latex>
+            where the results of the optimization are returned in a struct format.
+        </li>
+	</ol>
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="false">
+    <name>x</name>
+    <descr>Vector of size P.Dim</descr>
+    <class name="double vector"/>
+  </input>
+  <input required="false">
+    <name>S</name>
+    <descr>Polyhedron with the same dimension as <tt>P</tt>.</descr>
+    <class name="Polyhedron"/>
+  </input>
+
+  <output>
+    <name>dist</name>
+    <descr>Distance between the point <i>x</i> and the Polyhedron <i>P</i></descr>
+    <class name="double"/>
+  </output>
+  <output>
+      <name>ret</name>
+      <descr>Optimal solution or [] if <i>P</i> is empty.</descr>
+      <class name="struct">
+          <field>
+              <name>exitflag</name>
+              <descr>Integer value informing about the termination status of the optimization. </descr>
+              <class name="double"/>
+          </field>
+          <field>
+              <name>dist</name>
+              <descr>Distance from <i>S</i> to the set <i>P</i></descr>
+              <class name="double"/>
+          </field>
+          <field>
+              <name>x</name>
+              <descr>Point <i>x</i> in <i>S</i> closest to <i>P</i>.</descr>
+              <class name="double"/>
+          </field>
+          <field>
+              <name>y</name>
+              <descr>Point <i>y</i> in <i>P</i> closest to <i>S</i>.</descr>
+              <class name="double"/>
+          </field>
+      </class>
+  </output>
+  
+  <example>
+    <descr>Create a polytope:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin;</cmd>
+    <descr>Choose a point and compute the distance:</descr>
+    <cmd>y = [2;2];</cmd>
+    <cmd>d = P.distance(y);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot; hold on; pplot(y','or');
+      axis square; th=linspace(0,2*pi,100)';
+      pplot(d.dist*[sin(th) cos(th)]+repmat(y',100,1),'k');</cmd>
+  </example>
+
+  <example>
+    <descr>Create two polyhedra:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+    <cmd>[U,s]=svd(randn(3)); </cmd>
+    <cmd>S = ExamplePoly.poly3d_sin.affineMap(U(:,1:2)) + [2;2;2];</cmd>
+    <descr>Compute the distance:</descr>
+    <cmd>ret = distance(P,S);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>plot([P S]); hold on; pplot([ret.x';ret.y'],'ok-'); axis square;</cmd>
+  </example>
+    
+  <related>minVRep</related>
+   
+  <author macro="author_cnj"/>
+  
+  <license macro="GPL2"/>
+</help>

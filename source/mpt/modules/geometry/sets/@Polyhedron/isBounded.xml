@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isBounded</function>
+	
+	<info>Test if a polyhedron is bounded.</info>
+	<syntax>tf = P.isBounded</syntax>
+	<syntax>tf = isBounded(P)</syntax>
+
+	<descr>
+	  Return true if the polyhedron <i>P</i> is bounded and false otherwise.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>tf</name> 
+	  <descr>true if the polyhedron <i>P</i> is bounded and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+	<example>
+	  <descr>Bounded polyhedron:</descr>
+	  <cmd>Polyhedron('V', randn(30,5)).isBounded</cmd>
+	  <descr>Unbounded polyhedra:</descr>
+	  <cmd>Polyhedron('V', randn(30,5), 'R', randn(2,5)).isBounded</cmd>
+	  <cmd>Polyhedron('H', [rand(30,5) ones(30,1)], 'He', [randn(1,5) 0]).isBounded</cmd>
+	</example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isEmptySet</related>
+	<related>isFullDim</related>
+    <related>isBounded</related>
+	
+	<!-- multiple literature sources can be given -->
+	<!-- <literature>Fukuda : PolyFaq</literature> -->
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	
+	<!-- finally, the text of the license -->
+	<!-- 
+		if GPL2 is provided, we automatically substitute the actual
+		wording of the GPL2 license
+	-->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>contains</function>
+  
+  <info>
+    Test if a point is contained inside the union of polyhedra in the same dimension.
+  </info>
+  <syntax>[isin, inwhich, closest] = contains(U, x, fastbreak)</syntax>
+  <syntax>[isin, inwhich, closest] = U.contains(x)</syntax>
+  <syntax>[isin, inwhich, closest] = U.contains(x, fastbreak)</syntax>
+  
+  <descr>
+      Check if the point <tt>x0</tt> is contained in one of the polyhedra stored in the union <tt>U</tt>.
+      The result it the logical statement if <i>x \in U</i> and false otherwise. If the point
+      is contained inside the union, index of the corresponding polyhedra in which the point lie is returned. 
+      If the point does not lie in the union, the index of the region with the least distance
+      to the point <i>x</i> is returned.
+  </descr>
+  
+  <input required="true">
+    <name>U</name>
+    <descr><tt>PolyUnion</tt> object that holds sets polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point in the same dimension as the union.</descr>
+    <class name="double"/>
+  </input>
+  <input required="false">
+      <name>fastbreak</name>
+      <descr>Do a quick stop in the consecutive search when <tt>x</tt> is contained in the first polyhedron it founds.</descr>
+      <class name="logical">
+          <option>true</option>
+          <option>false</option>
+      </class>
+      <default>false</default>
+  </input>
+
+  
+  <output>
+    <name>isin</name>
+    <descr>True if <i>x \in U</i> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  <output>
+    <name>inwhich</name>
+    <descr>The index set that indicates in which polyhedra of the union the point <i>x</i> lies.</descr>
+    <class name="double"/>
+  </output>
+  <output>
+    <name>closest</name>
+    <descr>If the point is not contained inside the union, this output indicates the index of the polyhedron that has the least distance to the point <tt>x</tt>.
+    </descr>
+    <class name="double"/>
+  </output>
+
+  
+  <example>
+    <descr>Create five polyhedra in 3D.</descr>
+    <cmd>for i=1:5, P(i) = ExamplePoly.randVrep('d',3)+rand(3,1); end </cmd>
+    <descr> Create an union of these sets without specifying any properties.</descr>
+    <cmd> U = PolyUnion(P); </cmd>
+    <descr>Check if the point <i>x=(1,-1,0)</i> is contained in the union.</descr>
+    <cmd> x = [1, -1, 0]; </cmd>
+    <cmd>[isin, inwhich, closest] = U.contains(x) </cmd>
+  </example>
+   
+  <related>feval</related>
+  
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_quadprog</function>
+	
+	<info>
+		A gateway function to QUADPROG solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_quadprog(S)</syntax>
+
+    <descr>
+        The function implements call to QUADPROG solver based on formulation from <tt>Opt</tt> class.
+        Only QP and LP problems are supported.
+        
+        It is assumed that QP/LP entering this function (for LP <i>H=0</i>)
+        is of the form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{f}^{T}x \label{eq:quadprog:QP0-obj} \\
+				\text{s.t.}  &amp;&amp; \text{lb} \le x \le  \text{ub}  \label{eq:quadprog:QP0-ineq1} \\
+                &amp;&amp; Ax \le  b  \label{eq:quadprog:QP0-ineq2}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:quadprog:QP0-eq}
+            \end{eqnarray} 
+        </latex>
+        which is passed to QUADPROG solver directly. For LP QUADPROG solver passes the 
+        data to LINPROG automatically.                
+                
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+        <descr>Structure of the <tt>Opt</tt> class</descr>
+        <class name="struct">
+			<field>
+				<name>H</name>
+				<descr>Quadratic part of the objective function.</descr>
+				<class name="double"/>
+                <default>[]</default>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the variables <i>x \ge \text{lb}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the variables <i>x \le \text{ub}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>n</name>
+                <descr>Problem dimension (number of variables).</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved.</descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>test</name>
+                <descr>Call (false) or not to call (true) MPT global settings.</descr>
+                <class name="logical"/>
+                <default>false</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution.</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>obj</name>
+				<descr>Optimal objective value.</descr>
+				<class name="double"/>
+			</field>                                                                        
+			<field>
+				<name>lambda</name>
+				<descr>Lagrangian multipliers.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>mpt_solve</related>    
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

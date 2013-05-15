@@ -1,0 +1,73 @@
+# template for generating Makefile to compile files inside @Polyhedron directory
+CWD = `pwd`
+
+# programs
+SHELL = /bin/bash
+CC = @CC@
+CXX = @CXX@
+SED = @SED@
+MATLAB= @MATLAB@
+LN_S = @LN_S@
+WGET = @WGET@
+UNZIP = @UNZIP@
+GUNZIP = @GUNZIP@
+GZIP = @GZIP@
+SCP = @SCP@
+
+# variables from MATLAB
+@MATLAB_INFO@
+
+# in cygwin we need to convert windows path do unix path
+ifeq ($(IS_WIN),1)
+	# we want to get DOS path in order to get rid of spaces
+	M_PATH := "$(shell cygpath $(MATLAB_ROOT))"
+	DOS_PATH := "$(shell cygpath -d $(M_PATH))"
+	MATLAB_ROOT_DIR := "$(shell cygpath $(DOS_PATH))"
+	MEX := $(MATLAB_ROOT_DIR)/bin/mex.bat
+else
+	MATLAB_ROOT_DIR := $(MATLAB_ROOT)
+	MEX := $(MATLAB_ROOT_DIR)/bin/mex
+endif
+
+# define MEX file extension according to pc platform
+ifeq ($(PLATFORM),GLNX86)
+	EXT :=mexglx
+else ifeq ($(PLATFORM),MACI)
+	EXT := mexmaci
+else ifeq ($(PLATFORM),PCWIN)
+	EXT := mexw32
+else ifeq ($(PLATFORM),GLNXA64)
+	EXT := mexa64
+else ifeq ($(PLATFORM),MACI64)
+	EXT :=mexmaci64
+else ifeq ($(PLATFORM),PCWIN64)
+	EXT:=mexw64
+else ifeq ($(PLATFORM),SOL64)
+	EXT:=mexsol64
+endif
+
+# compiler flags
+CFLAGS = -largeArrayDims
+LDFLAGS = 
+
+
+# files to compile
+OBJ = isInside.c
+
+# compile using MEX
+all:
+	@# matlab may not start under cygwin when no TEMP variable is provided
+	@env TEMP=$(CWD) \
+		$(MEX) $(CFLAGS) $(OBJ) $(LDFLAGS) CC=$(CC) CXX=$(CXX)
+# if -maci option on mac works, compile it as well
+ifeq ($(MACI_WORKS),1)
+	@echo 'Your MATLAB runs on 64-bits by default, but it works on 32-bit as well.'
+	@echo 'Compiling "$(OBJ)" under 32-bits version...'
+	@$(MATLAB) -maci -nodesktop -nodisplay -nosplash -nojvm -r \
+		'mex  $(CFLAGS) $(OBJ) $(LDFLAGS) CC=$(CC) CXX=$(CXX); exit;'
+	@touch isInside.mexmaci
+	@echo 'If you want to use "$(OBJ)"  on 32-bit version, you must start MATLAB with "-maci" option from shell, e.g. "matlab -maci".'
+endif
+
+distclean:
+	@-rm Makefile

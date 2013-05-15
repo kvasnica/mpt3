@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>getValueByIndex</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Retrieve stored data for the element by index.
+	</info>
+	
+	<syntax>v = getValueByIndex(h,index)</syntax>
+	<syntax>v = h.getValueByIndex(index)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Retrieve value <tt>v</tt> for the element stored under the index <tt>index</tt>. If the index is 
+        greater as the total number of elements, an error is thrown.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>h</name>
+        <descr>Initialized HashTable object with at least 1 element.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="HashTable"/>
+	</input>
+
+    <input required="true">
+		<name>index</name>
+        <descr>Index of the element to extract.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="double"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>v</name>
+        <descr>Data stored under the given key.</descr>
+		<class name="struct"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+        <descr>Construct empty table</descr>		
+        <cmd>h = HashTable</cmd>
+        <descr>Put 10 elements inside the table.</descr> 
+        <cmd>for i=1:10, h.put(i,struct('data',[i,2-i,3+i])); end </cmd>		
+        <descr> Get the data for the sixth element </descr>
+        <cmd> h.getValueByIndex(6) </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>HashTable</related>
+    <related>put</related>
+    <related>getIndex</related>
+    <related>getKey</related>
+    <related>getValueByKey</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

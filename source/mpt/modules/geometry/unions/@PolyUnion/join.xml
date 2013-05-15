@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>join</function>
+	
+	<info>Merges arrays of polyunions to one polyunion object.</info>
+	<syntax>Un = U.join</syntax>
+    <syntax>Un = join(U)</syntax>
+
+	<descr>
+        Merging of array of <tt>PolyUnion</tt> objecs in the same dimension to single <tt>PolyUnion</tt> object.
+        If the union has <tt>Bounded</tt> and <tt>FullDim</tt> properties set as true, then all polyhedra must
+        be bounded and full-dimensional.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+      <descr>Array of <tt>PolyUnion</tt> objects in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+    <output>
+        <name>Un</name>
+      <descr>Single <tt>PolyUnion</tt> object.</descr>
+	  <class name="PolyUnion"/>        
+    </output>
+    
+    <example>
+        <descr>Create a partition by triangulation of polyhedron <i>P</i>.</descr>        
+        <cmd>P = 5*ExamplePoly.randVrep('d',3);</cmd>
+        <descr> Triangulate the polyhedron </descr>
+        <cmd> T = P.triangulate; </cmd>
+        <descr>Create the array of unions of polyhedra and specifying some properties.</descr>
+        <cmd> U(1) = PolyUnion('Set',T(1:4),'fulldim',true,'bounded',true); </cmd>
+        <cmd> U(2) = PolyUnion('Set',T(5:6)); </cmd>
+        <cmd> U(3) = PolyUnion('Set',T(7:end),'bounded',true); </cmd>
+        <descr> All unions are in the same dimension and all polyhedra are bounded and full-dimensional, therefore we can merge the unions.</descr>
+        <cmd> Un = U.join </cmd>
+    </example>
+    
+    <related>merge</related>
+    <related>isFullDim</related>
+    <related>isBounded</related>
+
+	<!-- multiple authors can be defined -->
+    <author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

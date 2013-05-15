@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>reference</function>
+  
+  <info>
+    Penalizes difference of a signal from a given reference level
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    Adding this filter to an MPC setup will modify the objective
+    function in such a way that the difference between actual signal
+    and a prescribed reference signal is minimized.<br/>
+
+    To enable this filter, call <tt>model.x.with('reference')</tt>,
+    which will enable tracking of state references by minimizing <i>\|
+    Q (x - x_{ref}) \|_p</i>. You can also add tracking to input and/or
+    output signals by using <tt>model.u.with('reference')</tt> and
+    <tt>model.y.with('reference')</tt>, respectively.<br/>
+
+    Once the filter is enabled, the reference trajectory can be
+    specified in the signal's <tt>reference</tt> property:<br/>
+
+    <tt>model.x.reference = [0.5; -1]</tt><br/>
+
+    The reference signal can also be time-varying. In such a case the
+    <i>k</i>-th column of the reference is interpreted as the
+    reference to be used at the <i>k</i>-th step of the prediction:<br/>
+
+    <tt>model.u.reference = [-1 -2 0 0 1]</tt><br/>
+
+    The filter can be removed by calling
+    <tt>model.x.without('reference')</tt>. 
+
+  </descr>
+
+  <example>
+    <descr>Create a 1D LTI system <i>x^+ = 0.9x + u</i>.</descr>
+    <cmd>model = LTISystem('A', 0.9, 'B', 1);</cmd>
+
+    <descr>Enable tracking of state and input references.</descr>
+    <cmd>
+		model.x.with('reference'); 
+		model.u.with('reference');
+		model.x.reference = 0.4;
+		model.u.reference = 1;
+		model.x.penalty = Penalty(1, 2);
+		model.u.penalty = Penalty(1, 2);
+	</cmd>
+
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

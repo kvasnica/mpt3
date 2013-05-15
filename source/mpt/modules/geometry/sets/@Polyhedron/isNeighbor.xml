@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isAdjacent</function>
+	
+	<info>Test if a polyhedron is close along a facet to another polyhedron.</info>
+	<syntax>ts  = P.isNeighbor(Q)</syntax>
+	<syntax>ts  = isNeighbor(P,Q)</syntax>
+    <syntax>[ts, iP, iQ] = isNeighbor(P,Q,fP,fQ)</syntax>
+
+	<descr>
+        Return true if the polyhedron <i>P</i> is close to polyhedron <i>Q</i> along any facet.
+        Both polyhedrons must be in H-representation. If they are not, the irredundant
+        H-representation will be computed.
+        
+        The function tests if polyhedra <i>P</i> and <i>S</i> are close to each other
+        along any facet by the following test. For each of the facets, compute its the Chebyshev centre, 
+        and generate a point outside of the set <i>P</i> that is close to the Chebyshev center.         
+        If the polyhedron <i>Q</i> contains this point, it is considered as neighbor, otherwise not.        
+        
+        Note: This is experimental code.    
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="true">
+	  <name>Q</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>fP</name>
+      <descr>Index of a facet to test from polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</input>
+	<input required="false">
+	  <name>fQ</name>
+      <descr>Index of a facet to test from polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+      <descr>Logical statement if the polyhedron <i>P</i> is close to <i>Q</i> along the facet.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+	<output>
+	  <name>iP</name> 
+      <descr>Index of a facet from polyhedron <i>P</i> that is closest to the polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</output>
+	<output>
+	  <name>iQ</name> 
+      <descr>Index of a facet from polyhedron <i>Q</i> that is closest to the polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</output>
+
+    <!--
+	<example>
+       <descr>Create two neighboring polyhedra <i>P</i> and <i>Q</i>.</descr>
+       <cmd> P = Polyhedron('lb',[-1;-1],'ub',[2;2]); </cmd>
+       <cmd> Q = Polyhedron('Ae',[0 1],'be',2); </cmd>
+       <descr> Plot the polyhedrons to see that they are very close to each other. </descr>
+       <cmd> plot([P,Q]); </cmd>
+       <descr> Polyhedrons are not adjacent </descr>
+       <cmd> [ts, iP, iQ] = P.isAdjacent(Q) </cmd>
+       <descr> but are considered as neighbors </descr>
+       <cmd> [ts, iP, iQ] = P.isNeighbor(Q) </cmd>       
+	</example>
+    -->
+
+	<!-- multiple related function can be defined -->
+	<related>isAdjacent</related>	
+
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+	<license macro="GPL2"/>
+</help>

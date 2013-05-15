@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>HashTable</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Matlab wrapper for LinkedHashMap Java utility.
+	</info>
+	
+	<syntax>h = HashTable</syntax>
+	<syntax>h = HashTable(a,b,c)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>HashTable</tt> class is a frontend to java object <tt>LinkedHashMap</tt> that implements general 
+        hash tables and preserves order of added elements. This is especially important for storing parametric
+        solutions because the regions are stored as they were found during the algorithm. The applicablity of 
+        this class is not only limited to parametric solution, the user can deploy it also for storing any kind
+        of data. The detailed documentation for <tt>LinkedHashMap</tt> can be found at:
+        <em>http://docs.oracle.com/javase/1.4.2/docs/api/java/util/LinkedHashMap.html</em>
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="false">
+		<name>a</name>
+        <descr>During the constrution of <tt>HashTable</tt> object, any arguments are accepted
+            and stored under <tt>Data</tt> property. This data will contained with the object and 
+        the user can alter them anytime by modifying <tt>Data</tt> property. </descr>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>h</name>
+		<descr>HashTable object</descr>
+		<class name="HashTable">
+		</class>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+            <descr>Construct empty table</descr>		
+            <cmd>h = HashTable</cmd>
+    </example>
+    <example>
+		<descr>Construct empty table and store some data with the table.</descr>
+        <descr>Declare the data, e.g.</descr> 
+        <cmd silent="true"> data.name = 'meas1'; </cmd>
+        <cmd silent="true"> data.author = 'Frank'; </cmd>
+        <cmd silent="true"> data.date = date; </cmd>
+        <cmd silent="true"> data.data = [1, 1, 1.03, 1.2, 1.5, 1.6, 1.8, 1.88, 1.9, 1.91]; </cmd>
+        <descr> Put data inside the constructor </descr>
+        <cmd> h = HashTable(data) </cmd>
+        <descr> Data are available under <tt>Data</tt> property </descr>
+        <cmd> h.Data </cmd>
+	</example>
+
+
+	<!-- multiple related function can be defined -->
+	<related>put</related>
+	<related>getKey</related>
+    <related>getIndex</related>
+    <related>removeByKey</related>
+    <related>removeByIndex</related>
+    <related>elem</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

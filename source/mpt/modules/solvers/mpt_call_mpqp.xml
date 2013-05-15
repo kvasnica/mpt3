@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_mppl</function>
+	
+	<info>
+		A gateway function to MPQP solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_mpqp(S)</syntax>
+
+    <descr>
+        The function call to MPQP solver from <tt>Opt</tt> class.
+        
+        Using option settings for MPQP solver taken from MPT2.6.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<input required="true">
+		<name>S</name>
+        <descr>Object of the <tt>Opt</tt> class</descr>
+        <class name="Opt">
+			<field>
+				<name>H</name>
+				<descr>Quadratic part of the objective function.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>pF</name>
+                <descr>Linear part of the objective function for parameters.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>pB</name>
+                <descr>Right hand side of the inequality constraints for parameters <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>pE</name>
+                <descr>Right hand side of the equality constraints for parameters <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the decision variables <i>x \ge \text{lb}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the decision variables <i>x \le \text{ub}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Ath</name>
+                <descr>Linear part of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>bth</name>
+                <descr>Right hand side of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>           
+            <field>
+                <name>M</name>
+                <descr>Linear matrix involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>q</name>
+                <descr>Right hand side vector involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Q</name>
+                <descr>Linear matrix involved in parametric formulation of LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>                                    
+            <field>
+                <name>n</name>
+                <descr>Number of decision variables.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>d</name>
+                <descr>Number of parameters.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e} + E\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved</descr>
+                <class name="char"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>varOrder</name>
+                <descr>Order of variables if the problem was processed by YALMIP first.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Internal</name>
+                <descr>Internal property of <tt>Opt</tt> class.</descr>
+                <class name="struct"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>recover</name>
+                <descr>Affine map for MPQP problems if there were any equalities present and have been removed by <tt>eliminateEquations</tt> method.</descr>
+                <class name="struct">
+                    <field>
+                        <name>Y</name>
+                        <descr>Matrix of the affine map <i>x = \text{Y}y + \text{th}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>.
+                            The map is from the optimization variables involed in the reduced MPQP <i> y(\theta) \mapsto x </i> to the original MPQP.
+                        </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                    <field>
+                        <name>th</name>
+                        <descr>Matrix of the affine map <i>x = \text{Y}y + \text{th}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>.
+                            The map is from the optimization variables involed in the reduced MPQP <i> y(\theta) \mapsto x </i> to the original MPQP.
+                        </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                </class>
+                <default>[]</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution</descr>
+				<class name="PolyUnion"/>
+			</field>
+            <field>
+				<name>mpqpsol</name>
+				<descr>Structure with the solution as returned by MPQP solver.</descr>
+                <class name="struct">
+                    <field>
+                        <name>Pn</name>
+                        <descr>Array of polytopes in MPT2 format. </descr>
+                        <class name="polytope"/>
+                    </field>
+                    <field>
+                        <name>Fi</name>
+                        <descr>Cell array of matrices of the control law given as <i>x=F_{i}\theta + G_{i}</i>. </descr>
+                        <class name="cell"/>
+                    </field>
+                    <field>
+                        <name>Gi</name>
+                        <descr>Cell array of matrices of the control law given as <i>x=F_{i}\theta + G_{i}</i>. </descr>
+                        <class name="cell"/>
+                    </field>
+                    <field>
+                        <name>activeConstraints</name>
+                        <descr>Index set of active constraints</descr>
+                        <class name="cell"/>
+                    </field>
+                    <field>
+                        <name>Phard</name>
+                        <descr>Feasible domain.</descr>
+                        <class name="polytope"/>
+                    </field>
+                    <field>
+                        <name>details</name>
+                        <descr>More details about the solution and the computation.</descr>
+                        <class name="struct"/>
+                    </field>
+                </class>
+			</field>
+<!--
+            <field>
+				<name>recover</name>
+				<descr>Affine map from <i>x = \text{Y}y + \text{th}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i> from the reduced MPLP 
+                problem to original MPLP problem.</descr>
+				<class name="struct"/>                
+			</field>
+-->            
+        </class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>Opt</related>    
+    <related>mpt_solvemp</related>    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

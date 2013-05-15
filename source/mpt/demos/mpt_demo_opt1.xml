@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_opt1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstration for using Opt interface
+	</info>
+	
+    <syntax>mpt_demo_opt1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Demonstration for using <tt>Opt</tt> interface for solving optimization problems
+	</descr>
+
+    <example>
+        <descr> Formulate LP problem <i>\min ~ {f}^{T}x ~ \text{s.t.:} ~ Ax\le b </i>. </descr>
+        <cmd> f = randn(8,1); </cmd>
+        <cmd> A = randn(25,8); </cmd>
+        <cmd> b = 5*rand(25,1); </cmd>
+        
+        <descr>  Formulate LP </descr>
+        <cmd> problem1 = Opt('f',f,'A',A,'b',b) </cmd>
+        
+        <descr> Solve LP </descr>
+        <cmd> res1 = problem1.solve </cmd>    
+    </example>
+    
+    <example>
+        <descr> Formulate MPLP problem <i>\min ~ {f}^{T}x ~ \text{s.t.:} ~ Ax\le b + B\theta </i>. </descr>
+        <descr> Do not forget to include bounds on the parameters <i> -1\le \theta \le 1 </i>. </descr>
+        
+        <descr> Formulate MPLP </descr>
+        <cmd> problem2 = Opt('f',f,'A',A,'b',b,'pB',ones(25,1),'Ath',[-1;1],'bth',[1;1]) </cmd>
+        
+        <descr> Solve MPLP </descr>
+        <cmd> res2 = problem2.solve </cmd>
+        
+        <descr> Solution is stored as "primal", we can plot it </descr>
+        <cmd> res2.xopt.fplot('primal',1,'Polyhedron',true,'LineWidth',3), title('Primal solution') </cmd>
+    </example>
+
+    <example>
+        <descr> Formulate MPLP problem using MPT2-solver </descr>
+        <descr> Formulate MPLP with MPT2-MPLP solver </descr>
+        <cmd> problem3 = Opt('f',f,'A',A,'b',b,'pB',ones(25,1),'Ath',[-1;1],'bth',[1;1],'solver','MPLP') </cmd>
+        
+        <descr> Solve MPLP using MPT2 </descr>
+        <cmd> res3 = problem3.solve </cmd>
+        
+        <descr> Plot the objective value </descr>
+        <cmd> res3.xopt.fplot('obj',1,'Polyhedron',true,'LineWidth',3), title('Objective value') </cmd>
+        
+    </example>
+
+    <example>
+        <descr> Formulate problem using YALMIP </descr>
+        <descr> Model data </descr>
+        <cmd> A = [0.5 -1;1 0]; B = [1;0]; nu = 1; </cmd>
+        <descr> MPC data </descr>
+        <cmd> Q = eye(2); R = 1; N = 4; </cmd>
+        <descr> Initial state </descr>
+        <cmd> x0 = sdpvar(2,1); </cmd>
+        
+        <descr> Setup the problem </descr>
+        <cmd> u = sdpvar(nu,N); </cmd>
+        <cmd> constraints = []; </cmd>
+        <cmd> objective = 0; </cmd>
+        <cmd> x = x0; </cmd>
+        <cmd>
+            for k = 1:N
+            x = A*x + B*u(k);
+                objective = objective + norm(Q*x,1) + norm(R*u(k),1);
+                constraints = [constraints, -1 &lt;= u(k) &lt;= 1, -5 &lt;= x &lt;= 5];
+            end
+        </cmd>
+        
+        <descr> Formulate the problem </descr>
+        <cmd> problem4 = Opt(constraints, objective, x0, u) </cmd>
+        
+        <descr> Solve the problem </descr>
+        <cmd> res4 = problem4.solve </cmd>
+        
+        <descr> Plot the partition </descr>
+        <cmd> res4.xopt.plot </cmd>
+        
+    </example>
+    <example> 
+        <descr> Formulate problem using MPT2 </descr>            
+        <descr> Process model </descr>
+        <cmd>
+                sysStruct.A = [1 1; 0 1];
+                sysStruct.B = [1; 0.5];
+                sysStruct.C = [1 0; 0 1];
+                sysStruct.D = [0;0];
+                sysStruct.ymin = [-5; -5];
+                sysStruct.ymax = [5; 5];
+                sysStruct.umin = -1;
+                sysStruct.umax = 1;
+        </cmd>
+        <descr> Problem formulation </descr>
+        <cmd>
+            probStruct.norm=2;
+            probStruct.Q=eye(2);
+            probStruct.R=1;
+            probStruct.N=5;
+            probStruct.subopt_lev=0;
+        </cmd>
+        <descr> Generate matrices of the appropriate formulation of parametric problem. </descr>
+        <cmd> Matrices = mpt_constructMatrices(sysStruct,probStruct);</cmd>
+        <descr> Define the problem using <tt>Opt</tt> class.</descr>
+        <cmd> problem5 = Opt(Matrices) </cmd>
+        <descr> Solve the problem </descr>
+        <cmd> res5 = problem5.solve </cmd>
+        <descr> Plot he objective function </descr>
+        <cmd> res5.xopt.fplot('obj') </cmd>
+    </example>
+    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_sets1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstrates construction and basic properties of the Polyhedron object
+	</info>
+	
+    <syntax>mpt_demo_sets1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        This demo presents the basic usage for the <tt>Polyhedron</tt> object. In particular 
+        it is shown how to:
+        <ul>
+            <li> create <tt>Polyhedron</tt> objects </li>
+            <li> access data stored in the <tt>Polyhedron</tt> object </li>
+            <li> query basic properties of the <tt>Polyhedron</tt> set </li>
+        </ul>
+	</descr>
+
+    <related>mpt_demo_sets2</related>
+    <related>mpt_demo_sets3</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

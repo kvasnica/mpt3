@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>horzcat</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Horizontal concatenation for convex set objecs.
+	</info>
+	
+	<syntax>S = [S1, S2]</syntax>
+	<syntax>S = horzcat(S1,S2)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Overloaded method for horizontal concatenation of convex sets. It is not possible 
+        to concatenate objects of different type to the same array (e.g. <tt>Polyhedron</tt> and <tt>YSet</tt>). 
+        Similarly, it is not possible to concatenate into matrices, only vectors are allowed.
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S1</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+	<input required="false">
+		<name>S2</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class that is of the same type as <tt>S1</tt>.</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>S</name>
+        <descr>The array of the convex sets.</descr>
+		<class name="ConvexSet"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> We have two sets described in Yalmip.</descr>
+        <cmd> x = sdpvar(1); </cmd>
+        <cmd> S1 = YSet(x,[x&lt;=1]); </cmd>
+        <cmd> S2 = YSet(x,[x&gt;=2]); </cmd>
+        <descr> Horizontal concanation gives an array with 2 elements </descr>
+        <cmd> S = [S1, S2] </cmd>
+    </example>
+    <example> 
+        <descr> It is not possible to create array with the mixed sets. </descr>
+        <descr> Define Yalmip set first</descr>
+        <cmd> x = sdpvar(2,1); </cmd>
+        <cmd> S = YSet(x, [0.5*x(1)-4*x(2)&lt;=1]); </cmd>
+        <descr> Define Polyhedron object</descr>
+        <cmd> P = Polyhedron([1 0; -1 -1]); </cmd>
+        <descr> Concatenation of <tt>YSet</tt> and <tt>Polyhedron</tt> is not allowed </descr>
+        <cmd> [S, P] </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>vertcat</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

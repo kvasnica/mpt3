@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>penalty</function>
+  
+  <info>
+    Penalizes the signal in the MPC cost function
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter, which is enabled by default, allows to penalize a
+    particular signal in the MPC cost function. The penalty function
+    can be specified by setting the <tt>model.signal.penalty</tt>
+    property to an instance of the <tt>Penalty</tt> class (see
+    "<tt>help Penalty</tt>" for more information). Penalization of
+    state variables is achieved by setting <tt>model.x.penalty</tt>,
+    while <tt>model.u.penalty</tt> and <tt>model.y.penalty</tt>
+    specify penalization of input and output variables, respectively.<br/>
+
+    Note that this filter only adds penalties to signals predicted at
+    steps <i>k = 0, \ldots, N-1</i> of the prediction
+    horizon. Therefore setting <tt>model.x.penalty</tt> will NOT
+    penalize the final predicted state (i.e., <i>x_N</i>). To add a
+    terminal state penalty, use the <tt>terminalPenalty</tt> filter
+    (see "<tt>help SystemSignal/filter_terminalPenalty</tt>").<br/>
+
+    To disable penalization of a signal, set its <tt>penalty</tt>
+    property to an empty matrix. 
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

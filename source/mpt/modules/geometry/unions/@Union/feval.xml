@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>feval</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Evaluates function over union of convex sets.
+	</info>
+	
+	<syntax>y = feval(U,x,name)</syntax>
+	<syntax>y = U.feval(x,name)</syntax>
+    <syntax>y = U.feval(x)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Evaluates function for given value of the point <tt>x</tt> over the union of convex sets <tt>U</tt> characterized
+        by the name <tt>name</tt>. If the string <tt>name</tt> is omitted, all functions are evaluated.
+        The dimension of the vector <tt>x</tt> must be the same as the dimension of all sets in the union.
+        The evaluation is based on the following approach:
+        <ol>
+            <li>Find the index of the set where the point <tt>x</tt> lies. </li>
+            <li>Evaluate the function over the set determined by given index. </li>
+        </ol>
+        If the point lies outside of the union, the result is empty.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Union of sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="Union"/>
+	</input>
+	<input required="true">
+		<name>x</name>
+        <descr>A point given as a real vector with the same dimension as the convex set.</descr>
+		<class name="double"/>
+	</input>
+	<input>
+		<name>name</name>
+        <descr>Name of the function to evaluate. The string must match one of the stored function names.
+        For multiple names, provide <tt>pos</tt> as a cell array of strings.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>y</name>
+        <descr>Value of the function for the point <tt>x</tt> over the union of convex sets <tt>U</tt>.</descr>
+		<class name="double or cell"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> PWA function over two Yalmip sets and polyhedron</descr>
+        <cmd> x = sdpvar(2,1); </cmd>
+        <cmd> A = [1 -0.2; 0.4 -1]; </cmd>
+        <cmd> F = [ norm(A*x-[1;1])&lt;=2; [1 -2]*x&lt;=0.4 ]; </cmd>
+        <cmd> G = [ [1 -2]*x&gt;=0.4; -1.5&lt;= x &lt;=1.5 ]; </cmd>
+        <descr> Create <tt>YSet</tt> objects out of Yalmip constraints. </descr>
+        <cmd> Y(1) = YSet(x,F); </cmd>
+        <cmd> Y(2) = YSet(x,G); </cmd>
+        <descr> Add two functions "a" and "b" to the sets. </descr>
+        <cmd> Y.addFunction(AffFunction(2*eye(2),[1;-1]),'a'); </cmd>
+        <cmd> Y.addFunction(AffFunction(3*eye(2),[-1;1]),'b'); </cmd>
+        <descr> Create the <tt>Union</tt> object. </descr>
+        <cmd> U = Union(Y); </cmd>
+        <descr> Add an affine set to the union </descr>
+        <cmd> P = Polyhedron('Ae',[0 1],'be',-1.5)</cmd>
+        <cmd> P.addFunction(AffFunction(4*eye(2),[1;1]),'a');</cmd>
+        <cmd> P.addFunction(AffFunction(eye(2)),'b');</cmd>
+        <cmd> U.add(P); </cmd>
+        <descr> Evaluate all functions for the point <i>v=(1,1)</i> </descr>        
+        <cmd> v = [1;1]; </cmd>
+        <cmd> y1 = U.feval(v) </cmd>
+        <descr> The output is a cell that contains the values for all functions defined above the point <i>v</i>.</descr>
+        <descr> We can provide the function name to evaluate just one function. </descr>
+        <cmd> y2 = U.feval([1,-1.5],'b') </cmd>
+        <descr> The output is again a cell, because this point is contained in two sets. In particular, it lies exactly 
+            on the boundary of those sets.</descr>
+        <descr> Evaluate the first function "a" for the point (2,1).</descr>
+        <cmd> y3 = U.feval([2,1],'a') </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>fplot</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>affineHull</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Computes affine hull of a convex set.
+	</info>
+	
+	<syntax>He = affineHull(Set)</syntax>
+	<syntax>He = Set.affineHull</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Compute an implicitly-defined affine hull of the convex <tt>Set</tt>.
+        The output is a real matrix <tt>He</tt> that defines the affine set
+        <latex>
+            \begin{equation}
+            \Big\{ x ~ \vline ~ \texttt{He} \begin{pmatrix} x \\ 1 \end{pmatrix}= 0 \Big\}
+            \end{equation}           
+        </latex>
+        If <tt>He</tt> is empty, then the affine hull is empty.
+        The affine hull function for general convex sets will only
+        function for bounded sets. If you want the affine hull of an
+        unbounded set, then intersect your set with a large
+        full-dimensional box.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>H</name>
+        <descr>The real matrix that defines the affine hull.</descr>
+		<class name="double"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> Construct a set by intersecting a circle, linear equality and inequality constraints using YALMIP. </descr>
+        <descr> Define variable first</descr>
+        <cmd> x = sdpvar(2,1); </cmd>
+        <descr> Define a set <tt>S</tt> using <tt>YSet</tt> class  </descr>
+        <cmd> opts = sdpsettings('solver','sedumi','verbose',0); </cmd>
+        <cmd> S = YSet(x, [norm(x)&lt;=1; x(1)-x(2)==0.2; [1 -0.5; 0.3, 0.8]*x&lt;=[0.5;0.6]], opts); </cmd>
+        <descr> We can plot the set</descr>
+        <cmd> S.plot </cmd>
+        <descr> Compute the affine hull </descr>
+        <cmd> S.affineHull </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>innerApprox</related>
+    <related>outerApprox</related>
+    <related>isEmptySet</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

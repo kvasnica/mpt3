@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<help>
+  <descr title="Installation steps">
+    <ol>
+      <li>Remove any previous installations of MPT2 and YALMIP from your path: <br />
+            <tt>rmpath(genpath(fileparts(which('mpt_init'))))</tt><br />
+            <tt>rmpath(genpath(fileparts(which('yalmipdemo'))))</tt><br />
+        </li>
+        <li>Create a directory where MPT3 and accompanying toolboxes will be installed to. Call the directory <tt>tbxmanager</tt> for instance.</li>
+      <li>Go to that directory in Matlab.</li>
+      <li>Install tbxmanager, our new mechanism for installing and updating free Matlab toolboxes:<br />
+            <tt>urlwrite('http://control.ee.ethz.ch/~mpt/tbx/tbxmanager.m', 'tbxmanager.m');</tt><br />
+            <tt>savepath</tt><br />
+      </li>      
+      <li>Install MPT3 and required toolboxes <br />
+          <tt>tbxmanager install mpt3 mpt3doc cddmex fourier glpkmex hysdel2 lcp sedumi yalmip </tt><br />
+      </li>
+      <li>Edit startup.m and put these lines there:<br/>
+          <tt>tbxmanager restorepath</tt><br />
+          <tt>mpt_init</tt><br />
+      </li>
+      <li>Type <tt>mpt_init</tt> to initialize MPT3.</li>
+    </ol>
+  </descr>
+  
+  <descr title="First steps">
+    Start by exploring MPT3 demos which can be found in the
+    <tt>demos</tt> directory.
+  </descr>
+
+</help>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>removeAllFunctions</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Remove all functions that are associated to this set.
+	</info>
+	
+	<syntax>Set.removeAllFunctions</syntax>
+	<syntax>removeAllFunctions(Set)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Removes all <tt>Function</tt> objects associated to this set. 
+    </descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>Set</name>
+        <descr>Modified object of <tt>ConvexSet</tt> class without the function handles.</descr>
+		<class name="ConvexSet"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> Create a polyhedron and add two functions to the set.</descr>
+        <cmd> P=ExamplePoly.randHrep; </cmd>
+        <cmd> P.addFunction(AffFunction([1,0],-1),'a') </cmd>
+        <cmd> P.addFunction(AffFunction([-3,5],2),'b') </cmd>
+        <descr> The set contains now two functions. We can remove this functions at once with the following command </descr>
+        <cmd> P.removeAllFunctions </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>addFunction</related>
+    <related>removeFunction</related>
+    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

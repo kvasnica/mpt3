@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>block</function>
+  
+  <info>
+    Adds a move blocking constraint
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    Adding this filter to an MPC setup will modify the constraints in
+    such a way that the differences between several consecutive
+    optimization variables are equal to zero.<br/>
+
+    In the most common scenario, adding this filter to a signal
+    representing control inputs will add a move-blocking constraint,
+    which is equivalent to setting a control horizon.<br/>
+
+    To enable this filter, call <tt>model.u.with('block')</tt> (note
+    that you can add this constrain to any type of signals, e.g., to
+    state and output signals as well).<br/>
+
+    Once the filter is enabled, parameters of the blocking scheme can
+    be specified in the <tt>model.u.block.from</tt> and
+    <tt>model.u.block.to</tt> parameters. Setting these values to
+    non-zero integers will add the constraint <i>u_{from}  =
+    u_{from+1} = \cdots = u_{to-1} = u_{to}</i>.<br/>
+
+    The filter can be removed by calling
+    <tt>model.x.without('block')</tt>. 
+
+  </descr>
+
+  <example>
+    <descr>Create a 1D LTI system <i>x^+ = 0.9x + u</i>.</descr>
+    <cmd>model = LTISystem('A', 0.9, 'B', 1);</cmd>
+
+    <descr>Add constraints and penalties</descr>
+    <cmd>
+		model.x.min = -4; model.x.max = 4;
+		model.u.min = -1; model.u.max = 1;
+		model.x.penalty = Penalty(1, 2);
+		model.u.penalty = Penalty(1, 2);
+	</cmd>
+
+	<descr>Create an MPC controller with prediction horizon 10</descr>
+    <cmd>M = MPCController(model, 5);</cmd>
+
+	<descr>Tell the controller that only the first two control moves
+    are free, the rest are to fixed</descr>
+    <cmd>
+		M.model.u.with('block');
+		M.model.u.block.from = 2;
+		M.model.u.block.to = 5;
+		x0 = 4;
+		[~, ~, openloop] = M.evaluate(x0);
+		openloop.U
+	</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

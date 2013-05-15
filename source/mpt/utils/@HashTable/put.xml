@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>put</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Insert data into HashTable object.
+	</info>
+	
+	<syntax>t = put(h,key,value)</syntax>
+	<syntax>t = h.put(key,value)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Insert element into HashTable that is characterized with unique <tt>key</tt> and store related data
+        under <tt>value</tt>. The <tt>key</tt> can be a string or an integer array that uniquely
+        represent the element. The <tt>value</tt> is restricted to be a struct class.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>h</name>
+        <descr>Initialized HashTable object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="HashTable"/>
+	</input>
+
+    <input required="true">
+		<name>key</name>
+        <descr>Key associated to given element which can be a string or unique integer array.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char or double"/>
+	</input>
+
+    <input required="true">
+		<name>value</name>
+        <descr>Data associated to given element which must be given in struct format.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="struct"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>t</name>
+        <descr>The logical scalar that informs whether there appeared error (true) during the insertion, 
+                or it went ok (false). </descr>
+		<class name="logical"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+        <descr>Construct empty table</descr>		
+        <cmd>h = HashTable</cmd>
+        <descr>Put first element inside the table with <tt>key</tt>as a string and some data. </descr> 
+        <cmd> h.put('first',struct('data',1)); </cmd>		
+        <descr>Put second element with <tt>key</tt> as integer and another data.</descr>
+        <cmd> h.put(2,struct('data',2)) </cmd>
+	</example>
+
+    <example> 
+        <descr> Put 5 elements inside the table using a FOR loop. </descr>
+        <cmd> h = HashTable; </cmd>
+        <cmd> for i=1:5, h.put(i,struct('iterator',i)); end </cmd>
+        <cmd> h </cmd>
+        <descr> Another element with the same key cannot be added </descr>
+        <cmd> h.put(1,struct('iterator',1)) </cmd>
+        <cmd> h </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>HashTable</related>
+    <related>getIndex</related>
+    <related>getKey</related>
+    <related>removeByKey</related>
+    <related>removeByIndex</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

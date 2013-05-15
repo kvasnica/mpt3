@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<help>
+  <descr title="Model Predictive Control">
+    <ol>
+      <li>Modeling of linear, affine, piecewise affine and MLD systems.</li>
+      <li>On-line and explicit MPC.</li>
+      <li>Closed-loop simulation.</li>
+      <li>Invariant set computation.</li>
+    </ol>
+  </descr>
+
+  <descr title="Geometric library">
+  <ol>
+    <li>Bounded and unbounded polyhedra.</li>
+    <li>Lower-dimensional polyhedra.</li>
+    <li>General convex sets.</li>
+    <li>Operations on unions of convex sets.</li>
+  </ol>
+  </descr>
+
+  <descr title="Parametric optimization">
+  <ol>
+    <li>Parametric linear programming solvers.</li>
+    <li>Parametric quadratic programming solvers.</li>
+    <li>Parametric linear complementarity solvers.</li>
+  </ol>
+  </descr>
+
+  <descr title="Interfaces to standalone solvers">
+  <ol>
+    <li>Linear programming: CDD, GLPK, SeDuMi, CLP, QPOASES, CPLEX,
+    GUROBI.</li>
+    <li>Quadratic programming: SeDuMi, CLP, QPOASES, QPSPLINE, CPLEX,
+    GUROBI.</li>
+    <li>Mixed-integer optimization: GLPK, CPLEX, GUROBI.</li>
+  </ol>
+  </descr>
+
+</help>

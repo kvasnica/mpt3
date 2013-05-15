@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>project</function>
+  
+  <info>
+      Compute the projection of the point onto this set.
+  </info>
+  <syntax>s = S.project(x)</syntax>
+  <syntax>s = project(S, x)</syntax>
+  
+  <descr>
+      Compute the projection of the point <tt>x</tt> onto this set.
+      The projection problem can be also explained as finding the closest point <tt>y</tt> from the set
+      <tt>S</tt> to the given point <tt>x</tt>.
+  </descr>
+  
+  <input required="true">
+    <name>S</name>
+    <descr>A convex set described as <tt>YSet</tt> object.</descr>
+    <class name="YSet"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point given as vector. Note that for <tt>YSet</tt> with symmetric matrix variable,
+    the point <tt>x</tt> must be given as vector with symmetric terms.</descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>s</name>
+    <descr>The output structure with the information about the projected point and the exit status from the optimization.</descr>
+    <class name="struct">
+            <field>
+				<name>exitflag</name>
+				<descr>Exit status from the optimization, i.e. an integer value that informs 
+                if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>            
+            <field>
+				<name>x</name>
+                <descr>Projected point that lies inside the set <tt>S</tt>.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>dist</name>
+                <descr>The distance between the projected point and the given point <tt>x</tt>.                
+                </descr>
+				<class name="double"/>
+			</field>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Create a set <tt>S</tt> in 2D as follows.</descr>
+    <cmd>x = sdpvar(2,1);</cmd>
+    <cmd>F = [x'*x-2*x&lt;=1];</cmd>
+    <cmd>S = YSet(x,F);</cmd>
+    <descr>Compute the projection of the point v=[-0.5; 1.5].</descr>
+    <cmd>v = [-0.5; 1.5];</cmd>
+    <cmd>s = S.project(v);</cmd>
+    <descr> The computed extreme point is lying the edge of the set and it is obviously the point [0;1]</descr>
+    <descr> We can plot the set and the points <tt>s.x</tt>, <tt>v</tt>. </descr>
+    <cmd> S.plot; hold on; text(s.x(1),s.x(2),'\bf x'); axis([-1 1.5 -0.5 2]); text(v(1),v(2),'\bf x');</cmd>
+    <descr> The computed distance must be </descr>
+    <cmd> norm(s.x-v) </cmd>
+    <descr> which equals the computed distance </descr>
+    <cmd> s.dist </cmd>
+  </example>
+   
+  <related>contains</related>
+  <related>extreme</related>
+  <related>shoot</related>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+  
+</help>

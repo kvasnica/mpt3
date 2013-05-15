@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_lcp</function>
+	
+	<info>
+		A gateway function to LCP solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_lcp(S)</syntax>
+
+    <descr>
+		The function implements calls to LCP solver based on the optimization problem to be solved.
+        Supported problems are LCP, LP, and QP.
+        
+        If the problem type is LCP, then LCP mex-function is called directly. Otherwise a transformation
+        to LCP problem is performed. Assume that QP/LP is written in a form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{f}^{T}x \label{eq:lcp:QP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b  \label{eq:lcp:QP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:lcp:QP0-eq}
+            \end{eqnarray} 
+        </latex>
+        We want to transform it to 
+        <latex>            
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}{H}_{f}x+{{f}_{f}}^{T}x \label{eq:lcp:QPf-obj}\\
+				\text{s.t.} &amp;&amp; {A}_{f}x \ge  {b}_{f} \label{eq:lcp:QPf-ineq1} \\
+				&amp;&amp; x \ge 0	\label{eq:lcp:QPf-ineq2}
+            \end{eqnarray}
+        </latex>
+        which corresponds to the following LCP
+        <latex>
+            \begin{eqnarray}
+            w - Mz &amp;= &amp; q \\
+            w &amp; \ge &amp; 0 \\
+            z &amp; \ge &amp; 0 \\
+            {w}^{T}z &amp; = &amp;  0        
+            \end{eqnarray}                        
+        </latex>
+        where 
+        <latex>
+            \begin{eqnarray}
+                M &amp; = &amp; \begin{pmatrix} {H}_{f} &amp; -{{A}_{f}}^{T} \\ {A}_{f} &amp; 0  \end{pmatrix} \\
+                q &amp; = &amp; \begin{pmatrix} {f}_{f} \\ -{b}_{f} \end{pmatrix}
+            \end{eqnarray}
+        </latex>
+        
+        If LP or QP contains equality constraints, these are removed first. It is required that the system of 
+        linear equations <i>A_{e}x=b_{e}</i> is consistent, i.e. no linearly dependent rows are found and 
+        the number of equalities is strictly less than number of variables.
+        The principle is based on factorizing equality constraints <i>{A}_{e}x=b_{e}</i> in basic <i> {x}_{Bc} </i>
+        and non-basic variables <i>x_{Nc}</i>, i.e.
+        <latex>
+		   \[
+            A_{e} = 
+            \begin{pmatrix} 
+            A_{e,Bc} &amp; A_{e,Nc}
+            \end{pmatrix}            
+            \]
+		</latex>
+        which gives
+        <latex>
+            \[
+            A_{e,Bc}{x}_{Bc} + A_{e,Nc}{x}_{Nc} = b_{e}
+            \]
+        </latex>
+        where the index sets <tt>Bc</tt>, <tt>Nc</tt> denote the columns from which factored system is built. 
+        The factored submatrix <i>A_{e,Bc}</i> must be invertible in order to express basic variables as 
+        a function of non-basic variables, i.e.
+        <latex>
+            \[
+            {x}_{Bc} = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc}{x}_{Nc} + {{A}_{e,Bc}}^{-1}{b}_{e,Bc}
+            \]
+        </latex>
+        With the substitution
+        <latex> \[ C = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc} \] </latex>
+        and 
+        <latex> \[ D = {{A}_{e,Bc}}^{-1}{b}_{e,Bc} \]</latex>
+        the  relation between basic and non-basic variables is simplified to
+        <latex>
+            \begin{equation}
+            {x}_{Bc} = C{x}_{Nc} + D \label{eq:lcp:xBcNc}
+            \end{equation}
+        </latex>
+        The above QP/LP problem <i>\eqref{eq:lcp:QP0-obj}-\eqref{eq:lcp:QP0-eq}</i> can be expressed only in non-basic variables <i>{x}_{Nc}</i> as follows:
+        <latex>          
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {{x}_{Nc}}^{T}\tilde{H}{x}_{Nc}+{\tilde{f}}^{T}{x}_{Nc} + \tilde{c} \label{eq:lcp:QP1-obj} \\
+				\text{s.t.} &amp;&amp; \tilde{A}{x}_{Nc} \le  \tilde{b} \label{eq:lcp:QP1-ineq} 			
+            \end{eqnarray}             
+        </latex>        
+        where 
+        <latex>
+            \begin{eqnarray}
+             \tilde{H} &amp; = &amp; {C}^{T}{H}_{Bc,Bc}C + {C}^{T}{H}_{Bc,Nc} + {H}_{Nc,Bc}C + {H}_{Nc,Nc} \\
+             \tilde{f} &amp; = &amp; {D}^{T}{H}_{Bc,Bc}C + {D}^{T}{H}_{Nc,Bc} + {{f}_{Bc}}^{T}C + {{f}_{Nc}}^{T} \\
+             \tilde{c} &amp; = &amp; \frac{1}{2}{D}^{T}{H}_{Bc,Bc}D + {{f}_{Bc}}^{T}D \\
+             \tilde{A} &amp; = &amp; {A}_{Bc}C+{A}_{Nc} \\
+             \tilde{b} &amp; = &amp; b - {A}_{Bc}D
+            \end{eqnarray}
+        </latex>
+        Original solution to QP problem <i>\eqref{eq:lcp:QP0-obj}-\eqref{eq:lcp:QP0-eq}</i> can be obtained via relation <i>\eqref{eq:lcp:xBcNc}</i>.
+        
+        Problem <i>\eqref{eq:lcp:QP1-obj}-\eqref{eq:lcp:QP1-ineq}</i> can be transformed to <i>\eqref{eq:lcp:QPf-obj}-\eqref{eq:lcp:QPf-ineq2}</i> 
+        effectively when considering the rank of the matrix <i>\tilde{A}</i>.
+        If the rank of matrix <i>\tilde{A}</i> is less than the number of inequalities in <i>\eqref{eq:lcp:QP1-ineq}</i> 
+        vector <i>x_{N}</i> can be expressed as a difference of two positive numbers, i.e.
+        <latex>
+            \begin{eqnarray}
+            {x}_{Nc} &amp; = &amp; {{x}_{Nc}}^{+} - {{x}_{Nc}}^{-} \\
+            {{x}_{Nc}}^{+} &amp; \ge &amp; 0 \\
+            {{x}_{Nc}}^{-} &amp; \ge &amp; 0 \\
+            \end{eqnarray}
+        </latex>
+        With the substitution
+        <latex>
+            \begin{equation}
+                v = \begin{pmatrix} {{x}_{Nc}}^{+} \\ {{x}_{Nc}}^{-} \end{pmatrix}
+            \end{equation}
+        </latex>
+        and putting back to <i>\eqref{eq:lcp:QP1-obj}-\eqref{eq:lcp:QP1-ineq}</i> we get
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {v}^{T} \begin{pmatrix} \tilde{H} &amp; -\tilde{H} \\ -\tilde{H} &amp; \tilde{H} \end{pmatrix} v
+                + \begin{pmatrix} {\tilde{f}}^{T} &amp; -{\tilde{f}}^{T} \end{pmatrix} {v} + \tilde{c}  \label{eq:lcp:QP2-obj}\\
+				\text{s.t.} &amp;&amp; \begin{pmatrix}-\tilde{A} &amp; \tilde{A} \end{pmatrix} {v} \ge  -\tilde{b} \label{eq:lcp:QP2-ineq}\\
+                &amp; &amp; v \ge 0
+			\end{eqnarray} 
+        </latex>        
+        which is a form equivalent to <i>\eqref{eq:lcp:QPf-obj}-\eqref{eq:lcp:QPf-ineq2}</i>.
+        If the rank of matrix <i>\tilde{A}</i> is greater or equal than the number of inequalities in <i>\eqref{eq:lcp:QP1-ineq}</i>, 
+        we can factorize the matrix <i>\tilde{A}</i> rowwise
+        <latex>
+		   \[
+            \tilde{A} = 
+            \begin{pmatrix} 
+            {\tilde{A}}_{B} \\ {\tilde{A}}_{N}
+            \end{pmatrix}            
+            \]
+		</latex>
+        where <i>B</i>, <i>N</i> are index sets corresponding to rows from which submatrices are built. The factored system
+        <i>\eqref{eq:lcp:QP1-ineq}</i> can be written as
+        <latex>
+            \begin{eqnarray}
+            -{\tilde{A}}_{B}{x}_{Nc} &amp;\ge -\tilde{{b}}_{B}  \\
+            -{\tilde{A}}_{N}{x}_{Nc} &amp;\ge -\tilde{{b}}_{N}            
+            \end{eqnarray}
+        </latex>
+        where the matrix <i>{\tilde{A}}_{B}</i> form by rows in the set <i>B</i> must be invertible. Using the substitution 
+        <latex>
+            \begin{equation}
+                -{\tilde{A}}_{B}{x}_{Nc} = -\tilde{{b}}_{B} + y
+            \end{equation}
+        </latex>
+        the system <i>\eqref{eq:lcp:QP2-obj}\eqref{eq:lcp:QP2-ineq}</i> can be rewritten in variable <i>y</i>
+        <latex>
+            \begin{eqnarray}
+            	\min &amp;&amp;  {\frac{1}{2}} {y}^{T} \left( {{\tilde{A}}_{B}}^{-T}\tilde{H}{{\tilde{A}}_{B}}^{-1} \right) y
+                + \left( -{{\tilde{A}}_{B}}^{-T}\tilde{H}{{\tilde{A}}_{B}}^{-1}\tilde{b}_{B}-{{\tilde{A}}_{B}}^{-T}\tilde{f} \right) {y} + \tilde{c} 
+                \label{eq:lcp:QP3-obj }\\
+				\text{s.t.} &amp;&amp;  {\tilde{A}}_{N}{{\tilde{A}}_{B}}^{-1}y \ge {\tilde{A}}_{N}{{\tilde{A}}_{B}}^{-1}\tilde{b}_{B}-\tilde{b}_{N} \label{eq:lcp:QP3-ineq1}\\
+                            &amp;&amp;   y \ge 0 \label{eq:lcp:QP3-ineq2}
+            \end{eqnarray}
+        </latex>
+        which is equivalent to <i>\eqref{eq:lcp:QPf-obj}-\eqref{eq:lcp:QPf-ineq2}</i>.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+		<descr>Structure of the Opt class.</descr>
+        <class name="struct">
+			<field>
+				<name>H</name>
+				<descr>Quadratic part of the objective function.</descr>
+				<class name="double"/>
+                <default>[]</default>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the variables <i>x \ge \text{lb}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the variables <i>x \le \text{ub}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>M</name>
+                <descr>Data matrix for linear-complementarity problem <i>w-Mx=q</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>q</name>
+                <descr>Right hand side vector for linear-complementarity problem <i>w-Mx=q</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>n</name>
+                <descr>Problem dimension (number of variables).</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved (only LP, QP and LCP problems are allowed).</descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>routine</name>
+                <descr>An integer specifying which subroutine to use for factorization. For details, see help for LCP solver.
+                    <ul>
+                        <li>The number 0 indicates to use fast recursive factorization based on rank-1 updates from LUMOD package. </li>
+                        <li>The number 1 indicates to use LU factorization based on DGESV routine of LAPACK. </li>
+                        <li>The number 2 indicates to use QR factorization based on DGELS routine of LAPACK. </li>
+                    </ul>
+                </descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>test</name>
+                <descr>Call (false) or not to call (true) MPT global settings.</descr>
+                <class name="logical"/>
+                <default>false</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>Result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+                <descr>The optimal values for variable <i>z</i>.</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>lambda</name>
+				<descr>The optimal values for variable <i>w</i>.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>obj</name>
+				<descr>If the LCP problem was created by conversion from LP/QP, this value represent the optimal cost of the appropriate LP/QP.</descr>
+				<class name="double"/>
+			</field>                                                           
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>mpt_solve</related>    
+
+	<!-- multiple literature sources can be given -->
+    <literature macro="boyd_cvxbook"/>
+    <literature macro="lcp_book"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

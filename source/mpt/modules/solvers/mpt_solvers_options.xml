@@ -1,0 +1,1424 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_solvers_options</function>
+	
+	<info>
+		Global option settings for solvers.
+	</info>
+
+    <syntax>s = mpt_solvers_options</syntax>
+
+    <descr>
+		This function returns a structure with default option settings for 
+        solvers used in MPT. 
+        
+        Used by <tt>mptopt</tt> class by first time initialization of MPT.
+        Later these settings are changed via <tt>mptopt</tt> class.
+        
+	</descr>
+	<!-- now describe input arguments -->
+		
+	<!-- now describe output arguments -->
+	<output>
+		<name>s</name>
+		<descr>options structure</descr>
+		<class name="struct">
+			<field>
+				<name>clp</name>
+				<descr>settings for CLP solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>solver</name>
+                        <descr>Which method to choose for solving LP/QP.</descr>
+                        <class name="double">
+                            <option>1</option><descr>primal</descr>
+                            <option>2</option><descr>dual</descr>
+                        </class>
+                        <default>1</default>
+                    </field>
+                    <field>
+                        <name>maxnumiterations</name>
+                        <descr>Maximum number of iterations allowed </descr>
+                        <class name="double"/>
+                        <default>99999999</default>
+                    </field>                    
+                    <field>
+                        <name>maxnumseconds</name>
+                        <descr>Maximum time allowed for computation in seconds</descr>
+                        <class name="double"/>
+                        <default>3600</default>
+                    </field>                    
+                    <field>
+                        <name>primaltolerance</name>
+                        <descr>Tolerance on the primal solution.</descr>
+                        <class name="double"/>
+                        <default>1e-7</default>
+                    </field>                    
+                    <field>
+                        <name>dualtolerance</name>
+                        <descr>Tolerance on the dual solution.</descr>
+                        <class name="double"/>
+                        <default>1e-7</default>
+                    </field>                    
+                    <field>
+                        <name>primalpivot </name>
+                        <descr>Which pivot method to choose for primal solution.</descr>
+                        <class name="double">
+                            <option>1</option><descr>steepest</descr>
+                            <option>2</option><descr>Dantzig</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>dualpivot</name>
+                        <descr>Which pivot method to choose for dual solution.</descr>
+                        <class name="double">
+                            <option>1</option><descr>steepest</descr>
+                            <option>2</option><descr>Dantzig</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>verbose</name>
+                        <descr>Verbosity level.</descr>
+                        <class name="double">
+                            <option>0</option><descr>silent</descr>
+                            <option>1</option><descr>verbose</descr>
+                            <option>2</option><descr>loud</descr>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                </class>
+			</field>
+            <field>
+				<name>cplexint</name>
+				<descr>Settings for CPLEX solver interfaced by Automatic Control Laboratory (cplexint).</descr>
+                <class name="struct">
+                    <field>
+                        <name>verbose</name>
+                        <descr>Verbosity level. </descr>
+                        <class name="double">
+                            <option>0</option><descr>silent</descr>
+                            <option>1</option><descr>verbose</descr>
+                            <option>2</option><descr>loud</descr>
+                        </class>
+                        <default>0</default>
+                    </field>
+                    <field>
+                        <name>logfile</name>
+                        <descr>Redirect output to a file.</descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>lic_rel</name>
+                        <descr>After how many runs to release the license.</descr>
+                        <class name="double"/>
+                        <default>1e3</default>
+                    </field>                    
+                </class>
+			</field>
+            <field>
+				<name>cplex</name>
+				<descr>Settings for CPLEX solver interfaced by IBM.</descr>
+                <class name="struct">
+                    <field>
+                        <name>lpmethod</name>
+                        <descr>Which method to use for solving LP.</descr>
+                        <class name="char">
+                            <option>0</option><descr>automatic</descr>
+                            <option>1</option><descr>primal simplex</descr>
+                            <option>2</option><descr>dual simplex</descr>
+                            <option>3</option><descr>network simplex</descr>
+                            <option>4</option><descr>barrier</descr>
+                            <option>5</option><descr>sifting</descr>
+                            <option>6</option><descr>concurrent</descr>
+                        </class>
+                        <default>2</default>
+                    </field>
+                    <field>
+                        <name>qpmethod</name>
+                        <descr>Which method to use for solving QP.</descr>
+                        <class name="char">
+                            <option>0</option><descr>automatic</descr>
+                            <option>1</option><descr>primal simplex</descr>
+                            <option>2</option><descr>dual simplex</descr>
+                            <option>3</option><descr>network simplex</descr>
+                            <option>4</option><descr>barrier</descr>
+                            <option>5</option><descr>sifting</descr>
+                            <option>6</option><descr>concurrent</descr>
+                        </class>
+                        <default>2</default>
+                    </field>                    
+                </class>
+			</field>                        
+            <field>
+				<name>plcp</name>
+				<descr>settings for PLCP solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>bfs</name>
+                        <descr>Perform breadth first search when explorting the parameter space.</descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>1</default>
+                    </field>
+                    <field>
+                        <name>dfs</name>
+                        <descr>Perform breadth first search when explorting the parameter space.</descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>debug</name>
+                        <descr>Debugging level</descr>
+                        <class name="double">
+                            <option>0</option><descr>no debugging</descr>
+                            <option>1</option><descr>no plots</descr>
+                            <option>2</option><descr>including plots</descr>
+                        </class>
+                        <default>0</default>
+                    </field>
+                    <field>
+                        <name>fixedstep</name>
+                        <descr>Always perform a step over the facet with a fixed step size given as <tt>region_tol</tt>.
+                        An alternative way to detect regions while exploring the parameter space. The approach is useful
+                        when numerical problems occurs with the standard method where the step size is computed automatically.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>
+                    <field>
+                        <name>QRfactor</name>
+                        <descr>Inside the main pivoting funtion use recursive QR factorization instead of direct LU factorization.
+                            It will speed up the computation time but will suffer from numerical problems for large LCP problems.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>checkoverlaps</name>
+                        <descr>Check for overlaps while exploring the parameter space. This option enforces to search through all
+                        discovered regions at each step for overlaps. If the overlap is detected, the overlapping part is discarted 
+                        via set-difference operation. Since this requires solving an LP for each region, this option reduces the 
+                        computational time significantly.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>rescue</name>
+                        <descr>If the variable step approach fails to find adjacent region, retry with the fixed step.
+                        The step size is given as the Chebyshev radius of the smallest allowable region, i.e. half of 
+                        the <tt>region_tol</tt>.                        
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                                        
+                    <field>
+                        <name>maxsteps</name>
+                        <descr>Maximum number of steps to perform with the fixed step approach in case no new regions
+                        have been found. Minimum 2-steps must be provided.
+                        </descr>
+                        <class name="double"/>
+                        <default>200</default>
+                    </field>
+                    <field>
+                        <name>maxlayers</name>
+                        <descr>Maximum value of layers to be explored for breadth first search (BFS). This option is valid only with
+                    BFS option. Useful only if there are too many regions far from the initial region that can be discarded from 
+                            optimal solution. The layered list of regions is returned in the field <tt>layer_list</tt>.
+                        </descr>
+                        <class name="double"/>
+                        <default>Inf</default>
+                    </field>
+                    <field>
+                        <name>maxregions</name>
+                        <descr>Maximum number of regions to be generated. 
+                        </descr>
+                        <class name="double"/>
+                        <default>Inf</default>
+                    </field> 
+                    <field>
+                        <name>maxpivots</name>
+                        <descr>The maximum number of pivots to be performed to find a neighboring region. Typically, the are  
+                        1, 2 pivots to be performed to find a neighboring regions. For a degenerate case, more pivots are needed.
+                            The maximum value of the pivots is given by the <tt>RecursionLimit</tt> of MATLAB which 500 by default.
+                            If the value of maxpivots is greater than <tt>RecursionLimit</tt>, change also this value by
+                            <tt>set(0,'RecursionLimit',N)</tt>.
+                        </descr>
+                        <class name="double"/>
+                        <default>100</default>
+                    </field>                                        
+                </class>
+			</field>            
+			<field>
+				<name>lcp</name>
+				<descr>settings for LCP solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>zerotol</name>
+                        <descr>Less than this treshold the value is considered as zero.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>
+                    <field>
+                        <name>lextol</name>
+                        <descr>Lexicographic tolerance - a small treshold from which values are considered as equal. </descr>
+                        <class name="double"/>
+                        <default>1e-9</default>
+                    </field>                    
+                    <field>
+                        <name>nstepf </name>
+                        <descr> If <tt>options.routine</tt> is 0, then every <tt>nstepf</tt> pivot steps the basis is refactorized to
+                        avoid numerical problems for LUMOD. For other routines the factorization
+                        is performed at each step.
+                        </descr>
+                        <class name="double"/>
+                        <default>50</default>
+                    </field>                    
+                    <field>
+                        <name>maxpiv</name>
+                        <descr>Maximum number of pivots to be performed. </descr>
+                        <class name="double"/>
+                        <default>1e6</default>
+                    </field>                    
+                    <field>
+                        <name>clock</name>
+                        <descr>Show the information about the computational time.</descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>verbose</name>
+                        <descr>Verbose output.</descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>routine</name>
+                        <descr>Routine which should be used to obtain a basis solution. </descr>
+                        <class name="double">
+                            <option>0</option><descr>Corresponds to LUmod package that performs factorization in the form
+                                <i>LA = U</i>. Depending on the change in <i>A</i> factors <i>L</i>, <i>U</i>  are updated. 
+                                This is the fastest method.
+                                </descr>
+                            <option>1</option><descr>Corresponds to DGESV simple driver from LAPACK package which solves
+                                the system <i>AX = B</i> by factorizing <i>A</i> and overwriting <i>B</i> with the solution <i>X</i>.
+                                Since the factorization is performed at each pivot step, this method
+                                tends to be much slower than method 0.
+                            </descr>
+                            <option>2</option><descr>
+                                Corresponds to DGELS simple driver which solves overdetermined or
+                                underdetermined real linear systems <i>\text{min}~~ \|b - Ax\|_2</i> involving an 
+                                <i>M</i>-by-<i>N</i> matrix <i>A</i>, or its transpose, using a QR or LQ factorization of
+                                <i>A</i>. Since the factorization is performed at each pivot step, this
+                                method tends to be much slower than method 0.                                                    
+                            </descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>timelimit</name>
+                        <descr>Time limit in seconds. If this limit is exceeded, the pivoting algorithm
+                         is terminated and current basis is returned.  </descr>
+                        <class name="double"></class>
+                        <default>3600</default>
+                    </field>                    
+                    <field>
+                        <name>normalize</name>
+                             <descr> Input matrices <i>M</i>, <i>q</i>  get scaled by <i>D_1</i> and <i>D_2</i> when invoking this
+                                 option: <i>M_n = D_{1}MD_{2}</i>, <i>q_n = D_{1}q</i>, and solution is recovered as <i>z =
+                                 D_{2}z_{n}</i>, <i>w = Mz+q</i>.   
+                            </descr>
+                            <class name="logical">
+                                <option>0</option>
+                                <option>1</option>
+                            </class>
+                            <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>normalizethres</name>
+                             <descr> If the <tt>normalize</tt> option is on, then the matrix scaling is performed 
+                                 only if 1 norm of matrix <i>M</i> (maximum absolute column sum) is above this
+                                threshold. 
+                            </descr>
+                            <class name="double"/>
+                            <default>1e6</default>
+                    </field> 
+                </class>
+			</field>            
+			<field>
+				<name>glpk</name>
+				<descr>settings for GLPK solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>msglev</name>
+                        <descr>Level of messages output by solver routines.</descr>
+                        <class name="double">
+                            <option>0</option><descr>No output.</descr>
+                            <option>1</option><descr>Error messages only.</descr>
+                            <option>2</option><descr>Normal output.</descr>
+                            <option>3</option><descr>Full output (includes informational messages).</descr>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>lpsolver</name>
+                        <descr>Which method to choose for solving primal LP.</descr>
+                        <class name="double">
+                            <option>1</option><descr>Revised simplex method.</descr>
+                            <option>2</option><descr>Interior point method.</descr>
+                            <option>3</option><descr>Simplex method with exact arithmetic.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>scale</name>
+                        <descr>Which method of scaling to use.</descr>
+                        <class name="double">
+                            <option>0</option><descr>No scaling.</descr>
+                            <option>1</option><descr>Equilibration scaling.</descr>
+                            <option>2</option><descr>Geometric mean scaling, then equilibration scaling.</descr>
+                            <option>3</option><descr>Geometric then Equilibrium scaling.</descr>
+                            <option>4</option><descr>Round to nearest power of 2 scaling.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>dual</name>
+                        <descr>Which method to choose for solving dual LP.</descr>
+                        <class name="double">
+                            <option>0</option><descr>Do not use the dual simplex.</descr>
+                            <option>1</option><descr>If initial basic solution is dual feasible, use the dual simplex.</descr>
+                            <option>2</option><descr>Use two phase dual simplex, or if primal simplex if dual fails.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>price</name>
+                        <descr>Pricing option (for both primal and dual simplex).</descr>
+                        <class name="double">
+                            <option>0</option><descr>Textbook pricing.</descr>
+                            <option>1</option><descr>Steepest edge pricing.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>r_test</name>
+                        <descr>Ratio test technique.</descr>
+                        <class name="double">
+                            <option>0</option><descr>Standart (textbook).</descr>
+                            <option>1</option><descr>Harris's two-pass ratio test.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>relax</name>
+                        <descr>Relaxation parameter used in the ratio test.
+                            If it is zero, the textbook ratio test is used. If it is non-zero (should be
+                            positive), Harris two-pass ratio test is used. In the latter case on the
+                            first pass of the ratio test basic variables (in the case of primal
+                            simplex) or reduced costs of non-basic variables (in the case of dual
+                            simplex) are allowed to slightly violate their bounds, but not more than
+                            <tt>relax*tolbnd</tt> or <tt>relax*toldj</tt> 
+                            (thus, <tt>relax</tt> is a percentage of <tt>tolbnd</tt> or <tt>toldj</tt>).                    
+                        </descr>
+                        <class name="double"/>
+                        <default>0.07</default>
+                    </field>                    
+                    <field>
+                        <name>tolbnd</name>
+                        <descr>Relative tolerance used to check ifthe current basic
+                            solution is primal feasible. It is not recommended that you change this
+                            parameter unless you have a detailed understanding of its purpose. 
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-7</default>
+                    </field>                    
+                    <field>
+                        <name>toldj</name>
+                        <descr>Absolute tolerance used to check if the current basic
+                               solution is dual feasible. It is not recommended that you change this
+                               parameter unless you have a detailed understanding of its purpose. 
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-7</default>
+                    </field>                    
+                    <field>
+                        <name>tolpiv</name>
+                        <descr>Relative tolerance used to choose eligible pivotal
+                              elements of the simplex table. It is not recommended that you change this
+                              parameter unless you have a detailed understanding of its purpose.
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-9</default>
+                    </field>                    
+                    <field>
+                        <name>round</name>
+                        <descr>Solution rounding option.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option><descr>Report all primal and dual values "as is" (default).</descr>
+                            <option>1</option><descr>Replace tiny primal and dual values by exact zero.</descr>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>objll</name>
+                        <descr>Lower limit of the
+                             objective function. If on the phase II the objective
+                             function reaches this limit and continues decreasing, the
+                             solver stops the search. This parameter is used in the
+                             dual simplex method only.                            
+                        </descr>
+                        <class name="double"/>
+                        <default>-1e12</default>
+                    </field>                    
+                    <field>
+                        <name>objul</name>
+                        <descr>Upper limit of the
+                             objective function. If on the phase II the objective
+                             function reaches this limit and continues increasing,
+                             the solver stops the search. This parameter is used in
+                             the dual simplex only.                         
+                        </descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>itlim</name>
+                        <descr>Simplex iterations limit.
+                             If this value is positive, it is decreased by one each
+                             time when one simplex iteration has been performed, and
+                             reaching zero value signals the solver to stop the search.
+                             Negative value means no iterations limit.                         
+                        </descr>
+                        <class name="double"/>
+                        <default>1e4</default>
+                    </field>                    
+                    <field>
+                        <name>itcnt</name>
+                        <descr>Output frequency, in iterations.
+                         This parameter specifies how frequently the solver sends
+                         information about the solution to the standard output.                      
+                        </descr>
+                        <class name="double"/>
+                        <default>200</default>
+                    </field>                    
+                    <field>
+                        <name>usecuts</name>
+                        <descr><tt>glp_intopt</tt> generates and adds cutting planes to
+                         the MIP problem in order to improve its LP relaxation
+                         before applying the branch-and-bound method.</descr>
+                        <class name="double">
+                            <option>0</option><descr>All cuts off.</descr>
+                            <option>1</option><descr>Gomoy's mixed integer cuts.</descr>
+                            <option>2</option><descr>Mixed integer rounding cuts.</descr>
+                            <option>3</option><descr>Mixed cover cuts.</descr>
+                            <option>4</option><descr>Clique cuts.</descr>
+                            <option>5</option><descr>All cuts.</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>pprocess</name>
+                        <descr>
+                             Pre-processing technique option (for MIP only).
+                        </descr>
+                        <class name="double">
+                            <option>0</option><descr>Disable preprocessing.</descr>
+                            <option>1</option><descr>Perform preprocessing for root only.</descr>
+                            <option>2</option><descr>Perform preprocessing for all levels.</descr>
+                        </class>
+                        <default>2</default>
+                    </field>                    
+                    <field>
+                        <name>binarize</name>
+                        <descr>
+                             Binarizeation option (for MIP), used only if presolver is enabled.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option><descr>Do not use binarization.</descr>
+                            <option>1</option><descr>Replace general integer variables by binary ones.</descr>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>tmlim</name>
+                        <descr>
+                             Searching time limit, in
+                             seconds. If this value is positive, it is decreased each
+                             time when one simplex iteration has been performed by the
+                             amount of time spent for the iteration, and reaching zero
+                             value signals the solver to stop the search. Negative
+                             value means no time limit
+                        </descr>
+                        <class name="double"/>
+                        <default>-1</default>
+                    </field>                    
+                    <field>
+                        <name>branch</name>
+                        <descr>
+                             Branching heuristic option (for MIP only).
+                        </descr>
+                        <class name="double">
+                            <option>0</option><descr>Branch on the first variable.</descr>
+                            <option>1</option><descr>Branch on the last variable.</descr>
+                            <option>2</option><descr>Branch on the most fractional variable.</descr>
+                            <option>3</option><descr>Branch using a heuristic by Driebeck and Tomlin.</descr>
+                        </class>
+                        <default>2</default>
+                    </field>                    
+                    <field>
+                        <name>btrack</name>
+                        <descr>
+                             Backtracking heuristic option (for MIP only).
+                        </descr>
+                        <class name="double">
+                            <option>0</option><descr>Depth first search.</descr>
+                            <option>1</option><descr>Breadth first search.</descr>
+                            <option>2</option><descr>Best local bound.</descr>
+                            <option>3</option><descr>Backtrack using the best projection heuristic.</descr>
+                        </class>
+                        <default>2</default>
+                    </field>                    
+                    <field>
+                        <name>tolint</name>
+                        <descr>
+                             Relative tolerance used
+                             to check if the current basic solution is integer
+                             feasible. It is not recommended that you change this
+                             parameter unless you have a detailed understanding of
+                             its purpose.
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>                    
+                    <field>
+                        <name>outdly</name>
+                        <descr>
+                         Output delay, in seconds.
+                         This parameter specifies how long the solver should
+                         delay sending information about the solution to the standard
+                         output. Non-positive value means no delay.
+                        </descr>
+                        <class name="double"/>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>tolobj</name>
+                        <descr>
+                             Relative tolerance used
+                             to check if the value of the objective function is not
+                             better than in the best known integer feasible solution.
+                             It is not recommended that you change this parameter
+                             unless you have a detailed understanding of its purpose.
+                       </descr>
+                        <class name="double"/>
+                        <default>1e-7</default>
+                    </field>                    
+                    <field>
+                        <name>presol</name>
+                        <descr>
+                             If this flag is set, the routine
+                             <tt>lpx_simplex</tt> solves the problem using the built-in LP presolver.
+                             Otherwise the LP presolver is not used.
+                       </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>save</name>
+                        <descr>
+                              If this parameter is nonzero save a copy of
+                              the original problem to file.
+                       </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>mipgap</name>
+                        <descr>
+                             The relative mip gap tolerance.  
+                             If the relative mip gap for currently known best integer feasible
+                             solution falls below this tolerance, the solver terminates
+                             the search.  This allows obtaining suboptimal interger
+                             feasible solutions if solving the problem to optimality
+                             takes too long.
+                       </descr>
+                        <class name="double"/>
+                        <default>0</default>
+                    </field>                    
+                </class>
+			</field>            
+			<field>
+				<name>gurobi</name>
+				<descr>settings for GUROBI solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>BarIterLimit</name>
+                        <descr>Limits the number of barrier iterations performed (barrier only).</descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>
+                    <field>
+                        <name>CutOff</name>
+                        <descr> If the objective value for the optimal solution is better than the specified cutoff,
+                        the solver will return the optimal solution. Otherwise, it will terminate with a CUTOFF status.
+                        </descr> 
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>
+                    <field>
+                        <name>IterationLimit</name>
+                        <descr>Limits the number of simplex iterations performed.</descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>NodeLimit</name>
+                        <descr>Limits the number of MIP nodes explored (MIP only).</descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>SolutionLimit</name>
+                        <descr>Limits the number of feasible solutions found (MIP only).</descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>TimeLimit</name>
+                        <descr>Limits the total time expended (in seconds).</descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>BarConvTol</name>
+                        <descr>Barrier convergence tolerance (barrier only). The barrier solver
+                                terminates when the relative difference between the primal and dual
+                                objective values is less than the specified tolerance.
+                                Value must be in range [1e-10, 1].
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-8</default>
+                    </field>         
+                    <field>
+                        <name>BarConvTol</name>
+                        <descr>Barrier convergence tolerance (barrier only). The barrier solver
+                                terminates when the relative difference between the primal and dual
+                                objective values is less than the specified tolerance.
+                                Value must be in range [1e-10, 1].
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-8</default>
+                    </field>                             
+                    <field>
+                        <name>BarQCPConvTol</name>
+                        <descr>The barrier solver terminates when the relative difference between the
+                            primal and dual objective values is less than the specified tolerance.
+                            ightening this tolerance may lead to a more accurate solution, but it may 
+                            also lead to a failure to converge. 
+                            Values must be in range [0, 1];
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>                    
+                    <field>
+                        <name>FeasibilityTol</name>
+                            <descr> All constraints must be satisfied to a tolerance of <tt>FeasibilityTol</tt>.
+                            Tightening this tolerance can produce smaller constraint violations, 
+                            but for numerically challenging models it can sometimes lead to much larger iteration counts.
+                            Value must be in range [1e-9, 1e-2].
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>                    
+                    <field>
+                        <name>IntFeasTol</name>
+                        <descr> Integer feasibility tolerance (MIP only). An integrality restriction on a
+                                variable is considered satisfied when the variable's value is less than
+                                <tt>INTFEASTOL</tt> from the nearest integer value.   
+                                Value must be in range [1e-9, 1e-1].
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-5</default>
+                    </field>                    
+                    <field>
+                        <name>OptimalityTol</name>
+                        <descr> Dual feasibility tolerance. Reduced costs must all be smaller than
+                                 OptimalityTol in the improving direction in order for a model to be
+                                 declared optimal.
+                                Value must be in range [1e-9, 1e-2].
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>                    
+                    <field>
+                        <name>MIPGap</name>
+                        <descr> Relative MIP optimality gap (MIP only). The MIP engine will terminate
+                             (with an optimal result) when the gap between the lower and upper
+                              objective bound is less than MIPGap times the upper bound.  
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-4</default>
+                    </field>                    
+                    <field>
+                        <name>PSDTol</name>
+                        <descr> Positive semi-definite tolerance (QP/MIQP only). Sets a limit on the
+                                 amount of diagonal perturbation that the optimizer is allowed to perform
+                                 on the Q matrix in order to correct minor PSD violations. If a larger
+                                 perturbation is required, the optimizer will terminate with an
+                                 <tt>GRB_ERROR_Q_NOT_PSD</tt> error.
+                        </descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>         
+                    <field>
+                        <name>InfUnbdInfo</name>
+                        <descr>Determines whether simplex (and crossover) will compute
+                        additional information when a model is determined to be infeasible or
+                        unbounded. Set this parameter if you want to query the unbounded ray for
+                        unbounded models (through the UnbdRay attribute), or the infeasibility
+                        proof for infeasible models (through the FarkasDual and FarkasProof
+                        attributes).
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>
+                    <field>
+                        <name>NormAdjust</name>
+                        <descr> Chooses from among multiple pricing norm variants. The details of
+                        how this parameter affects the simplex pricing algorithm are subtle and
+                        difficult to describe, so we've simply labeled the options 0 through 3.
+                        The default value of -1 chooses automatically.
+                        Changing the value of this parameter rarely produces a significant benefit. 
+                        </descr>
+                        <class name="double"/>
+                        <default>-1</default>
+                    </field>                 
+                    <field>
+                        <name>PerturbValue</name>
+                        <descr> Magnitude of the simplex perturbation. Note that
+                        perturbation is only applied when progress has stalled, so the parameter
+                         will often have no effect. Values must be in range [0, 0.01].
+                        </descr>
+                        <class name="double"/>
+                        <default>0.0002</default>
+                    </field>                                    
+                    <field>
+                        <name>ScaleFlag</name>
+                        <descr>Enables or disables model scaling. Scaling usually
+                        improves the numerical properties of the model, which typically leads to
+                        reduced solution times, but it may sometimes lead to larger constraint
+                        violations in the original, unscaled model.   
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>1</default>
+                    </field>
+                    <field>
+                        <name>ObjScale</name>
+                        <descr>  Divides the model objective by the specified value to avoid
+                             numerical errors that may result from very large objective coefficients.
+                             The default value of 0 decides on the scaling automatically. A value less
+                             than zero uses the maximum coefficient to the specified power as the
+                             scaling (so <tt>ObjScale=-0.5</tt> would scale by the square root of the largest
+                             objective coefficient).
+                        </descr>
+                        <class name="double"/>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>BarCorrectors</name>
+                        <descr>  Limits the number of central corrections performed in each barrier iteration.
+                        The default value chooses automatically, depending on problem characteristics. 
+                        The automatic strategy generally works well, although it is often possible to obtain
+                        higher performance on a specific model by selecting a value manually. The values must 
+                        be in range [-1, Inf)
+                        </descr>
+                        <class name="double"/>
+                        <default>-1</default>
+                    </field>                    
+                    <field>
+                        <name>Method</name>
+                        <descr>  Algorithm used to solve continuous models or the root node of a MIP model.
+                        Concurrent optimizers run multiple solvers on multiple threads simultaneously, and choose the one
+                        that finishes first. Deterministic concurrent (Method=4) gives the exact same result each time, 
+                        while Method=3 is often faster but can produce different optimal bases when run multiple times. 
+                        In the current release, the default Automatic (Method=-1) will typically choose non-deterministic concurrent
+                        (Method=3) for an LP, barrier (Method=2) for a QP or QCP, and dual (Method=1) for the MIP root node.
+                        Only simplex and barrier algorithms are available for continuous QP models. Only primal and dual
+                        simplex are available for solving the root of an MIQP model. Only barrier is available for
+                        continuous QCP models.
+
+                        The default setting is rarely significantly slower than the best possible setting, so you
+                        generally won't see a big gain from changing this parameter. There are classes of models where
+                        one particular algorithm is consistently fastest, though, so you may want to experiment with
+                        different options when confronted with a particularly difficult model.
+
+                        Note that if memory is tight on an LP model, you should consider choosing the dual
+                        simplex method (Method=1). The default will invoke the concurrent optimizer, which typically
+                        consumes a lot more memory than dual simplex alone. 
+                        </descr>
+                        <class name="double">
+                            <option>-1</option><descr>automatic</descr>
+                            <option>0</option><descr>primal simplex</descr>
+                            <option>1</option><descr>dual simplex</descr>
+                            <option>2</option><descr>barrier</descr>
+                            <option>3</option><descr>concurrent</descr>
+                            <option>4</option><descr>deterministic concurrent</descr>
+                        </class>
+                        <default>1</default>
+                    </field>                    
+                    <field>
+                        <name>Presolve</name>
+                        <descr> Controls the presolve level. A value of -1 corresponds to an automatic
+                                setting.
+                        </descr>
+                        <class name="double">
+                            <option>-1</option><descr>Automatic</descr>
+                            <option>0</option><descr>Off</descr>
+                            <option>1</option><descr>Conservative</descr>
+                            <option>2</option><descr>Aggressive</descr>
+                        </class>
+                        <default>-1</default>
+                    </field>                    
+                    <field>
+                        <name>TimeLimit</name>
+                        <descr>  Limits the total time expended (in seconds).
+                        </descr>
+                        <class name="double"/>
+                        <default>1e12</default>
+                    </field>                    
+                    <field>
+                        <name>Threads</name>
+                        <descr>  Controls the number of threads to apply to parallel MIP. The default
+                                 value of 0 sets the thread count equal to the maximum value, which is the
+                                 number of processors in the machine.
+                                 Value should range from 0 to maximum number of processors.
+                        </descr>
+                        <class name="double"/>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>OutputFlag</name>
+                        <descr>  Verbosity level.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>DisplayInterval</name>
+                        <descr> Controls the frequency at which log lines are printed (in seconds).
+                        </descr>
+                        <class name="double"/>
+                        <default>5</default>
+                    </field>                    
+                </class>
+			</field>
+            <field>
+				<name>nag</name>
+				<descr>settings for NAG solver</descr>
+                <class name="struct">
+                        <field>
+                            <name>qp</name>
+                            <descr>settings for QP solver </descr>
+                            <class name="struct">
+                                <field>
+                                    <name>ftol</name>
+                                    <descr>The maximum acceptable violation in each constraint at a "feasible" point.</descr>
+                                    <class name="double"/>
+                                    <default>1e-9</default>
+                                </field>
+                                <field>
+                                    <name>rank_tol</name>
+                                    <descr>Enables the user to control the condition number of the triangular factor <i>R</i>.</descr>
+                                    <class name="double"/>
+                                    <default>1e-20</default>
+                                </field>
+                                <field>
+                                    <name>crash_tol</name>
+                                    <descr>A constraint of the form <i>a^{T}x \ge l</i> will be included in the initial
+                                        working set if <i>|a^{T}x-l| \le \text{crash\_tol} \times (1+|l|) 0.0 &lt;
+                                    \text{options.crash\_tol} \le 1.0</i>.</descr>
+                                    <class name="double"/>
+                                    <default>0.1</default>
+                                </field>
+                                <field>
+                                    <name>reset_ftol</name>
+                                    <descr>This option is part of an anti-cycling procedure designed to guarantee
+                                        progress even on highly degenerate problems.
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>5</default>
+                                </field>
+                                <field>
+                                    <name>max_iter</name>
+                                    <descr>maximum number of iterations to be performed
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>1e6</default>
+                                </field>
+                                <field>
+                                    <name>fcheck</name>
+                                    <descr>every fcheck iterations, a numerical test is
+                                        made to see if the current solution satisfies
+                                        the constraints in the working set
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>50</default>
+                                </field>
+                                <field>
+                                    <name>inf_bound</name>
+                                    <descr>defines the "infinite" bound in the definition
+                                        of the problem constraints
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>1e12</default>
+                                </field>                            
+                            </class>
+                        </field>
+                        <field>
+                            <name>lp</name>
+                            <descr>settings for LP solver </descr>
+                            <class name="struct">
+                                <field>
+                                    <name>ftol</name>
+                                    <descr>The maximum acceptable violation in each constraint at a "feasible" point.</descr>
+                                    <class name="double"/>
+                                    <default>1e-9</default>
+                                </field>
+                                <field>
+                                    <name>optim_tol</name>
+                                    <descr>Enables the user to control the condition number of the triangular factor <i>R</i>.</descr>
+                                    <class name="double"/>
+                                    <default>1e-13</default>
+                                </field>
+                                <field>
+                                    <name>crash_tol</name>
+                                    <descr>A constraint of the form <i>a^{T}x \ge l</i> will be included in the initial
+                                    working set if <i>|a^{T}x-l| \le \text{crash\_tol} \times (1+|l|) 0.0 &lt;
+                                    \text{options.crash\_tol} \le 1.0</i>.</descr>
+                                    <class name="double"/>
+                                    <default>0.1</default>
+                                </field>
+                                <field>
+                                    <name>reset_ftol</name>
+                                    <descr>This option is part of an anti-cycling procedure designed to guarantee
+                                     progress even on highly degenerate problems.
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>5</default>
+                                </field>
+                                <field>
+                                    <name>max_iter</name>
+                                    <descr>maximum number of iterations to be performed
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>1e6</default>
+                                </field>
+                                <field>
+                                    <name>fcheck</name>
+                                    <descr>every fcheck iterations, a numerical test is
+                                     made to see if the current solution satisfies
+                                     the constraints in the working set
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>50</default>
+                                </field>
+                                <field>
+                                    <name>inf_bound</name>
+                                    <descr>defines the "infinite" bound in the definition
+                                        of the problem constraints
+                                    </descr>
+                                    <class name="double"/>
+                                    <default>1e12</default>
+                                </field>                            
+                            </class>                        
+                    </field>                    
+                </class>
+			</field>            
+			<field>
+				<name>qpip</name>
+				<descr>settings for QPC interior point solver "qpip"</descr>
+                <class name="struct">
+                    <field>
+                        <name>mu</name>
+                        <descr>Desired complementarity gap target (point on central-path).</descr>
+                        <class name="double"/>
+                        <default>0</default>
+                    </field>                    
+                    <field>
+                        <name>method</name>
+                        <descr>If <tt>method=1</tt>, then a faster but less accurate linear
+                                solve step is used. Conversely, if <tt>method=0</tt> then a slower but
+                                more accurate linear solve step is used.
+                            </descr>
+                        <class name="logical"/>
+                        <default>0</default>
+                    </field>                                        
+                </class>
+			</field>            
+			<field>
+				<name>qpspline</name>
+				<descr>settings for QPspline solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>maxiter</name>
+                        <descr>The maximum number of iterations. </descr>
+                        <class name="double"/>
+                        <default>10000</default>
+                    </field>
+                    <field>
+                        <name>abs_tol</name>
+                        <descr>Absolute tolerance.</descr>
+                        <class name="double"/>
+                        <default>1e-8</default>
+                    </field>                    
+                    <field>
+                        <name>nstepf</name>
+                        <descr>After these <tt>nstepf</tt> steps the basis will be refactored with new <i>Q</i>, <i>R</i>, factors.</descr>
+                        <class name="double"/>
+                        <default>30</default>
+                    </field>                    
+                    <field>
+                        <name>nqrelems</name>
+                        <descr> Do recursive QR factorization if the number of changed elements
+                             (rows/cols) is less than this treshold. If the treshold is large, the
+                             recursive factorization may actually consume more time than direct
+                             factorization. Large treshold causes also accumulation of numerical
+                             errors.</descr>
+                        <class name="double"/>
+                        <default>20</default>
+                    </field>                    
+                    <field>
+                        <name>timelimit</name>
+                        <descr> 
+                            Time limit on the computations in seconds.
+                        </descr>
+                        <class name="double"/>
+                        <default>3600</default>
+                    </field>                    
+                    <field>
+                        <name>verbose</name>
+                        <descr> 
+                            Show the iteration progress.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                    
+                </class>
+			</field>            
+			<field>
+				<name>quadprog</name>
+				<descr>settings for QUADPROG solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>MaxIter</name>
+                        <descr>Maximum number of iterations allowed.</descr>
+                        <class name="double"/>
+                        <default>1e6</default>
+                    </field>
+                    <field>
+                        <name>TolFun</name>
+                        <descr>Termination tolerance on the function value.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>                    
+                    <field>
+                        <name>TolX</name>
+                        <descr>Termination tolerance on the solution.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>
+                    <field>
+                        <name>Display</name>
+                        <descr>Display progress of optimization.</descr>
+                        <class name="char">
+                            <option>notify</option>
+                            <option>iter</option>
+                            <option>final</option>
+                        </class>
+                        <default>off</default>                        
+                    </field>                    
+                    <field>
+                        <name>Algorithm</name>
+                        <descr>Algorithm for solving the QP</descr>
+                        <class name="char">
+                            <option>active-set</option>
+                            <option>interior-point</option>
+                            <option>interior-point-convex</option>
+                            <option>levenberg-marquardt</option>
+                            <option>sqp</option> 
+                            <option>trust-region-dogleg</option>
+                            <option>trust-region-reflective</option>
+                        </class>
+                        <default>active-set</default>                        
+                    </field>                    
+                    <field>
+                        <name>LargeScale</name>
+                        <descr>Use large-scale or medium-scale algorithms.</descr>
+                        <class name="char">
+                            <option>on</option>
+                            <option>off</option>
+                        </class>
+                        <default>off</default>                        
+                    </field>                                        
+                </class>
+			</field>            
+			<field>
+				<name>linprog</name>
+				<descr>settings for LINPROG solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>MaxIter</name>
+                        <descr>Maximum number of iterations allowed.</descr>
+                        <class name="double"/>
+                        <default>1e6</default>
+                    </field>
+                    <field>
+                        <name>TolFun</name>
+                        <descr>Termination tolerance on the function value.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>                    
+                    <field>
+                        <name>TolX</name>
+                        <descr>Termination tolerance on the solution.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>
+                    <field>
+                        <name>Display</name>
+                        <descr>Display progress of optimization.</descr>
+                        <class name="char">
+                            <option>notify</option>
+                            <option>iter</option>
+                            <option>final</option>
+                        </class>
+                        <default>off</default>                        
+                    </field>                                        
+                </class>
+			</field>            
+			<field>
+				<name>sedumi</name>
+				<descr>settings for SEDUMI solver</descr>
+                <class name="struct">
+                    <field>
+                        <name>fid</name>
+                        <descr>Verbosity level</descr>
+                        <class name="logical">
+                            <option>0</option><descr>silent</descr>
+                            <option>1</option><descr>loud</descr>
+                        </class>
+                        <default>0</default>
+                    </field>
+                    <field>
+                        <name>alg</name>
+                        <descr> Type of algorithm that solves the problem.
+                        </descr>
+                        <class name="double">
+                            <option>0</option><descr>The first-order wide region algorithm is used, not recommended. </descr>
+                            <option>1</option><descr>The centering-predictor-corrector algorithm is used with v-linearization.</descr>
+                            <option>2</option><descr>The xz-linearization is used in the corrector, similar to Mehrotra's algorithm.</descr>
+                        </class>
+                        <default>2</default>
+                    </field>                    
+                    <field>
+                        <name>theta</name>
+                        <descr>The wide region parameter which varies <i>0 &lt; \texttt{theta} \le 1</i>.</descr>
+                        <class name="double"/>
+                        <default>0.25</default>
+                    </field>                    
+                    <field>
+                        <name>beta</name>
+                        <descr>The neighborhood region parameter which varies <i>0 &lt; \texttt{beta} \le 1</i>.</descr>
+                        <class name="double"/>
+                        <default>0.5</default>
+                    </field>                    
+                    <field>
+                        <name>stepdif</name>
+                        <descr>Set primal/dual differentiation step length.</descr>
+                        <class name="double"/>
+                        <default>2</default>
+                    </field>                    
+                    <field>
+                        <name>w</name>
+                        <descr>The weights for the relative primal, dual and gap residuals as
+                         w(1):w(2):1 in order to find the optimal step differentiation.</descr>
+                        <class name="double"/>
+                        <default>[1 1]</default>
+                    </field>                    
+                    <field>
+                        <name>eps</name>
+                        <descr>The desired accuracy.</descr>
+                        <class name="double"/>
+                        <default>1e-10</default>
+                    </field>                    
+                    <field>
+                        <name>bigeps</name>
+                        <descr>In case the desired accuracy cannot be achieved, SEDUMI tries to satisfy this accuracy.</descr>
+                        <class name="double"/>
+                        <default>1e-6</default>
+                    </field>                    
+                    <field>
+                        <name>maxiter</name>
+                        <descr>Maximum iterations allowed.</descr>
+                        <class name="double"/>
+                        <default>1e6</default>
+                    </field>                    
+                    <field>
+                        <name>cg</name>
+                        <descr>Settings for preconditioned conjugate gradient method (CG),
+                        which is only used if results from Cholesky are inaccurate.</descr>
+                        <class name="struct">
+                            <field> 
+                                <name>maxiter</name>
+                                <descr>Maximum number of CG-iterates (per solve). Theoretically needed
+                                is <tt>|add|+2*|skip|</tt>, the number of added and skipped pivots in Cholesky.</descr>                                
+                                <class name="double"/>
+                                <default>49</default>
+                            </field>
+                            <field> 
+                                <name>restol</name>
+                                <descr>Terminates if residual is a <tt>restol</tt> fraction of duality gap.
+                                 Should be smaller than 1 in order to make progress.</descr>
+                                <class name="double"/>
+                                <default>5e-3</default>
+                            </field>
+                            <field> 
+                                <name>refine</name>
+                                <descr>Number of refinement loops that are allowed. The maximum number
+                                    of actual CG-steps will thus be <tt>1+(1+refine)*maxiter</tt>. 
+                                </descr>
+                                <class name="double"/>
+                                <default>1</default>
+                            </field>
+                            <field> 
+                                <name>stagtol</name>
+                                <descr>Terminates if relative function progress less than stagtol.</descr>
+                                <class name="double"/>
+                                <default>4e-14</default>
+                            </field>
+                            <field> 
+                                <name>qprec</name>
+                                <descr>Stores cg-iterates in quadruple precision if true.</descr>
+                                <class name="logical">
+                                    <option>0</option>
+                                    <option>1</option>
+                                </class>                                
+                                <default>0</default>
+                            </field>                            
+                        </class>                        
+                    </field>                    
+                    <field>
+                        <name>chol</name>
+                        <descr>Parameters for controling the Cholesky solve.
+                        </descr>
+                        <class name="struct">
+                            <field> 
+                                <name>canceltol</name>
+                                <descr>Relative tolerance for detecting cancelation during Cholesky.</descr>                                
+                                <class name="double"/>
+                                <default>1e-12</default>
+                            </field>
+                            <field> 
+                                <name>maxu</name>
+                                <descr>Adds to diagonal if <tt>max(abs(L(:,j))) > maxu</tt> otherwise.</descr>
+                                <class name="double"/>
+                                <default>5e5</default>
+                            </field>
+                            <field> 
+                                <name>abstol</name>
+                                <descr>Skips pivots falling below <tt>abstol</tt>.
+                                </descr>
+                                <class name="double"/>
+                                <default>1e-20</default>
+                            </field>
+                            <field> 
+                                <name>maxuden</name>
+                                <descr>Pivots in dense-column factorization so that these factors
+                                satisfy <tt>max(abs(Lk)) &lt;= maxuden</tt>.</descr>
+                                <class name="double"/>
+                                <default>5e2</default>
+                            </field>
+                            <field> 
+                                <name>errors</name>
+                                <descr>If this field is true then SEDUMI outputs some error
+                                       measures as defined in the Seventh DIMACS Challenge. </descr>
+                                <class name="logical">
+                                    <option>0</option>
+                                    <option>1</option>
+                                </class>                                
+                                <default>0</default>
+                            </field>                            
+                        </class>                        
+                    </field>                    
+
+                </class>
+			</field>            
+
+            
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->    
+    <related>mptopt</related>
+    <related>mpt_solve</related> 
+	
+	<!-- multiple literature sources can be given -->
+	<literature macro="boyd_cvxbook"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

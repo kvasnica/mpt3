@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>terminalPenalty</function>
+  
+  <info>
+    Penalizes the final predicted state in the MPC problem
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter adds the term <i> \| Q x_N \|_p</i> to the MPC cost
+    function. Properties of the penalty (i.e., the weighting matrix
+    <i>Q</i> and the norm <i>p</i>) are provided by the
+    <tt>Penalty</tt> class.<br/>
+
+    Note that if the state signal has the <tt>reference</tt> filter
+    enabled, the terminal penalty becomes <i>\| Q (x_N - x_{ref})
+    \|_p</i>, where <i>x_{ref}</i> is a user-specified reference
+    signal, taken from <tt>model.x.reference</tt>.<br/>
+
+    To add this filter, call
+    <tt>model.x.with('terminalPenalty')</tt>. Then you can specify
+    parameters of the penalty function by setting the
+    <tt>model.x.terminalPenalty</tt> property to an instance of the
+    <tt>Penalty</tt> class (see "<tt>help Penalty</tt>").<br/>
+
+    To remove this filter, call
+    <tt>model.x.without('terminalPenalty')</tt>.
+  </descr>
+
+  <example>
+    <descr>Specify an LTI system <i>x^+ = 0.9 x + u</i></descr>
+    <cmd>sys = LTISystem('A', 0.9, 'B', 1);</cmd>
+
+    <descr>Add unity quadratic penalties on states and inputs (but not
+    on the terminal state)</descr>
+    <cmd>
+		sys.x.penalty = Penalty(1, 2);
+		sys.u.penalty = Penalty(1, 2);
+	</cmd>
+
+    <descr>Compute an LQR terminal penalty and use it as a terminal
+    state cost</descr>
+    <cmd>
+		sys.x.with('terminalPenalty');
+		sys.x.terminalPenalty = sys.LQRPenalty();
+		M = MPCController(sys, 4);
+		x0 = 10;
+		u = M.evaluate(x0)
+	</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mtimes</function>
+	
+	<info>
+	  Multiply two polyhedra, or a polyhedron with a matrix or scalar.
+	</info>
+	<syntax>Q = P*S</syntax>
+	<syntax>Q = M*P</syntax>
+	<syntax>Q = a*P</syntax>
+	<syntax>Q = P*a</syntax>
+
+    <descr>
+        <ol>
+            <li> <i>Q = P*S</i> where <i>P</i> and <i>S</i> are Polyhedra.
+                Computes the product of the two polyhedra:
+                <latex>$$Q = \{ (x,y) ~|~ x \in P,\ y \in S \}$$</latex>
+            </li>
+            <li> <i>Q = M*P</i> where <i>P</i> is a Polyhedron and <i>M</i> a matrix
+            Computes the affine mapping <tt>P.affineMap(M)</tt> </li>
+            <li> <i>Q = a*P</i> or <i>P*a</i> where <i>P</i> is a Polyhedron and <i>a</i> is a scalar
+                Computes the scaling <latex> $$Q = \{ax\ |\ x \in P \}$$ </latex>
+            </li>
+        </ol>
+        Note that only single polyhedron <tt>S</tt> can be provided to compute a product.
+	</descr>
+	
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>S</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>M</name>
+	  <descr>Matrix of size <i>n \times \texttt{P.Dim}</i></descr>
+	  <class name="double matrix"/>
+	</input>
+	<input required="false">
+	  <name>a</name>
+	  <descr>Scaling factor</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>Q</name>
+	  <descr>Polyhedron: Either <i>P*S</i>, <i>M*P</i> or <i>a*P</i> depending on the input </descr>
+	  <class name="Polyhedron"/>
+	</output>
+
+	<example>
+	  <descr>Create two polyhedra and take their product:</descr>
+	  <cmd>P = Polyhedron('V',[-1;0]);</cmd>
+	  <cmd>S = Polyhedron('V',[1;2]);</cmd>
+	  <cmd>plot([P S],'linewidth',2,'color','b'); hold on; plot(P*S); axis([-2 3 -2 3]);</cmd>
+	</example>
+
+	<example>
+	  <descr>Compute affine mapping:</descr>
+	  <cmd>P = Polyhedron('lb',-[1;1],'ub',[1;1]); </cmd>
+	  <cmd>Q = randn(3,2)*P;</cmd>
+	  <cmd>plot([P Q]);</cmd>
+	</example>
+
+	<example>
+	  <descr>Compute scaling:</descr>
+	  <cmd>P = ExamplePoly.poly3d_sin;</cmd>
+	  <cmd>plot([1.5*P P P*0.5]);</cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>affineMap</related>
+	
+	<!-- multiple literature sources can be given -->
+	<literature macro="Fukuda:PolyFaq"/>
+	<author macro="author_cnj"/>
+	<license macro="GPL2"/>	
+</help>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>initialize</function>
+  
+  <info>
+    Sets the internal state of the system
+  </info>
+  <syntax>system.initialize(x0)</syntax>
+
+  <descr> 
+    <tt>system.initialize(x0)</tt> sets the initial state of the
+    system to value <tt>x0</tt>.
+
+    The internal state can be retrieved by calling
+    <tt>system.getStates()</tt>.
+  </descr>
+
+  <input required="true">
+    <name>x0</name>
+    <descr>Initial state</descr>
+    <class name="double"/>
+  </input>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

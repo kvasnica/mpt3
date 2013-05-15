@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_ineq2eq</function>
+	
+	<info>
+		Detects inequality constraints which form equalities
+	</info>
+
+	<syntax>[An, bn, Ae, be, ind_e] = mpt_ineq2eq(A, b, tol)</syntax>
+
+	<descr>
+        For a system of inequalities <i>Ax \le b</i>, this function detects and returns those
+         inequality constraints which form equalities. For instance:
+         <tt> A = [1; -1; 1]; b = [1; -1; 2]; </tt>
+         The output will lead:
+         <tt> An = [-1]; bn = [2]; Ae = [1]; be = 1; </tt>
+         such that the original problem can be rewritten as:
+         <latex>
+             \begin{eqnarray*}
+             {A}_{n}x &amp; \le &amp; {b}_{n} \\
+             {A}_{e}x &amp; = &amp; {b}_{e}
+             \end{eqnarray*}
+         </latex>
+         The algorithm works up to specified tolerance <tt>tol</tt>.
+	</descr>
+
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>A</name>
+        <descr>Matrix of inequality constraints in <i>Ax\le b</i></descr>
+		<class name="double"/>
+	</input>
+	
+	<input required="true"> 
+		<name>b</name>
+        <descr>Right hand side of inequalities in <i>Ax\le b</i></descr>
+		<class name="double"/>
+	</input>
+    <input required="false"> 
+		<name>tol</name>
+        <descr>Working precision of the algorithm.</descr>
+		<class name="double"/>
+        <default>MPTOPTIONS.abs_tol</default>
+	</input>
+
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>An</name>
+        <descr>Matrix of new inequality constraints <i>{A}_{n}x\le {b}_{n}</i></descr>
+		<class name="double"/>        
+	</output>
+	<output>
+		<name>bn</name>
+        <descr>Right hand side of new inequality constraints in <i>{A}_{n}x\le {b}_{n}</i></descr>
+		<class name="double"/>        
+	</output>
+	<output>
+		<name>Ae</name>
+        <descr>Matrix of equality constraints <i>{A}_{e}x= {b}_{e}</i></descr>
+		<class name="double"/>        
+	</output>
+	<output>
+		<name>be</name>
+        <descr>Right hand side of equality constraints in <i>{A}_{e}x= {b}_{e}</i></descr>
+		<class name="double"/>        
+	</output>
+	<output>
+		<name>ind_e</name>
+        <descr>Rows of <i>A</i>, <i>b</i> that create a pair of double sided inequalities, sorted in columns. </descr>
+		<class name="double"/>        
+	</output>
+
+	<!-- we can provide multiple code examples -->
+	<example>
+        <descr>A system of inequalities <i>x\le 1</i>, <i>-x\le -1</i>, <i>x\le 2</i> contains one equality constraint 
+               <i>x=1</i> written as double-sided inequality.
+        </descr>
+        <descr> The corresponding matrix form of inequalities <i>Ax\le b</i> is built by </descr>		
+		<cmd>A = [1; -1; 1];</cmd>
+        <cmd>b = [1; -1; 2];</cmd>
+        <descr> To detect the equality, we use <tt>mpt_ineq2eq</tt> function</descr>
+        <cmd>[An, bn, Ae, be] = mpt_ineq2eq(A,b)</cmd>
+	</example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>Polyhedron</related>
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>	
+    <author macro="author_loefberg"/>
+    
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

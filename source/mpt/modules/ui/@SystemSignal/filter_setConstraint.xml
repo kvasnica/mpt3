@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>setConstraint</function>
+  
+  <info>
+    Adds a polyhedral constraint
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter adds polyhedral constraints <i>z_k \in P</i> for all
+    <i>k = 0, \ldots, N-1</i> to the MPC setup. The filter can be
+    applied to arbitrary signals, be it state, input, or output
+    variables.<br/>
+
+    Note, however, that adding this filter to a state variable will
+    NOT add the constraint on the final predicted state (only
+    quantities on prediction steps <i>k = 0, \ldots, N-1</i> are
+    affected by this filter). To add a polyhedral terminal state
+    constraint, use the <tt>terminalSet</tt> filter (see "<tt>help
+    SystemSignal/filter_terminalSet</tt>").<br/>
+
+    To enable the filter, first use
+    <tt>model.x.with('setConstraint')</tt> (you can replace the
+    <tt>x</tt> signal by any other signal of the prediction model).<br/>
+
+    The polyhedron <i>P</i> of the new constraint <i>x_k \in P</i> can
+    then be specified in the <tt>setConstraint</tt> property of the
+    signal:<br/>
+
+    <tt>model.x.setConstraint = Polyhedron(...)</tt><br/>
+    
+    To remove this filter, call <tt>model.x.without('setConstraint')</tt>.
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

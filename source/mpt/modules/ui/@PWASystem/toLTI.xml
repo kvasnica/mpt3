@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>toLTI</function>
+  
+  <info>
+    Converts the i-th mode of a PWA system to an LTI system
+  </info>
+  <syntax>ltisys = pwasys.toLTI(index)</syntax>
+
+  <descr> 
+    For a PWA system consisting of <i>M</i> local affine models, this
+    function converts the <tt>index</tt>-th model to an instance of
+    the <tt>LTISystem</tt> class.
+  </descr>
+
+  <input required="true">
+    <name>index</name>
+    <descr>Index of the local model to extract.</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>ltisys</name>
+    <descr>LTI representation of the <i>i</i>-th local model.</descr>
+    <class name="LTISystem"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

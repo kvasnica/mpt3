@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<macros>
+	<macro name="GPL2">
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this library; if not, write to the 
+Free Software Foundation, Inc., 
+59 Temple Place, Suite 330, 
+Boston, MA  02111-1307  USA
+</macro>
+
+<macro name="email_cnj">colin.jones@epfl.ch</macro>
+
+<macro name="author_cnj">
+	<date>2010-2012</date>
+	<name>Colin Neil Jones</name>
+	<affiliation>EPF Lausanne</affiliation>
+	<email macro="email_cnj"/>
+</macro>
+
+
+<macro name="email_kvasnica">michal.kvasnica@stuba.sk</macro>
+
+<macro name="author_kvasnica">
+	<date>2003-2012</date>
+	<name>Michal Kvasnica</name>
+	<affiliation>STU Bratislava</affiliation>
+	<email macro="email_kvasnica"/>
+</macro>
+
+<macro name="author_vasak">
+    <date> 2005 </date>
+    <name> Mario Vasak</name>
+    <affiliation> FER Zagreb </affiliation>
+    <email>mario.vasak@fer.hr</email>            
+</macro>
+
+<macro name="author_grieder">
+    <date> 2003-2005 </date>
+    <name> Pascal Grieder </name>
+    <affiliation> ETH Zurich </affiliation>
+    <email>grieder@control.ee.ethz.ch</email>       
+</macro>
+
+<macro name="author_baotic">
+    <date> 2003 </date>
+    <name> Mato Baotic</name>
+    <affiliation> ETH Zurich </affiliation>
+    <email>baotic@control.ee.ethz.ch</email>   
+</macro>
+
+<macro name="author_loefberg">
+    <date> 2006 </date>
+    <name> Johan Loefberg </name>
+    <affiliation> ETH Zurich </affiliation>
+    <email>loefberg@control.ee.ethz.ch</email>   
+</macro>
+
+<macro name="author_fjc">
+    <date> 2005 </date>
+    <name> Frank J. Christophersen</name>
+    <affiliation> ETH Zurich </affiliation>
+    <email>fjc@control.ee.ethz.ch</email>   
+</macro>
+
+<macro name="author_geyer">
+    <date> 2005 </date>
+    <name> Tobias Geyer </name>
+    <affiliation> ETH Zurich </affiliation>
+    <email>geyer@control.ee.ethz.ch</email>   
+</macro>
+
+<macro name="email_herceg">herceg@control.ee.ethz.ch</macro>
+<macro name="author_herceg">
+	<date>2010-2012</date>
+	<name>Martin Herceg</name>
+	<affiliation>ETH Zurich</affiliation>
+	<email macro="email_herceg"/>
+</macro>
+
+<macro name="Fukuda:PolyFaq">Fukuda: PolyFaq</macro>
+<macro name="boyd_cvxbook">
+	Stephen Boyd and Lieven Vandenberghe: Convex Optimization; Cambridge University Press
+</macro>
+<macro name="lcp_book">
+	Richard W. Cottle, Jong-Shi Pang, Richard E. Stone: Linear complementarity problem, Academic Press Inc. 1992
+</macro>
+<macro name="plcp">
+    C.N. Jones, M. Morari: Multiparametric Linear Complementarity Problems, IEEE Conference on Decision and Control, 2006
+</macro>
+
+<macro name="scaling1">
+    Details of the method are in file drRAL2001034.ps.gz
+</macro>
+<macro name="scaling2">
+    <tt>http://www.numerical.rl.ac.uk/reports/reports.html</tt>
+</macro>
+
+</macros>

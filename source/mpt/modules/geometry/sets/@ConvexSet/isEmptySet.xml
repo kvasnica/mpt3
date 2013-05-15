@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isEmptySet</function>
+	
+	<info>Test if a convex set is empty.</info>
+	<syntax>ts = S.isEmptySet</syntax>
+	<syntax>ts = isEmptySet(S)</syntax>
+
+	<descr>
+	  Return true if the convex set <i>S</i> is empty and false otherwise. 
+	</descr>
+
+	<input required="true">
+	  <name>S</name>
+      <descr>Any set derived from <tt>ConvexSet</tt> class, e.g. <tt>YSet</tt> or <tt>Polyhedron</tt>.</descr>
+	  <class name="ConvexSet"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if the convex set <i>P</i> is empty and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+    <example>
+        <descr>Describe circle in 2D using YALMIP</descr>
+        <cmd>x = sdpvar(2,1);</cmd>
+        <cmd>F = [x'*x&lt;=1];</cmd>
+        <cmd>S = YSet(x,F); </cmd>
+        <descr> Check if the set is not empty </descr>
+        <cmd> S.isEmptySet </cmd>
+    </example>
+    <example>
+        <descr>We have non-consistent constraints in 2D.</descr>
+        <cmd>x = sdpvar(2,1);</cmd>
+        <cmd>F = [2*x(1)-3*x(2) &lt;= 2; 2*x(1)-3*x(2) &gt;= 3];</cmd>
+        <cmd>S = YSet(x,F); </cmd>
+        <descr> The set must be empty </descr>
+        <cmd> S.isEmptySet </cmd>
+    </example>
+    
+	
+	<!-- multiple related function can be defined -->
+	<related>isBounded</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+	
+	<license macro="GPL2"/>
+</help>

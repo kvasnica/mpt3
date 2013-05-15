@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>eq</function>
+  
+  <info>
+    Returns true if the set covered by unions of polyhedra <i>U_1</i> is the same as the set covered by union <i>U_2</i> and false otherwise.
+  </info>
+  <syntax>ts = U1.eq(U2)</syntax>
+  <syntax>ts = U1 == U2</syntax>
+
+  <descr> 
+    Returns true if the union of polyhedra in the same dimension <tt>U1</tt> covers the same space as the union <tt>U2</tt> which is in the 
+    same dimension. The result is a logical statement if <i>U_1 = U_2</i> holds true or not.
+    The polyunion <tt>U1</tt> can be an array, whereas <tt>U2</tt> is restricted to be a single polyunion object.
+  </descr>
+  
+  <input required="true">
+    <name>U1</name>
+    <descr>Union of polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  <input required="true">
+    <name>U2</name>
+    <descr>Union of polyhedra in the same dimension as <tt>U1</tt>.</descr>
+    <class name="PolyUnion"/>
+  </input>
+
+  <output>
+    <name>ts</name>
+    <descr>True if <tt>U1 == U2</tt> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+    
+  <example>
+    <descr>Create union of two polyhedra in the same dimension</descr>
+    <cmd>P(1) = ExamplePoly.randHrep;</cmd>
+    <cmd>P(2) = ExamplePoly.randHrep('ne',1);</cmd>
+    <cmd> U1 = PolyUnion('Set',P,'Bounded',false) </cmd>
+    <descr>Create a copy of this polyunion</descr>
+    <cmd> U2 = U1.copy</cmd>
+    <descr>Obviously, the polyunions cover the same space. We can verify that using equality test:</descr>
+    <cmd>U1 == U2</cmd>
+  </example>
+  
+  <related>copy</related>
+  <related>join</related>  
+  
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+</help>

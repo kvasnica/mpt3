@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_deployment_onlineMPC</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Application of online MPC controller on Real-Time Windows target
+	</info>
+	
+    <syntax>mpt_demo_deployment_onlineMPC</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Demonstration of real-time control using online MPC controller. 
+       The demo relies on standalone LCP solver that solves the optimization
+       problem given as linear-complementarity problem (LCP). 
+       The LCP solver must be present in the installation path with all
+       required files.
+       <br />
+        
+        Principle:
+        <ol>
+            <li> Generate the online controller that has the desired properties. </li>
+            <li> Export the online controller to YALMIP using <tt>toYalmip</tt> method of <tt>MPCController</tt> class.</li>
+            <li> Formulate a parametric optimization problem and specify the feedback variables that are used as parameters.</li>
+            <li> Create an instance of <tt>Opt</tt> class and transform the optimization problem to LCP using <tt>qp2lcp</tt> method. </li>
+            <li> Create a Simulink scheme with the S-Function block that links to LCP solver.</li>
+            <li> In the Simulink scheme, choose code generation options and pick <bf>rtwin.tlc</bf> as the system target file. </li>
+            <li> Press "CTRL+B" that executes the code generation and compiles the code. </li>
+            <li> In the Simulink scheme choose "Simulation-&gt;External" option and press "Connect To Target". </li>
+            <li> Start the simulation to verify the controller in real-time. </li>
+        </ol>
+        
+	</descr>    
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_deployment_explicitMPC</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>ConvexSet</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Represets a convex set in MPT
+	</info>
+	
+	<syntax></syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Represents a general convex set in <i>\mathbb{R}^{n}</i>. The dimension of the set, i.e. <i>n</i>
+        is stored under <tt>Dim</tt> property. The <tt>ConvexSet</tt> cannot be instantiated, you can only 
+        create objects derived from this class, see related functions.
+        
+        You can associate functions to <tt>ConvexSet</tt> class via <tt>addFunction</tt> methods. Function handles
+        are stored inside <tt>Func</tt> property.
+         
+        The <tt>ConvexSet</tt> class handles various methods that operate over convex sets and functions over 
+        convex sets. For a list of available methods type "methods('ConvexSet')".
+
+    </descr>
+	<!-- no inputs, no outputs because constructing objects is forbidden -->
+
+	<!-- multiple related function can be defined -->
+	<related>YSet</related>
+	<related>Polyhedron</related>
+    <related>Union</related>
+    <related>PolyUnion</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

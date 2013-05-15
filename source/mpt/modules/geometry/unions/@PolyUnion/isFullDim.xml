@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isFullDim</function>
+	
+	<info>Test if the union is built from full-dimensional polyhedra.</info>
+	<syntax>ts = U.isFullDim</syntax>
+	<syntax>ts = isFullDim(U)</syntax>
+
+	<descr>
+	  Return true if all polyhedra in the union <tt>U</tt> are full-dimensional and false otherwise.
+      Once this method has been called, the information about the full-dimensionality can be retrieved
+        from <tt>U.Internal.FullDim</tt> property.
+	</descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if all polyhedra in the union are full-dimensional and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+    <example>
+        <descr>Union of full-dimensional and low-dimensional polyhedron.</descr>
+        <cmd>P(1) = Polyhedron('lb',[0;0],'ub',[1;1]);</cmd>
+        <cmd>P(2) = Polyhedron('lb',[0;0],'ub',[0;1]); </cmd>
+        <descr> Create union </descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr>Check if the union is full-dimensional</descr>
+        <cmd> U.isFullDim </cmd>
+        <descr> The full-dimensionality property can be retrieved from </descr>
+        <cmd> U.Internal.FullDim </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isConvex</related>
+    <related>isOverlapping</related>
+    <related>isConnected</related>
+    <related>isBounded</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

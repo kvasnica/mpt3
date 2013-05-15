@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_plcp</function>
+	
+	<info>
+		A gateway function to PLCP solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_plcp(S)</syntax>
+
+    <descr>
+        The function implements call to PLCP solver from <tt>Opt</tt> class.
+        Supported problems are PLCP, MPLP, and MPQP.
+        For PLCP, the problem is directly passed to <tt>mpt_plcp</tt> solver.
+        For MPLP/MPQP, the problem is first transformed to PLCP and then PLCP solver is called.
+                
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+        <descr>Object of the <tt>Opt</tt> class with the PLCP data.</descr>
+        <class name="Opt">
+            <field>
+                <name>Ath</name>
+                <descr>Linear part of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>bth</name>
+                <descr>Right hand side of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>           
+            <field>
+                <name>M</name>
+                <descr>Linear matrix involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>q</name>
+                <descr>Right hand side vector involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Q</name>
+                <descr>Linear matrix involved in parametric formulation of LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>                                    
+            <field>
+                <name>n</name>
+                <descr>Number of decision variables.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>d</name>
+                <descr>Number of parameters.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>varOrder</name>
+                <descr>Order of variables if the problem was processed by YALMIP first.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Internal</name>
+                <descr>Internal property of <tt>Opt</tt> class.</descr>
+                <class name="struct"/>
+                <default>[]</default>
+            </field>            
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution</descr>
+				<class name="PolyUnion"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1)</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization</descr>
+				<class name="char"/>
+			</field>
+            <field>
+				<name>solveTime</name>
+				<descr>Information about the time that elapsed during the computation in seconds.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>stats</name>
+				<descr>Further details from the parametric solver.</descr>
+				<class name="struct"/>
+			</field>                        
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>Opt</related>    
+    <related>mpt_solvemp</related>    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>removeFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Remove function associated to a convex set based on the function name.
+	</info>
+	
+	<syntax>Set = removeFunction(Set,name)</syntax>
+	<syntax>Set.removeFunction(name)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Removes the <tt>Function</tt> object <tt>F</tt> from the convex <tt>Set</tt> 
+        identified by the string <tt>name</tt>. The functions stored with 
+        the set can be found under <tt>Func</tt> property. The function name must match 
+        one of function names stored under this set that can be retrieved using
+        <tt>listFunctions</tt> method.
+    </descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+    <input required="true">
+		<name>name</name>
+        <descr>Name of the function to remove from the array. String must match one of the stored function names.
+        For multiple names, specify <tt>name</tt> as a cell array of strings.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="double or char"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>Set</name>
+        <descr>Modified object of <tt>ConvexSet</tt> class without the function that has been removed.</descr>
+		<class name="ConvexSet"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> Add two functions <i>{f}_{1}(x) = -x+1</i> and <i> {f}_{2}(x) = x+2 </i> to a polyhedron <i>P = \{ x ~|~ -4 &lt;= x &lt;= 5 \} </i></descr>
+        <descr> Define Polyhedron </descr>
+        <cmd> P = Polyhedron('lb',-4,'ub',5); </cmd>
+        <descr> Define the functions</descr>
+        <cmd> f1 = AffFunction(-1,1); f2=AffFunction(1,2);</cmd>
+        <descr> Add these functions to the polyhedron  </descr>
+        <cmd> P.addFunction(f1, 'f1');</cmd>
+        <cmd> P.addFunction(f2, 'f2');</cmd>
+        <descr> Remove the function "f1" from the set </descr>
+        <cmd> P.removeFunction('f1') </cmd>
+        <descr> Polyhedron no contains only 'f2' function </descr>
+        <cmd> P.Func </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>ConvexSet</related>
+    <related>Function</related>
+    <related>QuadFunction</related>
+    <related>AffFunction</related>
+    <related>addFunction</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

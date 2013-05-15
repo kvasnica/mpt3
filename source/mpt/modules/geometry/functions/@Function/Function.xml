@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>Function</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Function representation for MPT
+	</info>
+	
+	<syntax>F = Function(@fun, data)</syntax>
+	<syntax>F = Function(@fun)</syntax>
+    <syntax>F = Function([],struct('p',2))</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>Function</tt> class represents functions handles that are associated to sets in MPT. The class
+        combines the <tt>function_handle</tt> with changeable parameters which allows 
+        specifications of very general functions. When constructing the <tt>Function</tt> object, the
+        correctness of the given function is not tested. It is up to the user to provide correct mapping, or test 
+        it via <tt>feval</tt> method for <tt>ConvexSet</tt> class.
+        Domain of the function is specified by the set it is associated to. If the point lies outside of the domain,
+        an error is thrown. 
+        The range of the function is not known at the time of the construction of the <tt>Function</tt> object. It 
+        can be determined after evaluation of the related function for given point.
+        User can associate any data with the function, including parameters of the function, under the <tt>Data</tt>
+        field. These data can be modified anytime after the construction of the object.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Handle</name>
+        <descr>A <tt>function_handle</tt> that represents the function. It can be an anonymous function, e.g.
+            <i>f(x) = x^3</i> that corresponds to syntax <i>@(x){x}^{3}</i> or it can be a link to another file that
+            evaluates the expression, i.e. <tt>@file</tt>. Both of the expressions are fine as long as the given 
+            handle can be evaluated at the time of the construction. 
+            If more arguments (or parameters) are present in the function, the arguments are separated with a comma, 
+            e.g. <i>f(x,y,z) = x(y-z)^2</i> corresponds to <i>@(x,y,z) x*(y-z)^2 </i>. For more info about 
+            constructing handles see help for <tt>function_handle</tt> class.
+        </descr>
+        <class name="function_handle"/>
+	</input>
+	<input>
+		<name>Data</name>
+		<descr>Any data related to the function. It can be function parameters, variable bounds, domain, range, 
+            measured data, symbolic representation, etc. The data can be changed after construction of the 
+        <tt>Function</tt> object. </descr>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>F</name>
+		<descr> <tt>Function</tt> object. </descr>
+        <class name="Function"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+            <descr>Construct empty <tt>Function</tt></descr>		
+            <cmd>F=Function</cmd>
+            <descr>Construct an 5x1 array of empty <tt>Function</tt> objects </descr>
+            <cmd>F(5,1) = Function</cmd>
+    </example>
+    <example>
+            <descr>Construct anonymous function <i>f(x,y) = (x-y)/(x^2+y^2)^0.5</i></descr>
+            <cmd> F = Function(@(x,y) (x-y)/(x^2+y^2)^0.5) </cmd>       
+    </example>
+    <example>
+        <descr> Construct anonymous function <i>f(x) = a*sin(b*x)</i> with parameters <i>a</i> and <i>b</i>.</descr>
+        <descr> Firstly, construct empty <tt>Function</tt> object and put the parameter values inside the <tt>Data</tt> field</descr>
+        <cmd> F = Function([],struct('a',10.4,'b',-0.56)) </cmd>
+        <descr> Secondly, set the handle pointing to the parameters stored inside <tt>Data</tt> property </descr>
+        <cmd> F.setHandle(@(x) F.Data.a*sin(F.Data.b*x)) </cmd>
+        <descr> The values of the parameters <i>a</i>, <i>b</i> can be modified after construction of the object.
+        The <tt>Function</tt> object will then take the new values of the parameters. </descr>
+        <cmd> F.Data.a = 12.78; F.Data.b = -0.93 </cmd>
+	</example>
+    <example>
+        <descr> For functions arrays you must correctly refer to the appropriate index of the function data </descr>
+        <descr> Allocate an array of <tt>Function</tt> objects </descr>
+        <cmd> F(2,1) = Function </cmd>
+        <descr> Assign the data </descr>
+        <cmd> F(1).Data = struct('a',-1,'b',2); </cmd>
+        <cmd> F(1).setHandle(@(x) F(1).Data.a*sin(F(1).Data.b*x)); </cmd>
+        <cmd> F(2).Data = struct('a',-3,'b',4); </cmd>
+        <cmd> F(2).setHandle(@(x) F(2).Data.a*sin(F(2).Data.b*x)); </cmd>
+    </example>
+
+
+	<!-- multiple related function can be defined -->
+	<related>AffFunction</related>
+	<related>QuadFunction</related>
+    <related>setHandle</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

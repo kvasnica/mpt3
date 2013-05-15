@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>ClosedLoop</function>
+  
+  <info>
+    Create a closed-loop system.
+  </info>
+  <syntax>loop = ClosedLoop(controller, system)</syntax>
+
+  <descr> 
+      Creates a closed-loop system composed of a controller and a
+      system using a state feedback.
+
+      The object contains two read-only properties:
+      <ul>
+	<li><tt>controller</tt>: the controller</li>
+	<li><tt>system</tt>: the system</li>
+      </ul>
+
+      Note: the <tt>controller</tt> and <tt>system</tt> properties are
+      linked to original objects using references. It means that if you
+      change the system and/or the controller in your MATLAB
+      workspace, the change will automatically propagate to the
+      closed-loop object without the need to re-create it manually.
+  </descr>
+  
+  <input>
+    <name>controller</name>
+    <descr>Any MPT3 controller (<tt>MPCController</tt>,
+    <tt>EMPCController</tt>, <tt>LQRController</tt>,
+    <i>\ldots</i>)</descr> 
+    <class name="AbstractController"/>
+  </input>
+  <input>
+      <name>system</name>
+      <descr>Any MPT3 system (<tt>LTISystem</tt>, <tt>PWASystem</tt>,
+      <tt>MLDSystem</tt>)</descr> 
+      <class name="AbstractSystem"/>
+  </input>
+  <output>
+    <name>loop</name>
+    <descr>Instance of the <tt>ClosedLoop</tt> class.</descr>    
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

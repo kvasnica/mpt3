@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>copy</function>
+	
+	<info>Create a new copy of the PolyUnion object.</info>
+	<syntax>Un = U.copy</syntax>
+	<syntax>Un = copy(U)</syntax>
+
+	<descr>        
+        Create a new copy of the <tt>PolyUnion</tt> object. Any change of data in the new object <tt>Un</tt>
+        will not affect the data contained in <tt>U</tt> object.        
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+    
+    <example>
+        <descr>Create union of two polyhedra <i>P</i>.</descr>        
+        <cmd>P(1) = 5*ExamplePoly.randVrep;</cmd>
+        <cmd>P(2) = -P(1);</cmd>
+        <descr>Create the union of polyhedra by specifying some properties.</descr>
+        <cmd> U = PolyUnion('Set',P,'convex',false,'overlaps',true); </cmd>
+        <descr> Create the copy of the union <tt>U</tt> </descr>
+        <cmd> Un = U.copy; </cmd>
+        <descr> We can do some operations on the new object <tt>Un</tt>, without affecting the data stored in the old object<tt>U</tt>.
+            For instance, querying for full-dimensionality:
+        </descr>
+        <cmd> Un.isFullDim </cmd>
+        <descr> The old object was not affected by this query</descr>
+        <cmd> U </cmd>
+        <descr> Whereas in the new object was the property "FullDim" has been changed.</descr>
+        <cmd> Un </cmd>
+    </example>
+
+    <related>PolyUnion</related>
+    
+	<!-- multiple authors can be defined -->
+    <author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>isInside</function>
+  
+  <info>
+    Test if a point is contained inside polyhedron in H-representation.
+  </info>
+  <syntax>[isin, inwhich, closest] = isInside(Pn, x0, Options)</syntax>
+  <syntax>[isin, inwhich, closest] = Pn.isInside(x0, Options)</syntax>
+  
+  <descr>
+      Check if the point <tt>x0</tt> is contained inside the polyhedron array <tt>Pn</tt>.
+      The result it the logical statement if <i>x0 \in P</i> and false otherwise.
+
+      <tt>P</tt> must be given in H-representation, otherwise an error is thrown.
+      
+      Note that this operation depends on the settings of absolute tolerance that can be
+      changed in <tt>Options</tt> settings.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in H-representation.</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>x0</name>
+    <descr>A point in the same dimension as polyhedron and given as real column vector.</descr>
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>Options</name>
+    <descr>A structure with the option settings for point location problem.</descr>
+    <class name="struct">
+        <field>
+            <name>abs_tol</name>
+            <descr>Absolute tolerance for checking the satisfaction of inequalities and equalities.</descr>
+            <class name="double"/>
+            <default>mptopt.abs_tol</default>
+        </field>
+        <field>
+            <name>fastbreak</name>
+            <descr>If <tt>Pn</tt> is the polyhedron array, then do a quick stop in the consecutive search when <tt>x0</tt>
+            is contained in any of the polyhedrons.        
+        </descr>
+            <class name="logical">
+                <option>true</option>
+                <option>false</option>
+            </class>
+            <default>false</default>
+        </field>        
+    </class>
+  </input>
+
+  
+  <output>
+    <name>isin</name>
+    <descr>True if <i>x0 \in P</i> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  <output>
+    <name>inwhich</name>
+    <descr>If <tt>Pn</tt> is an array of polyhedra in the same dimension, than <tt>isin</tt> indicates which polyhedra
+    from this array contain the point <tt>x0</tt>.</descr>
+    <class name="double"/>
+  </output>
+  <output>
+    <name>closest</name>
+    <descr>If <tt>Pn</tt> is an array of polyhedra in the same dimension and none of polyhedra contains <tt>x0</tt>,
+    then the field <tt>closest</tt> indicates which polyhedra has the closest distance for <tt>x0</tt> to lie
+    in it's interior.</descr>
+    <class name="double"/>
+  </output>
+
+  
+  <example>
+    <descr>Create two polytopes in 2D.</descr>
+    <cmd>P(1) = ExamplePoly.randHrep;</cmd>
+    <cmd>P(2) = ExamplePoly.randHrep+[1;1];</cmd>
+    <descr>Check if the point x0=[1.1;0.9] is contained in any of them.</descr>
+    <cmd> x0 = [1.1; 0.9]; </cmd>
+    <cmd>[isin, inwhich] = P.isInside(x0)</cmd>
+    <descr>Plot the point and polyhedra</descr>
+    <cmd>plot(P); hold on; text(x0(1),x0(2),'\bf x')</cmd>
+  </example>
+   
+  <related>contains</related>
+  
+  <author macro="author_herceg"/>
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

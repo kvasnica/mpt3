@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>exportToC</function>
+  
+  <info>
+    Export the explicit controller to C-code
+  </info>
+  <syntax>controller.exportToC</syntax>
+  <syntax>controller.exportToC('filename')</syntax>
+  <syntax>controller.exportToC('filename','dirname')</syntax>
+
+  <descr> 
+      The routine <tt>exportToC</tt> generates C-code from the explicit <tt>controller</tt>. 
+      A new directory is always created with the generated code. If no name of the 
+      directory is provided in the second argument, the default name for the directory is
+      <tt>mpt_explicit_controller</tt>. The directory contains three files:
+      <ul>
+          <li><tt>mpt_getInput.h</tt> - The header files with PWA control law. </li>
+          <li><tt>mpt_getInput.c</tt> - The routine for sequential evaluation of PWA control law.</li>
+          <li><tt>mpt_getInput_sfunc.c</tt> - The Simulink interface for calling using the <tt>mpt_sim</tt> library. </li>
+      </ul>
+      The generated code can be used for fast execution of MPC control. An example of Simulink 
+      interface to generated code is given in <tt>mpt_getInput_sfunc.c</tt> that can be tested 
+      from Matlab. The prerequisite is to have C-compiler installed and recognized from Matlab.
+      To test the Simulink interface, compile the <tt>mpt_getInput_sfunc.c</tt> first by typing
+      <br />
+      <tt>mex mpt_getInput_sfunc.c</tt>.
+      <br />
+      When compiled, connect the block of explicit controller from MPT Simulink library <tt>mpt_sim</tt>
+      with your scheme and run the simulation.                  
+  </descr>
+
+  <input required="false">
+    <name>filename</name>
+    <descr>Name of the header file to be generated.</descr>
+    <class name="char"/>
+  </input>
+  <input required="false">
+    <name>dirname</name>
+    <descr>Name of the directory to be generated.</descr>
+    <class name="char"/>
+  </input>
+
+  <author macro="author_herceg"/>
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

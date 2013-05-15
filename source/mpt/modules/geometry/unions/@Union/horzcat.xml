@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>horzcat</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Horizontal concatenation for union objecs.
+	</info>
+	
+	<syntax>U = [U1, U2]</syntax>
+	<syntax>S = horzcat(U1,U2)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Overloaded method for horizontal concatenation of unions. It is not possible 
+        to concatenate objects of different type to the same array (e.g. <tt>PolyUnion</tt> and <tt>Union</tt>). 
+        Similarly, it is not possible to concatenate into matrices, only vectors are allowed.
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U1</name>
+        <descr>Object of the <tt>Union</tt> class. </descr>
+		<class name="Union"/>
+	</input>
+	<input required="false">
+		<name>U2</name>
+        <descr>Object of the <tt>Union</tt> class. </descr>
+		<class name="Union"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>The array of the <tt>Union</tt> objects.</descr>
+		<class name="Union"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> We have two polyhedra in <tt>U1</tt> object.</descr>
+        <cmd> P(1) = ExamplePoly.randHrep; </cmd>
+        <cmd> P(2) = ExamplePoly.randHrep; </cmd>
+        <cmd> U1 = Union(P); </cmd>
+        <descr> The object <tt>U2</tt> contains one polyhedron.</descr>
+        <cmd> U2 = Union(ExamplePoly.randHrep)</cmd>
+        <descr> Concatenate unions horizontally.</descr>
+        <cmd> U = [U1, U2] </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>vertcat</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

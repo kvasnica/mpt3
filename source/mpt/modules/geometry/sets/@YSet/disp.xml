@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>disp</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Overload display for <tt>YSet</tt> class.
+	</info>
+	
+	<syntax>disp(S)</syntax>
+    <syntax>S.disp</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Default display for <tt>YSet</tt> class.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+        <descr><tt>YSet</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="YSet"/>
+	</input>
+
+	<!-- multiple related function can be defined -->
+    <related>YSet</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

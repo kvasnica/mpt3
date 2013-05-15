@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>LQRSet</function>
+  
+  <info>
+    Computes an invariant subset of an LQR controller
+  </info>
+
+  <syntax>S = system.LQRSet()</syntax>
+
+  <descr> 
+    This function computes the set of states where an LQR controller
+    <i>u=Kx</i> provides recursive satisfaction of state and input
+    constraints.<br/>
+
+    The set is computed by running the set recursion
+    <latex>
+		\begin{equation*}
+      S_{k+1} = \{ x \ | \ (A+BK) x \in S_k, \ u_{\min} \leq Kx \leq
+      u_{max} \},
+	  \end{equation*}
+    </latex>
+    initialized by <i>S_0 = \{ x \ | \ x_{min} \leq x \leq x_{max}
+    \}</i> and terminating once <i>S_{k+1}=S_k</i>. The LQR feedback
+    gain is computed automatically by calling <tt>K =
+    system.LQRGain()</tt>.<br/>
+    
+    Note that this function requires that input and state constraints
+    are defined in <tt>system.u.min</tt>, <tt>system.u.max</tt>,
+    <tt>system.x.min</tt>, and <tt>system.x.max</tt> (see "<tt>help
+    SystemSignal</tt>"). 
+  </descr>
+
+  <output>
+    <name>S</name>
+    <descr>Invariant set of the LQR controller</descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

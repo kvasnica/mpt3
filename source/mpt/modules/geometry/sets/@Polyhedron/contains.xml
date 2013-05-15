@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>contains</function>
+  
+  <info>
+    Test if a polyhedron/point is contained inside polyhedron.
+  </info>
+  <syntax>tf = P.contains(S)</syntax>
+  <syntax>tf = contains(P, S)</syntax>
+  <syntax>P &gt; S</syntax>
+  <syntax>P &gt;= S</syntax>
+  <syntax>S &lt; P</syntax>
+  <syntax>S &lt;= P</syntax>
+  
+  <descr>
+      Check if the polyhedron or the point <tt>S</tt> is contained inside the polyhedron <tt>P</tt>.
+      The result it the logical statement if <i>S \subseteq P</i> and false otherwise.
+
+      <tt>S</tt> can be given as polyhedron, it can be a point (or set of points concatenated rowwise).
+      
+      Note that this operation is numerically sensitive and depends on the settings of the absolute and
+      relative tolerances.    
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>S</name>
+    <descr>Polyhedron in any format or a point given as real vector. Multiple points must be concatenated
+    in a matrix row-wise, where the number of columns corresponds to the dimension of <tt>P</tt>.</descr>
+    <class name="Polyhedron or double"/>
+  </input>
+  
+  <output>
+    <name>tf</name>
+    <descr>True if <i>S \subseteq P</i> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Create two polytopes:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+    <cmd>S = ExamplePoly.poly3d_sin('d',3); S = S.affineMap(eye(3)*2);</cmd>
+    <descr>Compare polytopes:</descr>
+    <cmd>P.contains(S)</cmd>
+    <cmd>S.contains(P)</cmd>
+    <descr>Plot the result</descr>
+    <cmd>plot([P,S],'alpha',0.3);</cmd>
+  </example>
+ 
+  <example>
+    <descr>Create two polyhedra:</descr>
+    <cmd>P = ExamplePoly.randHrep;</cmd>
+    <cmd>S = P + ExamplePoly.randVrep('n',1,'nr',1);</cmd>
+    <descr>Compare polytopes:</descr>
+    <cmd>P.contains(S)</cmd>
+    <cmd>S.contains(P)</cmd>
+    <descr>Plot the result</descr>
+    <cmd>plot([S P]);</cmd>
+  </example>
+  
+  <related>interiorPoint</related>
+  <related>le</related>
+  <related>lt</related>
+  <related>ge</related>
+  <related>gt</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

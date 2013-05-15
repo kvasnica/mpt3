@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>getStates</function>
+  
+  <info>
+    Returns the internal state of the system
+  </info>
+  <syntax>x = system.getStates()</syntax>
+
+  <descr> 
+    This function returns the system's internal state.
+  </descr>
+
+  <output>
+    <name>x</name>
+    <descr>Values of the internal states</descr>
+    <class name="double"/>
+  </output>
+
+  <example>
+    <descr>Define a 1D LTI system <i>x^+ = x + u</i>.</descr>
+    <cmd>sys = LTISystem('A', 1, 'B', 1)</cmd>
+    <descr>Set the system's internal state to <i>2.5</i>.</descr>
+    <cmd>sys.initialize(2.5);</cmd>
+    <descr>Retrieve the internal state.</descr>
+    <cmd>x = sys.getStates()</cmd>
+  </example>
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

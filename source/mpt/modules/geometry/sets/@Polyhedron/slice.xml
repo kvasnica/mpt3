@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>slice</function>
+  
+  <info>
+    Slice through the polyhedron in the given dimensions at specified offsets.
+  </info>
+  <syntax>Ps = P.slice(dims, offsets)</syntax>
+  <syntax>Ps = slice(P, dims, offsets)</syntax>
+
+  <descr> 
+    Compute the intersection of <i>P</i> with a subspace spanning the dimensions dims at the
+    given offsets.
+
+    For each element <i>o</i> in <tt>offsets</tt>, slice computes:
+    <latex>
+      $$ E ( P \cap \{ x\ ~|~  E x = 0 \} ) $$
+    </latex>
+    where <i>E</i> is a matrix who's <i>i^{\text{th}}</i> row is the <tt>dims(i)</tt> elementary vector.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>dims</name>
+    <descr>Dimensions to cut through</descr>
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>offsets</name>
+    <descr>Set of offsets at which to compute the slices.</descr>
+    <class name="double"/>
+    <default>0</default>
+  </input>
+
+  <output>
+    <name>Ps</name>
+    <descr>Vector of slices. i'th element corresponds to <tt>offset(i)</tt></descr>
+    <class name="Polyhedron"/>
+  </output>
+  
+  <example>
+    <descr>Create a polytope:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+    <descr>Compute slices:</descr>
+    <cmd>offsets = linspace(-1.5,1.5,7);</cmd>
+    <cmd>Ps = P.slice(1:2, offsets);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot('alpha',0.2); hold on;
+	 for(i=1:length(offsets))
+	    Ps(i).affineMap([eye(2);0 0]).plus([0;0;offsets(i)]).plot;
+	 end
+    </cmd>
+  </example>
+
+  <example>
+    <descr>Create unbounded polyhedron:</descr>
+    <cmd>P = ExamplePoly.randHrep('d',3,'ne',1,'nr',1);</cmd>
+    <descr>Slice it:</descr>
+    <cmd>offsets = linspace(-2,2,10);</cmd>
+    <cmd>Ps = P.slice(1:2, offsets);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot('alpha',0.2); hold on;
+	 for(i=1:length(offsets))
+	    Ps(i).affineMap([eye(2);0 0]).plus([0;0;offsets(i)]).plot;
+	 end
+    </cmd>
+  </example>
+     
+  <related>projection</related>
+  <related>project</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

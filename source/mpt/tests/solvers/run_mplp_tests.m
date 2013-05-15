@@ -1,0 +1,50 @@
+function run_mplp_tests
+%
+% header to be inserted
+
+global MPTOPTIONS
+
+if isempty(MPTOPTIONS)
+    MPTOPTIONS = mptopt;
+end
+
+% add other parametric solvers later and compare them
+name = MPTOPTIONS.solvers_list.parametric.LP;
+
+ct = zeros(1,numel(name));
+
+% find directory
+d=which('run_mplp_tests');
+id = strfind(d, filesep);
+d = d(1:id(end));
+
+% execute testing files in this directory
+disp('-------------------------------------------------------------------')
+for i=1:numel(name)
+    solvername = name{i};
+    disp(['Testing ', upper(solvername),' solver:']);
+    
+    p = dir([d,'test_mplp_*']);
+    for j=1:numel(p)
+        try
+            t = cputime;
+            eval([strtok(p(j).name,'.'),'(''',name{i},''');']);
+            tf = cputime-t;
+            disp([p(j).name,'........................ ok    cputime = ', sprintf('%.6f',tf),'s']);
+            ct(i) = ct(i) + tf;
+        catch
+            disp([p(j).name,'........................ error']);
+        end
+    end
+    
+    disp('  ');
+end
+
+% finding the fastest solver
+[mct, imin] = sort(ct);
+
+disp(['The fastest solver ',upper(name{imin(1)}),' needed ',sprintf('%.6f',mct(1)),'s to solve all tests.']);
+for i=2:numel(name)
+   disp([upper(name{imin(i)}),' needed ', sprintf('%.6f',mct(i)),'s.']);
+end
+disp('-------------------------------------------------------------------')

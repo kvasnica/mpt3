@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>removeFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Remove function from all Polyhedra in the union based on the function name.
+	</info>
+	
+	<syntax>U = removeFunction(U,name)</syntax>
+	<syntax>U.removeFunction(name)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Removes <tt>Function</tt> object from the union of polyhedra 
+        identified by the string <tt>name</tt>. The functions stored with 
+        the union can be retrieved using <tt>listFunctions</tt> method.
+        Index or string must match with the corresponding arrays.
+    </descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Object of the <tt>PolyUnion</tt> class that holds polyhedra in the same dimension.</descr>
+		<class name="PolyUnion"/>
+	</input>
+
+    <input required="true">
+		<name>name</name>
+        <descr>Name of the function to remove from the union. String must match one of the names as retrieved by <tt>listFunctions</tt>
+        method.For multiple names, provide <tt>name</tt> as a cell array of strings.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>Modified object of the <tt>PolyUnion</tt> class without the function handles that has been removed.</descr>
+		<class name="PolyUnion"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> Create an union of polyhedra that holds two quadratic functions.</descr>
+        <descr> Define Polyhedra </descr>
+        <cmd> P(1) = Polyhedron('lb',-2,'ub',0); </cmd>
+        <cmd> P(2) = Polyhedron('lb',-1,'ub',1); </cmd>
+        <descr> Define the functions</descr>
+        <cmd> f1 = QuadFunction(2,-1,1); </cmd>
+        <cmd> f2 = QuadFunction(3,-2,0);</cmd>
+        <descr> Add these functions to the polyhedron array </descr>
+        <cmd> P.addFunction(f1,'f1'); </cmd>
+        <cmd> P.addFunction(f2,'f2'); </cmd>
+        <descr> Create the <tt>PolyUnion</tt> object with some properties. </descr>
+        <cmd> U = PolyUnion('Set',P,'Overlaps',true) </cmd>
+        <descr> Remove the function "f2" from the set </descr>
+        <cmd> U.removeFunction('f2') </cmd>
+        <descr> Union of polyhedra now contains only 'f1' function </descr>
+        <cmd> U.listFunctions </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>addFunction</related>
+    <related>removeAllFunctions</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>listFunctions</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Extract list of functions stored with the union.
+	</info>
+	
+	<syntax>U.listFunctions</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Extract list of function names stored with the union of convex sets. 
+        If there are no functions associated, the result is empty.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+        <descr>Object derived from <tt>Union</tt> class.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Union"/>
+	</input>
+    
+    <example>
+        <descr>Create union of polyhedra with two affine function "width", "height".</descr>
+        <cmd> P(1) = Polyhedron('ub',-1); </cmd>
+        <cmd> P(1).addFunction(AffFunction(-1,1),'weight'); </cmd>
+        <cmd> P(1).addFunction(AffFunction(-2,0.5),'height'); </cmd>
+        <cmd> P(2) = Polyhedron('lb',-1,'ub',1); </cmd>
+        <cmd> P(2).addFunction(AffFunction(0,1),'weight'); </cmd>
+        <cmd> P(2).addFunction(AffFunction(-3,0.5),'height'); </cmd>
+        <cmd> P(3) = Polyhedron('lb',1); </cmd>
+        <cmd> P(3).addFunction(AffFunction(1,1),'weight'); </cmd>
+        <cmd> P(3).addFunction(AffFunction(-4,0.5),'height'); </cmd>
+        <descr> Create the <tt>PolyUnion</tt> object without specifying any properties. </descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr> Get the function names </descr>
+        <cmd> U.listFunctions </cmd>        
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>Union</related>
+    <related>PolyUnion</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

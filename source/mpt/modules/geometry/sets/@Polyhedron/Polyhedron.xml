@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>Polyhedron</function>
+  
+  <info>
+    Create a Polyhedron object.
+  </info>
+  <syntax>P = Polyhedron(param, value, ...)</syntax>
+  <syntax>P = Polyhedron(dat)</syntax>
+  <syntax>P = Polyhedron(con, var)</syntax>
+  <syntax>P = Polyhedron(Q)</syntax>
+
+  <descr> 
+      Creates a Polyhedron:
+      <latex>
+          $$ P = \{x ~|~ Ax \le b,\ {A}_{e}x = {b}_{e} \} $$
+      </latex>
+      or
+      <latex>
+          $$ P = \{x ~|~ x = V'\lambda + R'\gamma, \lambda, \gamma \ge 0,\ {1}^{T}\lambda = 1 \}$$
+      </latex>
+      <ol>
+          <li> Polyhedral data specified as param, value pairs (detailed below).</li>
+          <li> Polyhedral data given in a structure. The same data as described
+          below for param/value pair, but given as a structure.</li>
+          <li> Yalmip description <tt>con[straints]</tt> <tt>var[iables]</tt> specified</li>
+          <li> Polyhedron <i>Q</i> specified.
+              The polyhedron object is a <em>handle</em> object. This means that executing 
+              <i>Q = P</i> does NOT create a copy of <i>P</i>, both only another object by the same name. If you 
+          want to copy <i>P</i>, then call <i>Q = \texttt{Polyhedron}(P)</i>. </li>
+      </ol>
+      
+      
+      This class repreents the following polyhedra:
+      <ul>
+          <li> <bf>Unbounded polyhedra</bf>
+              All polyhedra can be decomposed into the sum of a bounded polytope a cone:
+              <latex>$$  P = \text{conv}(V) + \text{cone}(R) $$</latex>
+              and satisfy the Minkowski-Weyl theorem and can therefore be represented
+              either as the intersection of a finite number of inequalities, or as the convex
+              combination of a finite number of vertices (or rays).
+              <em>MPT will store all irredundant polyhedra as a decomposition into a polytope and a cone.</em>
+          </li>
+          <li> <bf>Lower-dimensional polyhedra</bf>
+              Theoretically there is no difference between full-dimensional and lower-dimensional
+              polyhedra either in representation or in the algorithms that operate on them. However,
+              experience has shown that if the affine hull of the polyhedron is not taken into account
+              explicitly, then virtually all algorithms will fail.
+              <em>MPT will store a polyhedron as the intersection of a full-dimensional polyhedron and an affine hull.</em>
+          </li>
+          <li> <bf>Upointed Polyhedra</bf>
+              Operations on polyhedra with non-empty lineality space (i.e. unpointed polyhedra) adds
+              significant complexity and difficulty. Thankfully, all convex sets can be decomposed into
+              the Minkowski sum of their lineality space, with their restriction onto a linear subspace
+              U that is perpendicular to <i>\text{lineal}(P)</i>
+              <i>P= \text{lineal}(P) + (P \cap U)</i>
+              where <i>P \cap U</i> has an empty lineality space. Therefore, it is always possible to
+              represent an unpointed polyhedron as the lifting of a pointed one:
+              <latex>$$P = \{Ey\,|\,y \in \tilde P\}$$</latex>
+              where <i>\tilde P \in \mathbb{R}^m</i> is pointed and <i>E \in \mathbb{R}^{n\times m}</i> with n &gt; m.
+              
+              The requirement of dealing with an additional lifting operation for all polyhedra will add
+              more coding complexity to MPT than desired. Therefore, in the interest of
+              simplicity, MPT will handle unpointed polyhedra only in halfspace form, where the
+              lifting map is not required, and any operation that cannot function on lifted polyhedra
+              will return an error.
+              
+              <em>MPT will have a limited ability to operate on unpointed polyhedra.  It will
+                  handle unpointed polyhedra only in halfspace form, where the lifting map is not
+                  required, and any operation that does not function on unpointed
+              polyhedra will throw an exception.</em>              
+          </li>
+      </ul>   
+  </descr>
+  
+  <input required="false">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+      <name>H</name>
+      <descr> Inequality description (must be full-dimensional) <i> {x ~|~ H \begin{pmatrix}x \\ -1\end{pmatrix} &lt;= 0}</i> </descr>
+      <class name="double"/>
+  </input>
+  <input>
+      <name>He</name>
+      <descr> Affine set <i>{x ~|~ {H}_{e}\begin{pmatrix} x \\ -1 \end{pmatrix} = 0}</i> </descr>
+      <class name="double"/>
+  </input>
+  <input>
+      <name>V</name>
+      <descr> Points defining the set <i>\text{conv}(V)</i>.</descr>
+      <class name="double"/>
+  </input>
+  <input>
+      <name>R</name>
+      <descr> Rays defining the set <i>\text{cone}(R)</i>.</descr>
+      <class name="double"/>
+  </input>
+  <input>
+      <name>irredundantVRep</name>
+      <descr> If true, then the given V-representation is assumed irredundant.</descr>
+      <class name="logical">
+          <option>true</option>
+          <option>false</option>
+      </class>
+  </input>
+  <input>
+      <name>irredundantHRep</name>
+      <descr> If true, then the given H-representation is assumed irredundant.</descr>
+      <class name="logical">
+          <option>true</option>
+          <option>false</option>
+      </class>
+  </input>
+  <input>
+      <name>lb</name>
+      <descr> Add a constraint of the form <i>\text{lb} &lt;= x</i>.</descr>
+      <class name="double"/>
+  </input>
+  <input>
+      <name>ub</name>
+      <descr> Add a constraint of the form <i> x &lt;= \text{ub}</i>.</descr>
+      <class name="double"/>
+  </input>
+  <output>
+    <name>P</name>
+    <descr>Object of the <tt>Polyhedron</tt> class.</descr>    
+  </output>
+  
+  <example>
+    <descr>Create V-Polyhedron</descr>
+    <cmd>P = Polyhedron([2 2;-5 -2; -5 3])</cmd>
+    <descr>Create H-Polyhedron</descr>
+    <cmd>Q = Polyhedron([1 -1;0.5 -2;-1 0.4; -1 -2],[1;2;3;4])</cmd>
+    <descr>Plot the polyhedra</descr>
+    <cmd> plot([P,Q]); </cmd>
+  </example>
+  <example>
+    <descr>Import polyhedron from YALMIP</descr>
+    <descr>Define yalmip variables and the set</descr>
+    <cmd> x = sdpvar(3,1); </cmd>
+    <cmd> S = set([-1;-2;-3]&lt;= x &lt;= [1;2;3]); </cmd>
+    <descr> Construct polyhedron </descr>
+    <cmd> P = Polyhedron(S,x) </cmd>
+    <descr>Plot the polyhedron</descr>
+    <cmd> plot(P); </cmd>        
+  </example>
+    
+  <related>YSet</related>
+
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

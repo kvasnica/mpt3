@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>minus</function>
+	
+	<info>Pontryagin/Minkowski difference for union of polyhedra</info>
+	<syntax>U - W</syntax>
+	<syntax>U.minus(W)</syntax>
+
+	<descr>
+            Computation of Pontryagin or Minkowski difference for the union of polyhedra in the same dimension.
+            The algorithm for efficiently computing the Minkowski difference between a union of polytopes
+            and a polytope is based on a talk by S. Rakovic and D. Mayne entitled <em>Constrained Control Computations</em>
+            It was the keynote addressed at the GBT Meeting, London, November, 2002.
+
+            The algorithm proceeds in the following way:
+            <ol>
+                <li>Compute the convex hull of the union. </li>
+                <li>Compute the Minkowski difference of each of the polyhedron from the convex hull. </li> 
+                <li>Compute the set difference between the convex hull and the union. </li>
+                <li>Compute the set difference between the Minkowski difference for each polyhedron and the set obtained in the previous step.</li>
+            </ol>
+            The result is a non-overlapping union of the polyhedra.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+	<input required="true">
+	  <name>W</name>
+	  <descr>Polyhedron to be summed with the union that is in the same dimension as the union.</descr>
+	  <class name="Polyhedron"/>
+	</input>
+    
+    
+    <example>
+        <descr> Create three polyhedra that form bounded union. </descr>
+        <cmd> P(1) = Polyhedron('V',[-5 0;-4 0;-5 5;-4 5]); </cmd>
+        <cmd> P(2) = Polyhedron('V',[-4 1;-1 1.5;-4 4;-1 2.5]); </cmd>
+        <cmd> P(3) = Polyhedron('V',[-1 0; -1 4]); </cmd>
+        <cmd> U = PolyUnion('Set',P,'bounded',true) </cmd>
+        <descr> Compute Minkowski difference for full-dimensional and bounded polyhedron <i>W</i>.</descr>
+        <cmd> W = Polyhedron('lb',[-0.1, -0.2],'ub',[0.1, 0.2]); </cmd>
+        <cmd> Uw = U - W </cmd>
+        <descr> Plot the new union <tt>Uw</tt> </descr>
+        <cmd> U.plot('color','lightblue'), hold on, Uw.plot </cmd>
+        <descr> Compute Minkowski addition for low-dimensional and bounded polyhedron <i>S</i>.</descr>
+        <cmd> S = Polyhedron('lb',[-0.1, 0],'ub',[0.1, 0]); </cmd>
+        <cmd> Us = U - S </cmd>
+        <descr> Plot the new union <tt>Us</tt> </descr>
+        <cmd> U.plot('color','lightgreen'), hold on, Us.plot </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>convexHull</related>
+    <related>plus</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>    
+    <author macro="author_vasak"/>
+    <author macro="author_kvasnica"/>    
+    <author macro="author_grieder"/>
+    <author macro="author_baotic"/>
+
+   
+    <license macro="GPL2"/>
+</help>

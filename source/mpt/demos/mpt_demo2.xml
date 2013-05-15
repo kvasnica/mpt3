@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo2</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Tour through visualization capabilities of the toolbox
+	</info>
+	
+    <syntax>mpt_demo2</syntax>
+
+	<!-- long description of the function -->
+	<descr>        
+        Demonstration how to plot basic sets and explanation of various plotting options.
+	</descr>
+
+    <related>mpt_demo1</related>
+    <related>mpt_demo_sets1</related>
+    <related>mpt_demo_sets2</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>	
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

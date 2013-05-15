@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_detect_solvers</function>
+	
+	<info>
+		Searches for installed solvers on the path.
+	</info>
+
+    <syntax>s = mpt_detect_solvers</syntax>
+
+    <descr>
+        Searches for installed solvers on the Matlab path. The following list of solvers are detected:
+        <ul>
+            <li>CDD</li>
+            <li>CLP</li> 
+            <li>CPLEX</li>
+            <li>GLPK</li>
+            <li>GUROBI</li>
+            <li>LCP</li>
+            <li>LINPROG</li>
+            <li>NAG</li>
+            <li>QPC</li>
+            <li>QPOASES</li>
+            <li>QPSPLINE</li>
+            <li>QUADPROG</li>
+            <li>SEDUMI</li>
+        </ul>
+        The found solvers are sorted according to a preference list that can be changed and according 
+        to the type of the optimization problem they solve. The search for solvers is only performed
+        at the first time start of the toolbox, the solvers list is stored under global 
+        options.
+        
+        To change the order of solvers, use <tt>mptopt</tt> option handler.
+        
+	</descr>
+	
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>s</name>
+		<descr>Structure with the solvers list sorted according to preference.</descr>
+		<class name="struct">
+			<field>
+				<name>LP</name>
+				<descr>List of available LP solvers.</descr>
+				<class name="char"/>
+			</field>
+			<field>
+				<name>QP</name>
+				<descr>List of available QP solvers.</descr>
+				<class name="char"/>
+			</field>
+			<field>
+				<name>MILP</name>
+				<descr>List of available MILP solvers.</descr>
+				<class name="char"/>
+			</field>
+			<field>
+				<name>MIQP</name>
+				<descr>List of available MIQP solvers.</descr>
+				<class name="char"/>
+			</field>           
+			<field>
+				<name>LCP</name>
+				<descr>List of available LCP solvers.</descr>
+				<class name="char"/>
+			</field>                        
+			<field>
+				<name>parametric</name>
+				<descr>List of available parametric solvers.</descr>
+				<class name="char"/>
+			</field>                        
+		</class>
+	</output>
+
+	<!-- multiple related function can be defined -->
+    <related>mptopt</related>    
+    <related>mpt_solve</related>        
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

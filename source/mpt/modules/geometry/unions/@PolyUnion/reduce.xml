@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>reduce</function>
+	
+	<info>Reduces the overlapping union to minimal number of sets.</info>
+	<syntax>kept = U.reduce</syntax>
+	<syntax>kept = reduce(U)</syntax>
+
+	<descr>
+        Simplifies the union of polyhedra by removing those regions who are completely covered by others.
+        Note that this algorithm is valid only for overlapping unions.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+	<input>
+	  <name>kept</name>
+	  <descr>Vector of logical indices indicating if the region is non-redundant.</descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+	</input>
+    
+
+    <example>
+        <descr>Create a random H-polyhedron that contains the origin.</descr>
+        <cmd>P = 5*ExamplePoly.randHrep;</cmd>
+        <descr> Create another polyhedron that is contained within <tt>P</tt> </descr>
+        <cmd> Q = 0.8*P; </cmd>
+        <descr> Create another random polyhedron.</descr>
+        <cmd> R = ExamplePoly.randVrep+[1,5]; </cmd>
+        <descr>Create the union of polyhedra without specifying any properties.</descr>
+        <cmd> U = PolyUnion([P,Q,R]) </cmd>
+        <descr> Plot the union </descr>
+        <cmd> U.plot </cmd>
+        <descr> This union can be reduced to only regions <tt>P</tt> and <tt>R</tt> because <tt>Q</tt> is completely covered by <tt>P</tt>. </descr>
+        <cmd> U.reduce </cmd>
+        <descr> We can see that the union has now only 2 polyhedra. Plot the reduced union </descr>
+        <cmd> U.plot </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>merge</related>
+    <related>isOverlapping</related>
+	
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+	<author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

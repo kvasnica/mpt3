@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>reachableSet</function>
+  
+  <info>
+    Computes forward or backwards reachable sets
+  </info>
+
+  <syntax>[S, SN] = system.reachableSet('X', X, 'U', U, 'N', N, 'direction', ['forward'|'backwards'])</syntax>
+
+  <descr> 
+    <tt>S = system.reachableSet('X', X, 'U', U, 'direction',
+    'forward')</tt> computes the forward reachable set for a PWA
+    system, i.e.,
+    <latex>
+	\begin{equation*} 
+	S = \{ f_PWA(x, u) \ | \ x \in X, u \in U \} 
+	\end{equation*}
+    </latex>
+
+    <tt>S = system.reachableSet('X', X, 'U', U, 'direction', 'backward')</tt> 
+    computes the backward reachable set, i.e.,
+    <latex>
+      \begin{equation*}
+      S = \{ x \ | \ f_PWA(x, u) \in X, u \in U \}
+      \end{equation*}
+    </latex>
+		
+    If <tt>X</tt> and/or <tt>U</tt> are not given, the constraints are
+    extracted from state and input constraints. If <tt>direction</tt>
+    is not specified, <tt>direction='forward'</tt> is assumed.<br/>
+		
+    This function supports autonomous systems as well.
+  </descr>
+
+  <input>
+    <name>X</name>
+    <descr>Polyhedron defining state constraints (optional)</descr>
+    <class name="polyhedron"/>
+  </input>
+
+  <input>
+    <name>U</name>
+    <descr>Polyhedron defining input constraints (optional)</descr>
+    <class name="polyhedron"/>
+  </input>
+
+  <input>
+    <name>direction</name>
+    <descr>Flag to switch between forward and backwards reachability.</descr>
+    <class name="char"/>
+  </input>
+
+  <input>
+    <name>N</name>
+    <descr>Number of steps (defaults to 1).</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>S</name>
+    <descr>Set of states reachable in <i>N</i> steps.</descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <output>
+    <name>SN</name>
+    <descr>Set of states reachable at each step.</descr>
+    <class name="cell"/>
+  </output>
+  
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

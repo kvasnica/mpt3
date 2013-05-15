@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>replaceByKey</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Replace the value of an element with a new value based on keys.
+	</info>
+	
+	<syntax>t = replaceByKey(h,key,value)</syntax>
+	<syntax>t = h.replaceByKey(key,value)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Replace the data for the element stored under given <tt>key</tt> with new <tt>value</tt>.
+        The output <tt>t</tt> informs if the replacement was succesful (false) or not (true).
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>h</name>
+        <descr>HashTable object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="HashTable"/>
+	</input>
+
+    <input required="true">
+		<name>key</name>
+        <descr>String or an integer array representing the key of the element to remove.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="string or double"/>
+	</input>
+
+    <input required="true">
+		<name>value</name>
+        <descr>Data associated to given element represented in a struct format.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="struct"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>t</name>
+        <descr>Logical scalar that informs whether the element was replaced (false) or not (true).</descr>
+		<class name="logical"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+        <descr>Construct empty table</descr>		
+        <cmd>h = HashTable</cmd>
+        <descr>Put an element inside the table.</descr> 
+        <cmd> h.put('item',struct('data',1));  </cmd>		
+        <descr> Actually, we wanted to assign different data. To replace the value based on key use</descr>
+        <cmd> h.replaceByKey('item',struct('newdata',2)) </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+    <related>replaceByIndex</related>
+    <related>removeByKey</related>
+    <related>removeByIndex</related>
+    <related>HashTable</related>
+    <related>put</related>
+
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

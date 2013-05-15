@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>convexHull</function>
+	
+	<info>Computes the convex hull for union of polyhedra</info>
+	<syntax>H = U.convexHull</syntax>
+	<syntax>H = convexHull(U)</syntax>
+
+	<descr>
+        The convex hull of the union of polyhedra is defined as the minimal convex set that contains
+        all polyhedra. 
+        
+        Note that computation of convex hull is an expensive operation, therefore the result is stored
+        internally under <tt>Internal.convexHull</tt> which can be accessed.
+        
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+	<output>
+	  <name>H</name>
+	  <descr>Convex hull of the polyhedra contained in the union</descr>
+	  <class name="Polyhedron"/>
+	</output>
+   
+    
+    <example>
+        <descr>Create 2 random V-polyhedra.</descr>
+        <cmd>P(1) = 5*ExamplePoly.randVrep;</cmd>
+        <cmd>P(2) = 5*ExamplePoly.randVrep;</cmd>
+        <descr> Create the union of polyhedra without specifying any properties.</descr>
+        <cmd> U = PolyUnion('Set',P) </cmd>
+        <descr> Compute the convex hull</descr>
+        <cmd> H = U.convexHull </cmd>
+        <descr> Plot the union and the convex hull </descr>
+        <cmd> U.plot; hold on; H.plot('wire',true,'linewidth',3,'linestyle','--') </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isConvex</related>
+    <related>merge</related>
+    <related>reduce</related>
+	
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+    <author macro="author_herceg"/>    
+
+
+    <license macro="GPL2"/>
+</help>

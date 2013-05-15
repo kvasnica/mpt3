@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>initialize</function>
+  
+  <info>
+    Sets the internal state of the system
+  </info>
+  <syntax>system.initialize(x0)</syntax>
+
+  <descr> 
+    <tt>system.initialize(x0)</tt> sets the initial state of the
+    system to value <tt>x0</tt>.<br/>
+
+    The internal state can be retrieved by calling
+    <tt>system.getStates()</tt>.
+  </descr>
+
+  <input required="true">
+    <name>x0</name>
+    <descr>Initial state</descr>
+    <class name="double"/>
+  </input>
+
+  <example>
+    <descr>Define a 1D LTI system <i>x^+ = x + u</i>.</descr>
+    <cmd>sys = LTISystem('A', 1, 'B', 1)</cmd>
+    <descr>Set the system's internal state to <i>2.5</i>.</descr>
+    <cmd>sys.initialize(2.5);</cmd>
+    <descr>Retrieve the internal state.</descr>
+    <cmd>x = sys.getStates()</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>affineHull</function>
+  
+  <!-- one-line description of the function -->
+  <info>
+    Compute the affine hull of the Polyhedron.
+  </info>
+  <!-- we can define multiple ways to call the function -->
+  <!-- note that we can freely use the underscore in function names -->
+  <syntax>hull = P.affineHull</syntax>
+  <syntax>hull = affineHull(P)</syntax>
+  
+  <descr>
+    Computes a minimum-rank matrix hull such that 
+    <latex>
+      \begin{equation}
+        P \subset \{ x | hull \begin{bmatrix} x \\ -1 \end{bmatrix} = 0 \}
+      \end{equation}
+    </latex>
+    
+    Notes:
+    <ul>
+        <li>If an H-rep is known, this function does not assume He is the affine hull,
+            but rather searches for implicit equalities.</li>
+        <li>The Polyhedron <tt>P</tt> is not modified after the call.</li>
+    </ul>
+  </descr>
+  <!-- now describe input arguments -->
+  
+  <!-- mark inputs as mandatory by providing the "required" attribute -->
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="Polyhedron"/>
+  </input>
+  
+  <!-- now describe output arguments -->
+  <output>
+    <name>hull</name>
+    <descr>Minimum-rank matrix representing the affine hull of <tt>P</tt>.</descr>
+    <class name="double"/>
+  </output>
+  
+  <example>
+    <descr>Create low-dimensional V-rep polyhedron:</descr>
+    <cmd>P = ExamplePoly.randVrep('ne',1,'d',3);</cmd>
+    <descr>Compute affine hull:</descr>
+    <cmd>hull = P.affineHull</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot; hold on; Polyhedron('He', hull).plot('alpha',0.1); </cmd>
+  </example>
+  
+  <example>
+    <descr>Create H-rep polyhedron with implicit equality:</descr>
+    <cmd>tmp = [randn(1,3) zeros(1,1)];</cmd>
+    <cmd>P = Polyhedron('H', [randn(20,3) ones(20,1);tmp;-tmp])</cmd>
+    <descr>Compute affine hull:</descr>
+    <cmd>hull = P.affineHull</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot; hold on; Polyhedron('He', hull).plot('alpha',0.1); </cmd>    
+  </example>
+  
+  <related>minVRep</related>
+  <related>affineMap</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

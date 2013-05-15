@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>separate</function>
+  
+  <info>Separate a point/polyhedron from another polyhedron.</info>
+  <syntax>h = P.separate(x)</syntax>
+  <syntax>h = separate(P, x)</syntax>
+  <syntax>h = P.separate(S)</syntax>
+  <syntax>h = separate(P, S)</syntax>
+  
+  <descr>
+    Computes a separating hyperplane <i>h</i> between <i>P</i> and <i>x</i>/<i>S</i> : 
+    <latex>
+      $$h = \{y\, |\, {h}^{T} \begin{pmatrix}y\\-1\end{pmatrix} \le 0\ \forall y \in P,\ {h}^{T} \begin{pmatrix}x\\-1\end{pmatrix} = 0 \} \ge 0 \}$$
+    </latex>
+    or
+    <latex>
+      $$h = \{y\, |\, {h}^{T} \begin{pmatrix}y\\-1\end{pmatrix} \le 0\ \forall y \in P,\ {h}^{T} \begin{pmatrix}z\\-1\end{pmatrix} = 0 \} \ge 0\ \forall z \in S \}$$
+    </latex>
+  </descr>
+
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>S</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>x</name>
+    <descr>Column vector of length <tt>P.Dim</tt>.</descr>
+    <class name="Polyhedron"/>
+  </input>
+  
+  <output>
+    <name>h</name>
+    <descr>Separating hyperplane <i>\{x ~|~ {h}^{T} \begin{pmatrix}x\\-1\end{pmatrix} = 0 \}</i>, or [] if none exists.</descr>
+    <class name="double"/>
+  </output>
+ 
+  <example>
+    <descr>Create a Polyhedron:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin;</cmd>
+    <descr>Choose a point:</descr>
+    <cmd>x = [2;2];</cmd>
+    <descr>Separate and plot</descr>
+    <cmd>h = P.separate(x);
+	 P.plot; hold on; pplot(x,'ro');
+	 Polyhedron('He',h).plot('linewidth', 2);
+    </cmd>
+  </example>
+
+  <example>
+    <descr>Create two polyhedra:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+    <cmd>[U,s]=svd(randn(3)); </cmd>
+    <cmd>S = ExamplePoly.poly3d_sin.affineMap(U(:,1:2)) + [2;2;2];</cmd>
+    <descr>Separate and plot:</descr>
+    <cmd>h = separate(P,S);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>plot([P S]); hold on; Polyhedron('He',h).plot('alpha',0.3);</cmd>
+  </example>
+
+  <!-- multiple related function can be defined -->
+  <!-- <related>Polyhedron.minHRep</related> -->
+  
+  <!-- multiple literature sources can be given -->
+  <!-- <literature>Fukuda : PolyFaq</literature> -->
+  
+  <!-- multiple authors can be defined -->
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

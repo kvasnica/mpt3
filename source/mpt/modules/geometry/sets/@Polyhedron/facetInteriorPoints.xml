@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>facetInteriorPoints</function>
+	
+	<info>Compute points that lie on each of the facet of the Polyhedron.</info>
+	<syntax>x = P.facetInteriorPoints</syntax>
+    <syntax>x = facetInteriorPoints(P)</syntax>
+    
+	<descr>
+	  For each of the facet of the polyhedron compute a point in the relative interior of that facet. 
+      The output is a matrix formed by concatenating the interior point row-wise.
+      Note that the polyhedron must be in the minimal H-representation in order to proceed.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format.</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>x</name>
+      <descr>Matrix formed by interior points where the row of the matrix corresponds to facet of the polyhedron.
+      </descr>
+	  <class name="double"/>
+	</output>
+
+	<example>
+        <descr>Compute all facet interior points of a zonotope <tt>Z</tt>.</descr>
+        <cmd>Z = ExamplePoly.randZono;</cmd>
+        <cmd>x = Z.facetInteriorPoints;</cmd>
+        <descr> Plot the points on the zonotope. </descr>
+        <cmd>Z.plot; hold on; plot(x(:,1),x(:,2),'kx','MarkerSize',5,'LineWidth',3); </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+    <related>chebyCenter</related>
+    <related>interiorPoint</related>
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+    <author macro="author_herceg"/>
+	<license macro="GPL2"/>
+</help>

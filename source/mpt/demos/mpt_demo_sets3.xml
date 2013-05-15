@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_sets3</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demo that illustrates operations on polyhedra
+	</info>
+	
+    <syntax>mpt_demo_sets3</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Demo that illustrates geometric operations with polyhedra. In particular, it is shown 
+        how to 
+        <ul>
+            <li>convert between H- and V-representation</li>
+            <li>intersection of polyhedra</li>
+            <li>comparisons between polyhedra</li>
+            <li>set algebra: affine maps, set summation, set difference</li>
+        </ul>
+	</descr>
+
+    <related>mpt_demo_sets1</related>
+    <related>mpt_demo_sets2</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

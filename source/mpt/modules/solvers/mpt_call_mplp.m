@@ -1,0 +1,148 @@
+function ret = mpt_call_mplp(S)
+%
+% a gateway routine to parametric QP solver of MPT2.6
+%
+
+global MPTOPTIONS
+if isempty(MPTOPTIONS)
+    MPTOPTIONS = mptopt;
+end
+
+if ~isa(S,'Opt')
+    error('mpt_call_mplp: Input argument must be an "Opt" class.');
+end
+
+if ~strcmpi(S.problem_type,'LP')
+    error('mpt_call_mplp: MPLP solver does not solve %s problems!',S.problem_type);
+end
+
+if norm(S.pF(:),Inf)>MPTOPTIONS.rel_tol
+   error('mpt_call_mplp: This type of problem cannot be solved with MPLP solver.');
+end
+
+% store the original problem
+opt = S.copy;
+
+if S.me>0   
+    % eliminate equations first
+    S.eliminateEquations;
+end
+
+% In validation of Opt class there are prepreprocessing functions
+% for tightening the bounds on the parametric solution. One of the task performs
+% extraction of lower and upper bounds on the variables from equation 
+% G*U <= W + E*th and puts them into separate fields. We need to put these 
+% bounds back.
+
+if any(S.pF(:))
+    error('MPLP solver does not solve problems with the parameterized cost (i.e. for nonzero "pF" matrix). Use PLCP solver instead.');
+end
+
+Matrices.G = S.A;
+Matrices.W = S.b;
+Matrices.E = S.pB;
+ilb = (S.lb==-Inf) | (S.lb<-MPTOPTIONS.infbound);
+iub = (S.ub==Inf)  | (S.ub>MPTOPTIONS.infbound);
+if any(~ilb)
+    % put ones at the positions where there is ub
+    L = -eye(S.n);
+    Matrices.G = [Matrices.G; L(~ilb,:)];
+    Matrices.W = [Matrices.W; -S.lb(~ilb)];
+    Matrices.E = [Matrices.E; zeros(nnz(~ilb),S.d)];
+end
+if any(~iub)
+    % put ones at the positions where there is ub
+    U = eye(S.n);
+    Matrices.G = [Matrices.G; U(~iub,:)];
+    Matrices.W = [Matrices.W; S.ub(~iub)];
+    Matrices.E = [Matrices.E; zeros(nnz(~iub),S.d)];
+end
+
+Matrices.H = S.f;
+Matrices.F = S.C;
+Matrices.bndA = S.Ath;
+Matrices.bndb = S.bth;
+
+disp('Calling mpt_mplp_26 with default options...')
+[r.Pn,r.Fi,r.Gi,r.activeConstraints,r.Phard,r.details]=mpt_mplp_26(Matrices);
+
+
+% regions = PolySet;
+% xopt  = PolySet;
+% 
+% 
+% if norm(opt.pF) < MPTOPTIONS.abs_tol
+%     obj = PolySet('isConvex', true);
+% else
+%     obj = PolySet;
+% end
+
+% Re-order variables if this came from YALMIP
+P = speye(opt.n);
+if ~isempty(opt.varOrder)
+    P = P(opt.varOrder.requested_variables,:);
+end
+
+% convert @polytope to @Polyhedron
+reg = toPolyhedron(r.Pn);
+
+for i=1:length(reg)
+    
+    % add only not empty regions (with region_tol)
+    if ~reg(i).isEmptySet
+        %regions.add(reg);
+        
+        % y = Fi*th + Gi = [Fi Gi]*[th;1]
+        % x = Y*y + T*[th;1];
+        % x = (Y*[Fi Gi]+T)*[th;1]
+        
+        if opt.me
+            % Compute affine mapping from parameter to primal        
+            T = S.recover.Y*[r.Fi{i} r.Gi{i}] + S.recover.th;
+        else
+            T = [r.Fi{i} r.Gi{i}];
+        end
+        
+%         % Compute cost [x;1]'*Q*[x;1]
+%         if ~isempty(opt.H)
+%             Q = 0.5*T'*opt.H*T + [opt.pF opt.f]'*T;
+%         else
+%             Q = [opt.pF opt.f]'*T;
+%         end
+%         
+%         obj.add(   PolyFunc(      regions.P(end), 'func', @(x) [x 1]*Q*[x 1]', 'user', struct('Q', Q)));
+%         
+%         
+%         % Compute primal/dual variables requested by user
+%         xopt.add(PolyAffineFunc(regions.P(end), 'funcDat', P*T));
+
+        % compute primal variables
+        Lprimal = P*T;
+        reg(i).addFunction(AffFunction(Lprimal(:,1:end-1),Lprimal(:,end)),'primal');
+        
+%         % compute dual variables
+%         Ldual = S.recover.lambdaX*x + S.recover.lambdaTh;
+%         reg(i).addFunction(AffFunction(Ldual(:,1:end-1),Ldual(:,end)),'dual');
+        
+        % compute the objective value
+        Y = T(:,1:end-1);
+        R = T(:,end);
+
+        lt = opt.f'*Y + opt.C;
+        at = opt.f'*R + opt.c;
+        reg(i).addFunction(AffFunction(lt,at),'obj');
+
+    end
+end
+
+%ret.regions = regions;
+%ret.primal    = xopt;
+%ret.obj     = obj;
+
+ret.xopt = PolyUnion('Set',reg,'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
+ret.xopt.setInternal('convexHull', toPolyhedron(r.Phard));
+ret.mplpsol = r;
+%ret.recover = S.recover;
+
+
+end

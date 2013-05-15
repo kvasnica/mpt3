@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>affineMap</function>
+  
+  <!-- one-line description of the function -->
+  <info>
+    Compute the affine map of the Polyhedron.
+  </info>
+  <!-- we can define multiple ways to call the function -->
+  <!-- note that we can freely use the underscore in function names -->
+  <syntax>Q = P.affineMap(T)</syntax>
+  <syntax>Q = P.affineMap(T,method)</syntax>
+  <syntax>Q = affineMap(P,T,method)</syntax>
+  
+  <descr>
+      Computes an affine map <i>P \mapsto Q</i> of polyhedron <tt>P</tt> to polyhedron <tt>Q</tt> 
+      based on the transformation matrix <i>T</i>. The polyhedron <tt>Q</tt> is given by
+    <latex>
+      \begin{equation}
+        Q = \{ y\in\mathbb{R}^n ~|~ y = Tx, x\in P \subset\mathbb{R}^d \}
+      \end{equation}
+    </latex>    
+    The matrix <tt>T</tt> must be real with <tt>n</tt> rows and <tt>d</tt> columns.
+    <ul>
+        <li>If <i>n&lt;d</i> then this operation is referred to as <em>projection</em>.</li>
+        <li>If <i>n=d</i> then this operation is referred to as <em>rotation/skew</em>.</li>
+        <li>If <i>n&gt;d</i> then this operation is referred to as <em>lifting</em>.</li>
+    </ul>
+  </descr>
+  <!-- now describe input arguments -->
+  
+  <!-- mark inputs as mandatory by providing the "required" attribute -->
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>T</name>
+    <descr>Transformation matrix.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>method</name>
+    <descr>Specific method to use in projection operation. Allowed methods are "vrep", "fourier", and "mplp". 
+            For details type "help Polyhedron/projection".</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="string"/>
+  </input>
+
+  
+  <!-- now describe output arguments -->
+  <output>
+    <name>Q</name>
+    <descr>Polyhedron representing the affine map in H- or V-representation.</descr>
+    <class name="Polyhedron"/>
+  </output>
+  
+  <example>
+    <descr>Projection of the rectangle described in 2D.</descr>
+    <descr>Define the rectangle <tt>P</tt> in V-representation.</descr>
+    <cmd>P = Polyhedron([0 0; 5 0; 5 3; 0 3]);</cmd>
+    <descr>Compute the affine map of the rectangle with the matrix [-1 0.5] </descr>
+    <cmd>Q = P.affineMap([-1 0.5]) </cmd>
+    <descr>We can see that <tt>Q</tt> is in dimension 1 while <tt>P</tt> is in dimension 2.</descr>
+    <cmd>plot([P,Q],'LineWidth',3); axis([-6 6 -1 4]); </cmd>
+  </example>
+  
+  <example>
+    <descr>Rotation of the rectangle described in 2D.</descr>
+    <descr>Compute the affine map of the rectangle with the matrix [-1 0.5; -2 3] </descr>
+    <cmd>R = P.affineMap([-1 0.5; -2 3]) </cmd>
+    <descr>We can see that <tt>Q</tt> remains in dimension 2.</descr>
+    <cmd>plot([P,R]); </cmd>
+  </example>  
+  
+  <example>
+    <descr>Lifting of the rectangle described in 2D.</descr>
+    <descr>Compute the affine map of the rectangle with the matrix [-1 0.5; -2 3; 0.8 -1.4] </descr>
+    <cmd>S = P.affineMap([-1 0.5; -2 3;-4 5]) </cmd>
+    <descr>We can see that <tt>S</tt> is in dimension 3.</descr>
+    <cmd>plot([P,S]); </cmd>
+  </example>  
+
+  <related>projection</related>  
+  <related>affineHull</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

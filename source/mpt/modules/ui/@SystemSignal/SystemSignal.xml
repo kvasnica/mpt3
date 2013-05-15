@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>SystemSignal</function>
+  
+  <info>
+    Class representing variables of a dynamical system
+  </info>
+  <syntax>signal = SystemSignal(n)</syntax>
+
+  <descr> 
+    The <tt>SystemSignal</tt> class represents
+    prediction of variables (e.g., system states, inputs, or
+    outputs) of a dynamical system in an MPC setup.<br/>
+
+    Signals are created by <tt>signal = SystemSignal(n)</tt>, where
+    <tt>n</tt> is the dimension of the variable. Once constructed,
+    signals can be assigned names by <tt>signal.name =
+    'myname'</tt>. Each signal has following properties available for
+    read/write access by default:
+    <ul>
+      <li><tt>signal.min</tt>: lower bound on the variable in MPC problems</li>
+      <li><tt>signal.max</tt>: upper bound on the variable in MPC problems</li>
+      <li><tt>signal.penalty</tt>: penalization of the variable in the
+      MPC cost function (see <tt>help Penalty</tt>)</li>
+    </ul>
+
+    Many additional properties can be set by the concept of
+    <em>filters</em>. In short, filters are dynamical properties which
+    can be added to a signal on demand. A filter is added by calling
+    <tt>signal.with('filter_name')</tt>. List of available filters can
+    be obtained by calling <tt>methods SystemSignal</tt> and looking
+    for methods prefixed by the <tt>filter_</tt> string. Filters can
+    be removed by calling <tt>signal.without('filter_name')</tt>. To
+    list filters added to a particular signal, use the
+    <tt>signal.listFilters()</tt> method.
+  </descr>
+  
+  <input required="true">
+      <name>n</name>
+      <descr>Dimension of the variable</descr> 
+      <class name="double"/>
+  </input>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

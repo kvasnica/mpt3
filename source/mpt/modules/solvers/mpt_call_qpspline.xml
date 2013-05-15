@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_qpspline</function>
+	
+	<info>
+		A gateway function to QPspline solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_qpspline(S)</syntax>
+
+    <descr>
+        The function implements call to QPspline solver based on formulation from <tt>Opt</tt> class.
+        Only QP problems are supported with positive definite Hessian.
+        
+        It is assumed that QP entering this function is of the form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{f}^{T}x \label{eq:qpspline:QP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b  \label{eq:qpspline:QP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:qpspline:QP0-eq}
+            \end{eqnarray} 
+        </latex>
+        which must be transformed to 
+        <latex>            
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}{H}_{f}x+{{f}_{f}}^{T}x \label{eq:qpspline:QPf-obj}\\
+				\text{s.t.} &amp;&amp; l \le {A}_{f}x \le  u \label{eq:qpspline:QPf-ineq1} \\
+            \end{eqnarray}
+        </latex>
+        which accepts QPspline. The lower bound <i>l</i> is always set as <tt>-MPTOPTIONS.infbound</tt>.
+        
+        If QP contains equality constraints, these are removed first. It is required that the system of 
+        linear equations <i>A_{e}x=b_{e}</i> is consistent, i.e. no linearly dependent rows are found and 
+        the number of equalities is strictly less than number of variables.
+        The principle is based on factorizing equality constraints <i>{A}_{e}x=b_{e}</i> in basic <i> {x}_{Bc} </i>
+        and non-basic variables <i>x_{Nc}</i>, i.e.
+        <latex>
+		   \[
+            A_{e} = 
+            \begin{pmatrix} 
+            A_{e,Bc} &amp; A_{e,Nc}
+            \end{pmatrix}            
+            \]
+		</latex>
+        which gives
+        <latex>
+            \[
+            A_{e,Bc}{x}_{Bc} + A_{e,Nc}{x}_{Nc} = b_{e}
+            \]
+        </latex>
+        where the index sets <tt>Bc</tt>, <tt>Nc</tt> denote the columns from which factored system is built. 
+        The factored submatrix <i>A_{e,Bc}</i> must be invertible in order to express basic variables as 
+        a function of non-basic variables, i.e.
+        <latex>
+            \[
+            {x}_{Bc} = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc}{x}_{Nc} + {{A}_{e,Bc}}^{-1}{b}_{e,Bc}
+            \]
+        </latex>
+        With the substitution
+        <latex> \[ C = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc} \] </latex>
+        and 
+        <latex> \[ D = {{A}_{e,Bc}}^{-1}{b}_{e,Bc} \]</latex>
+        the  relation between basic and non-basic variables is simplified to
+        <latex>
+            \begin{equation}
+            {x}_{Bc} = C{x}_{Nc} + D \label{eq:qpspline:xBcNc}
+            \end{equation}
+        </latex>
+        The above QP problem <i>\eqref{eq:qpspline:QP0-obj}-\eqref{eq:qpspline:QP0-eq}</i> can be expressed only in non-basic variables <i>{x}_{Nc}</i> as follows:
+        <latex>          
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {{x}_{Nc}}^{T}\tilde{H}{x}_{Nc}+{\tilde{f}}^{T}{x}_{Nc} + \tilde{c} \label{eq:qpspline:QP1-obj} \\
+				\text{s.t.} &amp;&amp; \tilde{A}{x}_{Nc} \le  \tilde{b} \label{eq:qpspline:QP1-ineq} \\			
+            \end{eqnarray}             
+        </latex>        
+        where 
+        <latex>
+            \begin{eqnarray}
+             \tilde{H} &amp; = &amp; {C}^{T}{H}_{Bc,Bc}C + {C}^{T}{H}_{Bc,Nc} + {H}_{Nc,Bc}C + {H}_{Nc,Nc} \\
+             \tilde{f} &amp; = &amp; {D}^{T}{H}_{Bc,Bc}C + {D}^{T}{H}_{Nc,Bc} + {{f}_{Bc}}^{T}C + {{f}_{Nc}}^{T} \\
+             \tilde{c} &amp; = &amp; \frac{1}{2}{D}^{T}{H}_{Bc,Bc}D + {{f}_{Bc}}^{T}D \\
+             \tilde{A} &amp; = &amp; {A}_{Bc}C+{A}_{Nc} \\
+             \tilde{b} &amp; = &amp; b - {A}_{Bc}D
+            \end{eqnarray}
+        </latex>
+        Original solution to QP problem <i>\eqref{eq:qpspline:QP0-obj}-\eqref{eq:qpspline:QP0-eq}</i> can be 
+        obtained via relation <i>\eqref{eq:qpspline:xBcNc}</i>.
+                
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+		<descr>structure of the Opt class</descr>
+        <class name="struct">
+			<field>
+				<name>H</name>
+                <descr>Quadratic part of the objective function which is strictly convex <i>H\succ 0</i>.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the variables <i>x \ge l_{b}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the variables <i>x \le u_{b}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>n</name>
+                <descr>Problem dimension (number of variables).</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved.</descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>test</name>
+                <descr>Call (false) or not to call (true) MPT global settings.</descr>
+                <class name="logical"/>
+                <default>false</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution.</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>obj</name>
+				<descr>Optimal objective value.</descr>
+				<class name="double"/>
+			</field>                                                                        
+			<field>
+				<name>lambda</name>
+				<descr>Lagrangian multipliers</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>mpt_solve</related>    
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

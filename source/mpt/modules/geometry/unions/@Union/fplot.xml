@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>fplot</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Plot function over the sets of the Union object.
+	</info>
+	
+	<syntax>h = fplot(U, name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = U.fplot(name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Plot function over the set. If there are more functions, then the string <tt>name</tt> indicates
+        the function name to be plotted. If the function 
+        is vector valued, i.e. its range is greater than 1, than the first element of the 
+        function is plotted by default. For vector valued functions the <tt>dim</tt> indicates 
+        which element of the vector to plot.
+
+        Figure properties, such as color, line width, etc, can be specified with "Property" - "Value" pairs. 
+	</descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Union object that contains sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="Union"/>
+	</input>
+	<input>
+		<name>name</name>
+        <descr>If there are more functions over the set, the <tt>name</tt> indicates the function name to be plotted.
+        By default, only the first function in the array is plotted.
+        Functions can be accessed directly from <tt>Func</tt> property.</descr>
+		<class name="char"/>
+	</input>
+	<input>
+		<name>dim</name>
+        <descr>For vector valued functions, the <tt>dim</tt> indicates which element of the vector to plot.</descr>
+		<class name="double"/>
+        <default>1</default>
+	</input>
+	<input>
+		<name>Prop1</name>
+        <descr>Specification of figure properties.</descr>
+		<class name="char">
+                <option>Grid</option><descr>With how many gridpoints to grid the circle/sphere for <tt>YSet</tt> class. Default is 40.</descr>
+                <option>Color</option><descr>The color of the plot specified by real RGB vector or a string name of the color (e.g. 'gray');</descr>
+                <option>Wire</option><descr>Highlight or not the edges of the set. Default is false.</descr>
+                <option>LineStyle</option><descr>Specify the type of the line to plot edges of the set. Accepted values are '-',':','-.','--', and'none'.</descr>
+                <option>LineWidth</option><descr>Specify the width of the line. Default is 1.</descr>
+                <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
+                <option>Contour</option><descr>Add contour graph. Default is false.</descr>
+                <option>ContourGrid</option><descr>With how many grid point to do the contour graph. Default is 20.</descr>
+                <option>Polyhedron</option><descr>Plot the domain of the function. Default is false.</descr>
+		</class>
+	</input>
+    <input>
+        <name>value1</name>
+        <descr>Assigns value to <tt>Prop1</tt>.</descr>
+    </input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>h</name>
+        <descr>Handle related to graphics object.</descr>
+		<class name="handle"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> We have two linear functions "alpha", "beta" over a union of convex sets.</descr>
+        <descr> Construct the set first set as the circle</descr>
+        <cmd> x = sdpvar(2,1); </cmd>
+        <cmd> F = [0.5*x'*x&lt;=0.2]; </cmd>
+        <cmd> S = YSet(x,F); </cmd>
+        <descr> Construct quadratic and linear function.</descr>
+        <cmd> Q = QuadFunction(eye(2),[0,1]); </cmd>
+        <cmd> L = AffFunction([-3, 1], 1); </cmd>
+        <descr> Add functions to the set with names "alpha" and "beta". </descr>
+        <cmd> S.addFunction(Q,'alpha'); </cmd>
+        <cmd> S.addFunction(L,'beta'); </cmd>
+        <descr> Construct a hyperplane that separates the set <tt>S</tt> and the point <tt>x=[0;1]</tt>. </descr>
+        <cmd> x = [0;1]; h = S.separate(x); </cmd>
+        <descr> Construct a polyhedron out of the hyperplane. </descr>
+        <cmd> P = Polyhedron('He',h,'lb',[-1;-1],'ub',[1;1]); </cmd>
+        <descr> Add functions "alpha" and "beta" to the polyhedron </descr>
+        <cmd> P.addFunction(Q,'alpha'); </cmd>
+        <cmd> P.addFunction(L,'beta'); </cmd>
+        <descr> Create union object from the sets <tt>S</tt> and <tt>P</tt>. </descr>
+        <cmd> U = Union(S); U.add(P) </cmd>
+        <descr> Plot the function "beta" over the union because this is contained in both sets</descr>
+        <cmd> U.fplot('beta'); </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>plot</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

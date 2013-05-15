@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>setHandle</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Assign function handle to existing <tt>Function</tt> object
+	</info>
+	
+	<syntax>setHandle(F,@fun)</syntax>
+	<syntax>F.setHandle(@fun)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Overwrites function handle of the <tt>Function</tt> object with a new one. This method is suitable
+        for specification of functions where the parameters are stored under <tt>Data</tt> property. Look at
+        examples for better explanation.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>F</name>
+        <descr>Existing <tt>Function</tt> object which function we want to overwrite.
+        </descr>
+        <class name="Function"/>
+	</input>
+	<input required="true">
+		<name>F</name>
+        <descr>Representation of the new function given as <tt>function_handle</tt> class.
+        </descr>
+        <class name="function_handle"/>
+	</input>
+	<output>
+		<name>F</name>
+        <descr>Modified <tt>Function</tt> objects.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Function"/>
+	</output>
+	
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> Construct anonymous function <i>f(x) = k*x</i> where <i>k</i> is a parameter. 
+            Assume that the value of <i>k</i> is not going to change in the future. 
+        </descr>
+        <descr>It suffices to declare the value of <i>k</i> before constructing the object, i.e. </descr>
+        <cmd> k=2; </cmd>
+        <descr> Then we can construct the object with this value of the parameter as </descr>
+        <cmd> F1 = Function(@(x) k*x) </cmd>
+        <descr> Evaluating this function will always take <i>k=2</i> value, e.g in this case we get 2 </descr>
+        <cmd> feval(F1.Handle,1) </cmd>
+        <descr> Changing the value of <i>k</i> does not affect the function </descr>
+        <cmd> k=3; </cmd>
+        <cmd> feval(F1.Handle,1) </cmd>
+        <descr> If the value of <i>k</i> may change in the future, one option is to make function depedent on two
+        variables </descr>
+        <cmd> F2 = Function(@(k,x) k*x) </cmd>
+        <descr> Evaluation of this function requires two arguments, i.e. </descr>
+        <cmd> feval(F2.Handle,2,1) </cmd>
+        <descr> Another option is to store the parameter <i>k</i> inside the <tt>Data</tt> property. </descr>
+        <descr> Let's create empty function with the initial value <i>k=2</i> </descr>
+        <cmd> F3 = Function([],struct('k',2)) </cmd>
+        <descr> Now we can assign the function handle with the reference to the parameter <i>k</i> 
+            stored inside <tt>F3</tt> object, i.e. </descr>
+        <cmd> F3.setHandle(@(x) F3.Data.k*x) </cmd>
+        <descr> If we change the value of the parameter <i>k</i> inside the object</descr>
+        <cmd> F3.Data.k = 3; </cmd>
+        <descr> this new value will be taken for evaluation.</descr>
+        <cmd> feval(F3.Handle,1) </cmd>
+        
+    </example>
+    <example>
+        <descr> Construct anonymous function <i>f(x) = a*sin(b*x)</i> with parameters <i>a</i> and <i>b</i>.</descr>
+        <descr> Firstly, construct empty <tt>Function</tt> object and store the parameters in the <tt>Data</tt> property.</descr>
+        <cmd> F = Function([], struct('a',10.4,'b',-0.56)) </cmd>
+        <descr> Secondly, set the handle pointing to the parameters stored inside <tt>Data</tt> property </descr>
+        <cmd> F.setHandle(@(x)F.Data.a*sin(F.Data.b*x)) </cmd>
+        <descr> The values of the parameters <i>a</i>, <i>b</i> can be modified after construction of the object.
+        The <tt>Function</tt> object will then take the new values of the parameters. </descr>
+        <cmd> F.Data.a = 12.78; F.Data.b = -0.93 </cmd>
+	</example>
+    <example>
+        <descr> For functions arrays you must correctly refer to the appropriate index of the function data </descr>
+        <descr> Allocate an array of <tt>Function</tt> objects </descr>
+        <cmd> F(2,1) = Function </cmd>
+        <descr> Assign the data </descr>
+        <cmd> F(1).Data = struct('a',-1,'b',2); </cmd>
+        <cmd> F(1).setHandle(@(x)F(1).Data.a*sin(F(1).Data.b*x)); </cmd>
+        <cmd> F(2).Data = struct('a',-3,'b',4); </cmd>
+        <cmd> F(2).setHandle(@(x)F(2).Data.a*sin(F(2).Data.b*x)); </cmd>
+    </example>
+    <example>
+        <descr> Assignment of multiple function handles is possible as well.</descr>
+        <descr> Allocate the array of 2 <tt>Function</tt> objects.</descr>
+        <cmd> F(2) = Function </cmd>
+        <descr> Assign two function handles must be done in a cell</descr>
+        <cmd> F.setHandle({@(x)x, @(x)x^2}) </cmd>
+    </example>
+
+
+	<!-- multiple related function can be defined -->
+	<related>AffFunction</related>
+	<related>QuadFunction</related>
+    <related>setHandle</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

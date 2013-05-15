@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>merge</function>
+	
+	<info>Greedy merging of polyhedra</info>
+	<syntax>U.merge</syntax>
+	<syntax>merge(U)</syntax>
+
+	<descr>
+        Simplifies the union of polyhedra by merging the neighboring polyhedra if their
+        union is convex.
+        The algorithm cycles through the regions and checks if any two regions form a convex union.
+        If so, the algorithm combines them in one region, and continues
+        checking the remaining regions.
+        To improve the solution, multiple merging loops can be enabled in options.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+    
+    <example>
+        <descr>Create a random V-polyhedron that contains the origin.</descr>
+        <cmd>P = 5*ExamplePoly.randVrep;</cmd>
+        <descr> Triangulate the polyhedron </descr>
+        <cmd> T = P.triangulate; </cmd>
+        <descr> Plot the triangular regions </descr>
+        <cmd> T.plot </cmd>
+        <descr>Create the union of polyhedra by specifying some properties.</descr>
+        <cmd> U = PolyUnion('Set',T,'convex',true,'overlaps',false,'fulldim',true,'bounded',true) </cmd>
+        <descr> Merge the polyhedra back.</descr>
+        <cmd> U.merge </cmd>
+        <descr> Plot the merged union </descr>
+        <cmd> U.plot </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>reduce</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>    
+    <author macro="author_kvasnica"/>
+    <author macro="author_fjc"/>
+    <author macro="author_geyer"/>
+
+   
+    <license macro="GPL2"/>
+</help>

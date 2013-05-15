@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mptdoc</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Display documentation for Multi-Parametric Toolbox in Matlab help browser.
+	</info>
+	
+	<syntax>mptdoc</syntax>
+    
+	<!-- long description of the function -->
+	<descr>
+        The function <tt>mptdoc</tt> opens the documentation for Multi-Parametric 
+        Toolbox inside the Matlab help browser.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- multiple related function can be defined -->
+    <related>mpt_init</related>
+    <related>mptopt</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

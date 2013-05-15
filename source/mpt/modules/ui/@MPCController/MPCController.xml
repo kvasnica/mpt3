@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>MPCController</function>
+  
+  <info>
+    MPC controller with on-line optimization
+  </info>
+  <syntax>ctrl = MPCController(model)</syntax>
+  <syntax>ctrl = MPCController(model, horizon)</syntax>
+
+  <descr> 
+    <tt>ctrl = MPCController(model)</tt> constructs an MPC
+    optimization problem by using the object <tt>model</tt> as the
+    prediction model.<br/>
+
+    The basic optimization problem takes the following form:
+    <latex>
+      \begin{align*}
+      \min_{U} &amp; J(x_N) + \sum_{k=0}^{N-1} J(x_k, u_k, y_k) \\
+      \text{s.t.} &amp; x_{k+1} = f(x_k, u_k) \\
+      &amp; y_k = g(x_k, u_k) \\
+      &amp; x_{min} \leq x_k \leq x_{max} \\
+      &amp; u_{min} \leq u_k \leq u_{max} \\
+      &amp; y_{min} \leq y_k \leq y_{max}
+      \end{align*}
+    </latex>
+    where <i>N</i> is the prediction horizon, <i>x_k</i>, <i>u_k</i>,
+    <i>y_k</i> are the state, input, and output predictions,
+    respectively, <i>J(x_N)</i> denotes the terminal cost,
+    <i>J(x_k, u_k, y_k)</i> is the stage cost, <i>f(x_k, u_k)</i>
+    represents the state-update equation, and <i>g(x_k, u_k)</i> is
+    the output equation.<br/>
+
+    The terminal cost is given by <i>J(x_N) = \| Q x_N \|_p</i>, where
+    <i>Q</i> is the weighting matrix and <i>p</i> is the type of the
+    norm (if <i>p=2</i>, then <i>J(x_N) = x_N^T Q x_N</i>, see
+    "<tt>help Penalty</tt>" for more information). The type
+    of the norm as well as the weighting matrix are specified by the
+    <tt>terminalPenalty</tt> property of the state signal (see
+    "<tt>help SystemSignal/filter_terminalPenalty</tt>").<br/>
+
+    The stage cost is represented by <i>J(x_k, u_k, y_k) = \| Q_x x_k
+    \|_{p_x} + \| Q_u u_k \|_{p_u} + \| Q_y y_k \|_{p_y}</i>, where
+    <i>Q_i</i> are weighting matrices and <i>p_i</i> represent types
+    of the norms. Properties of the state penalization are taken from
+    <tt>model.x.penalty</tt> (see "<tt>help
+    SystemSignal/filter_penalty</tt>"). Similarly, properties of input
+    and output penalizations are extracted from
+    <tt>model.u.penalty</tt> and <tt>model.y.penalty</tt>,
+    respectively. Note that different norms/weights can be assigned to
+    various signals. Hence you can have a quadratic penalization of
+    the state, but use a 1-norm penalty on the inputs.<br/>
+
+    If a certain signal (state, input, and/or output) has the
+    <tt>reference</tt> filter enabled (see "<tt>help
+    SystemSignal/filter_reference</tt>"), the terminal and stage costs
+    become <i>J(x_N) = \| Q (x_N - x_{ref}) \|_p</i> and <i>J(x_k,
+    u_k, y_k) = \| Q_x (x_k - x_{ref} \|_{p_x} + \| Q_u (u_k -
+    u_{ref}) \|_{p_u} + \| Q_y (y_k - y_{ref}) \|_{p_y}</i>. If some
+    signal does not have the <tt>reference</tt> property enabled, we
+    assume a zero reference instead.<br/>
+
+    By default, min/max bounds on state, input, and output variables
+    are added to the MPC setup. The bounds stored in
+    <tt>model.x.min</tt>, <tt>model.x.max</tt>, <tt>model.u.min</tt>, 
+    <tt>model.u.max</tt>, <tt>model.y.min</tt>, and
+    <tt>model.y.max</tt> are used. Note that other types of
+    constraints can be added. These include polyhedral constraints
+    (see "<tt>help SystemSignal/filter_setConstraint</tt>"), soft
+    constraints (see "<tt>help SystemSignal/filter_softMax</tt>" and
+    "<tt>help SystemSignal/filter_softMin</tt>"), or move blocking (see
+    "<tt>help SystemSignal/filter_block</tt>").<br/>
+
+    The basic way to create an MPC controller is to call<br/>
+
+    <tt>controller = MPCController(system)</tt><br/>
+
+    where <tt>system</tt> represents the dynamical system to be used
+    for predictions (can be an
+    instance of the <tt>LTISystem</tt>, <tt>PWASystem</tt>, or
+    <tt>MLDSystem</tt> classes). Then you can further fine-tune the
+    prediction model by adding constraints and/or modifying
+    penalties. This can be done by accessing the <tt>model</tt>
+    property of the controller object:<br/>
+
+    <tt>controller.model.x.min = [-5; -5]</tt><br/>
+ 
+    You can also specify the prediction horizon directly from the
+    command line:<br/>
+    
+    <tt>controller.N = 3</tt><br/>
+
+    Once the controller is fully specified, you can use the
+    <tt>evaluate</tt> method to obtain the optimal sequence of inputs,
+    (see "<tt>help MPCController/evaluate</tt>"), or compute the
+    explicit form of the controller by calling the <tt>toExplicit</tt>
+    method (see "<tt>help MPCController/toExplicit</tt>").
+  </descr>
+  
+  <input required="true">
+      <name>model</name>
+      <descr>Any MPT3 system (<tt>LTISystem</tt>, <tt>PWASystem</tt>,
+      <tt>MLDSystem</tt>)</descr> 
+      <class name="AbstractSystem"/>
+  </input>
+  <input required="false">
+      <name>N</name>
+      <descr>Prediction horizon</descr> 
+      <class name="Double"/>
+  </input>
+
+  <output>
+    <name>controller</name>
+    <descr>Instance of the <tt>MPCController</tt> class.</descr>    
+  </output>
+
+  <example>
+    <descr>Create a 1D LTI system <i>x^+ = 0.9x + u</i></descr>
+    <cmd>sys = LTISystem('A', 0.9, 'B', 1)</cmd>
+
+    <descr>Construct the MPC controller</descr>
+    <cmd>ctrl = MPCController(sys)</cmd>
+
+	<descr>Add constraints</descr>
+    <cmd>
+		ctrl.model.x.min = -1; ctrl.model.x.max = 1;
+		ctrl.model.u.min = -1; ctrl.model.u.max = 1;
+	</cmd>
+
+	<descr>Add penalties (we use squared two-norm with unity
+    weights here)</descr>
+    <cmd>
+		ctrl.model.x.penalty = Penalty(1, 2);
+		ctrl.model.u.penalty = Penalty(1, 2);
+	</cmd>
+
+	<descr>Specify the prediction horizon</descr>
+    <cmd>ctrl.N = 4;</cmd>
+
+	<descr>Compute the optimal control action for the initial state <tt>x0=0.5</tt></descr>
+    <cmd>
+		x0 = 0.5;
+		u = ctrl.evaluate(x0)
+	</cmd>
+
+	<descr>We can also ask for the full open-loop predictions:</descr>
+    <cmd>
+		[u, feasible, openloop] = ctrl.evaluate(x0)
+	</cmd>
+
+	<descr>Convert the controller to an explicit form</descr>
+    <cmd>expctrl = ctrl.toExplicit()</cmd>
+  </example>
+
+  <related>EMPCController</related>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

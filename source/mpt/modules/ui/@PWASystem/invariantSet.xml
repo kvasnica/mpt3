@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>invariantSet</function>
+  
+  <info>
+    Computation of invariant sets for PWA systems
+  </info>
+
+  <syntax>S = system.invariantSet()</syntax>
+  <syntax>S = system.invariantSet('X', X, 'U', U)</syntax>
+
+  <descr> 
+    For an autonomous PWA system <i>x^+ = f_PWA(x)</i> this function
+    computes the set of states for which recursive satisfaction of
+    state constraints can be shown.<br/>
+
+    The set is computed by running the set recursion
+    <latex>
+	\begin{equation*} 
+	S_{k+1} = \{ x \ | \ f_PWA(x) \in S_k \},
+	\end{equation*}
+    </latex>
+    initialized by <i>S_0 = X</i> and terminating once
+    <i>S_{k+1}=S_k</i>. If <i>X</i> is not provided, <i>X = \{ x \ | \
+    x_{min} \leq x \leq x_{max} \}</i> is assumed.<br/>
+    
+    For a PWA system <i>x^+ = f_PWA(x, u)</i>, which is subject to
+    polyhedral state constraints <i>x \in X</i> and input constraints
+    <i>u \in U</i> this function calculates the maximal
+    control-invariant set
+    
+    <latex>
+	\begin{equation*} C = \{x \ | \ \exists u(k) \in U,\
+	\text{s.t.} \ x(k) \in X, \ \forall k \geq 0\}.
+	\end{equation*}
+    </latex>
+
+    Note that this function requires that state constraints
+    defined in <tt>system.x.min</tt> and <tt>system.x.max</tt> (see
+    "<tt>help SystemSignal</tt>").
+  </descr>
+
+  <input>
+    <name>X</name>
+    <descr>Polyhedron defining state constraints (optional)</descr>
+    <class name="polyhedron"/>
+  </input>
+
+  <input>
+    <name>U</name>
+    <descr>Polyhedron defining input constraints (optional)</descr>
+    <class name="polyhedron"/>
+  </input>
+
+  <input>
+    <name>maxIterations</name>
+    <descr>Maximal number of iterations (optional)</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>S</name>
+    <descr>Invariant set</descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

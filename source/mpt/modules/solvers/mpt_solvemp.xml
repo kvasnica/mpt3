@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_solvemp</function>
+	
+	<info>
+		A gateway function to solve parametric optimization problems (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_solvemp(S)</syntax>
+
+    <descr>
+		The main routine for fast calls to parametric optimization solvers. 
+        In fact, it is a subroutine of <tt>Opt</tt> as a part of <tt>solve</tt> method.
+        The <tt>Opt</tt> class serves as general wrapper for preprocessing the data 
+        involved in optimization, including necessary error checks. Once the data are valid, 
+        then are passed to <tt>mpt_solvemp</tt> function that calls the appropriate parametric solver.
+        
+        It is assumed that MPLP/MPQP entering this function are of the form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{F\theta+f}^{T}x \label{eq:mpt_solvemp:QP0-obj} \\
+                \text{s.t.} &amp;&amp; Ax \le  b + B\theta  \label{eq:mpt_solvemp:QP0-ineq1}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} + E\ \label{eq:mpt_solvemp:QP0-eq} \\
+				&amp;&amp; lb \le x \le  ub  \label{eq:mpt_solvemp:QP0-ineq2} \\
+                &amp;&amp; {A}_{\theta}\theta \le  {b}_{\theta}  \label{eq:mpt_solvemp:QP0-ineq3}
+            \end{eqnarray} 
+        </latex>
+        where the matrices <i>H</i>, <i>F</i>, <i>A</i>, <i>A_e</i> <i>A_{\theta}</i>, <i>B</i>, <i>E</i>,
+        and vectors <i>f</i>, <i>b</i>, <i>b_e</i>, <i>b_{\theta}</i>, <tt>lb</tt>, <tt>ub</tt> are the 
+        problem data. Vector <i>x</i> represents decision variables and <i>\theta</i> are parameters.
+        The PLCP must be given as:
+        <latex>
+            \begin{eqnarray}
+            w - Mz = q + Q\theta  \label{eq:mpt_solvemp:LCP-1}\\
+            w \ge 0 \label{eq:mpt_solvemp:LCP-2}\\
+            z \ge 0 \label{eq:mpt_solvemp:LCP-3}\\
+            {w}(\theta)^{T}z(\theta) = 0 \label{eq:mpt_solvemp:LCP-4}\\
+            {A}_{\theta}\theta \le  {b}_{\theta}  \label{eq:mpt_solvemp:LCP4} \\            
+            \end{eqnarray} 
+        </latex>
+        where the matrices <i>M</i>, <i>Q</i>, <i>A_{\theta}</i>, and vectors <i>q</i>,<i>b_{\theta}</i> are the 
+        problem data, then <i>z</i>, <i>w</i> are the decision variables and <i>\theta</i> are the parameters.
+        
+        The routine <tt>mpt_solve</tt> processes data from any of the above optimization problems by passing it 
+        to the appropriated solver. Following solvers are supported:
+        <ul>
+            <li><bf>PLCP</bf> is the default solver, called automatically when invoking parametric optimization.
+                It can solve MPQP/MPLP and PLCP problems.
+            </li>
+            <li><bf>MPLP</bf> is the solver from MPT2.6 which is still supported for development purposes. </li>
+            <li><bf>MPQP</bf> is the solver from MPT2.6 which is still supported for development purposes. </li>             
+        </ul>
+        
+        Note that this function must contain all properties of <tt>Opt</tt> class that have been properly validated
+        in order to perform a correct call to given parametric solver. It is recommended to use <tt>Opt.solve</tt> 
+        method instead.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+		<descr>Object of the Opt class</descr>
+        <class name="Opt">
+			<field>
+				<name>H</name>
+				<descr>Quadratic part of the objective function.</descr>
+				<class name="double"/>
+                <default>[]</default>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>pF</name>
+                <descr>Linear part of the objective function for parameters.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>pB</name>
+                <descr>Right hand side of the inequality constraints for parameters <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>pE</name>
+                <descr>Right hand side of the equality constraints for parameters <i>{A}_{e}x=b_{e} + E\theta </i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the decision variables <i>x \ge \text{lb}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the decision variables <i>x \le \text{ub}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Ath</name>
+                <descr>Linear part of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>bth</name>
+                <descr>Right hand side of the inequality constraints <i>A_{\theta}\theta \le b_{\theta}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>     
+            <field>
+                <name>M</name>
+                <descr>Linear matrix involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>q</name>
+                <descr>Right hand side vector involved in LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Q</name>
+                <descr>Linear matrix involved in parametric formulation of LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>                        
+            <field>
+                <name>n</name>
+                <descr>Number of decision variables.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>d</name>
+                <descr>Number of parameters.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b + B\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e} + E\theta</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved</descr>
+                <class name="char"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>vartype</name>
+                <descr>A string array reserved for MPMILP/MPMIQP.</descr>
+                <class name="char"/>
+                <default>''</default>
+            </field>            
+            <field>
+                <name>solver</name>
+                <descr>S string specifying which solver should be called.</descr>
+                <class name="char"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>isParametric</name>
+                <descr>Logical scalar indicating that the problem is parametric.</descr>
+                <class name="double or logical"/>
+                <default>1</default>
+            </field>
+            <field>
+                <name>varOrder</name>
+                <descr>Order of variables if the problem was processed by YALMIP first.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>Internal</name>
+                <descr>Internal property of <tt>Opt</tt> class.</descr>
+                <class name="struct"/>
+                <default>[]</default>
+            </field>            
+            <field>
+                <name>recover</name>
+                <descr>Affine map for MPLP/MPQP problems after transformation to LCP.</descr>
+                <class name="struct">
+                    <field>
+                        <name>uX</name>
+                        <descr>Matrix of the affine map <i>x = \text{uX}\begin{pmatrix} w\\z \end{pmatrix} + \text{uTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>.
+                            The map is from the optimization variables involed in LCP <i> w(\theta),z(\theta) \mapsto x </i> and in the original LP/QP.
+                        </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                    <field>
+                        <name>uTh</name>
+                        <descr>Matrix of the affine map <i>x = \text{uX}\begin{pmatrix} w\\z \end{pmatrix} + \text{uTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>. 
+                          The map is from the optimization variables involed in LCP <i> w(\theta),z(\theta) \mapsto x </i> and in the original LP/QP.
+                    </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                    <field>
+                        <name>lambdaX</name>
+                        <descr>Matrix of the affine map <i>x = \text{lambdaX}\begin{pmatrix} w\\z \end{pmatrix} + \text{lambdaTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>.
+                        The map is from the optimization variables involed in LCP <i> w(\theta),z(\theta) \mapsto \lambda </i> and the Lagrangian multipliers in the original LP/QP.
+                    </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                    <field>
+                        <name>lambdaTh</name>
+                        <descr>Matrix of the affine map <i>x = \text{lambdaX}\begin{pmatrix} w\\z \end{pmatrix} + \text{lambdaTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} </i>.
+                        The map is from the optimization variables involed in LCP <i> w(\theta),z(\theta) \mapsto \lambda </i> and the Lagrangian multipliers in the original LP/QP.
+                        </descr>
+                        <class name="double"/>
+                        <default>[]</default>
+                    </field>
+                </class>
+                <default>[]</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution with the associated functions for optimizer, multipliers and the objective value.</descr>
+				<class name="PolyUnion"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1)</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization</descr>
+				<class name="char"/>
+			</field>
+            <field>
+				<name>solveTime</name>
+				<descr>Information about the time that elapsed during the computation in seconds.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>stats</name>
+				<descr>Further details from the parametric solver.</descr>
+				<class name="struct"/>
+			</field>                        
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>mpt_solve</related>    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

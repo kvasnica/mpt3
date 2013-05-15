@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>toSystem</function>
+  
+  <info>
+    Converts the closed-loop object to an autonomous dynamical system
+  </info>
+  <syntax>sys = loop.toSystem()</syntax>
+
+  <descr> 
+    This function converts the closed-loop object to an autonomous
+    dynamical system by using the state feedback <i>u = f(x)</i>,
+    where <i>f(x)</i> represents the explicit form of the controller.<br/>
+
+    If the system is an LTI system (i.e., <i>x^+ = A x + B u</i>), and
+    the controller is defined over a single region (i.e., <i>f(x) =
+    Kx+k</i>), this function produces an instance of the
+    <tt>LTISystem</tt> class with the dynamic <i>x^+ = (A+BK) x +
+    Bk</i>.<br/>
+    
+    If the system is PWA, or if the controller is defined over
+    multiple regions, the <tt>toSystem()</tt> method produces an
+    autonomous system as an instance of the <tt>PWASystem</tt>
+    class. The number of dynamics is equal to the number of regions,
+    over which the controller is defined.<br/>
+
+    In both cases the returned objects represent autonomous systems,
+    i.e. their <tt>B</tt> and <tt>D</tt> matrices are empty.<br/>
+
+    Note: this function requires that the closed-loop's controller is
+    available in its explicit form.
+  </descr>
+  
+  <output>
+    <name>sys</name>
+    <descr>Autonomous dynamical system representing the closed-loop
+    system.</descr>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

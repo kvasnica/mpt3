@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>plot</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Plot the polyhedron.
+	</info>
+	
+	<syntax>y = plot(P, 'Prop1', value1, 'Prop2', value2)</syntax>
+    <syntax>y = plot(P1, 'Prop1', value1, P2, 'Prop2', value2)</syntax>
+	<syntax>y = P.plot('Prop1', value1, 'Prop2', value2)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Plot the polyhedron up to dimension three.
+
+        Figure properties, such as color, line width, etc., can be specified with "Property" - "Value" pairs. 
+	</descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Polyhedron</name>
+        <descr>Polyhedron in any object with the dimension less or equal than 3.</descr>
+		<class name="ConvexSet"/>
+	</input>
+	<input>
+		<name>Prop1</name>
+        <descr>Specification of figure properties.</descr>
+		<class name="char">
+                <option>Color</option><descr>The color of the plot specified by real RGB vector or a string name of the color (e.g. 'gray');</descr>
+                <option>Wire</option><descr>Highlight or not the edges of the set. Default is false.</descr>
+                <option>LineStyle</option><descr>Specify the type of the line to plot edges of the set. Accepted values are '-',':','-.','--', and'none'.</descr>
+                <option>LineWidth</option><descr>Specify the width of the line. Default is 1.</descr>
+                <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
+                <option>Marker</option><descr>Type of markings to use. Allowed values are ".", "o", "x", "+", "*", "s", "d", "v", "\^", "&lt;", "&gt;", "p", "h" or "none". Default is "none".</descr>
+                <option>MarkerSize</option><descr>The size of the marker. Default is 6.</descr>
+                <option>ColorMap</option><descr>Color map given either as a M-by-3 matrix, or as a string. Default is 'mpt'. Other available options
+                                                are 'hsv', 'hot', 'gray', 'lightgray', 'bone', 'copper', 'pink', 'white', 'flag', 'lines', 'colorcube',
+                                                'vga', 'jet', 'prism', 'cool', 'autumn', 'spring', 'winter', 'summer'.
+                                            </descr>
+                <option>ColorOrder</option><descr>Either 'fixed' for fixed ordering of colors, or 'random' for a random order. Default is 'fixed'.</descr>
+		</class>
+	</input>
+    <input>
+        <name>value1</name>
+        <descr>Corresponding value to <tt>Prop1</tt>.</descr>
+    </input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>h</name>
+        <descr>Handle related to graphics object.</descr>
+		<class name="handle"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> Plot two polyhedra.</descr>
+        <descr> The first polyhedron is an interval [-1, 1] in 1D.</descr>
+        <cmd> P(1) = Polyhedron('lb',-1,'ub',1)</cmd>
+        <descr> The second polyhedron is in H-representation. </descr>
+        <cmd> P(2) = Polyhedron('A',[0 -1;0.4 4;0.5 -2.1],'b',[1;2;3]) </cmd>        
+        <descr> Plot the sets with the dash-dotted line and the size 3. </descr>
+        <cmd> P.plot('LineStyle','-.','LineWidth',3); </cmd>
+    </example>
+    <example>
+        <descr> Generate lower-dimensional polyhedron in 3D</descr>
+        <cmd> P = ExamplePoly.randHrep('d',3,'ne',1); </cmd>
+        <descr> Plot the polyhedron in 'darkred' color and some alpha transparency</descr>
+        <cmd> P.plot('Color','darkred','Alpha',0.6); </cmd>
+    </example>
+    <example>
+        <descr> Plot two polyhedra with different properties. </descr>
+        <cmd> P1 = ExamplePoly.randVrep; </cmd>
+        <cmd> P2 = rand(2)*P1+rand(2,1); </cmd>
+        <descr> Plot the polyhedron <tt>P1</tt> in lightgreen, dashed style and <tt>P2</tt> in wired frame and return handles.</descr>
+        <cmd> h = plot(P1,'color','lightgreen','linestyle','--',P2,'wire',true); </cmd>
+    </example>
+
+    <!-- multiple related function can be defined -->
+	<related>fplot</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+    <author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

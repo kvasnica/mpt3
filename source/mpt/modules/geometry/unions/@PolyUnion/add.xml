@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>add</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Insert Polyhedron to PolyUnion object.
+	</info>
+	
+	<syntax>U = add(U,P)</syntax>
+	<syntax>U.add(P)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Insert the <tt>Polyhedron</tt> object inside the existing <tt>PolyUnion</tt> object. 
+        The polyhedron <tt>P</tt> can be given as an array. Each element of the array is stored 
+        under <tt>PolyUnion.Set</tt> property which can be accessed later for usage.
+        
+        Any polyhedron <tt>P</tt> that is empty, it is not added to the union.
+        
+        If the <tt>PolyUnion</tt> object has been created with some properties, such as: 
+        <tt>Convex</tt>, <tt>Overlaps</tt>, <tt>Connected</tt>, <tt>Bounded</tt>, and
+        <tt>FullDim</tt>, then any polyhedron to be added is checked for this property.
+        If the union created by merging of the existing polyhedra and the new polyhedra 
+        <tt>P</tt> does not satisfy any of these properties, an error message is thrown.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>The object of the <tt>PolyUnion</tt> class.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="PolyUnion"/>
+	</input>
+
+    <input required="true">
+		<name>P</name>
+        <descr>A <tt>Polyhedron</tt> or an array of polyhedra to be added to the union.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>   
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>Union of the sets.</descr>
+		<class name="Union"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+         <!-- each example is a combination of descriptions and commands -->
+         <descr>Construct <tt>PolyUnion</tt> object by triangulating a zonotope.</descr>		
+        <cmd>Z = ExamplePoly.randZono;</cmd>
+        <descr>Triangulate the zonotope <tt>Z</tt>. </descr> 
+        <cmd> T = Z.triangulate </cmd>		
+        <descr> We know that the polyhedra <tt>T</tt> are not overlapping, bounded and in full-dimension. </descr>
+        <descr> We can create a union of first four polyhedra </descr>
+        <cmd> U = PolyUnion('Set',T(1:4),'Overlaps',false,'Bounded',true,'FullDim',true) </cmd>
+        <descr> Plot the union </descr>
+        <cmd> U.plot </cmd>
+        <descr> To add the remainining polyhedra is not a problem because the properties are fulfilled. </descr>
+        <cmd> U.add(T(5:end)) </cmd>
+        <descr> We can plot the union </descr>
+        <cmd> U.plot </cmd>        
+	</example>
+   
+	<!-- multiple related function can be defined -->
+	<related>Union</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>shoot</function>
+  
+  <info>
+      Compute the maximal value of a multiplier in the desired direction.
+  </info>
+  <syntax>alpha = S.shoot(x)</syntax>
+  <syntax>alpha = shoot(S, x)</syntax>
+  
+  <descr>
+      Compute the maximal value of the multiplier <i>\alpha</i> in the 
+      direction given by the point <i>x</i> by solving an optimization problem
+        <latex>
+            \begin{align*}
+            \underset{}{\text{max}} \; {\alpha}  \\
+                \text{s.t.} \quad  \alpha x \in \texttt{Set}
+            \end{align*}
+        </latex>              
+        This problem is usually referred as shooting towards the point <tt>x</tt>
+        because the point <i>\alpha x</i> should lie on the edge of the set.
+  </descr>
+  
+  <input required="true">
+    <name>S</name>
+    <descr>A convex set described as <tt>YSet</tt> object.</descr>
+    <class name="YSet"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point given as vector. Note that for <tt>YSet</tt> with symmetric matrix variable,
+    the point <tt>x</tt> must be given as vector with symmetric terms.</descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>alpha</name>
+    <descr>The optimal value of the multiplier <tt>alpha</tt> such that <tt>alpha*x</tt> lies inside the <tt>Set</tt>. 
+            If the set is empty, not-a-number is returned. For unbounded direction, an inf-value is returned.
+    </descr>
+    <class name="double"/>    
+  </output>
+  
+  <example>
+    <descr>Create a set <tt>S</tt> in 2D as follows.</descr>
+    <cmd>x = sdpvar(2,1);</cmd>
+    <cmd>F = [x'*x-2*x&lt;=1; x(2)+x(1)&lt;=1];</cmd>
+    <cmd>S = YSet(x,F);</cmd>
+    <descr>Compute the multiplier in the direction of the point v=[0.7; 0.7].</descr>
+    <cmd>v = [0.7; 0.7];</cmd>
+    <cmd>alpha = S.shoot(v)</cmd>
+    <descr> The computed extreme point is lying the edge</descr>
+    <descr> We can plot the set and see the points <tt>v</tt>, <tt>alpha*v</tt>. </descr>
+    <cmd> S.plot; hold on; text(v(1),v(2),'\bf x'); text(alpha*v(1),alpha*v(2),'\bf x');</cmd>
+  </example>
+   
+  <related>contains</related>
+  <related>extreme</related>
+  <related>project</related>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+  
+</help>

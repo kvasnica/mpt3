@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>add</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Insert set to Union object.
+	</info>
+	
+	<syntax>U = add(U,Set)</syntax>
+	<syntax>U.add(Set)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Insert the <tt>Set</tt> derived from from the <tt>ConvexSet</tt> inside the <tt>Union</tt> object. 
+        The <tt>Set</tt> can be also an array. Each element of the array is stored under <tt>Union.Set</tt>
+        property as a cell array because objects derived from the <tt>ConvexSet</tt> class cannot be 
+        concatenated.
+        
+        If the <tt>Set</tt> is empty, it is not added to the union.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>The object of the <tt>Union</tt> class.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Union"/>
+	</input>
+
+    <input required="true">
+		<name>Set</name>
+        <descr>A convex set derived from <tt>ConvexSet</tt> class.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="ConvexSet"/>
+	</input>   
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>Union of the sets.</descr>
+		<class name="Union"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+         <!-- each example is a combination of descriptions and commands -->
+         <descr>Construct empty <tt>Union</tt> object.</descr>		
+        <cmd>U = Union</cmd>
+        <descr>Insert random polyhedron inside the union. </descr> 
+        <cmd> U.add(ExamplePoly.randHrep); </cmd>		
+        <descr> The union now consist of one set.</descr>
+        <cmd> U.Set, U.Num </cmd>
+	</example>
+
+    <example> 
+        <descr> Union of <tt>YSet</tt> object and <tt>Polyhedron</tt> object. </descr>
+        <descr> Define <tt>YSet</tt> object. </descr>
+        <cmd> x = sdpvar(2,1);</cmd>
+        <cmd> F = [0&lt;= x &lt;= 1]; </cmd>
+        <cmd> Y = YSet(x,F); </cmd>
+        <descr> Define <tt>Polyhedron</tt> object. </descr>
+        <cmd> P = Polyhedron('lb',[2;0],'ub',[3;3]) </cmd>
+        <descr> Create the union </descr>        
+        <cmd> U = Union(Y); U.add(P) </cmd>
+        <descr> Empty polyhedron object is not added </descr>
+        <cmd> U.add(Polyhedron) </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>Union</related>
+    <related>remove</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

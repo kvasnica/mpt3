@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>feval</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Evaluates function over the set.
+	</info>
+	
+	<syntax>y = feval(Set,x,name)</syntax>
+	<syntax>y = Set.feval(x,name)</syntax>
+    <syntax>y = Set.feval(x)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Evaluates function for given value of the point <tt>x</tt> over the convex <tt>Set</tt> characterized
+        by the the string <tt>name</tt>.
+        The dimension of the vector <tt>x</tt> must be the same as the dimension of the <tt>Set</tt>.
+        If the <tt>Set</tt> is an array of convex sets, the function values are
+        returned in a cell array. For a point that lies outside of the <tt>Set</tt>, the output is empty.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+	<input required="true">
+		<name>x</name>
+        <descr>A point given as a real vector with the same dimension as the convex set.</descr>
+		<class name="double"/>
+	</input>
+	<input>
+		<name>name</name>
+        <descr>Name of the function to evaluate from the array.
+        String must match one of the names stored function names.
+        For multiple names, specify <tt>name</tt> as a cell array of strings.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>y</name>
+        <descr>Value of the function for the point <tt>x</tt> over the convex <tt>Set</tt>.</descr>
+		<class name="double or cell"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> Evaluate a function over a simple polytope. </descr>
+        <descr> Construct the polytope in H-representation</descr>
+        <cmd> P = Polyhedron('lb',[-1;-2],'ub',[1;2]); </cmd>
+        <descr> Assign a quadratic function to it </descr>
+        <cmd> Q = QuadFunction([1 2;-2 3],[0 -5],0.6) </cmd>
+        <cmd> P.addFunction(Q,'q'); </cmd>
+        <descr> Obtain the value of the function for the point [-1;0] </descr>
+        <cmd> x = [-1, -1.5];</cmd>
+        <cmd> y = P.feval(x)</cmd>
+        <descr> We can plot the function over the set with the point [x,y] </descr>
+        <cmd> P.fplot; hold on;  text(x(1),x(2),y,'\bf{x}','FontSize',14); </cmd>
+    </example>
+    <example>
+        <descr> We have three linear functions "a", "b", and "c" over unbounded polyhedron <tt>P</tt>.</descr>
+        <cmd> P = Polyhedron([1 2;-0.6 8; 0 0.4; 5 -1],[1;2;0.7;0.01]) </cmd>
+        <cmd> F1 = AffFunction([1 2]) </cmd>
+        <cmd> F2 = AffFunction([3 4; -1 0]) </cmd>
+        <cmd> F3 = AffFunction([5 6; 7 8; 9 -1]) </cmd>
+        <descr> Add functions to a polyhedron with corresponding names in a cell array.</descr>
+        <cmd> P.addFunction(F1, 'a') </cmd>
+        <cmd> P.addFunction(F2, 'b') </cmd>
+        <cmd> P.addFunction(F3, 'c') </cmd>
+        <descr> Evaluate function "a" for the point [-1,-1] </descr>
+        <cmd> P.feval([-1,-1],'a') </cmd>
+        <descr> Evaluate functions "b" and "c" for the point [-1,-1] </descr>
+        <cmd> y = P.feval([-1,-1],{'b','c'}) </cmd>        
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>fplot</related>
+    <related>Function</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

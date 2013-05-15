@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>terminalSet</function>
+  
+  <info>
+    Adds a polyhedral constraint on the final predicted state
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter adds a polyhedral constraint on the final predicted
+    state, i.e., <i>x_N \in P</i>, where <i>x_N</i>
+    is the final predicted state and <i>P</i> is a polyhedron of
+    suitable dimension.<br/>
+
+    To enable the filter, first call
+    <tt>model.x.with('terminalSet')</tt>. Then you can provide the
+    polyhedron in the <tt>model.x.terminalSet</tt> property.<br/>
+    
+    To remove this filter, call <tt>model.x.without('terminalSet')</tt>.
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

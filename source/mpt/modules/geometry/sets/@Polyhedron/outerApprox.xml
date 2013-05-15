@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>outerApprox</function>
+	
+	<info>Computes outer bounding hypercube of a polyhedron.</info>
+	<syntax>B = P.outerApprox</syntax>
+	<syntax>P.outerApprox</syntax>
+
+	<descr>
+	  <tt>B = P.outerApprox</tt> computes the smallest
+	  axis-aligned hypercube <tt>B</tt> that contains the
+	  polyhedron <tt>P</tt>. The lower and upper bounds of the
+	  hypercube are also stored in <tt>P.Internal.lb</tt> and
+	  <tt>P.Internal.ub</tt>, respectively.<br/>
+
+	  Use <tt>P.outerApprox</tt> if you only want the bounds to be
+	  written to <tt>P.Internal</tt>, but do not need the explicit
+	  bounding hypercube to be constructed.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+      <descr>Polyhedron.</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>B</name> 
+      <descr>Bounding hypercube.</descr>
+	  <class name="Polyhedron"/>
+	</output>
+
+    <example>
+        <descr>We have a lower dimensional polyhedron in 3D.</descr>
+        <cmd> P = Polyhedron('A',randn(9,3),'b',ones(9,1),'Ae', randn(1,3),'be',0.5);</cmd>
+        <descr> Compute the bounding box</descr>
+        <cmd> B = P.outerApprox; </cmd>
+        <descr> Plot the sets such that the outer approximation is wired. </descr>
+        <cmd> P.plot; hold on; B.plot('wire',true,'LineWidth',3) </cmd>
+    </example>
+    
+	
+	<!-- multiple related function can be defined -->
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+	
+	<license macro="GPL2"/>
+</help>

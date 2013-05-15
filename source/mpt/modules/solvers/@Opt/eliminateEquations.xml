@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>eliminateEquations</function>
+	
+	<info>
+		Reduce LP/QP/MPLP/MPQP by removing equality constraints
+	</info>
+
+    <syntax>problem.eliminateEquations</syntax>
+    <syntax>eliminateEquations(problem)</syntax>    
+
+    <descr>
+        Remove equality constraints involved in LP, QP, MPLP, and MPQP of the dimension <i>n</i> to get optimization
+        problem in the dimension <i>n-m_{e}</i> where <i>m_{e}</i> stands for the number of equalities.
+        Consider the following MPQP
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{(F\theta+f)}^{T}x \label{eq:eliminateEquations:QP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b + B\theta  \label{eq:eliminateEquations:QP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} + E\theta \label{eq:eliminateEquations:QP0-eq}
+            \end{eqnarray} 
+        </latex>
+        which contains <i>m</i>inequality constrains and <i>m_{e}</i> equality constraints. 
+        
+        To be able to reduce the optimization problem to a simpler form, it is required that the system 
+        of linear equations <i>A_{e}x=b_{e}+E\theta</i> is consistent, i.e. no linearly 
+        dependent rows are found and the number of equalities <i>m_{e}</i> is strictly less than number of variables <i>n</i>, 
+        i.e. <i> m_{e}&lt;n </i>.
+        The principle is based on factorizing equality constraints <i>{A}_{e}x=b_{e}+E\theta</i> in basic <i> {x}_{Bc} </i>
+        and non-basic variables <i>x_{Nc}</i>, i.e.
+        <latex>
+		   \[
+            A_{e} = 
+            \begin{pmatrix} 
+            A_{e,Bc} &amp; A_{e,Nc}
+            \end{pmatrix}            
+            \]
+		</latex>
+        which gives
+        <latex>
+            \[
+            A_{e,Bc}{x}_{Bc} + A_{e,Nc}{x}_{Nc} = b_{e} + E\theta
+            \]
+        </latex>
+        where the index sets <tt>Bc</tt>, <tt>Nc</tt> denote the columns from which factored system is built. 
+        The factored submatrix <i>A_{e,Bc}</i> must be invertible in order to express basic variables as 
+        a function of non-basic variables, i.e.
+        <latex>
+            \[
+            {x}_{Bc} = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc}{x}_{Nc} + {{A}_{e,Bc}}^{-1}{b}_{e} + {{A}_{e,Bc}}^{-1}{E}\theta
+            \]
+        </latex>
+        Using the substitution
+        <latex> \[ C = -{{A}_{e,Bc}}^{-1}{A}_{e,Nc} \] </latex>
+        and 
+        <latex> 
+            \begin{eqnarray*} 
+                {D}_{1} = {{A}_{e,Bc}}^{-1}{b}_{e} \\
+                {D}_{2} = {{A}_{e,Bc}}^{-1}{E}
+            \end{eqnarray*}
+        </latex>
+        the  relation between basic and non-basic variables is simplified to
+        <latex>
+            \begin{equation}
+            {x}_{Bc} = C{x}_{Nc} + {D}_{1} + {D}_{2}\theta \label{eq:eliminateEquations:xBcNc}
+            \end{equation}
+        </latex>
+        The above MPQP problem <i>\eqref{eq:eliminateEquations:QP0-obj}-\eqref{eq:eliminateEquations:QP0-eq}</i>
+        can be expressed only in non-basic variables <i>{x}_{Nc}</i> as follows:
+        <latex>          
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {{x}_{Nc}}^{T}\tilde{H}{x}_{Nc}+{(\tilde{F}\theta + \tilde{f})}^{T}{x}_{Nc} \label{eq:eliminateEquations:QP1-obj} \\
+				\text{s.t.} &amp;&amp; \tilde{A}{x}_{Nc} \le  \tilde{b} + \tilde{B}\theta \label{eq:eliminateEquations:QP1-ineq}	
+            \end{eqnarray}             
+        </latex>        
+        where     
+        <latex>
+            \begin{eqnarray}
+             \tilde{H} &amp; = &amp; {C}^{T}{H}_{Bc,Bc}C + {C}^{T}{H}_{Bc,Nc} + {H}_{Nc,Bc}C + {H}_{Nc,Nc} \\
+             \tilde{F} &amp; = &amp; 0.5({C}^{T}{H}_{Bc,Bc}{D}_{2} + {C}^{T}{{H}_{Bc,Bc}}^{T}{D}_{2} + {{H}_{Bc,Nc}}^{T}{D}_{2} + {H}_{Nc,Bc}{D}_{2}) + {C}^{T}{F}_{Bc} + {F}_{Nc} \\
+             \tilde{f} &amp; = &amp; 0.5({C}^{T}{H}_{Bc,Bc}{D}_{1} + {C}^{T}{{H}_{Bc,Bc}}^{T}{D}_{1} + {{H}_{Bc,Nc}}^{T}{D}_{1} + {H}_{Nc,Bc}{D}_{1}) + {C}^{T}{{f}_{Bc}} + {{f}_{Nc}} \\
+             \tilde{A} &amp; = &amp; {A}_{Bc}C+{A}_{Nc} \\
+             \tilde{b} &amp; = &amp; b - {A}_{Bc}{D}_{1} \\
+             \tilde{B} &amp; = &amp; B - {A}_{Bc}{D}_{2}
+            \end{eqnarray}
+        </latex>
+        Original solution to LP/QP problem <i>\eqref{eq:eliminateEquations:QP0-obj}-\eqref{eq:eliminateEquations:QP0-eq}</i> can be obtained 
+        via relation <i>\eqref{eq:eliminateEquations:xBcNc}</i>.  The matrices of the backward map are stored inside
+        <tt>recover</tt> property of the <tt>Opt</tt> class as follows
+        <latex>
+            \[
+            {x}_{Bc} = \text{Y}{x}_{Nc} + \text{th}\begin{pmatrix} \theta \\ 1 \end{pmatrix} 
+            \]
+        </latex>
+        where the matrix <tt>Y</tt> corresponds to <i>C</i> and the matrix <tt>th</tt> to <i>D</i> in <i>\eqref{eq:eliminateEquations:xBcNc}</i>.
+        Note the the reduced problem <i>\eqref{eq:eliminateEquations:QP1-obj}-\eqref{eq:eliminateEquations:QP1-ineq}</i> has different 
+        cost function as the original problem.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+        <name>problem</name>
+        <descr> LP/QP/MPLP/MPQP optimization problem given as <tt>Opt</tt> class. </descr>
+        <class name="Opt"/>
+    </input>
+	
+    <example>
+        <descr>Consider LP optimization problem with the following data </descr>
+        <cmd> f = [-1 1 2]; </cmd>
+        <cmd> A = [1 -1 0.4; 0.5 -9 -2; 0.5 -1 0; -5.1 -1 -3]; </cmd>
+        <cmd> b = [1; 2; 2; 4]; </cmd>
+        <cmd> Ae = [1 0 0]; be = 1; </cmd>
+        <descr> Create the problem </descr>
+        <cmd> problem = Opt('A',A,'b',b,'f',f,'Ae',Ae,'be',be) </cmd>
+        <descr> The problem has equality constraint <i>{x}_{1}=1</i> which can be verified by solving the problem.</descr>
+        <cmd> r = problem.solve </cmd>
+        <cmd> r.xopt </cmd>
+        <descr> We can eliminate the equality constaint by calling </descr>
+        <cmd> problem.eliminateEquations </cmd>
+        <descr> The solution and the objective value is different </descr>
+        <cmd> rn = problem.solve </cmd>
+        <cmd> rn.xopt </cmd>
+        <descr> The mapping between the variables in the old and new problem are stored inside <tt>recover</tt> property. </descr>
+        <cmd> problem.recover </cmd>
+        <descr> To get the original solution, use </descr>
+        <cmd> xold = problem.recover.Y*rn.xopt + problem.recover.th </cmd>
+        <descr> We can see that the solution is the same </descr>
+        <cmd> r.xopt - xold </cmd>        
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>solve</related>    
+
+	<!-- multiple literature sources can be given -->
+    <literature macro="boyd_cvxbook"/>
+    <literature macro="lcp_book"/>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

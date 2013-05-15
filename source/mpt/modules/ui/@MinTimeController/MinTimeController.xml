@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>MinTimeController</function>
+  
+  <info>
+    Implicit minimum-time MPC controller
+  </info>
+  <syntax>ctrl = MinTimeController(model)</syntax>
+
+  <descr> 
+    Constructs an object representing an implicit solution to the
+    minimum-time MPC problem:
+    <latex>
+      \begin{align*}
+      \min N &amp;\\
+      \text{s.t.}&amp; x(k+1) = f(x_k, u_k) \\
+      &amp; x(N) \in T_{set} \\
+      &amp; x(k) \in X\\
+      &amp; u(k) \in U
+      \end{align*}
+    </latex>
+    where <i>f(x_k, u_k)</i> represents the prediction model's
+    state-update equation, <i>T_{set}</i> is a given terminal set, and 
+    <i>X</i> and <i>U</i> denote, respectively, the state and input
+    constraints. <br/>
+
+    LTI, PWA, and MLD models are accepted for predictions.
+    State and input constraint sets <i>X</i>, <i>U</i> are
+    automatically created using the model's state and input
+    constraints (<tt>model.x.min</tt>, <tt>model.x.max</tt>,
+    <tt>model.u.min</tt>, <tt>model.u.max</tt>). The terminal set
+    <i>T_{set}</i> is either taken from <tt>model.x.terminalSet</tt>
+    or, if the field is empty, by calling
+    <tt>model.stabizilingController()</tt> (for LTI systems only).<br/>
+
+    Once computed, minimum-time controllers inherit the
+    behavior of the <tt>MPCController</tt> class in terms of
+    evaluation and post-processing.
+  </descr>
+  
+  <input required="true">
+      <name>model</name>
+      <descr>Any MPT3 system (<tt>LTISystem</tt>, <tt>PWASystem</tt>,
+      <tt>MLDSystem</tt>)</descr> 
+      <class name="AbstractSystem"/>
+  </input>
+  <output>
+    <name>ctrl</name>
+    <descr>Instance of the <tt>MinTimeController</tt> class.</descr>    
+  </output>
+
+  <example>
+    <descr>Create a 1D LTI system</descr>
+    <cmd>sys = LTISystem('A', 1, 'B', 1, 'C', 1, 'D', 0)</cmd>
+    <descr>Define constraints</descr>
+    <cmd>sys.x.min = -1; sys.x.max = 1;</cmd>
+    <cmd>sys.u.min = -1; sys.u.max = 1;</cmd>
+    <descr>Define penalties (we use squared two-norm with unity
+    weights here)</descr>
+    <cmd>sys.x.penalty = Penalty(1, 2);</cmd>
+    <cmd>sys.u.penalty = Penalty(1, 2);</cmd>
+    <descr>Construct the minimum-time controller</descr>
+    <cmd>ctrl = MinTimeController(sys)</cmd>
+    <descr>Convert the controller to its explicit form</descr>
+    <cmd>expctrl = ctrl.toExplicit()</cmd>
+  </example>
+
+  <related>EMinTimeControllerr</related>
+  <related>MPCController</related>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

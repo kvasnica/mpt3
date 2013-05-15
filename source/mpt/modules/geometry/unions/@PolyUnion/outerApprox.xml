@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>outerApprox</function>
+	
+	<info>Computes outer bounding box for the union of polyhedra</info>
+	<syntax>B = outerApprox(U)</syntax>
+	<syntax>B = U.outerApprox</syntax>
+
+	<descr>
+	  Compute the smallest axis-aligned hypercube that contains all polyhedra in this union.
+       The lower and upper bounds of the hypercube are stored under <tt>Internal</tt> property, 
+       i.e. <tt>Internal.lb</tt> for lower bound and <tt>Internal.ub</tt> for upper bound.
+	</descr>
+
+	<input required="true">
+	  <name>U</name>
+      <descr>Union of polyhedra in the same dimension</descr>
+	  <class name="PolyUnion"/>
+	</input>
+
+	<output>
+	  <name>B</name> 
+      <descr>Bounding box <i>B</i> described as <tt>Polyhedron</tt> in H-representation.</descr>
+	  <class name="Polyhedron"/>
+	</output>
+
+    <example>
+        <descr>We have union of two polyhedra.</descr>
+        <cmd> P(1) = Polyhedron('A',randn(9,2),'b',2*ones(9,1));</cmd>
+        <cmd> P(2) = Polyhedron('V',randn(9,2));</cmd>
+        <descr> Create the union without specifying the properties </descr>
+        <cmd> U = PolyUnion(P); </cmd>
+        <descr> Compute the bounding box</descr>
+        <cmd> B = U.outerApprox; </cmd>
+        <descr> Plot the sets such that the outer approximation is wired. </descr>
+        <cmd> U.plot; hold on; B.plot('wire',true,'LineWidth',2) </cmd>
+    </example>
+    
+	
+	<!-- multiple related function can be defined -->
+	<related>convexHull</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+	<author macro="author_herceg"/>
+	
+	<license macro="GPL2"/>
+</help>

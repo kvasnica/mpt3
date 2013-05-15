@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>hasFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Returns true if the set contains given function name.
+	</info>
+	
+	<syntax>ts = hasFunction(Set, FuncName)</syntax>
+	<syntax>ts = Set.hasFunction(FuncName)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Returns true or false if the function stored under <tt>FuncName</tt> is attached to a convex  <tt>Set</tt>. 
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+    <input required="true">
+		<name>FuncName</name>
+        <descr>Name of the function to test.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>ts</name>
+        <descr>Logical statement if the set contains the function <tt>FuncName</tt> or not.</descr>
+		<class name="logical"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> The polyhedron contains two functions "a" and "b".</descr>
+        <cmd> P = ExamplePoly.randHrep; </cmd>
+        <cmd> P.addFunction(AffFunction([1, -2]),'a'); </cmd>
+        <cmd> P.addFunction(QuadFunction([0 0.4;-0.1 0.2]),'b'); </cmd>        
+        <descr> Does the set P contain the function "b" ? </descr>
+        <cmd> P.hasFunction('b') </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>listFunctions</related>
+    <related>addFunction</related>
+    <related>removeFunction</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

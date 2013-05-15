@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isempty</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Test if the object of the <tt>Function</tt> class contains a function handle.
+	</info>
+	
+	<syntax>isempty(F)</syntax>
+    <syntax>F.isEmptyFunction</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The objects of <tt>Function</tt> class is considered as empty when it does not have
+        a function handle associated to it, i.e. the property <tt>Handle</tt> is empty.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>F</name>
+        <descr><tt>Function</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Function"/>
+	</input>
+    
+	<!-- multiple related function can be defined -->
+    <related>Function</related>	
+    <related>setHandle</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>toPWA</function>
+  
+  <info>
+    Converts the MLD model into an equivalent PWA form
+  </info>
+  <syntax>pwasys = mldsys.toPWA()</syntax>
+
+  <descr> 
+    For a PWA system consisting of <i>M</i> local affine models, this
+    function converts the <tt>index</tt>-th model to an instance of
+    the <tt>LTISystem</tt> class.
+  </descr>
+
+  <output>
+    <name>pwasys</name>
+    <descr>PWA representation of the MLD system.</descr>
+    <class name="PWASystem"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

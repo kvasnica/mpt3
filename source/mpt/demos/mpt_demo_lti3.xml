@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_lti3</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstrates simulation of the closed-loop system
+	</info>
+	
+    <syntax>mpt_demo_lti3</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Demonstrates simulation of the closed-loop system.
+	</descr>
+
+    <example>
+        <descr>Define the prediction model <i>x^+ = Ax + Bu</i>, <i>y
+	= Cx</i></descr>
+	<cmd>A = [1 1; 0 1]; B = [1; 0.5]; C = [1 0];</cmd>
+        <cmd> lti = LTISystem('A', A, 'B', B, 'C', C); </cmd>
+
+        <descr> Define the MPC controller with horizon 5.</descr>
+        <cmd> ctrl = MPCController(lti, 5); </cmd>
+        <descr> Define the closed-loop system </descr> 
+        <cmd> cl = ClosedLoop(ctrl, lti); </cmd>
+        <descr> Simulate the closed loop from a given initial condition </descr>
+        <cmd> data = cl.simulate([-4;0], 10) </cmd>
+    </example>
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_lti1</related>
+    <related>mpt_demo_lti2</related>
+    <related>mpt_demo_lti4</related>
+    <related>mpt_demo_lti5</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>meshGrid</function>
+  
+  <!-- one-line description of the function -->
+  <info>
+    Generate X-Y grid for 2D bounded polyhedra.
+  </info>
+  <!-- we can define multiple ways to call the function -->
+  <!-- note that we can freely use the underscore in function names -->
+  <syntax>[X,Y] = P.meshGrid</syntax>
+  <syntax>[X,Y] = P.meshGrid(N)</syntax>
+  <syntax>[X,Y] = meshGrid(P,N)</syntax>
+  <descr>
+        Generates X-Y grid points for plotting of two-dimensional polyhedra. Supported are only bounded and
+        lower-dimensional polyhedra.   
+        
+        The output from this function is consistent with Matlab "meshgrid" function used for plotting functions
+        over 2D polyhedra. The argument to this function is the number of points used to grid the polyhedron, 
+        default value is 20.      
+</descr>
+  <!-- now describe input arguments -->
+  
+  <!-- mark inputs as mandatory by providing the "required" attribute -->
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron given by V- or H-representation in dimension 2.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="Polyhedron"/>
+  </input>
+  <input required="false">
+    <name>N</name>
+    <descr>The number of points for gridding. The value must be positive and integer-valued.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+    <default>20</default>
+  </input>
+  
+  <!-- now describe output arguments -->
+  <output>
+    <name>X</name>
+    <descr>Matrix with x-coordinates of the grid values.</descr>
+    <class name="double"/>
+  </output>
+    <output>
+    <name>Y</name>
+    <descr>Matrix with y-coordinates of the grid values.</descr>
+    <class name="double"/>
+  </output>
+  
+  <example>
+    <descr>Define random polyhedron <tt>P</tt> in 2D.</descr>
+    <cmd> P = ExamplePoly.randVrep; </cmd>
+    <descr>Grid the polyhedron </descr>
+    <cmd>[X,Y] = P.meshGrid; </cmd>
+    <descr> Define Z coordinate as <i>z=10/(1+e^{(x-y)^2})</i>. </descr>
+    <cmd> Z=10./(1+exp((X-Y).^2)); </cmd>
+    <descr>Plot the Polyhedron and the Z values.</descr>
+    <cmd> plot(P,'color','limegreen','alpha',0.4); hold on; surf(X,Y,Z); view(3); </cmd>
+  </example>
+  
+  <related>grid</related>  
+  <related>plot</related>
+  <related>fplot</related>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+</help>

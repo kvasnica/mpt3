@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>setDomain</function>
+  
+  <info>
+    Sets the domain of an LTI system
+  </info>
+  <syntax>sys.setDomain('x', P)</syntax>
+  <syntax>sys.setDomain('u', P)</syntax>
+  <syntax>sys.setDomain('xu', P)</syntax>
+
+  <descr> 
+    Sets the region of the state-input space where a given LTI system
+    is valid.<br/>
+
+    This function sets the <tt>domain</tt> property of
+    <tt>LTISystem</tt> objects to the polyhedron <tt>P</tt>, provided
+    as the second input.
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

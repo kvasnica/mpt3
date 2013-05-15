@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>shoot</function>
+  
+  <info>
+    Maximize along a given ray within the polyhedron.
+  </info>
+  <syntax>s = P.shoot(r, x0)</syntax>
+  <syntax>s = shoot(P, r, x0)</syntax>
+  
+  <descr>
+    Computes the solution to the optimization problem:
+    <latex>
+      $$ {\max_{\alpha}} ~ \{ \alpha\ |\ {x}_{0} + \alpha r \in P \}$$
+    </latex>
+    The problem can be explained as to find the point that lies along the line given by the ray <tt>r</tt>
+    which starts from the point <tt>x0</tt> such that it still lies inside the set <i>P</i>. Typically, the
+    solution of this set is the point that lies on the boundary of the set, or can be <tt>Inf</tt> if the set 
+    is unbounded.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>dir</name>
+    <descr>Vector of size <tt>P.Dim</tt></descr>
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>x0</name>
+    <descr>Vector of size <tt>P.Dim</tt></descr>
+    <class name="double"/>
+    <default>Vector of all zeros</default>  
+  </input>
+  
+  <output>
+      <name>ret</name>
+      <descr>Optimal solution</descr>
+      <class name="struct">
+          <field>
+              <name>alpha</name>
+              <descr>Maximum length of ray, [] if <i>P</i> is empty, <tt>Inf</tt> if unbounded.</descr>
+          </field>
+          <field>
+              <name>exitflag</name>
+              <descr>Integer value informing about the termination status of the above optimization problem.</descr>
+              <class name="double">
+                  <option>mptopt.OK</option>
+                  <option>mptopt.INFEASIBLE</option>
+                  <option>mptopt.UNBOUNDED</option>
+                  <option>mptopt.ERR</option>
+              </class>
+          </field>
+          <field>
+              <name>x</name>
+              <descr>Extreme point of ray : <i>\alpha r + {x}_0</i></descr>
+          </field>
+      </class>
+  </output>
+  
+  <example>
+    <descr>Create polyhedron:</descr>
+    <cmd>P = ExamplePoly.randHrep;</cmd>
+    <descr>Choose direction and shoot:</descr>
+    <cmd>r = randn(P.Dim,1); r = r/norm(r);</cmd>
+    <cmd>s = P.shoot(r);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot; hold on; pplot([0 0;r'*s.alpha],'linewidth',3,'color','k');</cmd>
+  </example>
+    
+  <related>extreme</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+
+</help>

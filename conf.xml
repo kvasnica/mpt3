@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+
+<definitions>
+	
+<!-- 	REQUIRED PARAMETERS	 -->
+	
+	<!-- title of the toolbox -->
+	<def name="TITLE">Multiparametric Toolbox 3.0</def>
+	<!-- XML directory with the original source files that will be left untouched-->
+	<def name="XMLORIGDIR">source</def>
+	<!-- name of the temporary directory where the files will be overwritten with new
+	headers. The name must be different from XMLORIGDIR 
+	Also note, that this temporary directory must be present in the Matlab initialization
+	commands otherwise the generated documentation will overwrite the source directory.
+	  -->
+	<def name="XMLDIR">source_doc</def>
+	<!-- which subdirectory of XMLDIR contains functions? -->
+	<def name="FUNCTIONS_DIR">mpt</def>	
+	<!-- project web site -->
+	<def name="PROJECT_WEB_SITE">www.control.ee.ethz.ch/~mpt</def>
+	<!-- XML file with macros -->
+	<def name="MACRO_FILE">macros.xml</def>
+	<!-- destination directory -->
+	<def name="DESTDIR">doc</def>
+	
+	
+<!-- 	OPTIONAL PARAMETERS (can be omitted)	 -->
+
+
+	<!-- which subdirectory of XMLDIR contains user guide? -->
+	<def name="USER_GUIDE_DIR"></def>
+	<!-- which subdirectory of XMLDIR contains release notes? -->
+	<def name="REL_NOTES_DIR">rel_notes</def>
+	<!-- which subdirectory of XMLDIR contains getting started? -->
+	<def name="GET_STARTED_DIR">getting_started</def>
+	<!-- which subdirectory of XMLDIR contains examples? -->
+	<def name="EXAMPLES_DIR"></def>
+	
+	<!-- Matlab arguments when running matlab scripts
+	Already provided argumens are
+	-nosplash -nodesktop -nodisplay
+	If you prefer other setup, these arguments will be overwritten.
+	-->
+	<!-- uncomment this if you want to generate alpha-transparent figures -->
+	<def name="MATLAB_ARGS">-nosplash -nodesktop</def>
+	
+	<!-- Matlab initialization commands -->
+	<def name="MATLAB_INIT">cd source_doc/mpt;
+	mpt_init; cd ../..;
+	</def>
+	
+	<!-- Space-separated list of classes whose methods should be
+	put into separate files -->
+	<def name="SPLIT_CLASSES">AbstractController AbstractSystem
+	ClosedLoop ComponentBehavior EMinTimeController EMPCController
+	FilterBehavior FilterSetup LQRController LTISystem
+	MinTimeController MLDSystem MPCController MPTUIHandle Penalty
+	PWASystem SystemSignal</def>
+	
+	<!-- paragraph indentation (0pt) -->
+	<def name="PARINDENT"></def>
+	<!-- user defined packages to add as headers in TEX, e.g. \usepackage{amssymb} -->
+	<def name="USEPACKAGES"></def>
+	<!-- width for line break (12pt) -->
+	<def name="LINE_BREAK_UNIT"></def>
+	<!-- figure width for TEXT output (0.7\textwidth)-->
+	<def name="TEX_FIG_WIDTH"></def>
+	<!-- figure width for HTML output (100%)-->
+	<def name="HTML_FIG_WIDTH">60%</def>
+	<!-- table width for TEXT output (0.6\textwidth)-->
+	<def name="TEX_TABLE_WIDTH"></def>	
+	<!-- line width for TXT output (80) -->
+	<def name="TXT_LINE_WIDTH"></def>
+	<!-- specify prefix for matlab commands, e.g. >> -->
+	<def name="MATLAB_CMD_PREFIX"></def>
+	<!-- color of the output matlab command (blue)-->
+	<def name="MATLAB_CMD_COLOR">blue</def>
+
+	
+	
+</definitions>

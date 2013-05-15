@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>Ae</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Get <tt>Ae</tt> matrix from equality description of the <tt>Polyhedron</tt>.
+	</info>
+	
+	<syntax>P.Ae</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Get equality matrix <i>{A}_{e}</i> from <i>{A}_{e}x={b}_{e}</i> description of the polyhedron <tt>P</tt>.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+        <descr><tt>Polyhedron</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+
+	<!-- multiple related function can be defined -->
+    <related>Polyhedron</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

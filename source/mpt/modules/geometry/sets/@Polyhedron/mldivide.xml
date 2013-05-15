@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>mldivide</function>
+  
+  <info>Set difference between polyhedra</info>
+  <syntax>R = P \ Q</syntax>
+  <syntax>R = mldivide(P,Q)</syntax>
+  
+  <descr>
+      Function computes the set difference between polyhedron <i>P</i> and <i>Q</i>
+      which can be both single polyhedra or arrays of polyhedra in the same dimension
+
+      The set difference operation is defined as
+    <latex>
+      $$R = P \backslash Q =\{ x ~|~ x\in P ~, x\notin Q \}$$
+    </latex>
+    where the output <i>R</i> can comprise of multiple polyhedra. 
+    
+  </descr>
+
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>Q</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  
+  <output>
+    <name>R</name> 
+    <descr>Polyhedron (or array) <tt>R = P\S</tt> .</descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <example>
+  <descr>Set difference of two full-dimensional polyhedra.</descr>
+  <cmd> P = ExamplePoly.randHrep; </cmd>
+  <cmd> S = 0.2*P; </cmd>
+  <descr> We can plot the polyhedra. </descr>
+  <cmd> plot([P,S]); </cmd>
+  <descr> Compute the set difference. </descr>
+  <cmd> Q = P \ S </cmd>
+  <descr> Plot the polyhedra <tt>Q</tt>. </descr>
+  <cmd> plot(Q,'color','limegreen'); </cmd>      
+  </example>
+  
+  <!-- Not valid because this functionality has been removed.
+  <example>
+  <descr>Set difference of unbounded polyhedron and low-dimensional polyhedron.</descr>  
+  <descr> Unbounded polyhedron is given as positive orthant: </descr>
+  <cmd> P = Polyhedron('lb',[0;0;0]); </cmd>
+  <descr> Lower-dimensional polyhedron </descr>
+  <cmd> S = ExamplePoly.randHrep('d',3,'ne',1); </cmd>
+  <descr> We can plot the polyhedra. </descr>
+  <cmd> plot([P,S]); </cmd>
+  <descr> Compute the set difference. </descr>
+  <cmd> Q = P \ S </cmd>
+  <descr> Plot the polyhedra <tt>Q</tt>. </descr>
+  <cmd> plot(Q) </cmd>      
+  </example>
+  -->
+  
+  <related>plus</related>
+  <related>minus</related>
+  
+  <!-- multiple authors can be defined -->
+  <author macro="author_baotic"/>
+  <author macro="author_kvasnica"/>
+  <author macro="author_herceg"/>
+  
+  <license macro="GPL2"/>
+</help>

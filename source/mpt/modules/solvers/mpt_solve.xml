@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_solve</function>
+	
+	<info>
+		A gateway function to solve non-parametric optimization problems (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_solve(S)</syntax>
+
+    <descr>
+		The function is the main routine for fast calls for solving non-parametric optimization problems
+        in MPT. In fact, it is a subroutine of <tt>Opt</tt> as a part of <tt>solve</tt> method.
+        The <tt>Opt</tt> class serves as general wrapper for preprocessing the data 
+        involved in optimization, including necessary error checks. Once the data are valid, 
+        then are passed to <tt>mpt_solve</tt> function that calls the appropriate solver.
+        
+        It is assumed that QP/LP/MIQP/MILP and entering this function (for LP/MILP <i>H=0</i>)
+        is of the form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{f}^{T}x \label{eq:mpt_solve:QP0-obj} \\
+				\text{s.t.}  &amp;&amp; \text{lb} \le x \le  \text{ub}  \label{eq:mpt_solve:QP0-ineq1} \\
+                &amp;&amp; Ax \le  b  \label{eq:mpt_solve:QP0-ineq2}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:mpt_solve:QP0-eq} \\
+                &amp;&amp; x \in \{C, I, B, N, S \}
+            \end{eqnarray} 
+        </latex>
+        where the set <i>\{C, I, B, N, S\}</i> represents
+        <ul>
+            <li>C - continuous variables, <i>x \in (-\infty,\infty) </i> </li>
+            <li>I - integer variables <i>x \in (\ldots, -1, 0, 1, \ldots) </i> </li>
+            <li>B - binary variables <i>x \in \{0,1\}</i> </li>
+            <li>N - semi-integer variables (possibly bounded above) <i> x \in [0, 1, \overline{x} \le \infty )</i> </li>
+            <li>S - semi-continuous variables (possibly bounded above) <i> x \in [0, \overline{x} \le \infty)</i> </li>
+        </ul>
+        which is given by strings in <tt>vartype</tt> field. The matrices <i>H</i>, <i>A</i>, <i>A_{e}</i>,
+        and vectors <i>f</i>,<i>b</i>, <i>b_{e}</i>, <tt>lb</tt>, <tt>ub</tt> are the problem data, 
+        then <i>x</i> are the decision variables.
+
+        The LCP must be given as:
+        <latex>
+            \begin{eqnarray}
+            w - Mz= q \label{eq:mpt_solve:LCP-1}\\
+            w \ge 0 \label{eq:mpt_solve:LCP-2}\\
+            z \ge 0 \label{eq:mpt_solvemp:LCP-3}\\
+            {w}^{T}z = 0  \label{eq:mpt_solve:LCP-4}   
+            \end{eqnarray}                        
+        </latex>
+        where the matrices <i>M</i>, <i>Q</i>, and vectors <i>q</i> are the 
+        problem data, <i>z</i>, <i>w</i> are the decision variables to be determined.
+        
+        
+        The function <tt>mpt_solve</tt> processes the problem data and passes it to the appropriate solver. The 
+        particular solver can be specified by providing <tt>solver</tt> name or it is selected automatically from 
+        the list of available solvers. Based on the solver name, the appropriated function is called:
+        <ul>
+            <li><bf>CDD</bf> solver is installed by default, and can be called via <tt>mpt_call_cdd</tt>. Solves LP problems.</li>
+            <li><bf>CLP</bf> solver is installed by default, and can be called via <tt>mpt_call_clp</tt>. Solves LP/QP problems.</li>
+            <li><bf>CPLEX</bf> is a commercial solver and must be installed additionally. It can be called via <tt>mpt_call_cplex</tt>. 
+                CPLEX solves LP/QP/MILP/MIQP problems.</li>
+            <li><bf>GLPK</bf> solver is installed by default, and can be called via <tt>mpt_call_glpk</tt>. It solves
+                LP/QP/MILP problems.</li>
+            <li><bf>GUROBI</bf> is a commercial solver and must be installed additionally. It can be called via <tt>mpt_call_gurobi</tt>. 
+                It solves LP/QP/MILP/MIQP problems.
+            </li>
+            <li><bf>LCP</bf> is a default solver, and can be called via <tt>mpt_call_lcp</tt>. It can be used to solve LP/QP and LCP problems.</li>
+            <li><bf>LINPROG</bf> is Matlab LP solver, and can be called via <tt>mpt_call_linprog</tt>.</li>
+            <li><bf>QUADPROG</bf> is Matlab QP solver, and can be called via <tt>mpt_call_quadprog</tt>.</li>
+            <li><bf>NAG</bf> is a commercial solver and must be installed additionally. It can be called via <tt>mpt_call_nag</tt>. 
+                It solves LP/QP problems.
+            </li>
+            <li><bf>QPC</bf> is LP/QP solver that need to be installed additionally. It can be called via <tt>mpt_call_qpc</tt>.</li>
+            <li><bf>QPOASES</bf> is LP/QP solver that is installed by default. It can be called via <tt>mpt_call_qpoases</tt>.</li>
+            <li><bf>QPSPLINE</bf> is a QP solver for strictly convex problems and can be called via <tt>mpt_call_qpspline</tt>.</li>
+            <li><bf>SEDUMI</bf> is a semidefinite solver for general convex problems and can be called via <tt>mpt_call_sedumi</tt>.</li>
+        </ul>
+             
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+		<descr>structure of the Opt class</descr>
+        <class name="struct">
+			<field>
+				<name>H</name>
+				<descr>quadratic part of the objective function</descr>
+				<class name="double"/>
+                <default>[]</default>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>linear part of the objective function</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>A</name>
+                <descr>linear part of the inequality constraints <i>Ax \le b</i></descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>right hand side of the inequality constraints <i>Ax \le b</i></descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>Ae</name>
+                <descr>linear part of the equality constraints <i>{A}_{e}x=b_{e}</i></descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>right hand side of the equality constraints <i>{A}_{e}x=b_{e}</i></descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>lb</name>
+                <descr>lower bound for the variables <i>x \ge \text{lb}</i></descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>upper bound for the variables <i>x \le \text{ub}</i></descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>M</name>
+                <descr>Positive semi-definite matrix defining LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>q</name>
+                <descr>Right hand side vector defining LCP.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>n</name>
+                <descr>problem dimension (number of variables)</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>m</name>
+                <descr>number of inequalities in <i>Ax \le b</i></descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>number of equalities in <i>A_{e}x=b_{e}</i></descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>a string specifying the problem to be solved</descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>vartype</name>
+                <descr>A string specifying the type of variable. Supported characters are
+                C (continuous), I (integer), B (binary), N (semi-integer), S (semi-continuous). 
+                Example: First variable from three is binary, the rest is continuous: <tt>S.vartype='BCC';</tt> 
+                </descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>solver</name>
+                <descr>S string specifying which solver should be called. </descr>
+                <class name="char"/>
+            </field>
+
+            <field>
+                <name>test</name>
+                <descr>Call (false) or not to call (true) MPT global settings</descr>
+                <class name="logical"/>
+                <default>false</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>obj</name>
+				<descr>Objective value</descr>
+				<class name="double"/>
+			</field>            
+			<field>
+				<name>lambda</name>
+				<descr>Lagrangian multipliers</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1)</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+
+    <example>
+        <descr> Solve an LP stored in file <tt>sc50b</tt>.</descr>
+        <descr> Load the data</descr>
+        <cmd> load sc50b </cmd>
+        <descr> Solve the problem using LINPROG</descr>
+        <cmd>[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,[],[]); </cmd>
+        <descr> It is the same as solving using <tt>mpt_solve</tt>. </descr>
+        <descr> Put the data to a structure <tt>S</tt>. </descr>
+        <cmd> S.f=f; S.A=A; S.b=b; S.Ae=Aeq; S.be=beq; S.lb=lb; </cmd>
+        <descr> Solve with the default solver </descr>
+        <cmd> R1 = mpt_solve(S) </cmd>
+        <descr> Solve with LCP solver </descr>
+        <cmd> S.solver = 'LCP'; </cmd>
+        <cmd> R2 = mpt_solve(S) </cmd>
+        <descr> You can see that the results are the same. </descr>
+        <cmd> norm(x-R1.xopt) </cmd>
+        <cmd> norm(x-R2.xopt) </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>Opt</related>    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

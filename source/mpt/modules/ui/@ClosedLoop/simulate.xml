@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>simulate</function>
+  
+  <info>
+    Simulates the closed-loop system.
+  </info>
+  <syntax>data = loop.simulate(x0, M)</syntax>
+
+  <descr> 
+    Simulates the closed-loop system over <tt>M</tt> time steps,
+    starting from the initial condition <tt>x0</tt>.
+  </descr>
+  
+  <input>
+    <name>x0</name>
+    <descr>Initial condition.</descr> 
+    <class name="double"/>
+  </input>
+  <input>
+      <name>N_steps</name>
+      <descr>Number of simulation steps.</descr>
+      <class name="double"/>
+  </input>
+  <output>
+    <name>data</name>
+    <descr>Structure containing closed-loop profiles of state, input,
+    and output variables.</descr>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

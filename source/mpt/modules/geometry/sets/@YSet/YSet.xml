@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>YSet</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Representation of a convex set using YALMIP constraints.
+	</info>
+	
+	<syntax>S = YSet(vars, constraints)</syntax>
+	<syntax>S = YSet(vars, constraints, options)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The class <tt>YSet</tt> represents convex sets described by YALMIP constraints.
+        Because YALMIP offers very broad specification of convex sets, the class
+        <tt>YSet</tt> is useful when applying methods of the <tt>ConvexSet</tt> class that 
+        are not available in YALMIP. However, it is not intended with this class to 
+        replace basic functionalities for YALMIP objects. For reference how to use YALMIP
+        objects, refer to YALMIP help.
+        Only convex sets are accepted. Convexity is checked internally by YALMIP.
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>vars</name>
+        <descr> Symbolic variables used in the description of the constraints. The dimension of the 
+        variables must much the dimension used in the constraint set. Vector and matrix variables
+        are accepted, multidimensional matrices are not allowed.
+        </descr>
+        <class name="sdpvar"/>
+	</input>
+	<input required="true">
+		<name>constraints</name>
+		<descr>
+            Constraint set given as <tt>lmi</tt> object. The constraints must build a convex set, 
+            otherwise the argument is not accepted. The convexity is checked internally by YALMIP.
+        </descr>
+        <class name="lmi"/>
+	</input>
+	<input>
+		<name>options</name>
+		<descr>
+            YALMIP options defined by <tt>sdpsettings</tt>. You can specify the solver here, verbosity, 
+            the tolerances, etc. By default, these options are idependent of MPT settings.
+            YALMIP chooses the solver based on its internal preferences and depending on the type of the constraint set.            
+            For more details, type <tt>help sdpsettings</tt>.            
+        </descr>
+        <class name="struct"/>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>S</name>
+		<descr> <tt>YSet</tt> object representing a convex set. </descr>
+        <class name="YSet"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <descr>Create a set that looks like a <em>pizza cut</em>. </descr>		
+            <descr>Define 2D vector <tt>x</tt>.</descr>
+            <cmd> x = sdpvar(2,1);</cmd>
+            <descr> Create constraints in YALMIP. </descr>
+            <cmd> F = [-x(1)+x(2)&lt;=0;  -x(1)-x(2)&gt;=0; x'*x&lt;=1]; </cmd>
+            <descr> Construct the set </descr>
+            <cmd> S = YSet(x,F) </cmd>
+            <descr> Plot the set </descr>
+            <cmd> S.plot </cmd>
+    </example>
+    <example>
+        <descr> Create a set described by linear matrix inequalities  <i>P&gt;=0</i>, <i> A'P + PA &lt;= I</i>.</descr>
+        <descr> Firstly, define the unknow symmetric matrix <tt>P</tt> and a matrix <tt>A</tt>.</descr>
+        <cmd> P = sdpvar(2), A = randn(2); </cmd>
+        <descr> Secondly, set the inequalities in YALMIP. </descr>
+        <cmd> constraints = [P&gt;=0; A'*P + P*A &lt;= eye(2)] </cmd>
+        <descr> Construct the set <tt>S</tt> out of this constraint description. </descr>
+        <cmd> S = YSet(P(:),constraints) </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>ConvexSet</related>
+	<related>Polyhedron</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

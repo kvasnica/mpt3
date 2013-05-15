@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>feval</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Evaluates function over union of polyhedra.
+	</info>
+	
+	<syntax>y = feval(U,x,name)</syntax>
+	<syntax>y = U.feval(x,name)</syntax>
+    <syntax>y = U.feval(x)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Evaluates function for given value of the point <tt>x</tt> over the union of polyhedra <tt>U</tt> characterized
+        by the string <tt>name</tt>. If the string <tt>name</tt> is omitted, all functions are evaluated.
+        The dimension of the vector <tt>x</tt> must be the same as the dimension of the union.
+        The evaluation is based on the following approach:
+        <ol>
+            <li>Find the index of the polyhedron contained inside the union where the point <tt>x</tt> lies. </li>
+            <li>Evaluate the function over the polyhedron determined by the found index. </li>
+        </ol>
+        If the point lies outside of the PolyUnion, the result is empty.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Union of polyhedra in the same dimension.</descr>
+		<class name="PolyUnion"/>
+	</input>
+	<input required="true">
+		<name>x</name>
+        <descr>A point given as a real vector in the same dimension as union.</descr>
+		<class name="double"/>
+	</input>
+	<input>
+		<name>name</name>
+        <descr>Name of the function to evaluate. The string must match one of the stored function names.
+        For multiple names, specify <tt>name</tt> as a cell array of strings.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>y</name>
+        <descr>Value of the function for the point <tt>x</tt> over the union of polyhedra <tt>U</tt>.</descr>
+		<class name="double or cell"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> PWA function over polyhedral complex.</descr>
+        <descr> Define one bounded polyhedron in dimension 3.</descr>
+        <cmd> P = ExamplePoly.randVrep('d',3); </cmd>
+        <descr> Triangulate the polyhedron </descr>
+        <cmd> T = P.triangulate; </cmd>
+        <descr> Add linear function to each polyhedron <i>T</i> in the array under the name "a". </descr>
+        <cmd> T.addFunction(AffFunction([1 -2 0]),'a'); </cmd>
+        <descr> For each polyhedron in the array add second function 'b'. </descr>
+        <cmd> for i=1:length(T), T(i).addFunction(AffFunction(rand(1,3),rand(1)),'b'); end </cmd>
+        <descr> Create union out of polyhedra <i>T</i> with some properties. </descr>
+        <cmd> U = PolyUnion('Set',T,'Convex',true,'Bounded',true,'Overlaps',false); </cmd>
+        <descr> Evaluate the PWA function "a" for a point inside the polyhedron <i>P</i>. </descr>
+        <cmd> x = P.interiorPoint.x; </cmd>
+        <cmd> y = U.feval(x,'a') </cmd>
+        <descr> Evaluate both functions </descr>
+        <cmd> yn = U.feval(x) </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>fplot</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

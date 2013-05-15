@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>homogenize</function>
+  
+  <info>
+    Compute the homogenization of the given Polyhedron.
+  </info>
+  <syntax>H = P.homogenize(type)</syntax>
+  <syntax>H = homogenize(P, type)</syntax>
+  
+  <descr>
+    Compute the homogenization of the given Polyhedron. Parametrize the right hand side of the
+    inequalities/equalities that describe the polyhedron to get homogenized system of equations 
+    <i>Ax\le 0</i> and <i>A_{e}x = 0 </i>. 
+
+    Given Polyhedron 
+    <latex>
+	    $$P = \{x \in \mathbb{R}^{n} \ |\ Ax \le b,\ {A}_{e}x = {b}_{e}\}$$
+    </latex>
+    the homogenization is
+    <latex>
+      $$H = \{x\in \mathbb{R}^{n}, t \in \mathbb{R}^{1} \ |\ Ax - bt \le 0,\ {A}_{e}x - {b}_{e}t = 0\}$$
+    </latex>
+    where the <i>t</i> is the lifting parameter. The dimension of the polyhedron <i>H</i> is 
+    by one greater than the dimension of <i>P</i>.
+    
+    If <tt>type = 'Hrep'</tt> or <tt>type = 'Vrep'</tt> is specified, then the homogenization is returned 
+    in this form, otherwise the returned type is equal to the type of <i>P</i>.    
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="false">
+    <name>type</name>
+    <descr>Desired type of the returned polyhedron</descr>
+    <class name="char">
+        <option>Hrep</option><descr>Hyperplane representation.</descr>
+        <option>Vrep</option><descr>Vertex representation.</descr>
+    </class>
+  </input>
+  
+  <output>
+    <name>H</name>
+    <descr>Homogenization of <tt>P</tt> polyhedron </descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <example>
+    <descr>Create random polyhedron and homogenize:</descr>
+    <cmd>P = ExamplePoly.randHrep;</cmd>
+    <cmd>H = P.homogenize;</cmd>
+    <descr>Plot the result:</descr>
+    <cmd>plot([P, H]);</cmd>
+  </example>
+  
+  <author macro="author_cnj"/>
+  
+  <license macro="GPL2"/>
+</help>

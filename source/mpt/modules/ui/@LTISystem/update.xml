@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>update</function>
+  
+  <info>
+    Updates the internal state using the state-update equation
+  </info>
+  <syntax>system.update(u)</syntax>
+  <syntax>xn = system.update(u)</syntax>
+  <syntax>[xn, y] = system.update(u)</syntax>
+
+  <descr> 
+    This function evaluates the system's state-update equation and
+    updates the internal state of the system.<br/>
+
+    By calling <tt>system.update(u)</tt> this function updates the
+    internal state of <tt>system</tt> by evaluating the state-update
+    equation. The updated state can then be retrieved by calling <tt>x
+    = system.getStates()</tt>.<br/>
+
+    By calling <tt>[xn, y] = system.update(u)</tt> this function also
+    returns the updated state as the first output, and the result of
+    the output equation as the second output. Note that the internal
+    system's state is still updated as described above. 
+  </descr>
+
+  <input required="true">
+    <name>u</name>
+    <descr>Vector of system's inputs</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>xn</name>
+    <descr>Updated state vector</descr>
+    <class name="double"/>
+  </output>
+
+  <output>
+    <name>y</name>
+    <descr>Vector of outputs</descr>
+    <class name="double"/>
+  </output>
+
+  <example>
+    <descr>Define a 1D LTI system <i>x^+ = 0.9x + u</i>, <i>y = 0.5x</i></descr>
+    <cmd>sys = LTISystem('A', 0.9, 'B', 1, 'C', 0.5)</cmd>
+    <descr>Set the system's internal state to <i>1</i>.</descr>
+    <cmd>sys.initialize(1);</cmd>
+    <descr>Update the system's state using <i>u=0.2</i>.</descr>
+    <cmd>sys.update(0.2);</cmd>
+    <descr>Retrieve the internal state (should be equal to <i>1.1</i>).</descr>
+    <cmd>sys.getStates()</cmd>
+    <descr>Update the system's state using <i>u=0</i>.</descr>
+    <cmd>sys.update(0)</cmd>
+    <descr>Retrieve the internal state (should be equal to <i>0.99</i>).</descr>
+    <cmd>sys.getStates()</cmd>
+    <descr>Update the internal state using <i>u=-1</i> and retrieve
+    the updated state and the associated output</descr>
+    <cmd>[xn, y] = sys.update(-1)</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>
