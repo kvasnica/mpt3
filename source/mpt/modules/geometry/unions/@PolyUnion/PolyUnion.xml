@@ -119,9 +119,9 @@
     </example>
     <example>
         <descr> Create three random polyhedra and merge them to <tt>PolyUnion</tt> object. </descr>
-        <cmd> P(1) = ExamplePoly.randHrep; </cmd>
-        <cmd> P(2) = ExamplePoly.randHrep; </cmd>
-        <cmd> P(3) = ExamplePoly.randHrep; </cmd>
+        <cmd> P(1) = ExamplePoly.randVrep; </cmd>
+        <cmd> P(2) = ExamplePoly.randVrep; </cmd>
+        <cmd> P(3) = ExamplePoly.randVrep; </cmd>
         <descr> We don't know any of the particular properties of the union, we can call the short syntax:</descr>
         <cmd> U = PolyUnion(P)</cmd>
         <descr> Plot the sets </descr>
