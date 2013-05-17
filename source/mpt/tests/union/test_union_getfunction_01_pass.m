@@ -8,7 +8,7 @@ P1 = Polyhedron('lb', -1, 'ub', 2);
 U = Union;
 U.add(P1);
 [~, msg] = run_in_caller('fun = U.getFunction()');
-asserterrmsg(msg, 'Input argument "FuncName" is undefined.');
+asserterrmsg(msg, 'Not enough input arguments.');
 
 %% single function
 

@@ -110,6 +110,17 @@ classdef Union < handle & IterableBehavior
 
 		  error(nargchk(2, 2, nargin));
 		  for i = 1:numel(obj)
+			  % make sure the function exists
+			  if any(~obj(i).hasFunction(FuncName))
+				  if iscell(FuncName)
+					  idx = find(~obj(i).hasFunction(FuncName));
+					  missing = FuncName{idx(1)};
+				  else
+					  missing = FuncName;
+				  end
+				  error('No such function "%s" in the object.', missing);
+			  end
+			  
 			  U(i) = obj(i).copy();
 			  toremove = setdiff(obj(i).listFunctions, FuncName);
 			  if ~isempty(toremove)
@@ -124,6 +135,16 @@ classdef Union < handle & IterableBehavior
 		  error(nargchk(2, 2, nargin));
 		  % make a copy before removing function(s)
 		  for i = 1:numel(obj)
+			  % make sure the function exists
+			  if any(~obj(i).hasFunction(FuncNames))
+				  if iscell(FuncNames)
+					  idx = find(~obj(i).hasFunction(FuncNames));
+					  missing = FuncNames{idx(1)};
+				  else
+					  missing = FuncNames;
+				  end
+				  error('No such function "%s" in the object.', missing);
+			  end
 			  if iscell(obj(i).Set)
 				  for j = 1:length(obj(i).Set)
 					  obj(i).Set{j}.removeFunction(FuncNames);
