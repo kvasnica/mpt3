@@ -70,6 +70,14 @@ classdef Union < handle & IterableBehavior
 		  
 		  if isa(obj.Set, 'Polyhedron')
 			  U = Union('Set', Polyhedron(obj.Set), 'Data', obj.Data);
+		  elseif all(cellfun(@(x) isa(x, 'Polyhedron'), obj.Set))
+			  % all are polyhedra
+			  U = Union;
+			  U.Data = obj.Data;
+			  U.Set = cell(size(obj.Set));
+			  for i = 1:numel(obj.Set)
+				  U.Set{i} = Polyhedron(obj.Set{i});
+			  end
 		  else
 			  % TODO: we really do need a consistent copyable behavior!
 			  % NOTE: UNLESS WE FIX COPYING, WE GET WRONG BEHAVIOR
