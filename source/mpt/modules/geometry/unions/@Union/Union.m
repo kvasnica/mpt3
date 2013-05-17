@@ -108,6 +108,7 @@ classdef Union < handle & IterableBehavior
 	  function U = getFunction(obj, FuncName)
 		  % returns function indexed by the string FuncName
 
+		  error(nargchk(2, 2, nargin));
 		  for i = 1:numel(obj)
 			  U(i) = obj(i).copy();
 			  toremove = setdiff(obj(i).listFunctions, FuncName);
@@ -119,7 +120,8 @@ classdef Union < handle & IterableBehavior
 	  
 	  function obj = removeFunction(obj, FuncNames)
 		  % removes function indexed by the string FuncName
-		  
+
+		  error(nargchk(2, 2, nargin));
 		  % make a copy before removing function(s)
 		  for i = 1:numel(obj)
 			  if iscell(obj(i).Set)
@@ -163,7 +165,8 @@ classdef Union < handle & IterableBehavior
 	  function out = hasFunction(obj, FuncName)
 		  % returns true if the object contains function(s) indexed by
 		  % FuncName
-		  
+
+		  error(nargchk(2, 2, nargin));
 		  out = ismember(FuncName, obj.listFunctions);
 	  end
 
