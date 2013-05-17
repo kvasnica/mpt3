@@ -150,8 +150,9 @@ classdef Union < handle & IterableBehavior
 	  
 	  function out = listFunctions(obj)
 		  % lists attached functions
-		  
-		  if numel(obj.Set)>0
+
+		  obj.rejectArray();
+		  if numel(obj)==1 && numel(obj.Set)>0
 			  if iscell(obj.Set)
 				  out = obj.Set{1}.listFunctions;
 			  else
