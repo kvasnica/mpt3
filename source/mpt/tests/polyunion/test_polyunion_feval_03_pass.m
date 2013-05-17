@@ -5,32 +5,22 @@ function test_polyunion_feval_03_pass
 
 P = ExamplePoly.randVrep('d',4);
 T = P.triangulate;
-
-T.addFunction(AffFunction(rand(1,4)),'a');
-T.addFunction(AffFunction(rand(1,4)),'b');
-
-
+fa = rand(1, 4);
+fb = rand(1, 4);
+T.addFunction(AffFunction(fa),'a');
+T.addFunction(AffFunction(fb),'b');
 U = PolyUnion(T);
-
 x = P(1).interiorPoint.x;
-
-y1=U.feval(x,'b');
-
-if iscell(y1)
-    error('The result must be double because we evaluate only 1 function.')
-end
+y = U.feval(x,'b');
+assert(y==fb*x);
 
 Un = U.getFunction('a');
+y = Un.feval(x);
+assert(y==fa*x);
 
-y2 = Un.feval(x);
-
-if iscell(y2)
-    error('Only double here.');
-end
-
-y3 = U.feval(x);
-if ~iscell(y3)
-    error('Cell must be here because we have 2 functions.');
-end
+% evaluation of multiple functions must fail
+[worked, msg] = run_in_caller('y = U.feval(x);');
+assert(~worked);
+asserterrmsg(msg, 'The object has multiple functions, specify the one to evaluate.');
 
 end
