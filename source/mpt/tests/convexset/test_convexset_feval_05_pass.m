@@ -1,21 +1,25 @@
 function test_convexset_feval_05_pass
 %
-% two sets, one different function
+% function defined over YSet
 %
 
-P(1) = Polyhedron('lb', -1, 'ub', 1);
-P(2) = Polyhedron('lb', -1, 'ub', 1);
+x = sdpvar(2,1);
+F = set([-1;-2] <= x <= [1;2]);
+Y = YSet(x,F,sdpsettings('verbose',0));
+fun = QuadFunction(rand(2),[1 -1]);
+Y.addFunction(fun, 'qf');
 
-a1 = 1; b1 = 2;
-a2 = 2; b2 = 3;
-P(1).addFunction(AffFunction(a1, b1), 'f1');
-P(2).addFunction(AffFunction(a2, b2), 'f2');
+% point inside
+x = [-1; .1];
+[y, feasible] = Y.feval(x);
+assert(isequal(y, fun.Handle(x)));
+assert(feasible);
 
-x = 0.1;
-y = P.feval(x);
-assert(length(y)==2);
-assert(iscell(y));
-assert(isequal(y{1}, a1*x+b1));
-assert(isequal(y{2}, a2*x+b2));
+% point outside
+x = [100; .1];
+[y, feasible] = Y.feval(x);
+assert(~feasible);
+assert(isscalar(y));
+assert(isnan(y));
 
 end
