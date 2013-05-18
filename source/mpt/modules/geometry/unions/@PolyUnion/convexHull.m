@@ -8,13 +8,15 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-% deal with arrays
-if numel(U)>1
-    H(size(U)) = Polyhedron;
-    parfor i=1:numel(U)
-        H(i) = U(i).convexHull;
-    end
-    return;
+if numel(U)==0
+	H = Polyhedron;
+	return
+	
+elseif numel(U)>1
+	% compute a single convex hull of all unions
+	Hi = U.forEach(@(x) x.convexHull); % forEach() will use parfor
+	H = PolyUnion(Hi).convexHull();
+	return
 end
 
 % if there is 0 or 1 set contained, return
