@@ -3,6 +3,14 @@ function [isin, inwhich, closest] = contains(U,x,fastbreak)
 % test if the point x belongs to any of the sets stored under the union
 %
 
+error(nargchk(2, 3, nargin));
+if numel(U)==0
+	isin = [];
+	inwhich = [];
+	closest = [];
+	return
+end
+
 if nargin<3
     fastbreak = false;
 else
