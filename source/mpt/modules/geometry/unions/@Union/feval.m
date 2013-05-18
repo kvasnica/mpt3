@@ -1,7 +1,122 @@
 function [fval, feasible, idx, tie_value] = feval(obj, x, varargin)
 %
-% evaluates a given function
-%
+% Synopsis:
+% ---
+% 
+% Evaluates a given function defined over a union of convex sets.
+% 
+% Syntax:
+% ---
+% 
+% fval = U.feval(x)
+% fval = U.feval(x, func)
+% [fval, feasible, idx, tb_value] = U.feval(x, func)
+% 
+% Inputs:
+% ---
+% 
+%   U: union of convex sets (mandatory)
+%   x: point at which the function should be evaluated (mandatory)
+%   func: name of the function to evaluate (optional, see note below)
+% 
+% Notes:
+% * "U" must be a single union. Arrays of unions are not accepted. Use
+%   "array.forEach(@(e) e.feval(...))" to evaluate arrays of unions.
+% * "func" must refer to a single function. If omitted, "U.feval(x)"
+%   only works if the union has a single function.
+% 
+% Outputs:
+% ---
+% 
+% 1) "x" is not contained in any set of the union:
+%   fval = (m x 1) vector of NaNs, where "m" is the range of the function
+%   feasible = false
+%   idx = []
+%   tb_value = []
+% 
+% 2) "x" is in a single set:
+%   fval = (m x 1) vector of function values
+%   feasible = true
+%   idx = index of the set which contains "x"
+%   tb_value = []
+% 
+% 3) "x" is contained in multiple sets (either at the boundary or in
+%   strict interior if there are overlaps), no tie-breaking (default):
+%   fval = (m x j) matrix of function values ("j" denotes the number of
+%        sets which contain "x"), each column contains the value of "func"
+%        in the corresponding set
+%   feasible = true
+%   idx = (1 x j) vector of indices of sets which contain "x"
+%   tb_value = []
+% 
+% 4) "x" is contained in multiple sets (either at the boundary or in
+%   strict interior if there are overlaps), tie-breaking enabled (see
+%   below):
+%   fval = (m x 1) vector containing the function value in the set in
+%        which value of the tie-breaking function is smallest (if there
+%        are multiple sets with the same tie-breaking value, the first
+%        such set is considered)
+%   feasible = true
+%   idx = index of the set which contains "x" and, simultaneously, has
+%       the _smallest_ value of the tie-breaking function
+%   tb_value = scalar value of the tie-breaking function in set indexed
+%       by "idx"
+% 
+% Tie-breaking:
+% ---
+% 
+% The purpose of tie-breaking is to automatically resolve situations
+% where the evaluation point "x" is contained in multiple sets. With
+% tie-breaking enabled Union/feval() evaluates the tie-breaking function
+% to decide which set containing "x" should be used for evaluation of
+% the original function.
+% 
+% The tie-breaking function can be specified by "U.feval(x, 'tiebreak',
+% tb_fun)", where "tb_fun" can be either a string or a function
+% handle. A string value must refer to an another function which exists
+% in the union "U".
+% 
+% A typical case where tie-breaking is useful is evaluation of
+% discontinuous MPC feedback laws:
+% 
+%   uopt = U.feval(x, 'primal', 'tiebreak', 'obj')
+% 
+% Here, if "x" is contained in multiple sets, then the function "primal"
+% is only evaluated in the set which contain "x" and simultaneously has
+% the _smallest_ value of the tie-breaking function "obj".
+% 
+% A special case of tie-breaking is the "first-set" rule where we are
+% only interested in evaluating a function in the first set which
+% contains "x" (despite the fact there can be multiple such sets). This
+% is achieved by
+% 
+%   fval = U.feval(x, 'func', 'tiebreak', @(x) 0)
+% 
+% Notes:
+% * Tie-breaking functions must be scalar-valued.
+% * No tie-breaking is done by default.
+% 
+% Evaluation in particular sets:
+% ---
+% 
+% fval = U.feval(x, 'myfun', 'regions', indices) evaluates function
+% 'myfun' over all sets indexed by "indices". The output "fval" is
+% always an (m x j) matrix, where "j" is the cardinality of "indices".
+% 
+% Note that once the "regions" option is enabled, Union/feval() will not
+% perform point location. Instead, it will evaluate the function in all
+% sets indexed by "indices", regardless of whether they contain "x" or
+% not.
+% 
+% The "regions" option allows to quickly evaluate multiple functions as
+% follows:
+% 
+%   [first_value, idx] = U.feval(x, 'first_function')
+%   second_value = U.feval(x, 'second_function', 'regions', idx)
+% 
+% In the second call, Union/feval will only evaluate "second_function"
+% in sets specified by the "indices" option, hence skipping expensive
+% point location.
 
 error(nargchk(2, Inf, nargin));
 % use obj.forEach(@(z) z.feval(x, ...)) to evaluate arrays of unions
