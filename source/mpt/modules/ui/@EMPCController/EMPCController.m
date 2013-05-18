@@ -204,29 +204,57 @@ classdef EMPCController < AbstractController
 				error('The point must be a %dx1 vector.', obj.nx);
 			end
 			
-			mincost = zeros(numel(obj.optimizer), 2);
-			for i = 1:numel(obj.optimizer)
-				% determine cost in each region of the i-th partition
+			% evaluate the primal optimizer, break ties based on the cost
+			% function. guarantees that the output is a single region where
+			% the cost is minimal.
+			if numel(obj.optimizer)==1
+				% simple case, just a single optimizer
+				[U, feasible, idx, J] = obj.optimizer.feval(xinit, ...
+					'primal', 'tiebreak', 'obj');
+				if ~feasible
+					J = Inf;
+					% U is already a vector of NaNs by Union/feval
+					
+				elseif isempty(J)
+					% no tie-breaking was performed, compute cost manually
+
+					% Note: from a long-term sustainibility point of view
+					% we should use
+					%   J = obj.optimizer.Set(idx).feval(xinit, 'obj');
+					% here. but ConvexSet/feval() adds so much unnecessary
+					% overhead that we better evaluate the function
+					% directly
+					J = obj.optimizer.Set(idx).Functions('obj').Handle(xinit);
+				end
 				
-				J = obj.optimizer(i).Set.feval(xinit, 'obj');
-				if ~iscell(J), J = {J}; end
-				ie = cellfun('isempty', J);
-				[J{ie}] = deal(Inf);
-				J = [J{:}]; % convert to double array
-				
-				% pick the region in which cost is minimal
-				[mincost(i, 1), mincost(i, 2)] = min(J);
-			end
-			
-			% pick the partition in which cost is minimal
-			[J, active_part] = min(mincost(:, 1));
-			if isinf(J)
-				% infeasible
-				feasible = false;
-				U = NaN(obj.nu*obj.N, 1);
 			else
-				feasible = true;
-				U = obj.optimizer(active_part).Set(mincost(active_part, 2)).feval(xinit, 'primal');
+				% multiple optimizers, pick the partition in which the cost
+				% is minimal
+
+				[U, feas, idx, J] = obj.optimizer.forEach(@(opt) opt.feval(xinit, ...
+					'primal', 'tiebreak', 'obj'), 'UniformOutput', false);
+				% only consider partitions that contain "xinit"
+				feasible_idx = find(cellfun(@(x) x, feas));
+				if isempty(feasible_idx)
+					feasible = false;
+					U = U{1}; % it's set to NaN by Union/feval
+					J = Inf;
+					
+				else
+					% compute cost in the best region of each feasible
+					% partition
+					feasible = true;
+					for i = feasible_idx
+						if isempty(J{i})
+							% no cost provided by tie-breaking, compute it
+							% manually
+							J{i} = obj.optimizer(i).Set(idx{i}).Functions('obj').Handle(xinit);
+						end
+					end
+					Jmin = cat(2, J{feasible_idx});
+					[J, best_partition] = min(Jmin);
+					U = U{feasible_idx(best_partition)};
+				end
 			end
 			
 			if numel(U)~=obj.nu*obj.N
