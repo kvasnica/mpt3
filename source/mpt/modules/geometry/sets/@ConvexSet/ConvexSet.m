@@ -76,13 +76,60 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 	  
 	  function out = listFunctions(obj)
 		  % lists attached functions
-		  out = obj.Functions.keys();
+		  %
+		  % outputs:
+		  % * empty cell array if "obj" is an empty object
+		  % * cell array of function names if "obj" is a single set
+		  % * cell array of cell arrays of function names if "obj" is an
+		  %   array
+
+		  if numel(obj)==0
+			  out = {};
+		  elseif numel(obj)==1
+			  out = obj.Functions.keys();
+		  else
+			  out = cell(1, numel(obj));
+			  for i = 1:numel(obj)
+				  out{i} = obj(i).Functions.keys();
+			  end
+		  end
 	  end
 	  
 	  function out = hasFunction(obj, FuncName)
 		  % returns true if the object contains function(s) indexed by
 		  % FuncName
-		  out = obj.Functions.isKey(FuncName);
+		  %
+		  % inputs:
+		  %   FuncName: either a string or a cell array of strings
+		  %
+		  % outputs:
+		  % * empty double if "obj" is an empty object
+		  % * column logical vector if "obj" is a single set (each row
+		  %   corresponds to presence of FuncName{i})
+		  % * logical matrix if "obj" is an array, with "n" rows and "m"
+		  %   columns, where "n" is the number of functions which are
+		  %   queried, and "m" is the number of sets. then out(i, j)=true
+		  %   if the j-th set contains FuncName{i}
+
+		  if numel(obj)==0
+			  out = [];
+		  elseif numel(obj)==1
+			  x = obj.Functions.isKey(FuncName);
+			  % make sure we always return column vector if we have
+			  % multiple functions
+			  out = x(:); 
+		  else
+			  if iscell(FuncName)
+				  n = length(FuncName);
+			  else
+				  n = 1;
+			  end
+			  out = false(n, numel(obj));
+			  for i = 1:numel(obj)
+				  x = obj(i).Functions.isKey(FuncName);
+				  out(:, i) = x(:);
+			  end
+		  end
 	  end
 
 	  function [F, map] = uniqueFunctions(obj, FuncName)
