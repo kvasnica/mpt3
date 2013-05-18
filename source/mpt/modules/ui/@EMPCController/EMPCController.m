@@ -203,6 +203,11 @@ classdef EMPCController < AbstractController
 			if numel(xinit) ~= obj.nx
 				error('The point must be a %dx1 vector.', obj.nx);
 			end
+
+			% index of the optimizer and index of the region from which the
+			% control action was extracted
+			opt_region = [];
+			opt_partition = [];
 			
 			% evaluate the primal optimizer, break ties based on the cost
 			% function. guarantees that the output is a single region where
@@ -225,6 +230,10 @@ classdef EMPCController < AbstractController
 					% overhead that we better evaluate the function
 					% directly
 					J = obj.optimizer.Set(idx).Functions('obj').Handle(xinit);
+				end
+				if feasible
+					opt_partition = 1;
+					opt_region = idx;
 				end
 				
 			else
@@ -254,6 +263,8 @@ classdef EMPCController < AbstractController
 					Jmin = cat(2, J{feasible_idx});
 					[J, best_partition] = min(Jmin);
 					U = U{feasible_idx(best_partition)};
+					opt_region = idx{feasible_idx(best_partition)};
+					opt_partition = feasible_idx(best_partition);
 				end
 			end
 			
@@ -269,6 +280,8 @@ classdef EMPCController < AbstractController
 				openloop.U = reshape(U, [obj.nu obj.N]);
 				openloop.X = NaN(obj.nx, obj.N+1);
 				openloop.Y = NaN(obj.model.ny, obj.N);
+				openloop.partition = opt_partition;
+				openloop.region = opt_region;
 			end
 		end
 		
