@@ -181,11 +181,19 @@ classdef Union < handle & IterableBehavior
 		  if numel(obj)==0 || numel(obj(1).Set)==0
 			  out = {};
 		  elseif numel(obj)==1
-			  out = obj.index_Set(1).Functions.keys();
+			  if iscell(obj.Set)
+				  out = obj.Set{1}.Functions.keys();
+			  else
+				  out = obj.Set(1).Functions.keys();
+			  end
 		  else
 			  out = cell(1, numel(obj));
 			  for i = 1:numel(obj)
-				  out{i} = obj(i).index_Set(1).Functions.keys();
+				  if iscell(obj(i).Set)
+					  out{i} = obj(i).Set{1}.Functions.keys();
+				  else
+					  out{i} = obj(i).Set(1).Functions.keys();
+				  end
 			  end
 		  end
 	  end
@@ -209,7 +217,11 @@ classdef Union < handle & IterableBehavior
 		  error(nargchk(2, 2, nargin));
 		  out = []; % default output for empty arrays
 		  if numel(obj)==1 && numel(obj.Set)>0
-			  x = obj.index_Set(1).Functions.isKey(FuncName);
+			  if iscell(obj.Set)
+				  x = obj.Set{1}.Functions.isKey(FuncName);
+			  else
+				  x = obj.Set(1).Functions.isKey(FuncName);
+			  end
 			  % make sure we always return column vector if we have
 			  % multiple functions
 			  out = x(:);
@@ -222,7 +234,11 @@ classdef Union < handle & IterableBehavior
 			  out = false(n, numel(obj));
 			  for i = 1:numel(obj)
 				  if numel(obj(i).Set)>0
-					  x = obj(i).index_Set(1).Functions.isKey(FuncName);
+					  if iscell(obj(i).Set)
+						  x = obj(i).Set{1}.Functions.isKey(FuncName);
+					  else
+						  x = obj(i).Set(1).Functions.isKey(FuncName);
+					  end
 					  out(:, i) = x(:);
 				  end
 			  end
