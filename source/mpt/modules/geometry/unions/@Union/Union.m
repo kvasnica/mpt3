@@ -171,25 +171,62 @@ classdef Union < handle & IterableBehavior
 	  
 	  function out = listFunctions(obj)
 		  % lists attached functions
+		  %
+		  % outputs:
+		  % * empty cell array if "obj" is an empty object
+		  % * cell array of function names if "obj" is a single union
+		  % * cell array of cell arrays of function names if "obj" is an
+		  %   array
 
-		  obj.rejectArray();
-		  if numel(obj)==1 && numel(obj.Set)>0
-			  if iscell(obj.Set)
-				  out = obj.Set{1}.listFunctions;
-			  else
-				  out = obj.Set(1).listFunctions;
-			  end
-		  else
+		  if numel(obj)==0 || numel(obj(1).Set)==0
 			  out = {};
+		  elseif numel(obj)==1
+			  out = obj.index_Set(1).Functions.keys();
+		  else
+			  out = cell(1, numel(obj));
+			  for i = 1:numel(obj)
+				  out{i} = obj(i).index_Set(1).Functions.keys();
+			  end
 		  end
 	  end
 	  
 	  function out = hasFunction(obj, FuncName)
 		  % returns true if the object contains function(s) indexed by
 		  % FuncName
+		  %
+		  % inputs:
+		  %   FuncName: either a string or a cell array of strings
+		  %
+		  % outputs:
+		  % * empty double if "obj" is an empty object
+		  % * column logical vector if "obj" is a single union (each row
+		  %   corresponds to presence of FuncName{i})
+		  % * logical matrix if "obj" is an array, with "n" rows and "m"
+		  %   columns, where "n" is the number of functions which are
+		  %   queried, and "m" is the number of unions. then out(i, j)=true
+		  %   if the j-th union contains FuncName{i}
 
 		  error(nargchk(2, 2, nargin));
-		  out = ismember(FuncName, obj.listFunctions);
+		  out = []; % default output for empty arrays
+		  if numel(obj)==1 && numel(obj.Set)>0
+			  x = obj.index_Set(1).Functions.isKey(FuncName);
+			  % make sure we always return column vector if we have
+			  % multiple functions
+			  out = x(:);
+		  elseif numel(obj)>1
+			  if iscell(FuncName)
+				  n = length(FuncName);
+			  else
+				  n = 1;
+			  end
+			  out = false(n, numel(obj));
+			  for i = 1:numel(obj)
+				  if numel(obj(i).Set)>0
+					  x = obj(i).index_Set(1).Functions.isKey(FuncName);
+					  out(:, i) = x(:);
+				  end
+			  end
+		  end
 	  end
 
 	  function U = trimFunction(obj, FuncName, n)
@@ -256,6 +293,7 @@ classdef Union < handle & IterableBehavior
   end
   
   methods (Access=protected)
+	  % internal APIs
 	  
 	  function displayFunctions(obj)
 		  % displays attached functions (to be used from a disp() method)
@@ -278,6 +316,17 @@ classdef Union < handle & IterableBehavior
 		  
 	  end
 	  
+	  function out = index_Set(obj, i)
+		  % returns the i-th element of obj.Set, regardless of whether Set
+		  % is a cell or an ordinary array
+
+		  if iscell(obj.Set)
+			  out = obj.Set{i};
+		  else
+			  out = obj.Set(i);
+		  end
+	  end
+
   end
 
   methods      
