@@ -51,8 +51,16 @@ classdef EMPCController < AbstractController
 			end
 		end
 		
-		function obj = toInvariant(obj)
+		function obj = toInvariant(in)
 			% Computes the invariant subset of the controller
+			
+			if nargout==0
+				% replace original controller
+				obj = in;
+			else
+				% create a new controller
+				obj = in.copy();
+			end
 			
 			% create the closed-loop model
 			CL = ClosedLoop(obj, obj.model).toSystem();
