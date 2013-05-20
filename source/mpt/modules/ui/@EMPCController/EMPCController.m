@@ -309,6 +309,62 @@ classdef EMPCController < AbstractController
 			out.N = 1; % to get correct size of the open-loop optimizer
 			% TODO: implement a better way
 		end
+		
+		function data = clicksim(obj, varargin)
+			% Select initia condition for closed-loop simulation by mouse
+			%
+			%   controller.clicksim(['option', value, ...)
+			%
+			% Select initial points by left-click. Abort by right-click.
+			%
+			% options:
+			%  'N_sim': length of the closed-loop simulation (default: 100)
+			%  'x0': initial point, if provided, the method exits
+			%        immediately (default: [])
+			%  'alpha': transparency of the partition (default: 1)
+			%  'color': color of the closed-loop profiles (default: 'k')
+			%  'linewidth': width of the line (default: 2)
+			%  'marker': markers indicating points (default: '.')
+			%  'markersize': size of the markers (default: 20)
+			
+			if obj.nx~=2
+				error('Only 2D partitions can be plotted.');
+			end
+			ip = inputParser;
+			ip.addParamValue('x0', []);
+			ip.addParamValue('N_sim', 50, @isnumeric);
+			ip.addParamValue('alpha', 1, @isnumeric);
+			ip.addParamValue('linewidth', 2, @isnumeric);
+			ip.addParamValue('color', 'k');
+			ip.addParamValue('marker', '.');
+			ip.addParamValue('markersize', 20);
+			ip.parse(varargin{:});
+			options = ip.Results;
+			
+			obj.optimizer.plot('alpha', options.alpha);
+			hold on
+			button = 1;
+			while button~=3
+				if isempty(options.x0)
+					[x, y, button] = ginput(1);
+					x0 = [x; y];
+				else
+					x0 = options.x0;
+					button = 3;
+				end
+				data = obj.simulate(x0, options.N_sim);
+				plot(data.X(1, :), data.X(2, :), options.color, ...
+					'linewidth', options.linewidth, ...
+					'marker', options.marker, ...
+					'markersize', options.markersize);
+				title(sprintf('Closed-loop simulation: x0 = %s', mat2str(x0)));
+			end
+			hold off
+			if nargout==0
+				clear data
+			end
+			
+		end
 	end
 	
 	methods(Static, Hidden)
