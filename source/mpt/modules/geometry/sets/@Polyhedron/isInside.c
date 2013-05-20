@@ -190,8 +190,8 @@ void mexFunction(int nlhs, mxArray * plhs[], int nrhs, const mxArray * prhs[])
 		}
 		
 		/* check if polyhedron is in H-rep */
-		if ( (mxGetM(mxGetProperty(prhs[0],i,"H"))*mxGetN(mxGetProperty(prhs[0],i,"H"))==0) &&
-		     (mxGetM(mxGetProperty(prhs[0],i,"He"))*mxGetN(mxGetProperty(prhs[0],i,"He"))==0) )
+		if ( (mxGetM(mxGetProperty(prhs[0],i,"H_int"))*mxGetN(mxGetProperty(prhs[0],i,"H_int"))==0) &&
+		     (mxGetM(mxGetProperty(prhs[0],i,"He_int"))*mxGetN(mxGetProperty(prhs[0],i,"He_int"))==0) )
 			mexErrMsgTxt("isInside: All polyhedra must be in H-representation!");
 	}
 	/*must check x0 before allocating th */
@@ -223,8 +223,8 @@ void mexFunction(int nlhs, mxArray * plhs[], int nrhs, const mxArray * prhs[])
 	{
 
 		/* pick data from each polyhedron */
-		H = mxGetProperty(prhs[0],i,"H");
-		He = mxGetProperty(prhs[0],i,"He");
+		H = mxGetProperty(prhs[0],i,"H_int");
+		He = mxGetProperty(prhs[0],i,"He_int");
                 
 		/* test if th is in P */
 		if (isInside(H, He, th, options.abs_tol))
