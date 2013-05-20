@@ -10,7 +10,7 @@ P(2) = ExamplePoly.randVrep('d',4);
 s = P.facetInteriorPoints;
 
 for i=1:2
-    if any(~P(i).contains(s{i}))
+    if any(~P(i).contains(s{i}'))
         error('Each point must be inside.');
     end
 end

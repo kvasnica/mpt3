@@ -74,7 +74,7 @@ for i=1:3
     y = zeros(size(x,1),2);
     for j=1:size(x,1)
         y(j,:) = transpose(A*x(j,:)');
-        if ~Q(i).contains(y(j,:))
+        if ~Q(i).contains(y(j,:)')
             error('Point outside of the affine map.');
         end
     end

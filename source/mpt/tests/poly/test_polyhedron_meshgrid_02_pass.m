@@ -15,7 +15,7 @@ for i=1:2
     Xn(isnan(Xn))=[];
     Yn(isnan(Yn))=[];
     
-    if any(~P(i).contains([Xn,Yn]))
+    if any(~P(i).contains([Xn,Yn]'))
         error('Wrong default value.');
     end
 end

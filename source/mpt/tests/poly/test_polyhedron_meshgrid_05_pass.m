@@ -21,7 +21,7 @@ Yn(isnan(Yn))=[];
 P.addFunction(Function(@(x)2*x.^4-0.5*x.^3-3.5*x-1), 'a');
 
 % containment test first
-if any(~P.contains([Xn,Yn]))
+if any(~P.contains([Xn,Yn]'))
     error('Wrong default value.');
 end
 

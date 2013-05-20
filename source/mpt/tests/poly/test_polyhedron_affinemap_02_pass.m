@@ -40,7 +40,7 @@ R = P.affineMap(T);
 y2 = zeros(size(x));
 for i=1:size(x,1)
     y2(i,:) = transpose(T*x(i,:)');
-    if ~R.contains(y2(i,:))
+    if ~R.contains(y2(i,:)') % point must be a column vector
         error('Point outside of the affine map.');
     end
 end
@@ -52,7 +52,7 @@ L = P.affineMap(U);
 y3 = zeros(size(x,1),3);
 for i=1:size(x,1)
     y3(i,:) = transpose(U*x(i,:)');
-    if ~L.contains(y3(i,:))
+    if ~L.contains(y3(i,:)')
         error('Point outside of the affine map.');
     end
 end

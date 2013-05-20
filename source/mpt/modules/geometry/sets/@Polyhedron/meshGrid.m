@@ -88,7 +88,9 @@ for j = 1:2
     end
 end
 
-II = reshape(P.contains([X(:) Y(:)]), size(X,1), size(X,2));
+% the points passed to P.contains() must be column vectors
+Z = [X(:), Y(:)]';
+II = reshape(P.contains(Z), size(X,1), size(X,2));
 % II = zeros(size(X));
 % for i = 1:size(X,1)
 %   for j = 1:size(X,2)

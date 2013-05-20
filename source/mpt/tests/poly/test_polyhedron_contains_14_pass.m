@@ -12,13 +12,17 @@ P = Polyhedron([
 
 
 % check each vertex
-x = P.V;
-if ~P.contains(x)
-    error('All points must lie in P.')
-end
+x = P.V'; % the points must be column vectors
+assert(size(x, 1)==P.Dim);
+t = P.contains(x);
+% "t" must be a (1 x nv) vector
+nv = size(P.V, 1);
+assert(isequal(size(t), [1 nv]));
+% all points must be contained
+assert(all(t));
 
 % check center of vertices
-xc=mean(x);
+xc=mean(x, 2);
 if ~P.contains(xc)
     error('The center must be inside.');
 end
