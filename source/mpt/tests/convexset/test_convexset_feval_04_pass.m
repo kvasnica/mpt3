@@ -10,8 +10,9 @@ P = Polyhedron('lb', -1, 'ub', 1);
 f = AffFunction(2, 3);
 P.addFunction(f, 'f');
 x = [0.1, 0.2, 0.3];
-[~, msg] = run_in_caller('P.feval(x)');
-asserterrmsg(msg, 'The vector (or matrix) "x" must have 1');
+[worked, msg] = run_in_caller('P.feval(x)');
+assert(~worked)
+%asserterrmsg(msg, 'The vector (or matrix) "x" must have 1');
 
 return
 
