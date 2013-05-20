@@ -16,7 +16,11 @@ classdef PWASystem < AbstractSystem
         nu % Number of inputs
         ny % Number of outputs
         ndyn % Number of local dynamics
-    end
+	end
+
+	properties(SetAccess=private, GetAccess=private, Hidden)
+		functions % state-update and output functions as a PolyUnion
+	end
             
     methods
         
@@ -201,7 +205,17 @@ classdef PWASystem < AbstractSystem
             if nargin==1
                 % import constraints from sysStruct
                 obj.importSysStructConstraints(S);
-            end
+			end
+			
+			% store the state-update and output functions as a PolyUnion
+			P = Polyhedron(obj.domain); % create copy
+			for i = 1:obj.ndyn
+				update = AffFunction([obj.A{i}, obj.B{i}], obj.f{i});
+				output = AffFunction([obj.C{i}, obj.D{i}], obj.g{i});
+				P(i).addFunction(update, 'update');
+				P(i).addFunction(output, 'output');
+			end
+			obj.functions = PolyUnion(P);
 		end
         
 		function out = toLTI(obj, pwa_index)
@@ -395,42 +409,11 @@ classdef PWASystem < AbstractSystem
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 
-            xn = x0; y = [];
-			c = obj.domain.contains([x0; u]);
-			isin = any(c);
-			which_dynamics = find(c);
-            if ~isin
-                % no associated dynamic
-                error('No dynamics associated to x=%s and u=%s.', ...
-                    mat2str(x0), mat2str(u));
-            elseif length(which_dynamics)>1
-				% TODO: compute state updates using all detected dynamics
-				% and only trigger the warning if the updates differ
-                warning('x=%s belongs to dynamics %s, selecting dynamics %d.', ...
-                    mat2str(x0), mat2str(which_dynamics), which_dynamics(1));
-            end
-            which_dynamics = which_dynamics(1);
-            if obj.nx > 0
-                xn = obj.A{which_dynamics}*x0;
-			end
-			if obj.nu > 0
-				xn = xn + obj.B{which_dynamics}*u;
-			end
-			if ~isempty(obj.f{which_dynamics})
-				xn = xn + obj.f{which_dynamics};
-            end
-            if obj.ny > 0
-                y = obj.C{which_dynamics}*x0;
-			else
-				y = zeros(ny, 1);
-			end
-			if obj.nu > 0
-				y = y + obj.D{which_dynamics}*u;
-			end
-			if ~isempty(obj.g{which_dynamics})
-				y = y + obj.g{which_dynamics};
-            end
-            obj.initialize(xn);
+			% TODO: compute state updates using all detected dynamics
+			% and only trigger the warning if the updates differ
+			[xn, ~, idx] = obj.functions.feval([x0; u], 'update', 'tiebreak', @(x) 0);
+			y = obj.functions.feval([x0; u], 'output', 'regions', idx);
+			obj.initialize(xn);
         end
         
         function y = output(obj, u)
@@ -441,52 +424,16 @@ classdef PWASystem < AbstractSystem
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 
-            if nargin < 2
+			if nargin < 2
 				u = zeros(obj.nu, 1);
-				c = obj.domainx.contains(x0);
 			else
 				u = u(:);
-				c = obj.domain.contains([x0; u]);
 			end
-			isin = any(c);
-			which_dynamics = find(c);
-			if ~isin
-                % no associated dynamic
-                if nargin==2
-                    error('No dynamics associated to x=%s and u=%s.', ...
-                        mat2str(x0), mat2str(u));
-                else
-                    error('No dynamics associated to x=%s.', mat2str(x0));
-                end
-            elseif length(which_dynamics)>1
-                warning('x=%s belongs to dynamics %s, selecting dynamics %d.', ...
-                    mat2str(x0), mat2str(which_dynamics), which_dynamics(1));
-            end
-            which_dynamics = which_dynamics(1);
-                
-            if nnz(cat(1, obj.D{:}))>0 && nargin==1
-                error('Input is required for systems with direct feed-through.')
-            end
-            if nargin<2
-                u = zeros(obj.u.n, 1);
-			end
-            if obj.ny > 0
-                % catch cases with empty C matrix when modeling PWA
-                % functions
-                if isempty(obj.C{which_dynamics})
-                    y = zeros(obj.ny);
-                else                    
-                    y = obj.C{which_dynamics}*x0;
-				end
-				if obj.nu > 0
-					y = y + obj.D{which_dynamics}*u;
-				end
-				if ~isempty(obj.g{which_dynamics})
-					y = y + obj.g{which_dynamics};
-				end
-            else
-                y = [];
-            end
+			u = obj.validateInput(u);
+
+			% TODO: compute state updates using all detected dynamics
+			% and only trigger the warning if the updates differ
+			y = obj.functions.feval([x0; u], 'output', 'tiebreak', @(x) 0);
         end
         
     end
