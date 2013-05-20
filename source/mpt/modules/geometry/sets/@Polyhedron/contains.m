@@ -63,12 +63,17 @@ if m==0
 	% empty polyhedron array
 	tf = [];
 	
-elseif isnumeric(x) && n==1 && all([P.hasHRep])
-	% special case: P = H-rep polyhedron (or array), x = single point
+elseif isnumeric(x) && all([P.hasHRep])
+	% special case:
+	%   P = H-rep polyhedron (or array)
+	%   x = single or multiple points
+	%
 	% this is so frequent that it deserves a fast implementation
-	tf = false(m, 1);
-	[~, inwhich] = P.isInside(x, struct('fastbreak', fastbreak));
-	tf(inwhich) = true;
+	tf = false(m, n);
+	for i = 1:n
+		[~, inwhich] = P.isInside(x(:, i), struct('fastbreak', fastbreak));
+		tf(inwhich, i) = true;
+	end
 	
 elseif m>1
 	% "P" is an array
