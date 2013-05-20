@@ -20,6 +20,7 @@ classdef PWASystem < AbstractSystem
 
 	properties(SetAccess=private, GetAccess=private, Hidden)
 		functions % state-update and output functions as a PolyUnion
+		modes % local affine modes as an array of LTISystem
 	end
             
     methods
@@ -216,6 +217,20 @@ classdef PWASystem < AbstractSystem
 				P(i).addFunction(output, 'output');
 			end
 			obj.functions = PolyUnion(P);
+			
+			% store the individual modes as an array of LTISystems
+			modes = [];
+			for pwa_index = 1:obj.ndyn
+				lti = LTISystem('A', obj.A{pwa_index}, 'B', obj.B{pwa_index}, ...
+					'C', obj.C{pwa_index}, 'D', obj.D{pwa_index}, ...
+					'f', obj.f{pwa_index}, 'g', obj.g{pwa_index}, ...
+					'domain', obj.domain(pwa_index), 'Ts', obj.Ts);
+				lti.x = obj.x;
+				lti.u = obj.u;
+				lti.y = obj.y;
+				modes = [modes, lti];
+			end
+			obj.modes = modes;
 		end
         
 		function out = toLTI(obj, pwa_index)
@@ -224,13 +239,7 @@ classdef PWASystem < AbstractSystem
 			if pwa_index<1 || pwa_index>obj.ndyn
 				error('Index out of range.');
 			end
-			out = LTISystem('A', obj.A{pwa_index}, 'B', obj.B{pwa_index}, ...
-				'C', obj.C{pwa_index}, 'D', obj.D{pwa_index}, ...
-				'f', obj.f{pwa_index}, 'g', obj.g{pwa_index}, ...
-				'domain', obj.domain(pwa_index), 'Ts', obj.Ts);
-			out.x = obj.x.copy();
-			out.u = obj.u.copy();
-			out.y = obj.y.copy();
+			out = obj.modes(pwa_index);
 		end
 		
 		function [S, SN, dyn, dynN] = reachableSet(obj, varargin)
