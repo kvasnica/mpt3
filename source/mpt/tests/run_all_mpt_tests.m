@@ -102,7 +102,12 @@ if n_error>0 && ~options.rerunfailed
 	fprintf('Failed tests:\n\n');
 	for i = 1:length(failed)
 		[~, testname] = fileparts(failed{i});
-		fprintf('%s\n', testname);
+		if usejava('jvm')
+			fprintf('%s (<a href="matlab:opentoline(''%s'', 1, 0)">edit</a>)\n', ...
+				testname, [failed{i} '.m']);
+		else
+			fprintf('%s\n', testname);
+		end
 	end
 	fprintf('%s\n', repmat('=', 1, 60));
 end
