@@ -161,6 +161,25 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			% AbstractSystem/saveobj
 
 		end
+		
+		function out = simulate(obj, x0, N_sim)
+			% Simulate the closed-loop system using the prediction model
+			%
+			%   data = controller.simulate(x0, N_sim)
+			%
+			% Inputs:
+			%   controller: a controller object
+			%   x0: initial point for the simulation
+			%   N_sim: number of simulation steps
+			%
+			% Outputs:
+			%   data: structure containing closed-loop profiles of states,
+			%         inputs, outputs, and the cost function
+			%
+			% See ClosedLoop/simulate for more information.
+			
+			out = ClosedLoop(obj, obj.model).simulate(x0, N_sim);
+		end
 
 	end
 
