@@ -126,7 +126,7 @@ classdef IterableBehavior < handle
 			%
 			%    function mymethod(obj)
 			%
-			%       obj.rejectArray();
+			%       error(obj.rejectArray());
 			%       ...
 			%    end
 			
