@@ -23,16 +23,8 @@ else
     validate_dimension(N);
 end
 
-% deal with arrays
-no = numel(P);
-if no>1
-    X = cell(size(P));
-    Y = X;
-    for i=1:no
-        [X{i},Y{i}] = P(i).meshGrid(N);
-    end
-    return;
-end
+% use P.forEach() for arrays
+error(P.rejectArray());
 
 if ~P.isBounded || P.isEmptySet
     error('Can only grid nonempty and bounded polyhedra.');
