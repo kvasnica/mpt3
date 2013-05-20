@@ -69,10 +69,13 @@ classdef ComponentBehavior < MPTUIHandle
 				components = map(keys{i});
 				for j = 1:length(components)
 					component = components{j};
-					if ismethod(component, 'getComponents')
+					if isa(component, 'ComponentBehavior')
+						% dive recursively
 						out = component.getComponents(kind, out);
 					end
-					if ismethod(component, 'isKind')
+					if isa(component, 'SystemSignal')
+						% TODO: test any other class with the isKind()
+						% method (none at the moment besides SystemSignal)
 						if isequal(kind, 'all') || component.isKind(kind)
 							if numel(out)==0
 								out = component;
