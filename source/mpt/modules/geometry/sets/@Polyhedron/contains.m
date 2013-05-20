@@ -40,6 +40,8 @@ function tf = contains(P, x, fastbreak)
 %
 % if "x" is a polyhedron, then "P.contains(x)" <=> "x \subseteq P"
 
+global MPTOPTIONS
+
 error(nargchk(2, 3, nargin));
 if ~( isnumeric(x) || isa(x, 'Polyhedron') )
 	error('The input must be a real vector/matrix or a Polyhedron object.');
@@ -63,12 +65,33 @@ if m==0
 	% empty polyhedron array
 	tf = [];
 	
-elseif isnumeric(x) && all([P.hasHRep])
+elseif isnumeric(x) && m==1 && P.hasHRep
 	% special case:
-	%   P = H-rep polyhedron (or array)
+	%   P = single polyhedron in H-rep
 	%   x = single or multiple points
 	%
-	% this is so frequent that it deserves a fast implementation
+	% this is a frequent case in Polyhedron/meshGrid, which needs to be as
+	% fast as possible to have decent runtime of Polyhedron/fplot
+	tf = false(m, n);
+	for i = 1:n
+		% iterate over points
+		if any(P.H_int*[x(:, i); -1] > MPTOPTIONS.abs_tol)
+			% not in the inequality Hrep
+		elseif ~isempty(P.He_int) && ...
+				any(abs(P.He_int*[x(:, i); -1]) > MPTOPTIONS.abs_tol)
+			% not in the equality Hrep
+		else
+			tf(i) = true;
+		end
+	end
+	
+elseif isnumeric(x) && all([P.hasHRep])
+	% special case:
+	%   P = array of H-rep polyhedra
+	%   x = single or multiple points
+	%
+	% this is so frequently used by PolyUnion/contains that it deserves a
+	% fast implementation
 	tf = false(m, n);
 	for i = 1:n
 		[~, inwhich] = P.isInside(x(:, i), struct('fastbreak', fastbreak));
