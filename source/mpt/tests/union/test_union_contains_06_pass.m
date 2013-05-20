@@ -11,3 +11,5 @@ U = U([]); % empty array
 assert(isempty(isin));
 assert(isempty(inwhich));
 assert(isempty(closest));
+
+end
