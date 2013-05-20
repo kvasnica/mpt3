@@ -32,6 +32,9 @@ if ~S.contains(z)
 end
 
 s = S.extreme(z);
+assert(s.x'*s.x<=1);
+assert(all(A1*s.x <= b1));
+assert(all(A2*s.x <= b2));
 
 % the computed point must lie on the boundary of the set
 if ~S.contains(s.x)

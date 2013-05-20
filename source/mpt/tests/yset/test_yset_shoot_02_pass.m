@@ -12,7 +12,7 @@ F = set( -2*x(2) <= x(1)) + set( -1<= x <= 1);
 %S = YSet(x,F,sdpsettings('solver','sedumi','verbose',0));
 S = YSet(x,F);
 
-z = randn(1,2);
+z = randn(2,1);
 
 a = S.shoot(z);
 

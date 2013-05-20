@@ -1,8 +1,34 @@
 function ts = contains(obj,x)
 %
-% test if the point is contained in this set by assigning 
-% equality constraints and evaluation of primal residuals
+% YSet/contains
 %
+% Synopsis
+% ---
+%
+% Tests whether a point is contained in a YSet object
+%
+% Syntax
+% ---
+%
+% status = Y.contains(x)
+%
+% Inputs:
+% ---
+%
+% Y: single YSet or an array of YSets
+% x: point or set of points
+%
+% Note: if "x" is a double, then it must be either a column vector, or a
+% matrix composed of column vectors. No automatic transposition of "x" is
+% performed!
+%
+% Outputs:
+% ---
+%
+% if "ny" is the number of elements in "Y" and "nx" the number of points in
+% "x", then:
+%   status = (ny x nx) matrix of logicals with "status(i, j)=true" iff
+%            "Y(i)" contains point "x(:, j)"
 
 global MPTOPTIONS
 if isempty(MPTOPTIONS)
@@ -10,40 +36,27 @@ if isempty(MPTOPTIONS)
 end
 
 error(nargchk(2,2,nargin));
+validate_realmatrix(x);
 
-% check vector x
-validate_realvector(x);
-
-% deal with arrays
-no = numel(obj);
-if no>1
-    ts = false(size(obj));
-    for i=1:no
-        ts(i) = obj(i).contains(x);
-    end
-    return
+if numel(obj)==0
+	ts = [];
+	return
 end
 
-
-% check dimension
-if numel(x)~=obj.Dim
-    error('The point must be a vector with dimension %i.', obj.Dim);
-end
-if any(size(x)~=size(obj.vars))
-    x = transpose(x);
+ny = numel(obj);
+nx = size(x, 2);
+ts = false(ny, nx);
+if obj(1).Dim ~= size(x, 1)
+	error('The point must have %d rows.', obj(1).Dim);
 end
 
-% assign value
-assign(obj.vars, x);
-
-% check residual
-residual = checkset(obj.constraints);
-
-% if all residuals are nonnegative, the solution is feasible
-if all(residual>-MPTOPTIONS.abs_tol)
-    ts = true;
-else
-    ts = false;
+for i = 1:ny
+	for j = 1:nx
+		% check residuals
+		assign(obj(i).vars, x(:, j));
+		residual = checkset(obj(i).constraints);
+		ts(i, j) = all(residual>-MPTOPTIONS.abs_tol);
+	end
 end
 
 end
