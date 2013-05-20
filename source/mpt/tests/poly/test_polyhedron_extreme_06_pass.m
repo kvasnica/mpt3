@@ -12,7 +12,7 @@ S = P.intersect(R);
 % all vertices must lie inside both sets (vertices should be automatically
 % computed by lazy getters)
 assert(~isempty(S.V));
-if ~all(P.contains(S.V)) || ~all(R.contains(S.V))
+if ~all(P.contains(S.V')) || ~all(R.contains(S.V'))
     error('All vertices must be contained inside P and R.');
 end
 

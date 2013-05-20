@@ -16,9 +16,9 @@ U1 = PolyUnion('Set',P);
 U2 = PolyUnion('Set',Q);
 
 t0 = cputime;
-[isin1,inwhich1,closest1] = U1.contains(5*randn(1,2),1);
+[isin1,inwhich1,closest1] = U1.contains(5*randn(2,1),1);
 t1 = cputime -t0;
-[isin2,inwhich2,closest2] = U1.contains(5*randn(1,2),1);
+[isin2,inwhich2,closest2] = U1.contains(5*randn(2,1),1);
 t2 = cputime -t1;
 
 end

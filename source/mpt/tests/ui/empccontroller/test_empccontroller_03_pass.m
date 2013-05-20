@@ -33,8 +33,8 @@ cd(c);
 model.x.penalty = Penalty(eye(2), 1);
 model.u.penalty = Penalty(1, 1);
 E = EMPCController(model, 2);
-assert(E.nr==101 || E.nr==103); % 101 with mplp, 103 with plcp, check cost
-assert(numel(E.optimizer)==13);
+assertwarning(E.nr==101 || E.nr==103); % 101 with mplp, 103 with plcp, check cost
+assertwarning(numel(E.optimizer)==13);
 x = [0.7; -2];
 [~, ~, openloop] = E.evaluate(x);
 Jgood = 5.2;

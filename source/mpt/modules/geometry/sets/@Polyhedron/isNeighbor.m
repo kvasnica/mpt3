@@ -123,7 +123,7 @@ for i=fP
         thp = xP.x + 1.2/ngp*gp'*MPTOPTIONS.region_tol;
         
         % check if thp lies inside Q
-        isinQ = Q.isInside(thp);
+        isinQ = Q.contains(thp);
         if isinQ
             iP = i;
             
@@ -139,7 +139,7 @@ for i=fP
                     thq = xQ.x + 1.2/ngq*gq'*MPTOPTIONS.region_tol;
                     
                     % check if thq lies inside P
-                    isinP = P.isInside(thq);
+                    isinP = P.contains(thq);
                     if isinP
                         ts = true;
                         iQ = j;

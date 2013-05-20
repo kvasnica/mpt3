@@ -1,76 +1,81 @@
-function [isin, inwhich, closest] = contains(U,x,fastbreak)
+function [isin, inwhich, closest] = contains(obj, x, fastbreak)
 %
-% test if the point x belongs to any of the sets stored under the PolyUnion
+% Checks whether the union contains a given point
 %
+% [isin, inwhich, closest] = U.contains(x, [fastbreak])
+%
+% inputs:
+%   U: single polyunion (use U.forEach() to evaluate arrays), mandatory
+%   x: point to check, mandatory
+%   fastbreak: fast-abortion boolean flag, false by default
+%
+% outputs:
+%   isin: true if at least one set of the union contains "x"
+%   inwhich: indices of sets that contain "x" (will be a singleton if
+%            "fastbreak=true")
+%   closest: if no set contains "x", this output contains index of the set
+%            which is closest to "x". Note: since this computation is
+%            expensive, do not ask for the third output unless you really
+%            need it.
 
+error(nargchk(2, 3, nargin));
+% use obj.forEach(@(u) u.contains(x)) to evaluate arrays
+error(obj.rejectArray());
+
+%% parse inputs
 if nargin<3
-    fastbreak = false;
-else
-    if isnumeric(fastbreak) || islogical(fastbreak)
-        fastbreak = logical(fastbreak);
-    else
-        error('The "fastbreak" option must have numerical or logical value.');
-    end
-    if ~isscalar(fastbreak)
-        error('The "fastbreak" must be scalar.')
-    end
+	fastbreak = false;
 end
+check_hull_first = false;
 
-% deal with arrays
-if numel(U)>1
-    isin = false(size(U));
-    inwhich = cell(size(U));
-    closest = cell(size(U));
-    parfor i=1:numel(U)
-        [isin(i),inwhich{i},closest{i}] = U(i).contains(x, fastbreak);
-    end
-    return;
-end
-
-if U.Num==0
-    % for empty array return empty
-    isin = false;
-    inwhich = [];
-    closest = [];
-    return
-end
-
-validate_realvector(x);
-
-if numel(x)~=U.Dim
-    error('The dimension of the input vector must be %d.',U.Dim);
-end
-
-% recursive search
-isin = false;
+isin = [];
 inwhich = [];
 closest = [];
-
-if all([U.Set.hasHRep])
-    % prefer mex-function if all polyhedra are in H-rep
-    [isin,inwhich] = U.Set.isInside(x,struct('fastbreak',fastbreak));
-else    
-    for i=1:U.Num
-        if U.Set(i).contains(x)
-            isin = true;
-            inwhich = [inwhich; i];
-            if fastbreak
-                return;
-            end
-        end
-    end
+if numel(obj)==0 || ( numel(obj)==1 && obj.Num==0 )
+	return
 end
 
-if ~isin && nargout>2
-    d = Inf(1,U.Num);
-    parfor i=1:U.Num
-        s = distance(U.Set(i),x);
-        if ~isempty(s.dist)
-            d(i) = s.dist;
-        end
-    end
-    [dmin, closest] = min(d);
+%% validation
+validate_realvector(x);
+if size(x, 2)~=1 || numel(x)~=obj.Dim
+	error('The point must be a %dx1 vector.', obj.Dim);
 end
 
+%% heuristics
+if check_hull_first
+	% check the convex hull first, maybe we could exit quickly.
+	%
+	% in theory, this is a great idea. in practice, it does not pay out.
+
+	if numel(obj)==1 && isfield(obj.Internal, 'convexHull') && ...
+			~isempty(obj.Internal.convexHull)
+		H = obj.Internal.convexHull;
+		if ~H.contains(x)
+			% not in the convex hull, no point in evaluating further
+			isin = false;
+			if nargout==3
+				% computing the closest region is slow anyhow, so there is
+				% no harm in going via Union/contains
+				[~, ~, closest] = obj.contains@Union(x, fastbreak);
+			end
+			return
+		end
+	end
+end
+
+%% search
+% exploit Polyhedron/contains operating on arrays
+c = obj.Set.contains(x, fastbreak);
+isin = any(c);
+% always return "inwhich" as a row vector
+inwhich = find(c); 
+inwhich = inwhich(:)';
+
+%% find closest region if necessary
+if nargout==3 && ~isin
+	% computing the closest region is slow anyhow, so there is no harm in
+	% going via Union/contains
+	[~, ~, closest] = obj.contains@Union(x, true);
+end
 
 end

@@ -17,7 +17,7 @@ Yn(isnan(Yn))=[];
 P.addFunction(Function(@(x)x), 'a');
 
 % containment test first
-if any(~P.contains([Xn,Yn]))
+if any(~P.contains([Xn,Yn]'))
     error('Wrong default value.');
 end
 

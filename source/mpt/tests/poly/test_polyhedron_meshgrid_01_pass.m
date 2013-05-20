@@ -13,7 +13,7 @@ Yn = Y(:);
 Xn(isnan(Xn))=[];
 Yn(isnan(Yn))=[];
 
-if any(~P.contains([Xn,Yn]))
+if any(~P.contains([Xn,Yn]'))
     error('Wrong default value.');
 end
 

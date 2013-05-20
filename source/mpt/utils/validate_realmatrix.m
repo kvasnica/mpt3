@@ -4,7 +4,7 @@ function y=validate_realmatrix(v)
 %
 % empty argument (v=[]) is considered as valid
 
-if isreal(v) && ismatrix(v) && all(isfinite(v(:)))
+if isnumeric(v) && ismatrix(v) && all(isfinite(v(:)))
     y=true;
 else
     error('Input argument must be a real matrix.');

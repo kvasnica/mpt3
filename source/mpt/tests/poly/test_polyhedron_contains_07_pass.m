@@ -11,8 +11,9 @@ S.computeHRep();
 % low-dim
 R = Polyhedron('H',S.H,'He',[1 1 2]);
 
-if ~P.contains(R)
-    error('P must contain R.')
-end
+% P(1) and P(2) contain R
+t = P.contains(R);
+assert(isequal(size(t), [2 1]));
+assert(all(t));
 
 end

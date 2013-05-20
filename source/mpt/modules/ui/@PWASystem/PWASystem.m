@@ -396,7 +396,9 @@ classdef PWASystem < AbstractSystem
 			end
 
             xn = x0; y = [];
-            [isin, which_dynamics] = isInside(obj.domain, [x0; u]);
+			c = obj.domain.contains([x0; u]);
+			isin = any(c);
+			which_dynamics = find(c);
             if ~isin
                 % no associated dynamic
                 error('No dynamics associated to x=%s and u=%s.', ...
@@ -441,12 +443,14 @@ classdef PWASystem < AbstractSystem
 
             if nargin < 2
 				u = zeros(obj.nu, 1);
-                [isin, which_dynamics] = isInside(obj.domainx, x0);
+				c = obj.domainx.contains(x0);
 			else
 				u = u(:);
-                [isin, which_dynamics] = isInside(obj.domain, [x0; u]);
-            end
-            if ~isin
+				c = obj.domain.contains([x0; u]);
+			end
+			isin = any(c);
+			which_dynamics = find(c);
+			if ~isin
                 % no associated dynamic
                 if nargin==2
                     error('No dynamics associated to x=%s and u=%s.', ...

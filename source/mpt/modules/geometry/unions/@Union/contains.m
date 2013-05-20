@@ -1,71 +1,80 @@
-function [isin, inwhich, closest] = contains(U,x,fastbreak)
+function [isin, inwhich, closest] = contains(U, x, fastbreak)
 %
-% test if the point x belongs to any of the sets stored under the union
+% Checks whether the union contains a given point
 %
+% [isin, inwhich, closest] = U.contains(x, [fastbreak])
+%
+% inputs:
+%   U: single union (use U.forEach() to evaluate arrays), mandatory
+%   x: point to check, mandatory
+%   fastbreak: fast-abortion boolean flag, false by default
+%
+% outputs:
+%   isin: true if at least one set of the union contains "x"
+%   inwhich: indices of sets that contain "x" (will be a singleton if
+%            "fastbreak=true")
+%   closest: if no set contains "x", this output contains index of the set
+%            which is closest to "x". Note: since this computation is
+%            expensive, do not ask for the third output unless you really
+%            need it.
 
+error(nargchk(2, 3, nargin));
+% use obj.forEach(@(u) u.contains(x)) to evaluate arrays
+error(U.rejectArray());
+
+if numel(U)==0
+	isin = [];
+	inwhich = [];
+	closest = [];
+	return
+end
 if nargin<3
     fastbreak = false;
-else
-    if isnumeric(fastbreak) || islogical(fastbreak)
-        fastbreak = logical(fastbreak);
-    else
-        error('The "fastbreak" option must have numerical or logical value.');
-    end
-    if ~isscalar(fastbreak)
-        error('The "fastbreak" must be scalar.')
-    end
 end
 
-% deal with arrays
-if numel(U)>1
-    isin = false(size(U));
-    inwhich = cell(size(U));
-    closest = cell(size(U));
-    parfor i=1:numel(U)
-        [isin(i),inwhich{i},closest{i}] = U(i).contains(x,fastbreak);
-    end
-    return;
-end
-
-if U.Num==0
-    % for empty array return empty
-    isin = false;
-    inwhich = [];
-    closest = [];
-    return
-end
-
+%% validation
 validate_realvector(x);
-
-for i=1:U.Num
-   if U.Set{i}.Dim~=numel(x)
-       error('All sets in the union must have the same dimension as the provided vector.');
-   end
+if size(x, 2)~=1
+	error('The point must be a column vector.');
+end
+nx = numel(x);
+iscell_set = iscell(U.Set);
+for i = 1:U.Num
+	if ( iscell_set && U.Set{i}.Dim ~= nx ) || ...
+			( ~iscell_set && U.Set(i).Dim ~= nx )
+		error('All sets must be %d-dimensional.', nx);
+	end
 end
 
-% recursive search
+%% search
 isin = false;
 inwhich = [];
 closest = [];
-for i=1:U.Num
-    if U.Set{i}.contains(x)
-        isin = true;
-        inwhich = [inwhich, i];
-        if fastbreak 
-            return;
-        end
-    end
+for i = 1:U.Num
+	if ( iscell_set && U.Set{i}.contains(x) ) || ...
+			(~iscell_set && U.Set(i).contains(x))
+		isin = true;
+		inwhich = [inwhich, i];
+		if fastbreak
+			return
+		end
+	end
 end
-    
+
+%% find closest region if necessary
 if ~isin && nargout>2
-    d = Inf(1,U.Num);    
-    parfor i=1:U.Num
-       s = distance(U.Set{i},x);
-       if ~isempty(s.dist)
-           d(i) = s.dist;
-       end
-    end
-    [dmin, closest] = min(d);    
+	d = Inf(1, U.Num);
+	parfor i=1:U.Num
+		if iscell_set
+			s = distance(U.Set{i}, x);
+		else
+			s = distance(U.Set(i), x);
+		end
+		if ~isempty(s.dist)
+			d(i) = s.dist;
+		end
+	end
+	[~, closest] = min(d);
 end
 
 end

@@ -8,17 +8,16 @@ for i=1:5
 end
 
 U = PolyUnion('Set',P,'FullDim',true);
+[isin, inwhich, closest] = U.contains([]);
+assert(isempty(isin));
+assert(isempty(inwhich));
+assert(isempty(closest));
 
-[isin,inwhich,closest] = U.contains([]);
-
-if isin
-    error('Empty set');
-end
-if ~isempty(inwhich)
-    error('Empty set');
-end
-if ~isempty(closest)
-    error('Empty set');
-end
+% empty array
+U = U([]);
+[isin, inwhich, closest] = U.contains([]);
+assert(isempty(isin));
+assert(isempty(inwhich));
+assert(isempty(closest));
 
 end

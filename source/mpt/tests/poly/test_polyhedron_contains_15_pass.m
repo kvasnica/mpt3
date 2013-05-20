@@ -36,12 +36,20 @@ P(1) = Polyhedron('H',P.H);
 P(2) = Polyhedron('V',s2.V,'R',s2.R);
     
 % check vertices
-t1 = P.contains(s1.V);
-t2 = P.contains(s2.V);
+t1 = P.contains(s1.V'); % points must be stored column-wise
+t2 = P.contains(s2.V'); % points must be stored column-wise
 
-if ~t1(1) || ~all(t2(:,2))
-    error('Vertices must be contained.');
-end
+% P is a 2-element array, s1.V is a single vertex
+assert(isequal(size(t1), [numel(P) 1]));
+% P is a 2-element array, s2.V are multiple vertices
+assert(isequal(size(t2), [numel(P) size(s2.V, 1)]));
 
+% only P(1) contains s1.V
+assert(isequal(t1, [true; false]));
+
+% P(1) does not contain any vertex of P(2)
+assert(~any(t2(1, :)));
+% P(2) contains all vertices of P(2)
+assert(all(t2(2, :)));
 
 end

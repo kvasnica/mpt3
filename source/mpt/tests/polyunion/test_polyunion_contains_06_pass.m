@@ -1,26 +1,23 @@
 function test_polyunion_contains_06_pass
 %
-% 1D-polyhedron, two and three outputs
+% 1D-polyhedron, H-rep
 %
 
-P = PolyUnion(Polyhedron('lb', -1, 'ub', 1));
-Q = [P P];
-[a1, b1, c1] = Q.contains(0);
+P = Polyhedron('lb', -1, 'ub', 1);
+Q = PolyUnion([P P]);
 
-if ~a1
-    error('The point is inside.');
-end
+% point inside
+x = 0;
+[isin, inwhich, closest] = Q.contains(x);
+assert(isin);
+assert(isequal(inwhich, [1 2]));
+assert(isempty(closest));
 
-[a2, b2, c2] = Q.contains(2);
-
-if a2
-    error('The point is not inside.');
-end
-
-if ~iscell(c1) || ~iscell(c2) || ~iscell(b1) || ~iscell(b2)
-    error('Here should be cell output.');
-end
-
-
+% point outside
+x = 2;
+[isin, inwhich, closest] = Q.contains(x);
+assert(~isin);
+assert(isempty(inwhich));
+assert(closest==1);
 
 end

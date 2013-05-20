@@ -1,30 +1,65 @@
 function test_union_contains_04_pass
 %
-% array of unions
+% arrays of unions must be rejected
 %
 
-x = sdpvar(2,1);
+Z = Polyhedron('lb', -1, 'ub', 1);
+Y1 = Polyhedron('lb', -0.5, 'ub', 1);
+Y2 = Polyhedron('lb', 0, 'ub', 2);
+U1 = Union([Y1 Y2]);
+U2 = Union(Z);
+U = [U1 U2];
+x = 1;
 
-F = set(norm(randn(3,2)*x-randn(3,1)) <= ones(3,1));
+% no direct operation on arrays
+[~, msg] = run_in_caller('U.contains(x);');
+asserterrmsg(msg, 'This method does not support arrays.');
 
-Y(1) = YSet(x,F);
-Y(2) = YSet(x,set(-5<=x<=5));
+% per-element evaluation must work
 
-U = Union(Y);
-U.add(ExamplePoly.randHrep+[1;2]);
-U.add(ExamplePoly.randVrep-[1;2]);
+% x in U2
+x = -1;
+isin = U.forEach(@(e) e.contains(x));
+assert(isequal(isin, [false true]));
+% non-scalar outputs
+[~, msg] = run_in_caller('[isin, inwhich] = U.forEach(@(e) e.contains(x));');
+asserterrmsg(msg, 'Non-scalar in Uniform output, at index 1, output 2.');
+[isin, inwhich] = U.forEach(@(e) e.contains(x), 'UniformOutput', false);
+assert(iscell(isin));
+assert(numel(isin)==2);
+assert(~isin{1});
+assert(isin{2});
+assert(iscell(inwhich));
+assert(numel(inwhich)==2);
+assert(isempty(inwhich{1}));
+assert(inwhich{2}==1);
+[isin, inwhich, closest] = U.forEach(@(e) e.contains(x), 'UniformOutput', false);
+assert(iscell(isin));
+assert(numel(isin)==2);
+assert(~isin{1});
+assert(isin{2});
+assert(iscell(inwhich));
+assert(numel(inwhich)==2);
+assert(isempty(inwhich{1}));
+assert(inwhich{2}==1);
+assert(closest{1}==1);
+assert(isempty(closest{2}));
 
-U(2) = Union([ExamplePoly.randHrep; ExamplePoly.randZono]);
+% x in U1
+x = 2;
+isin = U.forEach(@(e) e.contains(x));
+assert(isequal(isin, [true false]));
 
-[isin,inwhich,closest] = U.contains( 0.01*rand(2,1),true);
-
-for i=1:2
-    if ~isin(i) && isempty(closest{i})
-        error('The closest regions should be found always when the point is not contained anywhere.');
-    end
-    if numel(inwhich{i})~=1
-        error('The length of inwhich must be 1 for fastbreak option.');
-    end
-end
+% x in both
+x = 0.1;
+isin = U.forEach(@(e) e.contains(x));
+assert(isequal(isin, [true true]));
+[~, msg] = run_in_caller('[isin, inwhich] = U.forEach(@(e) e.contains(x));');
+asserterrmsg(msg, 'Non-scalar in Uniform output, at index 1, output 2.');
+[isin, inwhich] = U.forEach(@(e) e.contains(x), 'UniformOutput', false);
+assert(isin{1});
+assert(isin{2});
+assert(isequal(inwhich{1}, [1 2]));
+assert(inwhich{2}==1);
 
 end
