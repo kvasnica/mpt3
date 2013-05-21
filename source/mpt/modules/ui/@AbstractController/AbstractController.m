@@ -12,11 +12,11 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 	end
 	properties(SetObservable=true, GetObservable=true)
 		model % Prediction model
+		optimizer % Implicit or explicit optimizer
 	end
 	properties
 		nu % Dimension of the optimizer
 		nx % Dimension of the paramater
-		optimizer % Implicit or explicit optimizer
 	end
 	properties(SetAccess=protected, Hidden)
 		yalmipData % YALMIP representation of the MPC problem

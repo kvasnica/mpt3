@@ -22,16 +22,16 @@ classdef MPCController < AbstractController
 			%         model: prediction model
 			%             N: prediction horizon
 
-			if nargin==0
-				return
-			end
-
 			%obj.addlistener('model', 'PreGet', @obj.modelPreGetEvent);
 			%obj.addlistener('model', 'PostGet', @obj.modelPostGetEvent);
 			%obj.addlistener('model', 'PreSet', @obj.modelPreSetEvent); 
 			%obj.addlistener('model', 'PostSet', @obj.modelPostSetEvent); 
 			obj.addlistener('N', 'PostSet', @obj.NPostSetEvent);
-			
+
+			if nargin==0
+				return
+			end
+
 			obj.importUserData(varargin{:});
 			
 			% Let's not construct the optimizer here, since it is expected

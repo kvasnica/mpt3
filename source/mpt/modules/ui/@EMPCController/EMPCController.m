@@ -5,10 +5,11 @@ classdef EMPCController < AbstractController
 	%   ctrl = EMPCController(model, N)
 	%   ctrl = EMPCController(MPCController)
 
-    properties(Dependent=true, SetAccess=protected, Transient=true)
+    properties(SetAccess=protected, Transient=true)
 		partition
 		feedback
 		cost
+		nr
 	end
     
     methods
@@ -27,6 +28,8 @@ classdef EMPCController < AbstractController
 			%
 			%   ctrl = EMPCController(model, N)
 
+			obj.addlistener('optimizer', 'PostSet', @obj.optPostSetEvent);
+
 			if nargin==0
                 return
 			end
@@ -35,19 +38,6 @@ classdef EMPCController < AbstractController
 			
 			if ~isobject(obj.optimizer)
 				obj.construct();
-			end
-		end
-		
-		function out = nr(obj)
-			% Returns total number of regions
-			
-			% Supports multiple optimizers
-			if isobject(obj.optimizer)
-				n = cell(1, numel(obj.optimizer));
-				[n{:}] = obj.optimizer.Num;
-				out = sum([n{:}]);
-			else
-				out = 0;
 			end
 		end
 		
@@ -130,46 +120,6 @@ classdef EMPCController < AbstractController
             obj.optimizer = res.xopt;
 		end
         
-		function out = get.feedback(obj)
-			% Returns the feedback law
-			
-			out = obj.optimizer.getFunction('primal');
-		end
-		
-		function out = get.cost(obj)
-			% Returns the cost function
-			
-			out = obj.optimizer.getFunction('obj');
-		end
-		
-		function out = get.partition(obj)
-			% Returns the polyhedral partition
-
-			if numel(obj.optimizer)==1
-				% single optimizer, copy it and remove functions
-				out = obj.optimizer.copy();
-				out.removeAllFunctions();
-			else
-				% multiple optimizers, concatenate regions together
-				P = [];
-				for i = 1:length(obj.optimizer)
-					P = [P; Polyhedron(obj.optimizer(i).Set)];
-				end
-				out = PolyUnion('Set', P.removeAllFunctions);
-			end
-		end
-		
-		% 		function obj = set.optimizer(obj, optimizer)
-		% 			% Splits the optimizer into feedback/cost/partition for fast
-		% 			% access
-		%
-		% 			disp('Optimizer set.');
-		% 			obj.optimizer = optimizer;
-		%
-		% 			obj.feedback = optimizer.getFunction('primal');
-		% 			obj.cost = optimizer.getFunction('obj');
-		% 		end
-			
 		% 		function h = plot(obj)
 		% 			% Plots partition of the controller
 		%
@@ -306,6 +256,9 @@ classdef EMPCController < AbstractController
 			end
 			out.optimizer.trimFunction('primal', obj.nu);
 			out.optimizer.merge('primal');
+			% TODO: figure out why out.optPostSetEvent() is not triggered
+			% automatically
+			out.optPostSetEvent();
 			out.N = 1; % to get correct size of the open-loop optimizer
 			% TODO: implement a better way
 		end
@@ -365,6 +318,7 @@ classdef EMPCController < AbstractController
 			end
 			
 		end
+		
 	end
 	
 	methods(Static, Hidden)
@@ -487,6 +441,56 @@ classdef EMPCController < AbstractController
 				end
 			end
 
+		end
+
+	end
+
+	methods(Access=protected, Hidden)
+	
+		function optPostSetEvent(obj, source, event)
+			% triggered after the optimizer was changed
+			%
+			% store the partition, feedback and cost objects for fast
+			% access
+			
+			obj.feedback = obj.optimizer.getFunction('primal');
+			obj.cost = obj.optimizer.getFunction('obj');
+			if numel(obj.optimizer)==1
+				% single optimizer, copy it and remove functions
+				out = obj.optimizer.copy();
+				out.removeAllFunctions();
+			else
+				% multiple optimizers, concatenate regions together
+				P = [];
+				for i = 1:length(obj.optimizer)
+					P = [P; Polyhedron(obj.optimizer(i).Set)];
+				end
+				out = PolyUnion('Set', P.removeAllFunctions);
+			end
+			obj.partition = out;
+			
+			% number of regions
+			if isobject(obj.optimizer)
+				n = cell(1, numel(obj.optimizer));
+				[n{:}] = obj.optimizer.Num;
+				obj.nr = sum([n{:}]);
+			else
+				obj.nr = 0;
+			end
+
+			obj.markAsModified();
+		end
+
+	end
+	
+	methods(Static)
+		
+		function new = loadobj(obj)
+			% load method
+			
+			% post-set events must be triggered manually
+			new = obj;
+			new.optPostSetEvent();
 		end
 
 	end
