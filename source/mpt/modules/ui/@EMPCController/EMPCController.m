@@ -467,7 +467,7 @@ classdef EMPCController < AbstractController
 			if nargin==2 
 				% possible import from an another controller
 				otherCtrl = varargin{1};
-				if ismethod(otherCtrl, 'isMPTController') && ...
+				if isa(otherCtrl, 'AbstractController') && ...
 						otherCtrl.isExplicit() && isobject(otherCtrl.optimizer)
 					% import optimizer
 					obj.model = otherCtrl.model;

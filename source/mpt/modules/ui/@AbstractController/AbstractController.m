@@ -183,14 +183,6 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 
 	end
 
-	methods(Static)
-		function out = isMPTController
-			% Internal function to determine whether an object is a
-			% controller
-			out = true;
-		end
-	end
-	
 	methods(Static, Hidden)
 
 		function U = PolyhedronToPolyUnionHelper(P)
@@ -274,13 +266,13 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				return
 			end
 			
-			if nargin==2 && ismethod(model, 'isMPTController')
+			if nargin==2 && isa(model, 'AbstractController')
 				% import from an another controller
 				otherCtrl = model;
 				obj.model = otherCtrl.model;
 				obj.N = otherCtrl.N;
 				
-			elseif ismethod(model, 'isMPTSystem')
+			elseif isa(model, 'AbstractSystem')
 				% import model and possibly the prediction horizon
 				%obj.N = 1;
 				obj.model = model;

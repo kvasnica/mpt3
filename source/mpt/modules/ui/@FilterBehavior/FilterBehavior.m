@@ -98,7 +98,7 @@ classdef FilterBehavior < MPTUIHandle
 					for i = 1:length(p)
 						v = obj.(p{i});
 						for j = 1:numel(v)
-							if ismethod(v(j), 'hasFilter')
+							if isa(v(j), 'FilterBehavior')
 								out = out || v(j).hasFilter(name, 'recursive', true);
 							end
 						end
@@ -381,7 +381,7 @@ classdef FilterBehavior < MPTUIHandle
 					for i = 1:length(p)
 						v = obj.(p{i});
 						for j = 1:numel(v)
-							if ismethod(v(j), 'hasFilter')
+							if isa(v(j), 'FilterBehavior')
 								out = out || v(j).hasFilterOnAction(action, 'recursive', true);
 							end
 						end
