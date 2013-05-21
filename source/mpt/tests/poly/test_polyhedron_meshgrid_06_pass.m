@@ -6,18 +6,8 @@ H = [0.145316894996979 0.989385162628001 2.38975849892281;0.707106781186547 0.70
 P = Polyhedron('H', H);
 
 
-% observe missing points:
-close all
-P.plot(); axis equal; a=axis;
-
-[x, y] = P.meshGrid(5);
-figure; surf(x, y, 0*x); view(2); axis(a);
-
-[x, y] = P.meshGrid(10);
-figure; surf(x, y, 0*x); view(2); axis(a);
-
-% but the output of meshgrid should give the original polytope:
-[x, y] = P.meshGrid(5);
+[x, y] = P.meshGrid(3);
+%in any case the output of meshgrid must give the original polytope:
 V = [];
 for i = 1:size(x, 1)
 	for j = 1:size(x, 2)
@@ -27,3 +17,19 @@ for i = 1:size(x, 1)
 	end
 end
 assert(Polyhedron(V)==P);
+
+% meshgrid must produce enough points
+assert(numel(~isnan(x))>70);
+assert(numel(~isnan(y))>70);
+
+% % observe missing points:
+% close all
+% P.plot(); axis equal; a=axis;
+%
+% [x, y] = P.meshGrid(3);
+% figure; surf(x, y, 0*x); view(2); axis(a);
+%
+% [x, y] = P.meshGrid(10);
+% figure; surf(x, y, 0*x); view(2); axis(a);
+
+end
