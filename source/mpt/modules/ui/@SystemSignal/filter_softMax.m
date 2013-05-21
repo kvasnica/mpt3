@@ -8,8 +8,8 @@ end
 
 % set up the filter
 filter = FilterSetup;
-filter.addField('penalty', Penalty(MPTOPTIONS.infbound*eye(obj.n), 0), @(x) isa(x, 'Penalty'));
-filter.addField('maximalViolation', 1e3, @isnumeric);
+filter.addField('penalty', Penalty(MPTOPTIONS.infbound*ones(1, obj.n), 0), @(x) isa(x, 'Penalty'));
+filter.addField('maximalViolation', 1e3*ones(obj.n, 1), @isnumeric);
 
 % this filter depends on the "max" filter
 filter.dependsOn('max') = true;
