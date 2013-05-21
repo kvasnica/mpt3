@@ -146,12 +146,23 @@ classdef FilterBehavior < MPTUIHandle
 			out = obj.hasFilter(name) && obj.internal_properties.filter_map(name).active;
 		end
 		
-		function out = applyFilters(obj, from)
+		function out = applyFilters(obj, from, concat_type)
 			% Applies all filters
+			%
+			% concat_type can be either '+' or 'map'
+			
+			if nargin<3
+				concat_type = '+';
+			end
 			
 			filters = obj.listFilters('actsOn', from);
 			if isempty(filters)
 				out = obj.filterDefaultOutput(from);
+			elseif isequal(concat_type, 'map')
+				out = containers.Map;
+				for i = 1:length(filters)
+					out(filters{i}) = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
+				end
 			else
 				out = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
 				for i = 2:length(filters)
@@ -403,7 +414,7 @@ classdef FilterBehavior < MPTUIHandle
 
 			switch from
 				case {'constraints', 'instantiate', 'uninstantiate', ...
-						'generate', 'construct', ...
+						'generate', 'construct', 'getVariables', ...
 						'setup', 'addFilter', 'removeFilter'}
 					out = [];
 				case 'objective'

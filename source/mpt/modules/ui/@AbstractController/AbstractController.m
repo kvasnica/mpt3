@@ -121,11 +121,38 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			Y.variables = struct('x', obj.model.getVariables('x'), ...
 				'u', obj.model.getVariables('u'), ...
 				'y', obj.model.getVariables('y'));
+			
+			
 			if isa(obj.model, 'PWASystem')
 				Y.variables.d = obj.model.getVariables('d');
 			elseif isa(obj.model, 'MLDSystem')
 				Y.variables.d = obj.model.getVariables('d');
 				Y.variables.z = obj.model.getVariables('z');
+			end
+			
+			% include additional variables introduced by filters
+			function s = map2struct(m)
+				% inline function to convert a containers.Map to a
+				% structure (operates recursively)
+				if isa(m, 'containers.Map')
+					k = m.keys;
+					s = [];
+					for i = 1:length(k)
+						v = m(k{i});
+						if ~isempty(v)
+							s.(k{i}) = map2struct(v);
+						end
+					end
+				else
+					s = m;
+				end
+			end
+			add = containers.Map;
+			add('x') = obj.model.x.applyFilters('getVariables', 'map');
+			add('u') = obj.model.u.applyFilters('getVariables', 'map');
+			add('y') = obj.model.y.applyFilters('getVariables', 'map');
+			if ~isempty(add('x')) || ~isempty(add('u')) || ~isempty(add('y'))
+				Y.variables.auto = map2struct(add);
 			end
 		end
 		

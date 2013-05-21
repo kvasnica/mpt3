@@ -21,6 +21,15 @@ filter.callback('instantiate') = @on_instantiate;
 filter.callback('uninstantiate') = @on_uninstantiate;
 filter.callback('addFilter') = @on_addFilter;
 filter.callback('removeFilter') = @on_removeFilter;
+filter.callback('getVariables') = @on_variables;
+
+end
+
+%------------------------------------------------
+function out = on_variables(obj, varargin)
+% called when filter's variables are requested
+
+out = obj.internal_properties.soft_max;
 
 end
 
