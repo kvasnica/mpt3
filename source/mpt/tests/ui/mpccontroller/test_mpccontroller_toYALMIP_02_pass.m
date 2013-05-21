@@ -26,16 +26,16 @@ data = ctrl.toYALMIP();
 assert(isfield(data.variables, 'x'));
 assert(isfield(data.variables, 'u'));
 assert(isfield(data.variables, 'y'));
-assert(isfield(data.variables, 'auto')); % variables introduced by filters
-assert(isfield(data.variables.auto, 'x'));
-assert(isfield(data.variables.auto, 'u'));
-assert(~isfield(data.variables.auto, 'y'));
-assert(isfield(data.variables.auto.x, 'softMax'));
-assert(~isfield(data.variables.auto.x, 'softMin'));
-assert(isa(data.variables.auto.x.softMax, 'sdpvar'));
-assert(isfield(data.variables.auto.u, 'softMax'));
-assert(isfield(data.variables.auto.u, 'softMin'));
-assert(isa(data.variables.auto.u.softMax, 'sdpvar'));
-assert(isa(data.variables.auto.u.softMin, 'sdpvar'));
+assert(isfield(data.variables, 'filters')); % variables introduced by filters
+assert(isfield(data.variables.filters, 'x'));
+assert(isfield(data.variables.filters, 'u'));
+assert(~isfield(data.variables.filters, 'y'));
+assert(isfield(data.variables.filters.x, 'softMax'));
+assert(~isfield(data.variables.filters.x, 'softMin'));
+assert(isa(data.variables.filters.x.softMax, 'sdpvar'));
+assert(isfield(data.variables.filters.u, 'softMax'));
+assert(isfield(data.variables.filters.u, 'softMin'));
+assert(isa(data.variables.filters.u.softMax, 'sdpvar'));
+assert(isa(data.variables.filters.u.softMin, 'sdpvar'));
 
 end
