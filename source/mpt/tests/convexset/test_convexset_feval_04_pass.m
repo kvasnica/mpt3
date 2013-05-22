@@ -1,25 +1,165 @@
 function test_convexset_feval_04_pass
 %
-% two sets, two identical functions
+% evaluation at multiple points
 %
 
-P(1) = Polyhedron('lb', -1, 'ub', 1);
-P(2) = Polyhedron('lb', -1, 'ub', 1);
+% currently we do not allow ConvexSet/feval() to evaluate the function at
+% multiple points. should we support it, use this test.
 
-a1 = 1; b1 = 2;
-a2 = 2; b2 = 3;
-P.addFunction(AffFunction(a1, b1), 'f1');
-P.addFunction(AffFunction(a2, b2), 'f2');
+P = Polyhedron('lb', -1, 'ub', 1);
+f = AffFunction(2, 3);
+P.addFunction(f, 'f');
+x = [0.1, 0.2, 0.3];
+[worked, msg] = run_in_caller('P.feval(x)');
+assert(~worked)
+%asserterrmsg(msg, 'The vector (or matrix) "x" must have 1');
 
-x = 0.1;
+return
 
-y = P.feval(x);
 
-assert(length(y)==2);
-assert(iscell(y));
-assert(isequal(y{1}{1}, a1*x+b1));
-assert(isequal(y{1}{2}, a2*x+b2));
-assert(isequal(y{2}{1}, a1*x+b1));
-assert(isequal(y{2}{2}, a2*x+b2));
+%% 1D set, scalar-valued function
+P = Polyhedron('lb', -1, 'ub', 1);
+f = AffFunction(2, 3);
+P.addFunction(f, 'f');
+
+% all points inside
+x = [0.1, 0.2, 0.3];
+[y, feasible] = P.feval(x);
+assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(feasible, [true true true]));
+
+% 1st and 3rd point inside
+x = [0.1, 100, 0.4];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [true false true]));
+assert(isequal(size(y), [1 3]));
+assert(y(1)==f.Handle(x(:, 1)));
+assert(y(3)==f.Handle(x(:, 3)));
+assert(isnan(y(2)));
+
+% 2nd point inside
+x = [200, 1, 100];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false true false]));
+assert(isequal(size(y), [1 3]));
+assert(isnan(y(1)));
+assert(isnan(y(3)));
+assert(y(2)==f.Handle(x(:, 2)));
+
+% none inside
+x = [200, 1000, 100];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false false false]));
+assert(isequal(size(y), [1 3]));
+assert(all(isnan(y)));
+
+%% 1D set, vector-valued function
+P = Polyhedron('lb', -1, 'ub', 1);
+f = AffFunction([2; 2], [3; 4]);
+P.addFunction(f, 'f');
+
+% all points inside
+x = [0.1, 0.2, 0.3];
+[y, feasible] = P.feval(x);
+assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(feasible, [true true true]));
+
+% 1st and 3rd point inside
+x = [0.1, 100, 0.4];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [true false true]));
+assert(isequal(size(y), [2 3]));
+assert(isequal(y(:, 1), f.Handle(x(:, 1))));
+assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(all(isnan(y(:, 2))));
+
+% 2nd point inside
+x = [200, 1, 100];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false true false]));
+assert(isequal(size(y), [2 3]));
+assert(all(isnan(y(:, 1))));
+assert(all(isnan(y(:, 3))));
+assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+
+% none inside
+x = [200, 1000, 100];
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false false false]));
+assert(isequal(size(y), [2 3]));
+assert(all(isnan(y(:))));
+
+
+%% 2D set, scalar-valued function
+P = Polyhedron('lb', [-1; -1], 'ub', [1; 1]);
+f = AffFunction([2 3], 4);
+P.addFunction(f, 'f');
+
+% all points inside
+x = [0.1 0.1; 0.2 0.2; 0.3 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(feasible, [true true true]));
+
+% 1st and 3rd point inside
+x = [0.1 0.1; 200 0.2; 0.3 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [true false true]));
+assert(isequal(size(y), [1 3]));
+assert(isequal(y(:, 1), f.Handle(x(:, 1))));
+assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(all(isnan(y(:, 2))));
+
+% 2nd point inside
+x = [100 0.1; 0.2 0.2; 300 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false true false]));
+assert(isequal(size(y), [1 3]));
+assert(all(isnan(y(:, 1))));
+assert(all(isnan(y(:, 3))));
+assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+
+% none inside
+x = [100 0.1; 200 0.2; 300 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false false false]));
+assert(isequal(size(y), [1 3]));
+assert(all(isnan(y(:))));
+
+%% 2D set, vector-valued function
+P = Polyhedron('lb', [-1; -1], 'ub', [1; 1]);
+f = AffFunction([2 3; 4 5; 6 7; 8 9], [3; 4; 5; 6]);
+P.addFunction(f, 'f');
+
+% all points inside
+x = [0.1 0.1; 0.2 0.2; 0.3 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(feasible, [true true true]));
+
+% 1st and 3rd point inside
+x = [0.1 0.1; 200 0.2; 0.3 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [true false true]));
+assert(isequal(size(y), [4 3]));
+assert(isequal(y(:, 1), f.Handle(x(:, 1))));
+assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(all(isnan(y(:, 2))));
+
+% 2nd point inside
+x = [100 0.1; 0.2 0.2; 300 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false true false]));
+assert(isequal(size(y), [4 3]));
+assert(all(isnan(y(:, 1))));
+assert(all(isnan(y(:, 3))));
+assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+
+% none inside
+x = [100 0.1; 200 0.2; 300 0.3]';
+[y, feasible] = P.feval(x);
+assert(isequal(feasible, [false false false]));
+assert(isequal(size(y), [4 3]));
+assert(all(isnan(y(:))));
 
 end

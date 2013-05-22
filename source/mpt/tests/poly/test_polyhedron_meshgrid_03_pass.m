@@ -26,7 +26,7 @@ Yn(isnan(Yn))=[];
 P.addFunction(Function(@(x)sqrt(x.^2+1)), 'a');
 
 % containment test first
-if any(~P.contains([Xn,Yn]))
+if any(~P.contains([Xn,Yn]'))
     error('Wrong default value.');
 end
 

@@ -22,16 +22,16 @@ classdef MPCController < AbstractController
 			%         model: prediction model
 			%             N: prediction horizon
 
-			if nargin==0
-				return
-			end
-
 			%obj.addlistener('model', 'PreGet', @obj.modelPreGetEvent);
 			%obj.addlistener('model', 'PostGet', @obj.modelPostGetEvent);
 			%obj.addlistener('model', 'PreSet', @obj.modelPreSetEvent); 
 			%obj.addlistener('model', 'PostSet', @obj.modelPostSetEvent); 
 			obj.addlistener('N', 'PostSet', @obj.NPostSetEvent);
-			
+
+			if nargin==0
+				return
+			end
+
 			obj.importUserData(varargin{:});
 			
 			% Let's not construct the optimizer here, since it is expected
@@ -84,7 +84,7 @@ classdef MPCController < AbstractController
 			%  * states (nx*N)
 			%  * outputs (ny*N)
 			%  * all other model variables
-			vars = Y.objective;;			
+			vars = Y.objective;			
 			main_variables = {'u', 'x', 'y'};
 			for i = 1:length(main_variables)
 				v = Y.variables.(main_variables{i});
@@ -92,12 +92,26 @@ classdef MPCController < AbstractController
 			end
 			
 			% now add all other variables (e.g. 'd' for PWA, 'd','z' for
-			% MLD
+			% MLD), dive recursively into automatically introduced
+			% variables
+			function v = struct2vars(s, v)
+				% extracts sdpvar objects from all fields of a structure
+				% "s" and concatenates them into a single column vector
+				% "v". dives recursively into fields of "s".
+				if isa(s, 'sdpvar')
+					v = [v; s(:)];
+				elseif isstruct(s)
+					n = fieldnames(s);
+					for j = 1:length(n)
+						v = struct2vars(s.(n{j}), v);
+					end
+				end
+			end
 			f = fieldnames(Y.variables);
 			for i = 1:length(f)
 				if ~ismember(f{i}, main_variables)
 					v = Y.variables.(f{i});
-					vars = [vars; v(:)];
+					vars = struct2vars(v(:), vars);
 				end
 			end
 			

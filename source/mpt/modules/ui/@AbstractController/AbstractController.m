@@ -12,11 +12,11 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 	end
 	properties(SetObservable=true, GetObservable=true)
 		model % Prediction model
+		optimizer % Implicit or explicit optimizer
 	end
 	properties
 		nu % Dimension of the optimizer
 		nx % Dimension of the paramater
-		optimizer % Implicit or explicit optimizer
 	end
 	properties(SetAccess=protected, Hidden)
 		yalmipData % YALMIP representation of the MPC problem
@@ -121,11 +121,38 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			Y.variables = struct('x', obj.model.getVariables('x'), ...
 				'u', obj.model.getVariables('u'), ...
 				'y', obj.model.getVariables('y'));
+			
+			
 			if isa(obj.model, 'PWASystem')
 				Y.variables.d = obj.model.getVariables('d');
 			elseif isa(obj.model, 'MLDSystem')
 				Y.variables.d = obj.model.getVariables('d');
 				Y.variables.z = obj.model.getVariables('z');
+			end
+			
+			% include additional variables introduced by filters
+			function s = map2struct(m)
+				% inline function to convert a containers.Map to a
+				% structure (operates recursively)
+				if isa(m, 'containers.Map')
+					k = m.keys;
+					s = [];
+					for i = 1:length(k)
+						v = m(k{i});
+						if ~isempty(v)
+							s.(k{i}) = map2struct(v);
+						end
+					end
+				else
+					s = m;
+				end
+			end
+			add = containers.Map;
+			add('x') = obj.model.x.applyFilters('getVariables', 'map');
+			add('u') = obj.model.u.applyFilters('getVariables', 'map');
+			add('y') = obj.model.y.applyFilters('getVariables', 'map');
+			if ~isempty(add('x')) || ~isempty(add('u')) || ~isempty(add('y'))
+				Y.variables.filters = map2struct(add);
 			end
 		end
 		
@@ -161,17 +188,28 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			% AbstractSystem/saveobj
 
 		end
-
-	end
-
-	methods(Static)
-		function out = isMPTController
-			% Internal function to determine whether an object is a
-			% controller
-			out = true;
+		
+		function out = simulate(obj, x0, N_sim)
+			% Simulate the closed-loop system using the prediction model
+			%
+			%   data = controller.simulate(x0, N_sim)
+			%
+			% Inputs:
+			%   controller: a controller object
+			%   x0: initial point for the simulation
+			%   N_sim: number of simulation steps
+			%
+			% Outputs:
+			%   data: structure containing closed-loop profiles of states,
+			%         inputs, outputs, and the cost function
+			%
+			% See ClosedLoop/simulate for more information.
+			
+			out = ClosedLoop(obj, obj.model).simulate(x0, N_sim);
 		end
+
 	end
-	
+
 	methods(Static, Hidden)
 
 		function U = PolyhedronToPolyUnionHelper(P)
@@ -255,13 +293,13 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				return
 			end
 			
-			if nargin==2 && ismethod(model, 'isMPTController')
+			if nargin==2 && isa(model, 'AbstractController')
 				% import from an another controller
 				otherCtrl = model;
 				obj.model = otherCtrl.model;
 				obj.N = otherCtrl.N;
 				
-			elseif ismethod(model, 'isMPTSystem')
+			elseif isa(model, 'AbstractSystem')
 				% import model and possibly the prediction horizon
 				%obj.N = 1;
 				obj.model = model;

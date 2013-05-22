@@ -5,19 +5,21 @@ function test_polyunion_feval_01_pass
 
 P = ExamplePoly.randVrep('d',4);
 
-P.addFunction(AffFunction(rand(1,4)), 'a');
-P.addFunction(AffFunction(rand(1,4)), 'b');
-
-
+A = rand(1, 4);
+B = rand(1, 4);
+P.addFunction(AffFunction(A), 'a');
+P.addFunction(AffFunction(B), 'b');
 U = PolyUnion(P);
-
 x = P(1).interiorPoint.x;
 
-y1=U.feval(x);
+% cannot evaluate multiple functions
+[~, msg] = run_in_caller('y1=U.feval(x)');
+asserterrmsg(msg, 'The object has multiple functions, specify the one to evaluate.');
 
-if ~iscell(y1)
-    error('The result must be a cell because we evaluate 2 functions.')
-end
-
+% single function evaluation should work
+f = U.feval(x, 'a');
+assert(f==A*x);
+f = U.feval(x, 'b');
+assert(f==B*x);
 
 end

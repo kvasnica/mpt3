@@ -8,8 +8,8 @@ end
 
 % set up the filter
 filter = FilterSetup;
-filter.addField('penalty', Penalty(MPTOPTIONS.infbound*eye(obj.n), 0), @(x) isa(x, 'Penalty'));
-filter.addField('maximalViolation', 1e3, @isnumeric);
+filter.addField('penalty', Penalty(MPTOPTIONS.infbound*ones(1, obj.n), 0), @(x) isa(x, 'Penalty'));
+filter.addField('maximalViolation', 1e3*ones(obj.n, 1), @isnumeric);
 
 % this filter depends on the "max" filter
 filter.dependsOn('max') = true;
@@ -21,6 +21,15 @@ filter.callback('instantiate') = @on_instantiate;
 filter.callback('uninstantiate') = @on_uninstantiate;
 filter.callback('addFilter') = @on_addFilter;
 filter.callback('removeFilter') = @on_removeFilter;
+filter.callback('getVariables') = @on_variables;
+
+end
+
+%------------------------------------------------
+function out = on_variables(obj, varargin)
+% called when filter's variables are requested
+
+out = obj.internal_properties.soft_max;
 
 end
 

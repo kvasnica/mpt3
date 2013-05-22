@@ -16,6 +16,16 @@ load mpc_saved
 assert(isa(M, 'EMPCController'));
 assert(isa(M.optimizer, 'PolyUnion'));
 assert(M.optimizer.Num==5);
+assert(isa(M.partition, 'PolyUnion'));
+assert(isa(M.cost, 'PolyUnion'));
+assert(isa(M.feedback, 'PolyUnion'));
+assert(M.cost.hasFunction('obj'));
+assert(~M.cost.hasFunction('primal'));
+assert(M.feedback.hasFunction('primal'));
+assert(~M.feedback.hasFunction('obj'));
+assert(M.nr==5);
+
+
 [~, ~, openloop] = M.evaluate(1);
 assert(norm(openloop.U-ugood)<1e-10);
 % sdpvars should be restored on load

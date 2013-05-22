@@ -1,26 +1,82 @@
 function test_union_contains_02_pass
 %
-% two Ysets
+% two overlapping polyhedra
 %
 
-x = sdpvar(2,1);
+Y1 = Polyhedron('lb', -1, 'ub', 1);
+Y2 = Polyhedron('lb', 0, 'ub', 2);
+U = Union([Y1 Y2]);
 
-A = randn(3,2);
-F = set(A*x<=ones(3,1));
-F = F+set(norm(randn(3,2)*x-randn(3,1))<= ones(3,1));
+% point outside (closer to Y2)
+x = 10;
+isin = U.contains(x);
+assert(~isin);
+[isin, inwhich] = U.contains(x);
+assert(~isin);
+assert(isempty(inwhich));
+[isin, inwhich, closest] = U.contains(x);
+assert(~isin);
+assert(isempty(inwhich));
+assert(closest==2);
 
-Fn = set(A*x>=ones(3,1)) + set(randn(4,2)*x<=2*ones(4,1));
+% point outside (closer to Y1)
+x = -10;
+isin = U.contains(x);
+assert(~isin);
+[isin, inwhich] = U.contains(x);
+assert(~isin);
+assert(isempty(inwhich));
+[isin, inwhich, closest] = U.contains(x);
+assert(~isin);
+assert(isempty(inwhich));
+assert(closest==1);
 
-Y(1) = YSet(x,F);
-Y(2) = YSet(x,Fn);
+% point in Y1
+x = -1;
+isin = U.contains(x);
+assert(isin);
+[isin, inwhich] = U.contains(x);
+assert(isin);
+assert(inwhich==1);
+[isin, inwhich, closest] = U.contains(x);
+assert(isin);
+assert(inwhich==1);
+assert(isempty(closest));
 
-U = Union(Y);
+% point in Y2
+x = 2;
+isin = U.contains(x);
+assert(isin);
+[isin, inwhich] = U.contains(x);
+assert(isin);
+assert(inwhich==2);
+[isin, inwhich, closest] = U.contains(x);
+assert(isin);
+assert(inwhich==2);
+assert(isempty(closest));
 
-[isin,inwhich,closest] = U.contains( 0.01*rand(2,1));
+% point in Y1 and Y2, no fastbreak
+x = 0;
+isin = U.contains(x);
+assert(isin);
+[isin, inwhich] = U.contains(x);
+assert(isin);
+assert(isequal(inwhich, [1 2]));
+[isin, inwhich, closest] = U.contains(x);
+assert(isin);
+assert(isequal(inwhich, [1 2]));
+assert(isempty(closest));
 
-if ~isin && isempty(closest)
-    error('The closest regions should be found always when the point is not contained anywhere.');
-end
-
+% point in Y1 and Y2, fastbreak
+x = 0;
+isin = U.contains(x, true);
+assert(isin);
+[isin, inwhich] = U.contains(x, true);
+assert(isin);
+assert(inwhich==1);
+[isin, inwhich, closest] = U.contains(x, true);
+assert(isin);
+assert(inwhich==1);
+assert(isempty(closest));
 
 end

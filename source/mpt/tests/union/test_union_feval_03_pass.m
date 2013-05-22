@@ -1,46 +1,82 @@
 function test_union_feval_03_pass
 %
-% overlaps, two PWA functions over cirle+polyhedron
+% union with a single function, no tiebreaking
 %
 
-x = sdpvar(2,1);
-A = [1 -0.2; 0.4 -1];
-F = set(norm(A*x-[1;1])<=2) + set( [1 -2]*x<=0.4 );
-G = set(-1.5<=x <=1.5);
+% union with a single element
+f1 = @(x) [x^2; x^3];
+P1 = Polyhedron('lb', -1, 'ub', 2);
+P1.addFunction(f1, 'fun');
+U = Union;
+U.add(P1);
+x = 1.1;
+f = U.feval(x);
+assert(isequal(f, f1(x)));
 
-Y(1) = YSet(x,F);
-Y(1).addFunction(AffFunction(2*eye(2),[1;-1]),'a');
-Y(1).addFunction(AffFunction(2*eye(2),[1;-1]),'b');
-Y(2) = YSet(x,G);
-Y(2).addFunction(AffFunction(3*eye(2),[-1;1]),'a');
-Y(2).addFunction(AffFunction(3*eye(2),[-1;1]),'b');
 
-U = Union(Y);
-P = Polyhedron('Ae',[-1 1],'be',-1.5);
-P.addFunction(AffFunction(4*eye(2),[1;1]), 'a');
-P.addFunction(AffFunction(randn(2)), 'b');
-U.add(P);
+% union with multiple regions
+f1 = @(x) [x; x];
+f2 = @(x) [x^2; x^3];
+P1 = Polyhedron('lb', -1, 'ub', 2);
+P2 = Polyhedron('lb', 2, 'ub', 3);
+P1.addFunction(f1, 'fun');
+P2.addFunction(f2, 'fun');
+U = Union;
+U.add(P1);
+U.add(P2);
 
-y1=U.feval([1;1]);
-if ~iscell(y1)
-    error('Here must be two values present.');
-end
-if ~iscell(y1{1}) || ~iscell(y1{2})
-    error('The output is cell within a cell for two overlaps and two functions.');
-end
-if numel(y1{1})~=2 || numel(y1{2})~=2
-    error('We are evaluating two functions over two overlapping polyhedra.');
-end
+% x not in the domain, must get [NaN; NaN]
+x = -5;
+f = U.feval(x);
+assert(isequal(size(f), size(f1(x))));
+assert(all(isnan(f)));
+[f, feasible] = U.feval(x);
+assert(isequal(size(f), size(f1(x))));
+assert(all(isnan(f)));
+assert(~feasible);
+[f, feasible, idx] = U.feval(x);
+assert(isequal(size(f), size(f1(x))));
+assert(all(isnan(f)));
+assert(~feasible)
+assert(isempty(idx));
+[f, feasible, idx, tie_value] = U.feval(x);
+assert(isequal(size(f), size(f1(x))));
+assert(all(isnan(f)));
+assert(~feasible)
+assert(isempty(idx));
+assert(isempty(tie_value));
 
-y2=U.feval([3;1.5],'a');
-if ~isnumeric(y2)
-    error('Here must one value present because we are evaluating only one function.');
-end
+% x \in single region
+x = 0.1;
+f = U.feval(x);
+assert(isequal(f, f1(x)));
+f = U.feval(x, 'fun');
+assert(isequal(f, f1(x)));
+[f, feasible, idx, tie_value] = U.feval(x, 'fun');
+assert(feasible);
+assert(isequal(f, f1(x)));
+assert(idx==1);
+assert(isempty(tie_value));
 
-y4 = U.feval([0;0],'a');
-if ~iscell(y4)
-    error('The result must be a cell because two sets overlap here.');
-end
+x = 2.1;
+f = U.feval(x);
+assert(isequal(f, f2(x)));
+f = U.feval(x, 'fun');
+assert(isequal(f, f2(x)));
+[f, feasible, idx, tie_value] = U.feval(x);
+assert(feasible);
+assert(isequal(f, f2(x)));
+assert(idx==2);
+assert(isempty(tie_value));
 
+% x in multiple regions, no tiebreak
+x = 2;
+f = U.feval(x);
+assert(isequal(f, [f1(x), f2(x)]));
+[f, feasible, idx, tie_value] = U.feval(x);
+assert(feasible);
+assert(isequal(f, [f1(x), f2(x)]));
+assert(isequal(idx, [1 2]));
+assert(isempty(tie_value));
 
 end

@@ -23,16 +23,8 @@ else
     validate_dimension(N);
 end
 
-% deal with arrays
-no = numel(P);
-if no>1
-    X = cell(size(P));
-    Y = X;
-    for i=1:no
-        [X{i},Y{i}] = P(i).meshGrid(N);
-    end
-    return;
-end
+% use P.forEach() for arrays
+error(P.rejectArray());
 
 if ~P.isBounded || P.isEmptySet
     error('Can only grid nonempty and bounded polyhedra.');
@@ -88,7 +80,9 @@ for j = 1:2
     end
 end
 
-II = reshape(P.contains([X(:) Y(:)]), size(X,1), size(X,2));
+% the points passed to P.contains() must be column vectors
+Z = [X(:), Y(:)]';
+II = reshape(P.contains(Z), size(X,1), size(X,2));
 % II = zeros(size(X));
 % for i = 1:size(X,1)
 %   for j = 1:size(X,2)

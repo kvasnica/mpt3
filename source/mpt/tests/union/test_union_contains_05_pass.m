@@ -9,17 +9,8 @@ end
 
 U = Union('Set',P);
 
-[isin,inwhich,closest] = U.contains([]);
-
-if isin
-    error('Empty set');
-end
-if ~isempty(inwhich)
-    error('Empty set');
-end
-if ~isempty(closest)
-    error('Empty set');
-end
-
+% the point must be a column vector
+[~, msg] = run_in_caller('U.contains([])');
+asserterrmsg(msg, 'The point must be a column vector.');
 
 end

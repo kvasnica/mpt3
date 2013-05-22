@@ -11,8 +11,8 @@ if ~isa(U1,'PolyUnion') || ~isa(U2,'PolyUnion')
     error('All inputs must be PolyUnion objects.');
 end
 % use forEach if you have multiple unions
-U1.rejectArray();
-U2.rejectArray();
+error(U1.rejectArray());
+error(U2.rejectArray());
 
 if (U1.Num==0 || all(isEmptySet(U1.Set)))
 	% empty set is contained in any set

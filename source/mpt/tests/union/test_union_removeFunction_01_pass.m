@@ -4,12 +4,9 @@ function test_union_removeFunction_01_pass
 %
 
 U = Union;
-
-U.removeFunction();
-
+U = U([]);
+U.removeFunction('one');
 s = U.listFunctions;
+assert(isempty(s));
 
-if ~isempty(s)
-    error('There are no functions here.');
-end
 end

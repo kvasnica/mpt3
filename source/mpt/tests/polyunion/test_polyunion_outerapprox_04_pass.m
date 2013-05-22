@@ -22,7 +22,7 @@ end
 U(2) = PolyUnion(Q);
 
 B = U.outerApprox;
-H = U.convexHull;
+H = U.forEach(@(x) x.convexHull);
 Hb = H.outerApprox;
 
 for i=1:2

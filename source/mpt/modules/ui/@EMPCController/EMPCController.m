@@ -5,10 +5,11 @@ classdef EMPCController < AbstractController
 	%   ctrl = EMPCController(model, N)
 	%   ctrl = EMPCController(MPCController)
 
-    properties(Dependent=true, SetAccess=protected, Transient=true)
+    properties(SetAccess=protected, Transient=true)
 		partition
 		feedback
 		cost
+		nr
 	end
     
     methods
@@ -27,6 +28,8 @@ classdef EMPCController < AbstractController
 			%
 			%   ctrl = EMPCController(model, N)
 
+			obj.addlistener('optimizer', 'PostSet', @obj.optPostSetEvent);
+
 			if nargin==0
                 return
 			end
@@ -38,21 +41,16 @@ classdef EMPCController < AbstractController
 			end
 		end
 		
-		function out = nr(obj)
-			% Returns total number of regions
-			
-			% Supports multiple optimizers
-			if isobject(obj.optimizer)
-				n = cell(1, numel(obj.optimizer));
-				[n{:}] = obj.optimizer.Num;
-				out = sum([n{:}]);
-			else
-				out = 0;
-			end
-		end
-		
-		function obj = toInvariant(obj)
+		function obj = toInvariant(in)
 			% Computes the invariant subset of the controller
+			
+			if nargout==0
+				% replace original controller
+				obj = in;
+			else
+				% create a new controller
+				obj = in.copy();
+			end
 			
 			% create the closed-loop model
 			CL = ClosedLoop(obj, obj.model).toSystem();
@@ -122,46 +120,6 @@ classdef EMPCController < AbstractController
             obj.optimizer = res.xopt;
 		end
         
-		function out = get.feedback(obj)
-			% Returns the feedback law
-			
-			out = obj.optimizer.getFunction('primal');
-		end
-		
-		function out = get.cost(obj)
-			% Returns the cost function
-			
-			out = obj.optimizer.getFunction('obj');
-		end
-		
-		function out = get.partition(obj)
-			% Returns the polyhedral partition
-
-			if numel(obj.optimizer)==1
-				% single optimizer, copy it and remove functions
-				out = obj.optimizer.copy();
-				out.removeAllFunctions();
-			else
-				% multiple optimizers, concatenate regions together
-				P = [];
-				for i = 1:length(obj.optimizer)
-					P = [P; Polyhedron(obj.optimizer(i).Set)];
-				end
-				out = PolyUnion('Set', P.removeAllFunctions);
-			end
-		end
-		
-		% 		function obj = set.optimizer(obj, optimizer)
-		% 			% Splits the optimizer into feedback/cost/partition for fast
-		% 			% access
-		%
-		% 			disp('Optimizer set.');
-		% 			obj.optimizer = optimizer;
-		%
-		% 			obj.feedback = optimizer.getFunction('primal');
-		% 			obj.cost = optimizer.getFunction('obj');
-		% 		end
-			
 		% 		function h = plot(obj)
 		% 			% Plots partition of the controller
 		%
@@ -203,30 +161,69 @@ classdef EMPCController < AbstractController
 			if numel(xinit) ~= obj.nx
 				error('The point must be a %dx1 vector.', obj.nx);
 			end
+
+			% index of the optimizer and index of the region from which the
+			% control action was extracted
+			opt_region = [];
+			opt_partition = [];
 			
-			mincost = zeros(numel(obj.optimizer), 2);
-			for i = 1:numel(obj.optimizer)
-				% determine cost in each region of the i-th partition
+			% evaluate the primal optimizer, break ties based on the cost
+			% function. guarantees that the output is a single region where
+			% the cost is minimal.
+			if numel(obj.optimizer)==1
+				% simple case, just a single optimizer
+				[U, feasible, idx, J] = obj.optimizer.feval(xinit, ...
+					'primal', 'tiebreak', 'obj');
+				if ~feasible
+					J = Inf;
+					% U is already a vector of NaNs by Union/feval
+					
+				elseif isempty(J)
+					% no tie-breaking was performed, compute cost manually
+
+					% Note: from a long-term sustainibility point of view
+					% we should use
+					%   J = obj.optimizer.Set(idx).feval(xinit, 'obj');
+					% here. but ConvexSet/feval() adds so much unnecessary
+					% overhead that we better evaluate the function
+					% directly
+					J = obj.optimizer.Set(idx).Functions('obj').Handle(xinit);
+				end
+				if feasible
+					opt_partition = 1;
+					opt_region = idx;
+				end
 				
-				J = obj.optimizer(i).Set.feval(xinit, 'obj');
-				if ~iscell(J), J = {J}; end
-				ie = cellfun('isempty', J);
-				[J{ie}] = deal(Inf);
-				J = [J{:}]; % convert to double array
-				
-				% pick the region in which cost is minimal
-				[mincost(i, 1), mincost(i, 2)] = min(J);
-			end
-			
-			% pick the partition in which cost is minimal
-			[J, active_part] = min(mincost(:, 1));
-			if isinf(J)
-				% infeasible
-				feasible = false;
-				U = NaN(obj.nu*obj.N, 1);
 			else
-				feasible = true;
-				U = obj.optimizer(active_part).Set(mincost(active_part, 2)).feval(xinit, 'primal');
+				% multiple optimizers, pick the partition in which the cost
+				% is minimal
+
+				[U, feas, idx, J] = obj.optimizer.forEach(@(opt) opt.feval(xinit, ...
+					'primal', 'tiebreak', 'obj'), 'UniformOutput', false);
+				% only consider partitions that contain "xinit"
+				feasible_idx = find(cellfun(@(x) x, feas));
+				if isempty(feasible_idx)
+					feasible = false;
+					U = U{1}; % it's set to NaN by Union/feval
+					J = Inf;
+					
+				else
+					% compute cost in the best region of each feasible
+					% partition
+					feasible = true;
+					for i = feasible_idx
+						if isempty(J{i})
+							% no cost provided by tie-breaking, compute it
+							% manually
+							J{i} = obj.optimizer(i).Set(idx{i}).Functions('obj').Handle(xinit);
+						end
+					end
+					Jmin = cat(2, J{feasible_idx});
+					[J, best_partition] = min(Jmin);
+					U = U{feasible_idx(best_partition)};
+					opt_region = idx{feasible_idx(best_partition)};
+					opt_partition = feasible_idx(best_partition);
+				end
 			end
 			
 			if numel(U)~=obj.nu*obj.N
@@ -241,6 +238,8 @@ classdef EMPCController < AbstractController
 				openloop.U = reshape(U, [obj.nu obj.N]);
 				openloop.X = NaN(obj.nx, obj.N+1);
 				openloop.Y = NaN(obj.model.ny, obj.N);
+				openloop.partition = opt_partition;
+				openloop.region = opt_region;
 			end
 		end
 		
@@ -257,9 +256,69 @@ classdef EMPCController < AbstractController
 			end
 			out.optimizer.trimFunction('primal', obj.nu);
 			out.optimizer.merge('primal');
+			% TODO: figure out why out.optPostSetEvent() is not triggered
+			% automatically
+			out.optPostSetEvent();
 			out.N = 1; % to get correct size of the open-loop optimizer
 			% TODO: implement a better way
 		end
+		
+		function data = clicksim(obj, varargin)
+			% Select initia condition for closed-loop simulation by mouse
+			%
+			%   controller.clicksim(['option', value, ...)
+			%
+			% Select initial points by left-click. Abort by right-click.
+			%
+			% options:
+			%  'N_sim': length of the closed-loop simulation (default: 100)
+			%  'x0': initial point, if provided, the method exits
+			%        immediately (default: [])
+			%  'alpha': transparency of the partition (default: 1)
+			%  'color': color of the closed-loop profiles (default: 'k')
+			%  'linewidth': width of the line (default: 2)
+			%  'marker': markers indicating points (default: '.')
+			%  'markersize': size of the markers (default: 20)
+			
+			if obj.nx~=2
+				error('Only 2D partitions can be plotted.');
+			end
+			ip = inputParser;
+			ip.addParamValue('x0', []);
+			ip.addParamValue('N_sim', 50, @isnumeric);
+			ip.addParamValue('alpha', 1, @isnumeric);
+			ip.addParamValue('linewidth', 2, @isnumeric);
+			ip.addParamValue('color', 'k');
+			ip.addParamValue('marker', '.');
+			ip.addParamValue('markersize', 20);
+			ip.parse(varargin{:});
+			options = ip.Results;
+			
+			obj.optimizer.plot('alpha', options.alpha);
+			hold on
+			button = 1;
+			while button~=3
+				if isempty(options.x0)
+					[x, y, button] = ginput(1);
+					x0 = [x; y];
+				else
+					x0 = options.x0;
+					button = 3;
+				end
+				data = obj.simulate(x0, options.N_sim);
+				plot(data.X(1, :), data.X(2, :), options.color, ...
+					'linewidth', options.linewidth, ...
+					'marker', options.marker, ...
+					'markersize', options.markersize);
+				title(sprintf('Closed-loop simulation: x0 = %s', mat2str(x0)));
+			end
+			hold off
+			if nargout==0
+				clear data
+			end
+			
+		end
+		
 	end
 	
 	methods(Static, Hidden)
@@ -362,7 +421,7 @@ classdef EMPCController < AbstractController
 			if nargin==2 
 				% possible import from an another controller
 				otherCtrl = varargin{1};
-				if ismethod(otherCtrl, 'isMPTController') && ...
+				if isa(otherCtrl, 'AbstractController') && ...
 						otherCtrl.isExplicit() && isobject(otherCtrl.optimizer)
 					% import optimizer
 					obj.model = otherCtrl.model;
@@ -382,6 +441,56 @@ classdef EMPCController < AbstractController
 				end
 			end
 
+		end
+
+	end
+
+	methods(Access=protected, Hidden)
+	
+		function optPostSetEvent(obj, source, event)
+			% triggered after the optimizer was changed
+			%
+			% store the partition, feedback and cost objects for fast
+			% access
+			
+			obj.feedback = obj.optimizer.getFunction('primal');
+			obj.cost = obj.optimizer.getFunction('obj');
+			if numel(obj.optimizer)==1
+				% single optimizer, copy it and remove functions
+				out = obj.optimizer.copy();
+				out.removeAllFunctions();
+			else
+				% multiple optimizers, concatenate regions together
+				P = [];
+				for i = 1:length(obj.optimizer)
+					P = [P; Polyhedron(obj.optimizer(i).Set)];
+				end
+				out = PolyUnion('Set', P.removeAllFunctions);
+			end
+			obj.partition = out;
+			
+			% number of regions
+			if isobject(obj.optimizer)
+				n = cell(1, numel(obj.optimizer));
+				[n{:}] = obj.optimizer.Num;
+				obj.nr = sum([n{:}]);
+			else
+				obj.nr = 0;
+			end
+
+			obj.markAsModified();
+		end
+
+	end
+	
+	methods(Static)
+		
+		function new = loadobj(obj)
+			% load method
+			
+			% post-set events must be triggered manually
+			new = obj;
+			new.optPostSetEvent();
 		end
 
 	end

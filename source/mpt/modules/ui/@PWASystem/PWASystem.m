@@ -16,7 +16,12 @@ classdef PWASystem < AbstractSystem
         nu % Number of inputs
         ny % Number of outputs
         ndyn % Number of local dynamics
-    end
+	end
+
+	properties(SetAccess=private, GetAccess=private, Hidden)
+		functions % state-update and output functions as a PolyUnion
+		modes % local affine modes as an array of LTISystem
+	end
             
     methods
         
@@ -201,7 +206,31 @@ classdef PWASystem < AbstractSystem
             if nargin==1
                 % import constraints from sysStruct
                 obj.importSysStructConstraints(S);
-            end
+			end
+			
+			% store the state-update and output functions as a PolyUnion
+			P = Polyhedron(obj.domain); % create copy
+			for i = 1:obj.ndyn
+				update = AffFunction([obj.A{i}, obj.B{i}], obj.f{i});
+				output = AffFunction([obj.C{i}, obj.D{i}], obj.g{i});
+				P(i).addFunction(update, 'update');
+				P(i).addFunction(output, 'output');
+			end
+			obj.functions = PolyUnion(P);
+			
+			% store the individual modes as an array of LTISystems
+			modes = [];
+			for pwa_index = 1:obj.ndyn
+				lti = LTISystem('A', obj.A{pwa_index}, 'B', obj.B{pwa_index}, ...
+					'C', obj.C{pwa_index}, 'D', obj.D{pwa_index}, ...
+					'f', obj.f{pwa_index}, 'g', obj.g{pwa_index}, ...
+					'domain', obj.domain(pwa_index), 'Ts', obj.Ts);
+				lti.x = obj.x;
+				lti.u = obj.u;
+				lti.y = obj.y;
+				modes = [modes, lti];
+			end
+			obj.modes = modes;
 		end
         
 		function out = toLTI(obj, pwa_index)
@@ -210,13 +239,7 @@ classdef PWASystem < AbstractSystem
 			if pwa_index<1 || pwa_index>obj.ndyn
 				error('Index out of range.');
 			end
-			out = LTISystem('A', obj.A{pwa_index}, 'B', obj.B{pwa_index}, ...
-				'C', obj.C{pwa_index}, 'D', obj.D{pwa_index}, ...
-				'f', obj.f{pwa_index}, 'g', obj.g{pwa_index}, ...
-				'domain', obj.domain(pwa_index), 'Ts', obj.Ts);
-			out.x = obj.x.copy();
-			out.u = obj.u.copy();
-			out.y = obj.y.copy();
+			out = obj.modes(pwa_index);
 		end
 		
 		function [S, SN, dyn, dynN] = reachableSet(obj, varargin)
@@ -395,40 +418,11 @@ classdef PWASystem < AbstractSystem
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 
-            xn = x0; y = [];
-            [isin, which_dynamics] = isInside(obj.domain, [x0; u]);
-            if ~isin
-                % no associated dynamic
-                error('No dynamics associated to x=%s and u=%s.', ...
-                    mat2str(x0), mat2str(u));
-            elseif length(which_dynamics)>1
-				% TODO: compute state updates using all detected dynamics
-				% and only trigger the warning if the updates differ
-                warning('x=%s belongs to dynamics %s, selecting dynamics %d.', ...
-                    mat2str(x0), mat2str(which_dynamics), which_dynamics(1));
-            end
-            which_dynamics = which_dynamics(1);
-            if obj.nx > 0
-                xn = obj.A{which_dynamics}*x0;
-			end
-			if obj.nu > 0
-				xn = xn + obj.B{which_dynamics}*u;
-			end
-			if ~isempty(obj.f{which_dynamics})
-				xn = xn + obj.f{which_dynamics};
-            end
-            if obj.ny > 0
-                y = obj.C{which_dynamics}*x0;
-			else
-				y = zeros(ny, 1);
-			end
-			if obj.nu > 0
-				y = y + obj.D{which_dynamics}*u;
-			end
-			if ~isempty(obj.g{which_dynamics})
-				y = y + obj.g{which_dynamics};
-            end
-            obj.initialize(xn);
+			% TODO: compute state updates using all detected dynamics
+			% and only trigger the warning if the updates differ
+			[xn, ~, idx] = obj.functions.feval([x0; u], 'update', 'tiebreak', @(x) 0);
+			y = obj.functions.feval([x0; u], 'output', 'regions', idx);
+			obj.initialize(xn);
         end
         
         function y = output(obj, u)
@@ -439,50 +433,16 @@ classdef PWASystem < AbstractSystem
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 
-            if nargin < 2
+			if nargin < 2
 				u = zeros(obj.nu, 1);
-                [isin, which_dynamics] = isInside(obj.domainx, x0);
 			else
 				u = u(:);
-                [isin, which_dynamics] = isInside(obj.domain, [x0; u]);
-            end
-            if ~isin
-                % no associated dynamic
-                if nargin==2
-                    error('No dynamics associated to x=%s and u=%s.', ...
-                        mat2str(x0), mat2str(u));
-                else
-                    error('No dynamics associated to x=%s.', mat2str(x0));
-                end
-            elseif length(which_dynamics)>1
-                warning('x=%s belongs to dynamics %s, selecting dynamics %d.', ...
-                    mat2str(x0), mat2str(which_dynamics), which_dynamics(1));
-            end
-            which_dynamics = which_dynamics(1);
-                
-            if nnz(cat(1, obj.D{:}))>0 && nargin==1
-                error('Input is required for systems with direct feed-through.')
-            end
-            if nargin<2
-                u = zeros(obj.u.n, 1);
 			end
-            if obj.ny > 0
-                % catch cases with empty C matrix when modeling PWA
-                % functions
-                if isempty(obj.C{which_dynamics})
-                    y = zeros(obj.ny);
-                else                    
-                    y = obj.C{which_dynamics}*x0;
-				end
-				if obj.nu > 0
-					y = y + obj.D{which_dynamics}*u;
-				end
-				if ~isempty(obj.g{which_dynamics})
-					y = y + obj.g{which_dynamics};
-				end
-            else
-                y = [];
-            end
+			u = obj.validateInput(u);
+
+			% TODO: compute state updates using all detected dynamics
+			% and only trigger the warning if the updates differ
+			y = obj.functions.feval([x0; u], 'output', 'tiebreak', @(x) 0);
         end
         
     end

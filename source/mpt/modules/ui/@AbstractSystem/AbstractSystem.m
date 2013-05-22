@@ -484,15 +484,6 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 		
 	end
 	
-	methods(Static)
-	
-		function out = isMPTSystem
-			% Internal function to determine whether an object is a
-			% prediction model
-			out = true;
-		end
-	end
-	
 	methods(Static, Hidden)
 
 		function [optcost, sol] = solve(con, cost)

@@ -13,14 +13,8 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-%% deal with arrays
-if length(P)>1
-    sol = cell(size(P));
-    parfor i=1:length(P)
-        sol{i} = P(i).facetInteriorPoints;
-    end
-    return;
-end
+% use P.forEach() for arrays
+error(P.rejectArray());
 
 %% compute interior points via projection
 % check if P is not empty

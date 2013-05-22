@@ -1,33 +1,23 @@
 function test_polyunion_convexhull_03_pass
 %
-% array of polyhedra
+% convex hull of an array of unions must produce a single hull
 %
 
-U(1) = PolyUnion(ExamplePoly.randHrep);
+P = Polyhedron('lb', -1, 'ub', 1);
+U1 = PolyUnion(P);
+P1 = Polyhedron('lb', 0.1, 'ub', 0.3);
+P2 = Polyhedron('lb', 0.4, 'ub', 2);
+U2 = PolyUnion([P1 P2]);
+U = [U1 U2];
 
-for i=1:10
-    P(i) = ExamplePoly.randHrep;
-end
-for i=11:15
-    P(i) = ExamplePoly.randVrep;
-end
+% direct computation
+H = U.convexHull();
+G = Polyhedron('lb', -1, 'ub', 2);
+assert(H==G);
 
-U(2) = PolyUnion(P);
-H = U.convexHull;
-
-if numel(H)~=2
-    error('Two polyhedra must be here.');
-end
-
-if ~H(1).contains(U(1).Set)
-    error('This set must be contained inside the convex hull.');
-end
-
-for i=1:15
-    if ~H(2).contains(U(2).Set(i))
-        error('This set must be contained inside the convex hull.');
-    end
-end
-
+% alternative computation
+H = PolyUnion([P, P1, P2]).convexHull;
+G = Polyhedron('lb', -1, 'ub', 2);
+assert(H==G);
 
 end

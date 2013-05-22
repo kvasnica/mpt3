@@ -4,7 +4,7 @@ function test_mptctrl_load_01_pass
 % finite-horizon explicit MPC
 load expctrl
 assert(isa(ctrl, 'EMPCController'));
-assert(ctrl.nr()==25);
+assert(ctrl.nr==25);
 assert(numel(ctrl.optimizer)==1);
 assert(ctrl.nx==2);
 assert(ctrl.nu==1);

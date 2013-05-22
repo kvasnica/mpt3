@@ -144,11 +144,11 @@ switch type
         
     otherwise
         
-        x = S(:);
-        validate_realvector(x);
-        if length(x) ~= P.Dim,
-            error('Length of the vector must be P.Dim = %i.', P.Dim);
+        validate_realvector(S);
+		if size(S, 2)~=1 || numel(S)~=P.Dim
+            error('The point must be a %dx1 vector', P.Dim);
         end
+        x = S(:);
         
         % Get the data for P
         PV  = P.V_int;

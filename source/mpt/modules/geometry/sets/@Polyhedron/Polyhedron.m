@@ -550,6 +550,17 @@ classdef Polyhedron < ConvexSet
 		
 	end
 	
+	methods(Hidden)
+		% non-public methods
+
+		% Polyhedron/isInside() implicitly assumes that the
+		% H-representation is available. Use it only if you know what you
+		% are doing! In general cases you should use Polyhedron/contains()
+		% instead.
+		[isin, inwhich, closest] = isInside(P, x, Options);
+		
+	end
+	
 	methods(Static)
 		function new = loadobj(obj)
 			% load Polyhedron objects
