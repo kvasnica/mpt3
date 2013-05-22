@@ -21,7 +21,8 @@ res = Ynew.solve;
 ts = false(res.xopt.Num,1);
 for i=1:res.xopt.Num
       xc = chebyCenter(res.xopt.Set(i));
-      index=find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
+      %index=find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
+      index = locatePoint(r.xopt,xc.x);
       if isempty(index)
           [~,index] = isInside(r.xopt.Set,xc.x);
       else

@@ -73,7 +73,8 @@ for i=1:rn.xopt.Num
     % list - if there's is a point missing -either a solution or adjacency
     % list is wrong
     for j=1:size(p,1)
-        index = find_region(p(j,:)',res.xopt.Set,res.xopt.Internal.adj_list);
+        %index = find_region(p(j,:)',res.xopt.Set,res.xopt.Internal.adj_list);
+        index = locatePoint(res.xopt,p(j,:)');
         %[isin, index] = isInside(res.xopt.Set,p(j,:)');
         
         if isempty(index)

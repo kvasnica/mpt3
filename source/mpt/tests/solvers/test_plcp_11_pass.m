@@ -50,7 +50,8 @@ for i=1:res.xopt.Num
     % find equivalent region to Pn
     xc = chebyCenter(res.xopt.Set(i));
     x = xc.x;
-    index = find_region(x,r.xopt.Set,r.xopt.Internal.adj_list);
+    %index = find_region(x,r.xopt.Set,r.xopt.Internal.adj_list);
+    index = locatePoint(r.xopt,x);
     %[isin,index] = isInside(r.xopt.Set,x);
     
     if isempty(index)

@@ -20,7 +20,8 @@ for i=1:length(Pn)
     
       x = chebyball(Pn(i));
 
-      index=find_region(x,r.xopt.Set,r.xopt.Internal.adj_list);
+      %index=find_region(x,r.xopt.Set,r.xopt.Internal.adj_list);
+      index = locatePoint(r.xopt,x);
       if isempty(index)
           [~,index] = isInside(r.xopt.Set,x);
       else

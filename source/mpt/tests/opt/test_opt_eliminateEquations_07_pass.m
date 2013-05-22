@@ -97,7 +97,8 @@ if res.xopt.Num>r.xopt.Num
         list(i,1) = i;
         
         % find index of region from PLCP
-        index=find_region(x.x,r.xopt.Set,r.xopt.Internal.adj_list);
+        %index=find_region(x.x,r.xopt.Set,r.xopt.Internal.adj_list);
+        index = locatePoint(r.xopt,x.x);
         
         if ~isempty(index)
             list(i,2) = index;
@@ -130,7 +131,8 @@ for i=1:res.xopt.Num
     xc = chebyCenter(res.xopt.Set(i));
     % region index
     %ireg = find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
-    [~,ireg]=isInside(r.xopt.Set,xc.x);
+    %[~,ireg]=isInside(r.xopt.Set,xc.x);
+    ireg = locatePoint(r.xopt,xc.x);
     
     % evaluate solutions
     x1 = feval(res.xopt.Set(i),xc.x,'primal');

@@ -35,7 +35,8 @@ for i=1:res.xopt.Num
     % get some point inside Pn
     xc = chebyCenter(res.xopt.Set(i));
     % region index
-    ireg = find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
+    %ireg = find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
+    ireg = locatePoint(r.xopt,xc.x);
     % evaluate solutions
     x1 = feval(res.xopt.Set(i),xc.x,'primal');
     x2 = feval(r.xopt.Set(ireg),xc.x,'primal');

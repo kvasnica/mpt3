@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>locatePoint</function>
+  
+  <info>
+    Implementation of a graph search algorithm for a point location problem.
+  </info>
+  <syntax>[index, details] = locatePoint(U,x)</syntax>
+  
+  <descr>
+      Return an index of region in the polyunion <tt>U</tt> where the point <tt>x</tt> is contained.
+      If the point lies outside of the union of polyhedra, the output is empty.
+
+      The polyunion <tt>U</tt> must be returned from PLCP solver with an appropriate adjacency list, 
+      otherwise the method is not applicable. The best performance is achieved if the region exploration 
+      in PLCP solver has been done using breadth-first search (BFS) where the regions have a leveled structure
+      and the first region lies in the middle of the partition. In this case, the graph traversal algorithm
+      proceeds through increasing levels outside from the first region until the desired region is found.
+      
+      The set membership operation depends on the settings of absolute tolerance that can be
+      changed in <tt>Options</tt> settings.
+  </descr>
+  
+  <input required="true">
+    <name>U</name>
+    <descr>Union of polyhedra returned from PLCP solver with an included adjacency list.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point in the same dimension as <tt>PolyUnion</tt> given as real column vector.</descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>index</name>
+    <descr>Index of a region where <i>x</i> is contained, otherwise an empty output <tt>[]</tt>.</descr>
+    <class name="double"/>
+  </output>
+  <output>
+    <name>details</name>
+    <descr>A structure with statistical information numerical performance of the graph traversal algorithm. </descr>
+    <class name="struct">
+        <option>niter</option><descr>Number of iterations. </descr>
+        <option>noper </option><descr>Total number of arithmetic operations (multiplications+summations+comparisons). </descr>
+        <option>multiplications </option><descr> Multiplications count. </descr>
+        <option>summations </option><descr> Summation count. </descr>
+        <option>comparisons </option><descr> Comparisons count. </descr>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Generate random polytope <tt>P</tt>. </descr>
+    <cmd>P = ExamplePoly.randVrep('d',3);</cmd>
+    <descr>Formulate a parametric optimization problem in 2D over the polytope <tt>P</tt>.</descr>
+    <cmd>problem = Opt('f',[1,-0.4,0.4],'A',P.A,'b',P.b,'pB',randn(size(P.H,1),2)); </cmd>
+    <descr>Solve the problem to get a polyunion with attached adjacency list.</descr>
+    <cmd> res = problem.solve </cmd>
+    <descr> Get the interior point located in the last region.</descr>
+    <cmd> last = res.xopt.Num </cmd>
+    <cmd> p = res.xopt.Set(last).interiorPoint </cmd>
+    <descr> Verify using the graph traversal algorithm that the point lies in the last region.</descr>
+    <cmd> index = locatePoint(res.xopt,p.x) </cmd>
+  </example>
+   
+  <related>contains</related>
+  <related>isInside</related>
+  
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+</help>

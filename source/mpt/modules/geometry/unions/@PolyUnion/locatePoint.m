@@ -1,3 +1,67 @@
+function [index, details] = locatePoint(U,x)
+% Implementation of a graph search algorithm for a point location problem.
+%
+% The algorithm solves a point location problem for a convex union of
+% non-overlapping polyhedra that comes from the PLCP solver. The
+% implemented method is a graph traversal approach that uses the adjacency
+% list returned from PLCP solver. If the explicit controller was generated
+% using other parametric solver, the method is not applicable.
+%
+% Input: a point x in R^n
+% Ouput: - index of a region where the region is located
+%        - details with the number of operations needed
+%
+
+% deal with arrays
+if numel(U)>1
+    index = cell(size(U));
+    details = cell(size(U));
+    parfor i=1:numel(U)
+        [index{i}, details{i}] = U(i).locatePoint(x);
+    end
+    return;
+end
+
+% empty polyunion
+if numel(U)==0 || U.Num<1
+    index = [];
+    details = [];
+    return;
+end
+
+% check x
+validate_realvector(x);
+x = x(:);
+if numel(x)~=U.Dim
+    error('The point must have the same dimension as the union.');
+end
+
+
+% check if the adjacency list is present
+if ~isfield(U.Internal,'adj_list')
+    error('The union does not have an adjacency list. Please, use the polyunion output from PLCP solver that contains the adjacency list.');
+end
+
+% check the properties of the union
+if isempty(U.Internal.Convex) || isempty(U.Internal.Overlaps) || ...
+    isempty(U.Internal.Connected) || isempty(U.Internal.Bounded) || ...
+    isempty(U.Internal.FullDim)        
+    disp('No properties are attached to this union.')
+    disp('The following properties are checked: convexity, overlaps, connectivity, boundedness, and full-dimensionality.');
+    disp('This may take some time...');
+end
+if ~(U.isBounded && U.isFullDim && U.isConnected && U.isConvex && ~U.isOverlapping)
+    error(['This method supports unions of polyhedra that are convex, non-overlapping, '... 
+        'bounded, full-dimensional, connected, and come from PLCP solver with an adjacency list.']);
+end
+
+        
+% call the graph traversal method
+[index, details] = find_region(x,U.Set, U.Internal.adj_list);
+
+
+end
+
 function [index, details] = find_region(x,Parray,graph, index, details)
 %
 % For given point x, find a region index from the partition Parray of the
