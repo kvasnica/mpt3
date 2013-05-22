@@ -106,9 +106,6 @@ tmpdir:
 # generate only text documentation without examples for quick release
 txt: tmpdir
 	@#run document generator which generates text headers and overwrites source files afterwards
-ifeq ($(UNSTABLE),1)
-	@touch $(XML_DIR)
-else
 	$(MAXDOC) -tw conf.xml
 	@#put version and date string to "mptopt.m" and "Contents.m"
 	@$(SED) 's/@version@/$(FULLVERSION)/g' $(XML_DIR)/$(FUNC_DIR)/mptopt.m > $(XML_DIR)/$(FUNC_DIR)/mptopt.m.tmp
@@ -116,7 +113,6 @@ else
 	@$(SED) 's/@version@/$(FULLVERSION)/g' $(XML_DIR)/$(FUNC_DIR)/Contents.m > $(XML_DIR)/$(FUNC_DIR)/Contents.m.tmp
 	@$(SED) 's/@date@/$(DATE)/g' $(XML_DIR)/$(FUNC_DIR)/Contents.m.tmp > $(XML_DIR)/$(FUNC_DIR)/Contents.m
 	@rm $(XML_DIR)/$(FUNC_DIR)/Contents.m.tmp
-endif
 
 # generate all documentation
 doc: tmpdir
