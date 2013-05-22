@@ -232,7 +232,7 @@ hdat.redundant_rows = R.Internal.redundant_rows;
 HASH.put(Io,hdat);
 
 % initialize counters
-regions = [];
+regions = Polyhedron('H',zeros(0,lc.d+1));
 stats.pivs = 0;
 stats.facetsTraversed = 0;
 flag = 1;
@@ -315,9 +315,12 @@ while ~builtin('isempty',UNEX)
 
      
   % Store solution
-  iter = iter + 1; % current explored region 
-  regions = [regions;R]; % store regions in array as they were explored
-  adj_list{iter} = cell(size(R.H,1),1); % adjacency list
+  iter = iter + 1; % current iteration
+  actual_region = HASH.getIndex(R.Internal.I);
+  regions(actual_region) = R; % store regions in array as they were explored
+  er = ([regions.Dim]==0); % empty regions
+  regions(er) = Polyhedron('H',zeros(0,lc.d+1)); % set the dimensio of empty regions to lc.d
+  adj_list{actual_region} = cell(size(R.H,1),1); % adjacency list
   layer_list{layer+1} = []; % layers list 
   regions_found = 0;
          
@@ -347,10 +350,12 @@ while ~builtin('isempty',UNEX)
         plot(regions(nr),'alpha',0);
         for ii=nr
            ip = regions(ii).chebyCenter;
-           if lc.d==1
-               text(ip.x,0,num2str(ii));
-           elseif lc.d==2
-               text(ip.x(1),ip.x(2),num2str(ii));
+           if ~regions(ii).isEmptySet
+               if lc.d==1
+                   text(ip.x,0,num2str(HASH.getIndex(regions(ii).Internal.I)));
+               elseif lc.d==2
+                   text(ip.x(1),ip.x(2),num2str(HASH.getIndex(regions(ii).Internal.I)));
+               end
            end
         end        
       end
@@ -448,7 +453,7 @@ while ~builtin('isempty',UNEX)
               region_index = HASH.getIndex(Radj{i}(j).Internal.I);
                            
               % for each facet i we found j neighbors
-              adj_list{iter}{i}(j) = region_index;
+              adj_list{actual_region}{i}(j) = region_index;
               
               % DFS
               if MPTOPTIONS.modules.solvers.plcp.dfs
@@ -482,7 +487,7 @@ while ~builtin('isempty',UNEX)
       end
     
     % if there are zero indices (empty neighbor), we need to remove them
-    adj_list{iter}{i}(adj_list{iter}{i}<=0)=[];
+    adj_list{actual_region}{i}(adj_list{actual_region}{i}<=0)=[];
   end
   
   if MPTOPTIONS.verbose >= 1
@@ -684,7 +689,11 @@ if ~isempty(s)
     else
         R = UNEX(s-nR);
     end
-    return;
+    if ~R.isEmptySet
+        % region exist, but it is not stored in the arrays of regions,
+        % we need to evaluate it from the polyhedral description
+        return
+    end
 end
 
 % region description
@@ -971,6 +980,9 @@ if ~builtin('isempty',Radj) && check_overlaps(Radj, R)
    
    I=Radj.Internal.I;
    %x=Radj.Internal.x;
+   piv = Radj.Internal.piv;
+   redundant_rows = Radj.Internal.redundant_rows;
+   th = Radj.Internal.th;
    if P.isEmptySet
        % remainder after cutting is empty - Radj is empty
        Radj = [];
@@ -978,8 +990,11 @@ if ~builtin('isempty',Radj) && check_overlaps(Radj, R)
        % restore Radj with the cut       
        Radj = P;
        % include new index set
-       Radj.setInternal('I', I);
+       Radj.setInternal('I', I);       
        %Radj.setInternal('x', x);
+       Radj.setInternal('piv',piv);
+       Radj.setInternal('redundant_rows',redundant_rows);
+       Radj.setInternal('th',th);
    end
 end
 
@@ -1027,7 +1042,9 @@ if flag==MPTOPTIONS.OK
         % construct region from basis
         R = lcp_getRegion(lc, basis, HASH, regions, UNEX, piv);
         % store theta based on which the region was determined
-        R.setInternal('th', thn);
+        if ~builtin('isempty',R)
+            R.setInternal('th', thn);       
+        end
     end
 else
     R = [];
@@ -2131,7 +2148,7 @@ for i=1:length(regions)
 						lt = inwhich;
 						adj_list{i}{j} = lt;
 					end
-				end
+                end
             end
         end
         
@@ -2161,7 +2178,7 @@ for i=1:length(regions)
             end
         end
         
-	end
+    end
 
 end
 
