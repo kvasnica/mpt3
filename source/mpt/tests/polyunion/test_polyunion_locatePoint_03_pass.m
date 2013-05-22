@@ -19,8 +19,8 @@ c = ctrl.toExplicit;
 for i=1:c.optimizer.Num;
     x = c.optimizer.Set(i).grid(3);
     for j=1:size(x,1)
-        index = c.optimizer.locatePoint(x(j,:));
-        if ~c.optimizer.Set(index).contains(x(j,:))
+        index = c.optimizer.locatePoint(x(j,:)');
+        if ~c.optimizer.Set(index).contains(x(j,:)')
             error('Wrong region detected.');
         end
     end

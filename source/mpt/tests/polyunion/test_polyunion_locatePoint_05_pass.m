@@ -30,8 +30,8 @@ a.modules.solvers.plcp.dfs = dfs;
 for i=1:U.Num;
     x = U.Set(i).grid(10);
     for j=1:size(x,1)
-        index = U.locatePoint(x(j,:));
-        if ~U.Set(index).contains(x(j,:))
+        index = U.locatePoint(x(j,:)');
+        if ~U.Set(index).contains(x(j,:)')
             error('Wrong region detected.');
         end
     end

@@ -29,7 +29,7 @@ for j=1:size(x,1)
 	c = cellfun('isempty',index);
     uind = find(~c);
     if ~isempty(uind)
-        if ~PU(uind).Set(index{uind}).contains(x(j,:))
+        if ~PU(uind).Set(index{uind}).contains(x(j,:)')
             error('Wrong region detected.');
         end
     end
