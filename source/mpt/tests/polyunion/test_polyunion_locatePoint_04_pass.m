@@ -25,7 +25,7 @@ end
 
 x = P.grid(10);
 for j=1:size(x,1)
-    [index,details] = PU.locatePoint(x(j,:));
+    [index,details] = PU.forEach(@(e) e.locatePoint(x(j,:)'), 'UniformOutput', false);
 	c = cellfun('isempty',index);
     uind = find(~c);
     if ~isempty(uind)

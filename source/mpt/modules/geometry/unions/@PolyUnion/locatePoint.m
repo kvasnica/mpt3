@@ -12,15 +12,9 @@ function [index, details] = locatePoint(U,x)
 %        - details with the number of operations needed
 %
 
-% deal with arrays
-if numel(U)>1
-    index = cell(size(U));
-    details = cell(size(U));
-    parfor i=1:numel(U)
-        [index{i}, details{i}] = U(i).locatePoint(x);
-    end
-    return;
-end
+error(nargchk(2, 2, nargin));
+% use U.forEach(@(u) u.contains(x)) to evaluate arrays
+error(U.rejectArray());
 
 % empty polyunion
 if numel(U)==0 || U.Num<1
