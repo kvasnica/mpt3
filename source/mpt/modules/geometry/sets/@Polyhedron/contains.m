@@ -52,12 +52,12 @@ end
 
 m = numel(P);
 if isnumeric(x)
-	n = size(x, 2);
+	[d,n] = size(x);    
 else
 	n = numel(x);
 	if n > 1
 		% TODO: use setdiff for arrays
-		error('Can only test containement of a single polyhedron.');
+		error('Can only test containment of a single polyhedron.');
 	end
 end
 
@@ -72,6 +72,9 @@ elseif isnumeric(x) && m==1 && P.hasHRep
 	%
 	% this is a frequent case in Polyhedron/meshGrid, which needs to be as
 	% fast as possible to have decent runtime of Polyhedron/fplot
+    if d~=P.Dim
+        error('The point(s) must have the dimension %i as the set.',P.Dim);
+    end
 	tf = false(m, n);
 	for i = 1:n
 		% iterate over points
