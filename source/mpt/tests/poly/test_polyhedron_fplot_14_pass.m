@@ -12,14 +12,14 @@ for i = 1:length(P)
 	% default colormap
 	P{i}.fplot('a'); close all;
 	% default colormap
-	P{i}.fplot('a', 1, 'colormap', 'mpt'); close all;
+	P{i}.fplot('a', 'colormap', 'mpt'); close all;
 	% custom colormap identified by string
-	P{i}.fplot('a', 1, 'colormap', 'hsv'); close all;
+	P{i}.fplot('a', 'colormap', 'hsv'); close all;
 	% custom colormap identified by double
 	M = hsv(10);
-	P{i}.fplot('a', 1, 'colormap', M); close all;
+	P{i}.fplot('a', 'colormap', M); close all;
 	% wrong colormap string
-	[worked, msg] = run_in_caller('P{i}.fplot(''a'', 1, ''colormap'', ''nofunction'');');
+	[worked, msg] = run_in_caller('P{i}.fplot(''a'', ''colormap'', ''nofunction'');');
 	assert(~worked);
 	assert(~isempty(strfind(msg, 'Undefined function or variable ''nofunction''.')));
 	close all

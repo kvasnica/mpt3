@@ -16,9 +16,9 @@ B = AffFunction(randn(3,2),[0;-1;-2]);
 Y.addFunction(A,'saluva');
 Y.addFunction(B,'echaz');
 
-Y(1).fplot('saluva',2,'alpha',0.3,'color','g','grid',30);
+Y(1).fplot('saluva','position',2,'alpha',0.3,'color','g','grid',30);
 
-h = Y(2).fplot('echaz',3,'contour',true,'polyhedron',true);
+h = Y(2).fplot('echaz','position',3,'contour',true,'polyhedron',true);
 if isempty(h)
     error('Handle should not be empty.');
 end

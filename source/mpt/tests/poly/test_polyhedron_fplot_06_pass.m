@@ -11,16 +11,12 @@ Q = QuadFunction(6,-1,2);
 P.addFunction(L,'gain');
 P.addFunction(Q,'skew');
 
-h1=P.fplot();
+figure
+h = P.fplot('gain');
+assert(numel(h)==2);
 
-if numel(h1)~=4
-    error('Here must be 4 handles.');
-end
+figure
+h = P.fplot('skew');
+assert(numel(h)==2);
 
-h2 = P.fplot('skew');
-if numel(h2)~=2
-    error('Here must be 2 handles.');
-end
-
-close;
 end

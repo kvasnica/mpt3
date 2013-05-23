@@ -16,7 +16,7 @@ if numel(h)~=1
     error('Wrong plot.');
 end
 
-P.fplot('a',1,'Polyhedron',true);
+P.fplot('a','show_set',true);
 hn = get(gca,'Children');
 if numel(hn)~=2
     error('Wrong plot.');

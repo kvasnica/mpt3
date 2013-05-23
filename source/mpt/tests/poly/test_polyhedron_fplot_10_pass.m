@@ -12,12 +12,12 @@ P.addFunction(Q(1), 'hel');
 P.addFunction(Q(2), 'pab');
 
 
-h1=P.fplot('hel',1,'polyhedron',true,'wire',true,'alpha',0.4);
+h1=P.fplot('hel','show_set',true,'wire',true,'alpha',0.4);
 if numel(h1)~=4
     error('Wrong number of handles.');
 end
 
-P.fplot('pab',1,'wire',true,'LineWidth',2);
+P.fplot('pab','wire',true,'LineWidth',2);
 
 h=get(gca,'Children');
 if numel(h)~=2

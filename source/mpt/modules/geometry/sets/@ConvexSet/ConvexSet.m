@@ -207,6 +207,9 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
   
   methods (Access=protected)
 
+	  % function prototypes
+	  h = fplot_internal(obj, function_name, options)
+
 	  function displayFunctions(obj)
 		  % displays attached functions (to be used from a disp() method)
 		  
@@ -226,7 +229,7 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 			  fprintf('\n');
 		  end
 	  end
-	  
+
   end
   
 end

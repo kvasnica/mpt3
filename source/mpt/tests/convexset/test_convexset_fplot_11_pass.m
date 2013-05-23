@@ -4,7 +4,7 @@ function test_convexset_fplot_11_pass
 %
 
 x = sdpvar(2,1);
-F = set(-[1;3]<=x<=[5;4]) + set(0.5*x'*x<=0.2) + set(randn(1,2)*x<=0.5);
+F = [-[1;3]<=x<=[5;4]] + [0.5*x'*x<=0.2] + [randn(1,2)*x<=0.5];
 
 Y = YSet(x,F,sdpsettings('verbose',0));
 

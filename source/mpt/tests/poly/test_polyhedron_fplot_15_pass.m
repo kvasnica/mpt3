@@ -10,17 +10,17 @@ P = [Q1 Q2];
 % default colororder
 P.fplot; close all;
 % colororder='fixed'
-P.fplot('a', 1, 'colororder', 'fixed'); close all;
+P.fplot('a', 'colororder', 'fixed'); close all;
 % colororder='random'
-P.fplot('a', 1, 'colororder', 'random'); close all;
+P.fplot('a', 'colororder', 'random'); close all;
 % colororder+colormap
-P.fplot('a', 1, 'colororder', 'fixed', 'colormap', hsv(10)); close all;
+P.fplot('a', 'colororder', 'fixed', 'colormap', hsv(10)); close all;
 % colororder+colormap
-P.fplot('a', 1, 'colororder', 'random', 'colormap', hsv(1)); close all;
+P.fplot('a', 'colororder', 'random', 'colormap', hsv(1)); close all;
 % colororder+colormap
-P.fplot('a', 1, 'colororder', 'random', 'colormap', 'mpt'); close all;
+P.fplot('a', 'colororder', 'random', 'colormap', 'mpt'); close all;
 % wrong colororder
-[worked, msg] = run_in_caller('P.fplot(''a'', 1, ''colororder'', ''wrong'');');
+[worked, msg] = run_in_caller('P.fplot(''a'', ''colororder'', ''wrong'');');
 assert(~worked);
 assert(~isempty(strfind(msg, 'Argument ''colororder'' failed validation')));
 close all

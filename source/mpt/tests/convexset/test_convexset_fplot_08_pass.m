@@ -5,9 +5,9 @@ function test_convexset_fplot_08_pass
 %
 
 x = sdpvar(1);
-F1 = set(-1<=x<=5) + set(0.5*x^2<=0.2);
+F1 = [-1<=x<=5] + [0.5*x^2<=0.2];
 Y1 = YSet(x,F1,sdpsettings('verbose',0));
-F2 = set(x<=0.3) + set(-x^2>=-.4);
+F2 = [x<=0.3] + [-x^2>=-.4];
 Y2 = YSet(x,F2,sdpsettings('verbose',0));
 
 Y = [Y1,Y2];
@@ -21,10 +21,10 @@ Y.addFunction(A2,'A2');
 Y.addFunction(Q,'Q');
 
 % plot second value from the vectorized function
-h1 = Y.fplot({'A2','Q'},2,'Color','g','LineWidth',4,'LineStyle','-.');
-assert(length(h1)==4);
-h2 = Y.fplot({'A1','A2'},3,'LineWidth',3,'FaceColor','c');
-assert(length(h2)==4);
+h1 = Y.fplot('A2','position',2,'Color','g','LineWidth',4,'LineStyle','-.');
+assert(length(h1)==2);
+h2 = Y.fplot('A2','position',3,'LineWidth',3,'FaceColor','c');
+assert(length(h2)==2);
 
 close all
 

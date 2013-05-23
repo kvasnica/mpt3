@@ -9,17 +9,12 @@ L = AffFunction([-1 0.6;2 -3],[-2;0.5]);
 P.addFunction(L,'risk');
 
 % dash, magenta, size 3
-h1=P.fplot('risk',1,'linestyle','--','color','magenta','linewidth',3);
+h1=P.fplot('risk','linestyle','--','color','magenta','linewidth',3);
+assert(numel(h1)==1);
 
-if numel(h1)~=1
-    error('Here must be handle.');
-end
-
-% plot with polyhedron, alpha-transparent, in olive color, wired
-h2=P.fplot('risk',2,'polyhedron',true,'alpha',0.3,'color','olive','wire',true);
-if numel(h2)~=2
-    error('Here must be 2 handles (polyhedron+function).');
-end
+% we must get two handles (one for the set, one for the function)
+h2=P.fplot('risk',2,'show_set',true,'alpha',0.3,'color','olive','wire',true);
+assert(numel(h2)==2);
 
 
 close;

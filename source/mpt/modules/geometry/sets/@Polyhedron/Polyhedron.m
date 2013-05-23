@@ -594,5 +594,12 @@ classdef Polyhedron < ConvexSet
 		end
 	end
 	
+	methods (Access=protected)
+		
+		% function prototypes
+		h = fplot_internal(obj, function_name, options)
+		
+	end
+	
 end
 

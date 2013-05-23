@@ -70,7 +70,7 @@ if ~isempty(varargin)
 			% by putting 'index'=i at the end we override any 'index'
 			% settings there might be in args
 			for j = 1:length(obj_stack{i})
-				hp = plot(obj_stack{i}(j), 'index', index, args{:});
+				hp = plot(obj_stack{i}(j), 'array_index', index, args{:});
 				h = [h; hp(:)];
 				index = index + 1;
 			end
@@ -101,10 +101,10 @@ if length(P(:)) > 1,
   for i=1:length(P),
     if toc > 2, drawnow; tic; end
     if nargout>0
-        hp = plot(P(i), varargin{:}, 'index', i);
+        hp = plot(P(i), varargin{:}, 'array_index', i);
         h = [h; hp(:)];
     else
-        plot(P(i), varargin{:}, 'index', i);
+        plot(P(i), varargin{:}, 'array_index', i);
     end
   end
   
@@ -131,16 +131,16 @@ ip.addParamValue('marker',     'none', @validate_marker);
 ip.addParamValue('markerSize', 6, @isnumeric);
 ip.addParamValue('colormap', 'mpt', @(x) (isnumeric(x) && size(x, 2)==3) || ischar(x)); 
 ip.addParamValue('colororder', 'fixed', @(x) isequal(x, 'fixed') || isequal(x, 'random'));
-% "index" is an internal property which denotes position of the plotted
+% "array_index" is an internal property which denotes position of the plotted
 % object in an array. It is used to get properl color in charToColor()
-ip.addParamValue('index', 1, @validate_indexset);
+ip.addParamValue('array_index', 1, @validate_indexset);
 
 ip.parse(varargin{:});
 p = ip.Results;
 
 % If color is a letter, rather than a vector then convert
 if ischar(p.color) || isempty(p.color)
-    clr = charToColor(p.color, p.colormap, p.index, p.colororder);
+    clr = charToColor(p.color, p.colormap, p.array_index, p.colororder);
 else
     clr = p.color;
 end

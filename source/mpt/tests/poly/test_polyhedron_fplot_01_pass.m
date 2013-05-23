@@ -7,24 +7,27 @@ P = ExamplePoly.randHrep;
 while ~P.isBounded
     P = ExamplePoly.randHrep;
 end
-
-L = AffFunction(rand(2),randn(2,1));
+L = AffFunction([0 0; 2 3], randn(2,1));
 P.addFunction(L, 'a');
 
-h1=P.fplot;
-if isempty(h1)
-    error('Here must be handle.');
-end
+% plots the only function, position=1
+P.fplot();
+% explicit function name
+P.fplot('a');
+% position
+P.fplot('position', 2);
+% name + position
+P.fplot('a', 'position', 1);
 
-h2 = P.fplot('a',1);
-if isempty(h2)
-    error('Here must be handle.');
-end
-
-h3 = P.fplot('a',2);
-if isempty(h3)
-    error('Here must be handle.');
-end
+% handles must be returned
+h=P.fplot;
+assert(isscalar(h));
+h=P.fplot('a');
+assert(isscalar(h));
+h=P.fplot('position', 2);
+assert(isscalar(h));
+h=P.fplot('a', 'position', 1);
+assert(isscalar(h));
 
 close
 

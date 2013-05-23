@@ -9,25 +9,21 @@ Q = QuadFunction(rand(2),randn(1,2),1);
 P.addFunction(L, 'a');
 P.addFunction(Q, 'b');
 
-h1=P.fplot({'a', 'b'});
-if numel(h1)~=2
-    error('Here must be 2 handles.');
-end
+% multiple functions => error
+[~, msg] = run_in_caller('P.fplot()');
+asserterrmsg(msg, 'The object has multiple functions, specify the one to evaluate.');
 
-h2 = P.fplot('a');
-if isempty(h2)
-    error('Here must be handle.');
-end
+% function name is not a string => error
+[~, msg] = run_in_caller('P.fplot({''a''})');
+asserterrmsg(msg, 'The function name must be a string.');
 
-h3 = P.fplot('a',2);
-if isempty(h3)
-    error('Here must be handle.');
-end
+% position out of range
+[~, msg] = run_in_caller('P.fplot(''b'', ''position'', 2)');
+asserterrmsg(msg, 'The position index must be less than 2.');
 
-h3 = P.fplot('b');
-if isempty(h3)
-    error('Here must be handle.');
-end
+% now correct syntax
+P.fplot('a');
+P.fplot('b');
 
 close
 
