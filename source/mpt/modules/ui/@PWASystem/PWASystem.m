@@ -435,8 +435,6 @@ classdef PWASystem < AbstractSystem
 
 			if nargin < 2
 				u = zeros(obj.nu, 1);
-			else
-				u = u(:);
 			end
 			u = obj.validateInput(u);
 

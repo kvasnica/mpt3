@@ -448,13 +448,8 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 				error('System is not autonomous, please provide the input.');
 			elseif isempty(u)
                 u = zeros(obj.nu, 1);
-			else
-				u = u(:);
 			end
-			if size(u, 1)~=obj.nu
-				error('The input must be a %dx1 vector', obj.nu);
-			end
-
+			error(validate_vector(u, obj.nu, 'input'));
 		end
 		
 		function obj = importSysStructConstraints(obj, sysStruct)

@@ -145,10 +145,7 @@ classdef MPCController < AbstractController
 			% make sure we have the prediction horizon available
 			error(obj.assert_controllerparams_defined);
 			
-			xinit = xinit(:);
-			if numel(xinit) ~= obj.nx
-				error('The point must be a %dx1 vector.', obj.nx);
-			end				
+			error(validate_vector(xinit, obj.nx, 'initial state'));
 			
 			if obj.wasModified() || isempty(obj.optimizer)
 				% Re-generate the optimizer if the problem setup was

@@ -40,11 +40,7 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			%
 			
 			error(nargchk(3, 3, nargin));
-			
-			x0 = x0(:);
-			if numel(x0)~=obj.system.nx
-				error('The initial state must be a %dx1 vector.', obj.system.nx);
-			end
+			error(validate_vector(x0, obj.system.nx, 'initial state'));
 
 			obj.system.initialize(x0);
 			X = x0(:); U = []; Y = []; J = [];

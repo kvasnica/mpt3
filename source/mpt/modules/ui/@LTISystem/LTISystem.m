@@ -284,12 +284,9 @@ classdef LTISystem < AbstractSystem
             end
             if nargin<2
                 u = zeros(obj.nu, 1);
-			else
-				u = u(:);
 			end
-			if size(u, 1)~=obj.nu
-				error('The input must be a %dx1 vector', obj.nu);
-			end
+			u = obj.validateInput(u);
+			
             if obj.ny > 0
                 % catch cases with empty C matrix (e.g. for linear
                 % controllers)

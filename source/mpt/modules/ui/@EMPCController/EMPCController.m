@@ -165,10 +165,7 @@ classdef EMPCController < AbstractController
 			end
 			
             % evaluate the explicit optimizer
-			xinit = xinit(:);
-			if numel(xinit) ~= obj.nx
-				error('The point must be a %dx1 vector.', obj.nx);
-			end
+			error(validate_vector(xinit, obj.nx, 'initial state'));
 
 			% index of the optimizer and index of the region from which the
 			% control action was extracted

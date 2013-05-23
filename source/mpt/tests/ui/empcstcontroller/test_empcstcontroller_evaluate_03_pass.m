@@ -45,8 +45,8 @@ cst = ectrl.toSearchTree;
 X = grid(ectrl.optimizer.Internal.convexHull,10);
 
 for i=1:size(X,1)
-    f1 = ectrl.evaluate(X(i,:));
-    f2 = cst.evaluate(X(i,:));
+    f1 = ectrl.evaluate(X(i,:)');
+    f2 = cst.evaluate(X(i,:)');
     if any(isnan(f2))
         error('Wrong region detection.');
     end
