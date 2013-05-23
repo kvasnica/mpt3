@@ -73,6 +73,8 @@ function h = fplot(obj, varargin)
 %  * if nargout=0, then no handle(s) must be returned
 %  * the validation code is shared with ConvexSet/feval
 
+global MPTOPTIONS
+
 %% error checks
 error(nargoutchk(0,1,nargout));
 if any([obj.Dim]>=3)
@@ -144,7 +146,7 @@ end
 tic
 h = [];
 for i=1:numel(obj)
-	if toc > 2,
+	if toc > MPTOPTIONS.report_period,
 		% refresh the plot every 2 seconds
 		drawnow;
 		tic;
