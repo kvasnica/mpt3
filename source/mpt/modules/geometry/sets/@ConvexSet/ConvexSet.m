@@ -239,8 +239,10 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 			  fnames = obj(1).listFunctions();
 			  if isempty(fnames)
 				  msg = 'The object has no functions.';
+				  return
 			  elseif numel(fnames)>1
 				  msg = 'The object has multiple functions, specify the one to evaluate.';
+				  return
 			  else
 				  function_name = fnames{1};
 			  end
@@ -253,8 +255,10 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 			  end
 		  elseif ~ischar(function_name)
 			  msg = 'The function name must be a string.';
+			  return
 		  elseif any(~obj.hasFunction(function_name))
 			  msg = sprintf('No such function "%s" in the object.', function_name);
+			  return
 		  end
 
 	  end
