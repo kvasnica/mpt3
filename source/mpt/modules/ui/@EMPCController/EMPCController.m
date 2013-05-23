@@ -73,6 +73,11 @@ classdef EMPCController < AbstractController
         function obj = construct(obj)
             % Constructs the explicit solution
 
+			global MPTOPTIONS
+			if isempty(MPTOPTIONS)
+				MPTOPTIONS = mptopt;
+			end
+			
 			% make sure the prediction horizon was provided
 			error(obj.assert_controllerparams_defined);
 
@@ -115,6 +120,9 @@ classdef EMPCController < AbstractController
 					res.xopt = mpt_mpsol2pu(sol);
 				else
 					res = problem.solve;
+					if res.exitflag ~= MPTOPTIONS.OK
+						error('Problem is infeasible.');
+					end
 				end
 			end
             obj.optimizer = res.xopt;
