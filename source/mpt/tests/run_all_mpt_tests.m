@@ -36,6 +36,9 @@ function run_all_mpt_tests(varargin)
 
 persistent test_files
 
+cwd = pwd;
+maindir = fileparts(which(mfilename));
+
 % determine options
 options = struct('onlyerrors', false, ...
 	'rerunfailed', false, ...
@@ -58,9 +61,6 @@ for i = 1:length(varargin)
 		end
 	end
 end
-
-cwd = pwd;
-maindir = fileparts(which(mfilename));
 
 if ~options.rerunfailed
 	% determine list of tests to run
@@ -92,6 +92,8 @@ for i = 1:length(test_files)
 			with_warning(i) = true;
 	end
 end
+
+cd(cwd);
 
 % display results
 n_error = length(find(with_error));
