@@ -230,6 +230,35 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 		  end
 	  end
 
+	  function [function_name, msg] = validateFunctionName(obj, function_name)
+		  % returns a valid function_name if none was provided
+		  % returns an error message if validation fails
+
+		  msg = '';
+		  if isempty(function_name)
+			  fnames = obj(1).listFunctions();
+			  if isempty(fnames)
+				  msg = 'The object has no functions.';
+			  elseif numel(fnames)>1
+				  msg = 'The object has multiple functions, specify the one to evaluate.';
+			  else
+				  function_name = fnames{1};
+			  end
+			  % check that all remaining sets have this function defined
+			  for i = 2:numel(obj)
+				  if ~obj(i).hasFunction(function_name)
+					  msg = sprintf('No such function "%s" in set %d.', function_name, i);
+					  return
+				  end
+			  end
+		  elseif ~ischar(function_name)
+			  msg = 'The function name must be a string.';
+		  elseif any(~obj.hasFunction(function_name))
+			  msg = sprintf('No such function "%s" in the object.', function_name);
+		  end
+
+	  end
+
   end
   
 end

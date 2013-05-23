@@ -121,28 +121,8 @@ ip.parse(varargin{start_idx:end});
 options = ip.Results;
 
 %% validation
-% TODO: this validation code is the same as in ConvexSet/feval. Make it a
-% protected method of ConvexSet.
-if isempty(function_name)
-	fnames = obj(1).listFunctions();
-	if isempty(fnames)
-		error('The object has no functions.');
-	elseif numel(fnames)>1
-		error('The object has multiple functions, specify the one to evaluate.');
-	else
-		function_name = fnames{1};
-	end
-	% check that all remaining sets have this function defined
-	for i = 2:numel(obj)
-		if ~obj(i).hasFunction(function_name)
-			error('No such function "%s" in set %d.', function_name, i);
-		end
-	end
-elseif ~ischar(function_name)
-	error('The function name must be a string.');
-elseif any(~obj.hasFunction(function_name))
-	error('No such function "%s" in the object.', function_name);
-end
+[function_name, msg] = obj.validateFunctionName(function_name);
+error(msg); % the error is only thrown if msg is not empty
 
 fun = obj(1).getFunction(function_name);
 if (isa(fun, 'AffFunction') || isa(fun, 'QuadFunction')) && ...
@@ -150,6 +130,7 @@ if (isa(fun, 'AffFunction') || isa(fun, 'QuadFunction')) && ...
 	error('The position index must be less than %d.', fun.R+1);
 end
 
+%% plotting
 % hold the plot for the first element of the array
 if options.use_hold
 	prevHold = ishold;

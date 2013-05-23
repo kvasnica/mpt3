@@ -46,26 +46,8 @@ if n_obj==0
 end
 
 %% validate arguments
-if isempty(function_name)
-	fnames = obj(1).listFunctions();
-	if isempty(fnames)
-		error('The object has no functions.');
-	elseif numel(fnames)>1
-		error('The object has multiple functions, specify the one to evaluate.');
-	else
-		function_name = fnames{1};
-	end
-	% check that all remaining sets have this function defined
-	for i = 2:numel(obj)
-		if ~obj(i).hasFunction(function_name)
-			error('No such function "%s" in set %d.', function_name, i);
-		end
-	end
-elseif ~ischar(function_name)
-	error('The function name must be a string.');
-elseif any(~obj.hasFunction(function_name))
-	error('No such function "%s" in the object.', function_name);
-end
+[function_name, msg] = obj.validateFunctionName(function_name);
+error(msg); % the error is only thrown if msg is not empty
 
 %% evaluate
 validate_realvector(x);
