@@ -64,18 +64,8 @@ Matrices.bndA = S.Ath;
 Matrices.bndb = S.bth;
 
 disp('Calling mpt_mplp_26 with default options...')
+start_time = clock;
 [r.Pn,r.Fi,r.Gi,r.activeConstraints,r.Phard,r.details]=mpt_mplp_26(Matrices);
-
-
-% regions = PolySet;
-% xopt  = PolySet;
-% 
-% 
-% if norm(opt.pF) < MPTOPTIONS.abs_tol
-%     obj = PolySet('isConvex', true);
-% else
-%     obj = PolySet;
-% end
 
 % Re-order variables if this came from YALMIP
 P = speye(opt.n);
@@ -142,7 +132,13 @@ end
 ret.xopt = PolyUnion('Set',reg,'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
 ret.xopt.setInternal('convexHull', toPolyhedron(r.Phard));
 ret.mplpsol = r;
-%ret.recover = S.recover;
-
+if numel(reg)>0
+	ret.exitflag = MPTOPTIONS.OK;
+	ret.how = 'ok';
+else
+	ret.exitflag = MPTOPTIONS.INFEASIBLE;
+	ret.how = 'infeasible';
+end
+ret.stats.solveTime = etime(clock, start_time);
 
 end
