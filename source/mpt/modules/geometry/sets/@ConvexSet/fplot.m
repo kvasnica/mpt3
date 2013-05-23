@@ -112,6 +112,11 @@ ip.addParamValue('show_set', false, @islogical);
 % position=i plots the i-th element f(i) of f=fun(x)
 ip.addParamValue('position', 1, @validate_indexset);
 
+% internal parameters
+ip.addParamValue('use_hold', true, @islogical);
+ip.addParamValue('use_3dview', true, @islogical);
+ip.addParamValue('array_index', 1);
+
 ip.parse(varargin{start_idx:end});
 options = ip.Results;
 
@@ -146,11 +151,13 @@ if (isa(fun, 'AffFunction') || isa(fun, 'QuadFunction')) && ...
 end
 
 % hold the plot for the first element of the array
-prevHold = ishold;
-if ~ishold,
-	clf;
+if options.use_hold
+	prevHold = ishold;
+	if ~ishold,
+		clf;
+	end
+	hold('on');
 end
-hold('on');
 
 % plot the array
 tic
@@ -161,15 +168,17 @@ for i=1:numel(obj)
 		drawnow;
 		tic;
 	end
-	options.array_index = i;
+	if numel(obj)>1
+		options.array_index = i;
+	end
 	hi = obj(i).fplot_internal(function_name, options);
 	h = [h; hi];
 end
 
-if ~prevHold
+if options.use_hold && ~prevHold
 	hold('off');
 end
-if any([obj.Dim] >= 2)
+if options.use_3dview && any([obj.Dim] >= 2)
 	view(3);
 	axis tight
 end

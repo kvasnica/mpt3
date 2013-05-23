@@ -41,9 +41,9 @@ figure
 hold on
 colors = 'kbm';
 for i = 1:length(f)
-	PU(i).fplot([], [], 'color', colors(i), 'linewidth', 3);
+	PU(i).fplot('color', colors(i), 'linewidth', 3);
 end
-out.fplot([], [], 'color', 'g', 'linestyle', ':', 'linewidth', 3);
+out.fplot('color', 'g', 'linestyle', ':', 'linewidth', 3);
 hold off
 drawnow
 

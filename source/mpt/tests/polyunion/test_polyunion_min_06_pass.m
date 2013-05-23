@@ -9,7 +9,7 @@ PU1 = PolyUnion('Set', P1, 'overlaps', false);
 PU2 = PolyUnion('Set', P2, 'overlaps', false);
 PUs = [PU1 PU2];
 out = PUs.min('obj');
-out.fplot([], [], 'linewidth', 3); axis([0 3 0.9 2.1]);
+out.fplot('linewidth', 3); axis([0 3 0.9 2.1]);
 assert(out.Num==2);
 assert(isequal(sortrows(out.Set(1).V), [0; 2]));
 assert(isequal(sortrows(out.Set(2).V), [2; 3]));
