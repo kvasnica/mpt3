@@ -21,4 +21,10 @@ ctrl.model.u.penalty.Q = 100;
 Jgood = 142.9453;
 assert(abs(c.cost-Jgood) < 1e-8);
 
+% also updating the constraints must be propagated
+ctrl.model.u.min = -1.5;
+u = ctrl.evaluate([5; 1]);
+ugood = -1.5;
+assert(norm(u-ugood)<1e-7);
+
 end
