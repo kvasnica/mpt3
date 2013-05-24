@@ -34,7 +34,7 @@ if numel(P)>1
 end
 
 % pre-alocate output
-iMap = struct('V', [], 'R', [], 'H', [], 'He', [], 'incRH', [], 'incVH', [])
+iMap = struct('V', [], 'R', [], 'H', [], 'He', [], 'incRH', [], 'incVH', []);
 
 % Need H-rep and V-rep
 hRep = P.minHRep();
