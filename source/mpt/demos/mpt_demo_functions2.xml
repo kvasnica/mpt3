@@ -55,7 +55,7 @@
         <cmd> PU.fplot('beta') </cmd>
         
         <descr> Plot the functions over polyhedra based with some properties</descr>
-        <cmd> PU.fplot('beta',1,'Polyhedron',true) </cmd>
+        <cmd> PU.fplot('beta','show_set',true) </cmd>
     </example>
 
     

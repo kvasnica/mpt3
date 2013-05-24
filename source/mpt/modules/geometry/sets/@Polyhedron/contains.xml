@@ -7,7 +7,8 @@
     Test if a polyhedron/point is contained inside polyhedron.
   </info>
   <syntax>tf = P.contains(S)</syntax>
-  <syntax>tf = contains(P, S)</syntax>
+  <syntax>tf = P.contains(S, fastbreak)</syntax>
+  <syntax>tf = contains(P, S, fastbreak)</syntax>
   <syntax>P &gt; S</syntax>
   <syntax>P &gt;= S</syntax>
   <syntax>S &lt; P</syntax>
@@ -16,28 +17,66 @@
   <descr>
       Check if the polyhedron or the point <tt>S</tt> is contained inside the polyhedron <tt>P</tt>.
       The result it the logical statement if <i>S \subseteq P</i> and false otherwise.
-
-      <tt>S</tt> can be given as polyhedron, it can be a point (or set of points concatenated rowwise).
       
-      Note that this operation is numerically sensitive and depends on the settings of the absolute and
+      <tt>S</tt> can be given as polyhedron, it can be a point given as a column (or set of points concatenated column-wise).
+
+      Notes:
+      <ul>
+          <li> <tt>P.contains(S)</tt> with <tt>S</tt> a point assumes that <tt>S</tt> is a column vector. No automatic transposition is performed! </li>
+          <li> <tt>P.contains(S)</tt> with <tt>S</tt> a matrix of points assumes that the points are stored column-wise. No automatic transposition is performed! </li>
+          <li> If <tt>P</tt> is an array, <tt>P.contains(S)</tt> returns a <i>(n_p \times n_S)</i> matrix of logicals, where <i>n_p</i> is the number of elements of 
+          <tt>P</tt> and <i>n_x</i> the number of points (i.e., the no. of columns) in <tt>S</tt>. </li>
+      </ul>
+      
+      Remember that testing the set membership is numerically sensitive and depends on the settings of the absolute and
       relative tolerances.    
   </descr>
   
   <input required="true">
     <name>P</name>
-    <descr>Polyhedron in any format</descr>
+    <descr>polyhedron or an array of polyhedra with <tt>m</tt> elements</descr>
     <class name="Polyhedron"/>
   </input>
   <input required="true">
     <name>S</name>
-    <descr>Polyhedron in any format or a point given as real vector. Multiple points must be concatenated
-    in a matrix row-wise, where the number of columns corresponds to the dimension of <tt>P</tt>.</descr>
+    <descr>Polyhedron or a polyhedron array or a set of points. 
+    Multiple points must be concatenated in a matrix column-wise, where the number of rows corresponds to the dimension of <tt>P</tt> and 
+    the number of columns gives the number of points to test.
+    No automatic transposition is performed!
+    </descr>
     <class name="Polyhedron or double"/>
   </input>
-  
+  <input required="false">
+    <name>fastbreak</name>
+    <descr> A logical flag. If true it indicates that the set membership test should be terminated as soon as at least one element of <tt>P</tt> contains
+    the point <tt>S</tt>.
+    </descr>
+    <class name="logical">
+        <option>0</option>
+        <option>1</option>
+    </class>
+    <default>0</default>
+  </input>
+    
   <output>
     <name>tf</name>
-    <descr>True if <i>S \subseteq P</i> and false otherwise.</descr>
+    <descr>True if <i>S \subseteq P</i> and false otherwise.
+        <ul>
+            <li>
+                If <tt>S</tt> is a single point or a single polyhedron:
+                <tt>status</tt> is a <i>(m \times 1)</i> vector of <tt>true/false</tt>, 
+                <tt>status(i)=true</tt> iff <tt>P(i)</tt> contains <tt>S</tt>.
+            </li>
+            <li>
+                If <tt>S</tt> is a matrix of points (i.e., <tt>S = [s_1, ..., s_n]</tt>)
+                <tt>status</tt> is a <i>(m \times n)</i> matrix of <tt>true/false</tt>, 
+                <tt>status(i, j)=true</tt> iff <tt>P(i)</tt> contains point <tt>S(:, j)</tt>.
+            </li>
+            <li>
+                If <tt>S</tt> is a polyhedron, then <tt>P.contains(x)</tt> iff <i>x \subseteq P</i>
+            </li>
+        </ul>
+</descr>
     <class name="logical">
       <option>true</option>
       <option>false</option>
@@ -66,6 +105,15 @@
     <cmd>plot([S P]);</cmd>
   </example>
   
+  <example>
+      <descr> Create random polyhedron. </descr>
+      <cmd> P = ExamplePoly.randVrep; </cmd>
+      <descr> Grid the polyhedron with 5 point over dimension.</descr>
+      <cmd> x =  P.grid(5); </cmd>
+      <descr> Test whether each grid point is contained in the polyhedron <tt>P</tt>. </descr>
+      <cmd> P.contains(x') </cmd>
+  </example>
+  
   <related>interiorPoint</related>
   <related>le</related>
   <related>lt</related>
@@ -73,5 +121,7 @@
   <related>gt</related>
   
   <author macro="author_cnj"/>
+  <author macro="author_kvasnica"/>
+  <author macro="author_herceg"/>
   <license macro="GPL2"/>
 </help>

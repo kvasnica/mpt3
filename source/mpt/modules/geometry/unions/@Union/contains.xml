@@ -11,9 +11,9 @@
   <syntax>[isin, inwhich, closest] = U.contains(x, fastbreak)</syntax>
   
   <descr>
-      Check if the point <tt>x0</tt> is contained in one of the sets in the union <tt>U</tt>.
-      The result it the logical statement if <i>x \in U</i> and false otherwise. If the point
-      is contained inside the union, index of the sets in which the point lie is returned. 
+      Check if the point <tt>x</tt> is contained in any of the sets in the union <tt>U</tt>.
+      The result it a logical statement if <i>x \in U</i> and false otherwise. If the point
+      is contained inside the union, indices of sets in which the point lie are returned. 
       If the point does not lie in the union, the index of the region with the least distance
       to the point <i>x</i> is returned.
       All sets in the union must have the same dimension, otherwise the evaluation cannot be done.
@@ -21,7 +21,9 @@
   
   <input required="true">
     <name>U</name>
-    <descr>Union object that holds sets derived from the <tt>ConvexSet</tt> class.</descr>
+    <descr>Single union object that holds sets derived from the <tt>ConvexSet</tt> class.
+           If <tt>U</tt>is an array, use <tt>U.forEach()</tt>.
+    </descr>
     <class name="Union"/>
   </input>
   <input required="true">
@@ -42,7 +44,7 @@
   
   <output>
     <name>isin</name>
-    <descr>True if <i>x \in U</i> and false otherwise.</descr>
+    <descr>True if <i>x \in U</i> and false otherwise. </descr>
     <class name="logical">
       <option>true</option>
       <option>false</option>
@@ -50,12 +52,13 @@
   </output>
   <output>
     <name>inwhich</name>
-    <descr>The index set that indicates in which sets contained in the union the point <i>x</i> lies.</descr>
+    <descr>Indices of sets that contain <i>x</i>. If the <tt>fastbreak</tt> option is turned on, a single index is returned. </descr>
     <class name="double"/>
   </output>
   <output>
     <name>closest</name>
     <descr>If the point is not contained inside the union, this output indicates the index of the set that is the closest to the point <tt>x</tt>.
+           Note: since this computation is expensive, do not ask for the third output unless you really need it.
     </descr>
     <class name="double"/>
   </output>
@@ -76,5 +79,6 @@
   <related>feval</related>
   
   <author macro="author_herceg"/>
+  <author macro="author_kvasnica"/>
   <license macro="GPL2"/>
 </help>

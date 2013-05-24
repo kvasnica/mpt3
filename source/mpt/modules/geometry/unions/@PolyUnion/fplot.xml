@@ -8,15 +8,16 @@
 		Plot function over the union of polyhedra.
 	</info>
 	
-	<syntax>h = fplot(U, name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
-	<syntax>h = U.fplot(name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
+    <syntax>h = Set.fplot()</syntax>
+    <syntax>h = Set.fplot('name', 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = fplot(Set, 'name', 'Prop1', value1, 'Prop2', value2)</syntax>
 
 	<!-- long description of the function -->
 	<descr>
         Plot function over the union of polyhedra. If there are more functions, then the string <tt>name</tt> indicates
-        the function name to be plotted. If the function is vector valued, i.e. its range is greater than 1, 
+        the function to be plotted. If the function is vector valued, i.e. its range is greater than 1, 
         than the first element of the function is plotted by default. For vector valued functions 
-        the <tt>dim</tt> indicates which element of the vector to plot.
+        the <tt>position</tt> property indicates which element of the function value to plot.
 
         Figure properties, such as color, line width, etc, can be specified with "Property" - "Value" pairs. 
 	</descr>
@@ -30,29 +31,26 @@
 	<input>
 		<name>name</name>
         <descr>If there are more functions over one set, the string <tt>name</tt> identifies
-        the function to be plotted. By default, only the first function is plotted.
-        Function array can be accessed inside <tt>Func</tt> property.
+        the function to be plotted. This argument can be omitted if only one function is attached to a set.
         </descr>
 		<class name="char"/>
-	</input>
-	<input>
-		<name>dim</name>
-        <descr>For vector valued functions, the <tt>dim</tt> indicates which element of the vector to plot.</descr>
-		<class name="double"/>
-        <default>1</default>
 	</input>
 	<input>
 		<name>Prop1</name>
         <descr>Specification of figure properties.</descr>
 		<class name="char">
+                <option>position</option><descr>For vector valued functions, the <tt>position</tt> indicates which element of the function value to plot.</descr>
+                <option>Grid</option><descr>With how many gridpoints to grid the circle/sphere. Default is 20.</descr>
                 <option>Color</option><descr>The color of the plot specified by real RGB vector or a string name of the color (e.g. 'gray');</descr>
-                <option>Wire</option><descr>Highlight or not the edges of the set. Default is false.</descr>
+                <option>Wire</option><descr>Highlight the edges of the set. Default is false.</descr>
                 <option>LineStyle</option><descr>Specify the type of the line to plot edges of the set. Accepted values are '-',':','-.','--', and'none'.</descr>
                 <option>LineWidth</option><descr>Specify the width of the line. Default is 1.</descr>
                 <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
                 <option>Contour</option><descr>Add contour graph. Default is false.</descr>
-                <option>ContourGrid</option><descr>With how many grid point to do the contour graph. Default is 20.</descr>
-                <option>Polyhedron</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
+                <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>colormap</option><descr>Color map to use given as a string or a function handle. Default is 'mpt'.</descr>
+                <option>colororder</option><descr>Either 'fixed' or 'random'. Default is 'fixed'.</descr>
 		</class>
 	</input>
     <input>
@@ -84,7 +82,7 @@
         <descr> Construct the union saying that it is convex, non-overlapping, bounded, and full-dimensional. </descr>
         <cmd> U = PolyUnion('Set',P,'convex',true,'overlaps',false,'bounded',true,'fulldim',true) </cmd>
         <descr> Plot the functions over the union with the line width equal 3 and by showing the polyhedra as well. </descr>
-        <cmd> U.fplot('a',1,'LineWidth',3,'Polyhedron',true); </cmd>
+        <cmd> U.fplot('a','LineWidth',3,'show_set',true); </cmd>
     </example>
 
 	<!-- multiple related function can be defined -->
@@ -92,6 +90,7 @@
 	
 	<!-- multiple authors can be defined -->
 	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
 
 	<!-- finally, the text of the license -->
 	<license macro="GPL2"/>

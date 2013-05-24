@@ -27,7 +27,7 @@ else
         'box = YSet(x,[ 0<=x(1)<=2; 0<=x(2)<=3])'
         'U = Union([box, triangle])'
         'axis on; grid on; hold on;'
-        'plot(U);'
+        'plot(U,''colororder'',''random'');'
         'axis([-1 6 -1 4]);'
      };
     slide(2).text={
@@ -50,7 +50,7 @@ else
         'P2 = P1.projection([1:2]) + [3;-1]'
         'U1 = Union([P1,P2])'
         'cla; grid on; hold on;'
-        'U1.plot;'
+        'U1.plot(''colororder'',''random'');'
         'axis([-1 5 -2 2 0 1]);'
      };
     slide(3).text={
@@ -73,7 +73,7 @@ else
         'U2 = Union(P3)'
         'U2.add(C)'
         'cla; hold on;'
-        'U2.plot; view(2);'
+        'U2.plot(''colororder'',''random''); view(2);'
         'axis([-5 5 -5 5]);'
     };
     slide(4).text = {
@@ -100,7 +100,7 @@ else
         'T = P.triangulate'
         'U = Union(T(1:2))'
         'cla; hold on;'
-        'U.plot;'
+        'U.plot(''colororder'',''random'');'
         'axis([-50 50 -50 50]);'
      };
     slide(5).text = {
@@ -120,7 +120,7 @@ else
     slide(6).code = {
     'U.add(T(3:end))'
     'cla; hold on;'
-    'U.plot;'
+    'U.plot(''colororder'',''random'');'
     };
     slide(6).text = {
     'We can add the remaining polyhedra to union U with the "add" method.'
@@ -131,7 +131,7 @@ else
       'U.Set'
       'U.remove([2,3])'
       'cla; hold on;'
-      'U.plot;'
+      'U.plot(''colororder'',''random'');'
     };
     slide(7).text = {
     'We can also remove sets from the union using the "remove" method.'
@@ -145,7 +145,7 @@ else
     slide(8).code = {
       'U.add(C)'
       'cla; hold on;'
-      'U.plot;'
+      'U.plot(''colororder'',''random'');'
     };
     slide(8).text = {
     'Or add the sets of the different class, e.g. YSet.'

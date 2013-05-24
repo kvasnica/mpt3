@@ -30,7 +30,7 @@ function h = fplot(obj, varargin)
 %     logical, default=false
 %  'colormap': color map to use
 %     string or a function handle, default='mpt'
-%  'colororder': either 'fixed' or 'variable'
+%  'colororder': either 'fixed' or 'random'
 %     string, default='fixed'
 
 % Implementation:

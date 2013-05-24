@@ -33,7 +33,7 @@
         <descr> Create another polyhedron that is contained within <tt>P</tt> </descr>
         <cmd> Q = 0.8*P; </cmd>
         <descr> Create another random polyhedron.</descr>
-        <cmd> R = ExamplePoly.randVrep+[1,5]; </cmd>
+        <cmd> R = ExamplePoly.randVrep+[1;5]; </cmd>
         <descr>Create the union of polyhedra without specifying any properties.</descr>
         <cmd> U = PolyUnion([P,Q,R]) </cmd>
         <descr> Plot the union </descr>

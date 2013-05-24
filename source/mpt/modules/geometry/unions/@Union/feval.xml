@@ -5,42 +5,160 @@
 	
 	<!-- one-line description of the function -->
 	<info>
-		Evaluates function over union of convex sets.
+		Evaluates a given function defined over a union of convex sets.
 	</info>
-	
-	<syntax>y = feval(U,x,name)</syntax>
-	<syntax>y = U.feval(x,name)</syntax>
-    <syntax>y = U.feval(x)</syntax>
+		
+    <syntax>fval = U.feval(x)</syntax>
+    <syntax>fval = U.feval(x, function_name)</syntax>
+    <syntax>[fval, feasible, idx, tb_value] = U.feval(x, function_name)</syntax>
+    <syntax>[fval, feasible, idx, tb_value] = feval(U, x, function_name)</syntax>
 
 	<!-- long description of the function -->
 	<descr>
-        Evaluates function for given value of the point <tt>x</tt> over the union of convex sets <tt>U</tt> characterized
-        by the name <tt>name</tt>. If the string <tt>name</tt> is omitted, all functions are evaluated.
+        Evaluates function for a given value of the point <tt>x</tt> over the union of convex sets <tt>U</tt> characterized
+        by the name <tt>function_name</tt>. If the string <tt>function_name</tt> is omitted, it is assumed that only one 
+        function is attached to the union.
         The dimension of the vector <tt>x</tt> must be the same as the dimension of all sets in the union.
         The evaluation is based on the following approach:
         <ol>
             <li>Find the index of the set where the point <tt>x</tt> lies. </li>
             <li>Evaluate the function over the set determined by given index. </li>
         </ol>
-        If the point lies outside of the union, the result is empty.
+        If the point lies outside of the union, the result is <tt>NaN</tt>.
+        
+    Notes:<br />
+    <ul>
+        <li> <tt>U</tt> must be a single union. Arrays of unions are not accepted. Use
+            <tt>array.forEach(@(e) e.feval(...))</tt> to evaluate arrays of unions.
+        </li>
+        <li>
+            <tt>function_name</tt> must refer to a single function. If omitted, <tt>U.feval(x)</tt>
+            only works if the union has a single function.
+        </li>
+    </ul>
+    
+    <bf>Outputs</bf><br />
+    <ol>
+        <li> <tt>x</tt> is not contained in any set of the union:
+        
+            <tt>fval</tt> = <i>(m \times 1)</i> vector of <tt>NaNs</tt>, where <i>m</i> is the range of the function,
+            <tt>feasible = false</tt>,
+            <tt>idx = [] </tt>,
+            <tt>tb_value = []</tt>.
+        </li>
+        <li>
+            <tt>x</tt> is in a single set:
+            
+            <tt>fval</tt> = <i>(m \times 1)</i> vector of function values,
+            <tt>feasible = true</tt>,
+            <tt>idx</tt> = index of the set which contains <tt>x</tt>,
+            <tt>tb_value = []</tt>.
+        </li>
+        <li>
+            <tt>x</tt> is contained in multiple sets (either at the boundary or in
+            strict interior if there are overlaps), no tie-breaking (default):
+            
+            <tt>fval</tt> = <i>(m \times j)</i> matrix of function values (<i>j</i> denotes the number of
+            sets which contain <i>x</i>), each column contains the value of <tt>function_name</tt>
+            in the corresponding set,
+            <tt>feasible = true</tt>,
+            <tt>idx</tt> = <i>(1 \times j)</i> vector of indices of sets which contain <tt>x</tt>,
+            <tt>tb_value = []</tt>.
+        </li>
+        
+        <li> <tt>x</tt> is contained in multiple sets (either at the boundary or in
+            strict interior if there are overlaps), tie-breaking enabled (see
+            below):
+            
+            <tt>fval</tt> = <i>(m \times 1)</i> vector containing the function value in the set in
+            which value of the tie-breaking function is smallest (if there
+            are multiple sets with the same tie-breaking value, the first
+            such set is considered),
+            <tt>feasible = true</tt>,
+            <tt>idx</tt> = index of the set which contains <tt>x</tt> and, simultaneously, has
+            the <bf>smallest</bf> value of the tie-breaking function,
+            <tt>tb_value</tt> = scalar value of the tie-breaking function in set indexed
+            by <tt>idx</tt>.
+        </li>
+    </ol>
+        
+    <bf>Tie-breaking</bf><br />
+
+ The purpose of tie-breaking is to automatically resolve situations
+ where the evaluation point <tt>x</tt> is contained in multiple sets. With
+ tie-breaking enabled <tt>Union/feval()</tt> evaluates the tie-breaking function
+ to decide which set containing <tt>x</tt> should be used for evaluation of
+ the original function.
+ 
+ The tie-breaking function can be specified by <tt>U.feval(x, 'tiebreak',
+ tb_fun)</tt>, where <tt>tb_fun</tt> can be either a string or a function
+ handle. A string value must refer to an another function which exists
+ in the union <tt>U</tt>.
+ 
+ A typical case where tie-breaking is useful is evaluation of
+ discontinuous MPC feedback laws:
+ 
+ <tt>uopt = U.feval(x, 'primal', 'tiebreak', 'obj')</tt>
+ 
+ Here, if <tt>x</tt> is contained in multiple sets, then the function <tt>primal</tt>
+ is only evaluated in the set which contain <tt>x</tt> and simultaneously has
+ the <bf>smallest</bf> value of the tie-breaking function <tt>obj</tt>.
+ 
+ A special case of tie-breaking is the "first-set" rule where we are
+ only interested in evaluating a function in the first set which
+ contains <tt>x</tt> (despite the fact there can be multiple such sets). This
+ is achieved by
+ 
+ <tt>fval = U.feval(x, 'function_name', 'tiebreak', @(x) 0)</tt>
+ 
+ Notes:
+ <ul>
+     <li> Tie-breaking functions must be scalar-valued.</li>
+     <li> No tie-breaking is done by default. </li>
+ </ul>
+ 
+ <bf>Evaluation in particular sets</bf><br />
+ 
+ <tt>fval = U.feval(x, 'myfun', 'regions', indices)</tt> evaluates function
+ <tt>myfun</tt> over all sets indexed by <tt>indices</tt>. The output <tt>fval</tt> is
+ always an <i>(m \times j)</i> matrix, where <i>j</i> is the cardinality of <tt>indices</tt>.
+ 
+ Note that once the <tt>regions</tt> option is enabled, <tt>Union/feval()</tt> will not
+ perform point location. Instead, it will evaluate the function in all
+ sets indexed by <tt>indices</tt>, regardless of whether they contain <tt>x</tt> or
+ not.
+ 
+ The <tt>regions</tt> option allows to quickly evaluate multiple functions as
+ follows:
+ 
+ <tt>[first_value, idx] = U.feval(x, 'first_function')</tt>
+ <tt>second_value = U.feval(x, 'second_function', 'regions', idx)</tt>
+ 
+ In the second call, <tt>Union/feval</tt> will only evaluate <tt>second_function</tt>
+ in sets specified by the <tt>indices</tt> option, hence skipping expensive
+ point location.
+
+    
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
 		<name>U</name>
-        <descr>Union of sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+        <descr>Union of convex sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
 		<class name="Union"/>
 	</input>
 	<input required="true">
 		<name>x</name>
-        <descr>A point given as a real vector with the same dimension as the convex set.</descr>
+        <descr>A point at which the function should be evaluated. The point must be given as a column 
+        real vector with the same dimension as the convex set.</descr>
 		<class name="double"/>
 	</input>
 	<input>
-		<name>name</name>
+		<name>function_name</name>
         <descr>Name of the function to evaluate. The string must match one of the stored function names.
-        For multiple names, provide <tt>pos</tt> as a cell array of strings.</descr>
+            If there is only one function attached, this argument can be omitted.
+        </descr>
 		<!-- any class name can be used, it can even be omitted -->
 		<class name="char"/>
 	</input>
@@ -48,11 +166,30 @@
     
 	<!-- now describe output arguments -->
 	<output>
-		<name>y</name>
-        <descr>Value of the function for the point <tt>x</tt> over the union of convex sets <tt>U</tt>.</descr>
-		<class name="double or cell"/>
+		<name>fval</name>
+        <descr>Function value at the point <tt>x</tt> over the union of convex sets <tt>U</tt>.</descr>
+		<class name="double"/>
+	</output>
+    <output>
+		<name>feasible</name>
+        <descr>Logical value indicating if the point <tt>x</tt> is contained in the union or not.</descr>
+        <class name="logical">
+                <option>1</option>
+                <option>0</option>
+        </class>
+	</output>
+    <output>
+		<name>idx</name>
+        <descr>Vector of indices of sets that contain the point <tt>x</tt>.</descr>
+        <class name="double"/>
+	</output>
+    <output>
+		<name>tb_value</name>
+        <descr>Value of the tie-breaking function if the point belongs to multiple sets.</descr>
+        <class name="double"/>
 	</output>
 
+    
 	<!-- we can provide multiple code examples -->
     <example> 
         <descr> PWA function over two Yalmip sets and polyhedron</descr>
@@ -64,32 +201,35 @@
         <cmd> Y(1) = YSet(x,F); </cmd>
         <cmd> Y(2) = YSet(x,G); </cmd>
         <descr> Add two functions "a" and "b" to the sets. </descr>
-        <cmd> Y.addFunction(AffFunction(2*eye(2),[1;-1]),'a'); </cmd>
+        <cmd> Y.addFunction(AffFunction([1,-0.4],-1),'a'); </cmd>
         <cmd> Y.addFunction(AffFunction(3*eye(2),[-1;1]),'b'); </cmd>
         <descr> Create the <tt>Union</tt> object. </descr>
         <cmd> U = Union(Y); </cmd>
         <descr> Add an affine set to the union </descr>
         <cmd> P = Polyhedron('Ae',[0 1],'be',-1.5)</cmd>
-        <cmd> P.addFunction(AffFunction(4*eye(2),[1;1]),'a');</cmd>
+        <cmd> P.addFunction(AffFunction([-0.6, 0.5], 0.8),'a');</cmd>
         <cmd> P.addFunction(AffFunction(eye(2)),'b');</cmd>
         <cmd> U.add(P); </cmd>
-        <descr> Evaluate all functions for the point <i>v=(1,1)</i> </descr>        
+        <descr> Evaluate function "a" for the point <i>v=(1,1)</i> </descr>        
         <cmd> v = [1;1]; </cmd>
-        <cmd> y1 = U.feval(v) </cmd>
-        <descr> The output is a cell that contains the values for all functions defined above the point <i>v</i>.</descr>
-        <descr> We can provide the function name to evaluate just one function. </descr>
-        <cmd> y2 = U.feval([1,-1.5],'b') </cmd>
-        <descr> The output is again a cell, because this point is contained in two sets. In particular, it lies exactly 
-            on the boundary of those sets.</descr>
-        <descr> Evaluate the first function "a" for the point (2,1).</descr>
-        <cmd> y3 = U.feval([2,1],'a') </cmd>
+        <cmd> y1 = U.feval(v,'a') </cmd>
+        <descr> Plot the sets to see the union.</descr>
+        <cmd> U.plot('color','lightgreen'); </cmd>
+        <descr> Assume that we provide a point that lies in two sets, for instance [1;-1.5] </descr>
+        <cmd> y2 = U.feval([1;-1.5],'b') </cmd>
+        <descr> The output is a matrix because this point is contained in two sets. In particular, it lies exactly 
+            on the boundary of those sets. If we want just one output, we specify a tie-breaking function. </descr>
+        <descr> Evaluate the function 'b' with respect to a tie-breaking function 'a'.</descr>
+        <cmd> y3 = U.feval([1;-1.5],'b','tiebreak','a') </cmd>
     </example>
+    
 
 	<!-- multiple related function can be defined -->
 	<related>fplot</related>
 	
 	<!-- multiple authors can be defined -->
 	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
 
 	<!-- finally, the text of the license -->
 	<license macro="GPL2"/>

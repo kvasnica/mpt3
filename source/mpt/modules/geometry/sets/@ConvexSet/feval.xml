@@ -5,39 +5,41 @@
 	
 	<!-- one-line description of the function -->
 	<info>
-		Evaluates function over the set.
+		Evaluates a function defined over a convex set or an array thereof.
 	</info>
 	
-	<syntax>y = feval(Set,x,name)</syntax>
-	<syntax>y = Set.feval(x,name)</syntax>
-    <syntax>y = Set.feval(x)</syntax>
+	<syntax>[fval, feasible] = Set.feval(x)</syntax>
+	<syntax>[fval, feasible] = Set.feval(x,function_name)</syntax>
+    <syntax>[fval, feasible] = feval(Set,x,function_name)</syntax>
+    
 
 	<!-- long description of the function -->
 	<descr>
         Evaluates function for given value of the point <tt>x</tt> over the convex <tt>Set</tt> characterized
-        by the the string <tt>name</tt>.
+        by the the string <tt>function_name</tt>.
         The dimension of the vector <tt>x</tt> must be the same as the dimension of the <tt>Set</tt>.
         If the <tt>Set</tt> is an array of convex sets, the function values are
-        returned in a cell array. For a point that lies outside of the <tt>Set</tt>, the output is empty.
+        returned in an array. For a point that lies outside of the <tt>Set</tt>, the output is <tt>NaN</tt>.
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
 		<name>Set</name>
-        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+        <descr>Convex set or an array thereof, i.e. any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
 		<class name="ConvexSet"/>
 	</input>
 	<input required="true">
 		<name>x</name>
-        <descr>A point given as a real vector with the same dimension as the convex set.</descr>
+        <descr>A point at which the function should be evaluated. The point must be given as column and must be in the same dimension as the set.</descr>
 		<class name="double"/>
 	</input>
 	<input>
-		<name>name</name>
-        <descr>Name of the function to evaluate from the array.
-        String must match one of the names stored function names.
-        For multiple names, specify <tt>name</tt> as a cell array of strings.</descr>
+		<name>function_name</name>
+        <descr>String name of the function to evaluate. It must refer
+                   to a single function. If omitted, <tt>S.feval(x)</tt> only
+                works if the set has a single function. 
+        </descr>
 		<!-- any class name can be used, it can even be omitted -->
 		<class name="char"/>
 	</input>
@@ -45,10 +47,19 @@
     
 	<!-- now describe output arguments -->
 	<output>
-		<name>y</name>
-        <descr>Value of the function for the point <tt>x</tt> over the convex <tt>Set</tt>.</descr>
-		<class name="double or cell"/>
+		<name>fval</name>
+        <descr>An <i>(n \times m)</i> matrix of function values at <tt>x</tt>, where <i>m</i> is the number
+            of sets. If <tt>x</tt> is not contained in the <i>j</i>-th set, then the <i>j</i>-th
+        column of <tt>fval</tt> is a vector of <tt>NaN</tt>.</descr>
+		<class name="double"/>
 	</output>
+    <output>
+        <name>feasible</name>
+            <descr>An <i> (1 \times m)</i> vector of logicals. <tt>feasible(j)=true</tt> if the <i>j</i>-th
+                element of the array contains <tt>x</tt>.
+        </descr>
+        <class name="double"/>
+    </output>
 
 	<!-- we can provide multiple code examples -->
     <example> 
@@ -58,8 +69,8 @@
         <descr> Assign a quadratic function to it </descr>
         <cmd> Q = QuadFunction([1 2;-2 3],[0 -5],0.6) </cmd>
         <cmd> P.addFunction(Q,'q'); </cmd>
-        <descr> Obtain the value of the function for the point [-1;0] </descr>
-        <cmd> x = [-1, -1.5];</cmd>
+        <descr> Obtain the value of the function for the point [-1;-1.5] </descr>
+        <cmd> x = [-1; -1.5];</cmd>
         <cmd> y = P.feval(x)</cmd>
         <descr> We can plot the function over the set with the point [x,y] </descr>
         <cmd> P.fplot; hold on;  text(x(1),x(2),y,'\bf{x}','FontSize',14); </cmd>
@@ -74,10 +85,11 @@
         <cmd> P.addFunction(F1, 'a') </cmd>
         <cmd> P.addFunction(F2, 'b') </cmd>
         <cmd> P.addFunction(F3, 'c') </cmd>
-        <descr> Evaluate function "a" for the point [-1,-1] </descr>
-        <cmd> P.feval([-1,-1],'a') </cmd>
-        <descr> Evaluate functions "b" and "c" for the point [-1,-1] </descr>
-        <cmd> y = P.feval([-1,-1],{'b','c'}) </cmd>        
+        <descr> Evaluate function "a" for the point [-1;-1] </descr>
+        <cmd> P.feval([-1;-1],'a') </cmd>
+        <descr> Evaluate functions "b" and "c" for the point [-1;-1] </descr>
+        <cmd> y1 = P.feval([-1;-1],'b') </cmd>        
+        <cmd> y2 = P.feval([-1;-1],'c') </cmd>        
     </example>
 
 	<!-- multiple related function can be defined -->

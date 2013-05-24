@@ -59,7 +59,7 @@ PU.fplot('beta')
 
 pause
 disp('Plot the functions over polyhedra with some properties.');
-PU.fplot('beta',1,'Polyhedron',true)
+PU.fplot('beta','show_set',true)
 
 
 end
