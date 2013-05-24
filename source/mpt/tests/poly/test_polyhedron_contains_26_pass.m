@@ -11,18 +11,18 @@ asserterrmsg(msg, 'The input must be a real vector/matrix or a Polyhedron object
 
 % "x" must have a correct dimension
 x = [1; 1];
-worked = run_in_caller('t = P.contains(x);');
-assert(~worked);
+[~, msg] = run_in_caller('t = P.contains(x);');
+asserterrmsg(msg, 'The point(s) must be 1x1 vector(s).');
 
 % "x" must have a correct dimension (P in V-rep)
 P = Polyhedron([-1; 1]);
 x = [1; 1];
-[worked, msg] = run_in_caller('t = P.contains(x);');
-assert(~worked);
+[~, msg] = run_in_caller('t = P.contains(x);');
+asserterrmsg(msg, 'The vector/matrix "x" must have 1 rows.');
 
 % "x" can only be a single polyhedron
 x = [Polyhedron, Polyhedron];
 [~, msg] = run_in_caller('t = P.contains(x);');
-asserterrmsg(msg, 'Can only test containement of a single polyhedron.');
+asserterrmsg(msg, 'Can only test containment of a single polyhedron.');
 
 end

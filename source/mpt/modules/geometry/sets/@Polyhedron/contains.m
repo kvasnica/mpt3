@@ -73,7 +73,7 @@ elseif isnumeric(x) && m==1 && P.hasHRep
 	% this is a frequent case in Polyhedron/meshGrid, which needs to be as
 	% fast as possible to have decent runtime of Polyhedron/fplot
     if d~=P.Dim
-        error('The point(s) must have the dimension %i as the set.',P.Dim);
+        error('The point(s) must be %dx1 vector(s).', P.Dim);
     end
 	tf = false(m, n);
 	for i = 1:n
