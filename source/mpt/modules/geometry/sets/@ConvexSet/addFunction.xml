@@ -81,7 +81,8 @@
         <cmd> Set.addFunction(f1, 'polynomial')</cmd>
         <cmd> Set.addFunction(f2, 'rational') </cmd>
         <descr> Plot the functions above the set </descr>
-        <cmd> Set.fplot() </cmd>
+        <cmd> Set.fplot('polynomial') </cmd>
+        <cmd> Set.fplot('rational') </cmd>
     </example>
 
 	<!-- multiple related function can be defined -->
