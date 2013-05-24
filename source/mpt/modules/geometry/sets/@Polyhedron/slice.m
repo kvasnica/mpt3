@@ -1,61 +1,51 @@
-function Psliced = slice(P, dims, offsets)
+function S = slice(P, dims, values)
 %
-% Slice the set through the given dimensions.<p>
+% Slice a polyhedron by through given dimensions
 %
-% @param dims Variables to remove
-% @return Sliced polyhedron
+% S = P.slice(dims)
+% S = P.slice(dims, values)
 %
+% If "values" is omitted, then "values = zeros(size(dims))".
+%
+% When P = {x | A*x <= b, Aeq*x == beq}, then
+% S = { x | A*x <= b, Aeq*x == beq, x(dims) == values }
+%
+% Note that dimension of S is equal to dimension of P.
 
-
-if nargin < 3,
-    offsets = 0;
+error(nargchk(2, 3, nargin));
+if nargin<3
+	values = zeros(size(dims));
 end
 
-
-% deal with arrays
-no = numel(P);
-if no>1
-    Psliced = cell(size(P));
-    parfor i=1:no
-        Psliced{i} = P(i).slice(dims, offsets);
-    end
-    return;
+%% deal with arrays
+if numel(P)>1
+	S = P.forEach(@(e) e.slice(dims, values));
+	return
 end
         
-dim = P.Dim;
-if dim<1
-    error('Cannot slice with empty polyhedra.');
+%% validation
+if P.isEmptySet
+    error('Cannot slice empty polyhedra.');
 end
 % check dimensions
 for i=1:numel(dims)
     validate_dimension(dims(i));
 end
 if any(dims>P.Dim)
-    error('Cannot compute slicing on higher dimension than %i.', P.Dim);
+    error('The second input cannot exceed dimension of the polyhedron.');
+end
+if numel(values)~=numel(dims)
+	error('"values" must be a vector with %d element(s).', numel(dims));
 end
 
+%% computation
 
-%% the algorithm
-Psliced(size(offsets)) = Polyhedron;
-parfor i=1:length(offsets)
-  % Set all dimensions we're not interested in to offset
-  I = eye(P.Dim);
-  ind = ones(P.Dim,1) == 1; ind(dims) = false;
-  tmp = P.intersect(Polyhedron('He',[I(ind,:) offsets(i)*ones(sum(ind),1)]));
-
-  % Project onto the dimensions that we want
-  Psliced(i) = tmp.projection(dims);
+% require the H-representation (the getters computes it automatically if
+% it does not exist)
+Z = zeros(numel(dims), P.Dim);
+for i = 1:numel(dims)
+	Z(i, dims(i)) = 1;
 end
-
-
-% if P.hasHRep
-%   A = P.A; Ae = P.Ae;
-%   Psliced = Polyhedron('H',[A(:,dims) P.b], 'He', [Ae(:,dims) P.be]);
-% else
-%   % Intersect with affine hull
-%   I = eye(P.Dim);
-%   ind = ones(P.Dim,1) == 1; ind(dims) = false;  
-%   Psliced = P.intersect(Polyhedron('He',[I(ind,:) zeros(sum(ind),1)]));
-% end
+S = Polyhedron('H', P.H, 'He', [P.He; [Z, values(:)]]);
 
 end

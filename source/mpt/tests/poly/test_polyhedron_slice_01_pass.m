@@ -1,15 +1,38 @@
 function test_polyhedron_slice_01_pass
 %
-% one dim
+% reject bogus cases
 % 
 
-P = ExamplePoly.randHrep('d',3);
+% cannot slice an empty polyhedron
+P = Polyhedron;
+[~, msg] = run_in_caller('P.slice(1,[0.2 0.5])');
+asserterrmsg(msg, 'Cannot slice empty polyhedra.');
 
-S = P.slice(1,0.2);
+% another empty set
+P = Polyhedron([1; -1], [-1; 0]);
+assert(P.isEmptySet);
+assert(P.Dim==1);
+[~, msg] = run_in_caller('P.slice(1,[0.2 0.5])');
+asserterrmsg(msg, 'Cannot slice empty polyhedra.');
 
+% dimensions must be correct
+P = Polyhedron('lb', -1, 'ub', 1);
+[~, msg] = run_in_caller('P.slice(0)');
+asserterrmsg(msg, 'Input argument is a not valid dimension.');
+[~, msg] = run_in_caller('P.slice(0.1)');
+asserterrmsg(msg, 'Input argument is a not valid dimension.');
+[~, msg] = run_in_caller('P.slice(2)');
+asserterrmsg(msg, 'The second input cannot exceed dimension of the polyhedron.');
 
-if ~S.contains(0.2)
-    error('The point must be inside S.');
-end
+% more values than dimensions
+P = Polyhedron('lb', [-1; -1; -1], 'ub', [1; 1; 1]);
+[~, msg] = run_in_caller('P.slice([1 3], 0.1)');
+asserterrmsg(msg, '"values" must be a vector with 2 element(s).');
+[~, msg] = run_in_caller('P.slice([1], [0.1, 0.2])');
+asserterrmsg(msg, '"values" must be a vector with 1 element(s).');
+
+% less values than dimensions
+[~, msg] = run_in_caller('P.slice([1 3], [0.1])');
+asserterrmsg(msg, '"values" must be a vector with 2 element(s).');
 
 end

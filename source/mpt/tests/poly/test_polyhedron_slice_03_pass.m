@@ -1,29 +1,18 @@
 function test_polyhedron_slice_03_pass
 %
-% two dims, Vrep
+% array of polyhedra
 % 
 
-P = 5*ExamplePoly.randVrep('d',3,'nr',1);
-while ~P.contains(zeros(3,1))
-    P = 5*ExamplePoly.randVrep('d',3,'nr',1);
-end
+P1 = Polyhedron([-1 0; 1 3; 1 -1; 2 0]); % 2D fulldim
+P2 = Polyhedron([-1 0 0.1; 1 3 0.1; 1 -1 0.1; 2 0 0.1]); % 3D lowdim
+P = [P1 P2];
 
-S = P.slice([1:2],1);
-
-T=S.affineMap([eye(2);0 0]).plus([0;0;1]);
-if ~P.contains(T)
-    error('The set must be contained in P.');
-end
-
-% three cuts
-offset = [0.1, -0.2, 0.3];
-Sn = P.slice([1:2],offset);
-
-for i=1:3
-    Tn=Sn.affineMap([eye(2);0 0]).plus([0;0;offset(i)]);
-    if ~P.contains(Tn(i))
-        error('The set must be contained in P.');
-    end
-end
+S = P.slice(1, -0.5);
+S1good = Polyhedron([-0.5 -0.25;-0.5 0.75]);
+S2good = Polyhedron([-0.5 -0.25 0.1;-0.5 0.75 0.1]);
+assert(isa(S, 'Polyhedron'));
+assert(numel(S)==2);
+assert(S(1)==S1good);
+assert(S(2)==S2good);
 
 end
