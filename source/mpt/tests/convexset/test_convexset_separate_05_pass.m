@@ -14,12 +14,23 @@ Y = [Y1; Y2];
 
 v = 10*randn(2,1);
 
-s = Y.separate(v);
+% arrays must be rejected
+[~, msg] = run_in_caller('s = Y.separate(v);');
+asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
+
+% forEach must require UniformOutput=true
+[~, msg] = run_in_caller('s = Y.forEach(@(e) e.separate(v))');
+asserterrmsg(msg, 'Non-scalar in Uniform output, at index 1, output 1.');
+
+% correct syntax
+s = Y.forEach(@(e) e.separate(v), 'UniformOutput', false);
 
 d = distance(Y,v);
+assert(isstruct(d));
+assert(numel(d)==numel(Y));
 
-x1 = (v+d{1}.y)/2;
-x2 = (v+d{2}.y)/2;
+x1 = (v+d(1).y)/2;
+x2 = (v+d(2).y)/2;
 
 P1 = Polyhedron('He',s{1});
 P2 = Polyhedron('He',s{2});

@@ -25,12 +25,9 @@ error(nargchk(2,2,nargin));
 validate_realvector(x);
 
 % deal with arrays
-no = numel(obj);
-if no>1
-    sol = cell(size(obj));
-    for i=1:no
-        sol{i} = obj(i).extreme(x);        
-    end
+if numel(obj)>1
+	% return an array of structures
+	sol = obj.forEach(@(elem) elem.extreme(x));
     return
 end
 

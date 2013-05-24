@@ -22,13 +22,8 @@ function T = triangulate(P)
 % -------------------------------------------------------------------
 %
 
-if numel(P)>1
-    T = cell(size(P));
-    parfor i=1:numel(P)
-        T{i}=P(i).triangulate;
-    end
-    return
-end
+% use P.forEach for arrays
+error(P.rejectArray());
 
 if ~P.isBounded || ~P.isFullDim || P.isEmptySet
     error('Only bounded, non-empty polyhedra in the full dimension can be triangulated.');

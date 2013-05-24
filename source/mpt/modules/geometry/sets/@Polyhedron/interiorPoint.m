@@ -24,13 +24,15 @@ if nargin < 2
     facetI = [];
 end
 
+%% allocate output
+% must be here to always have the same ordering of fields
+sol = struct('x', [], 'isStrict', [], 'r', []);
+
 %% deal with arrays
-if length(P)>1
-    sol = cell(size(P));
-    parfor i=1:length(P)
-        sol{i} = P(i).interiorPoint(facetI);
-    end
-    return;
+if numel(P)>1
+	% return an array of structures
+	sol = P.forEach(@(elem) elem.interiorPoint(facetI));
+    return
 end
 
 %% try to reuse a stored information
@@ -49,9 +51,6 @@ if ~isempty(facetI)
 end
 
 %% compute interior points
-
-% allocate output
-sol = struct('x',[],'isStrict',[],'r',[]);
 
 % try specific problems first for faster computation
 if isempty(facetI)

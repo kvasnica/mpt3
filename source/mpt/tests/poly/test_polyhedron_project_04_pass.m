@@ -5,7 +5,13 @@ function  test_polyhedron_project_04_pass
 
 P(1) = ExamplePoly.randVrep;
 P(2) = ExamplePoly.randHrep;
-d = P.project(randn(5,2));
+x = randn(5, 2);
+
+% arrays must be rejected
+[~, msg] = run_in_caller('d = P.project(x);');
+asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
+
+d = P.forEach(@(e) e.project(x), 'UniformOutput', false);
 
 for i=1:2
     dist = [d{i}.dist];

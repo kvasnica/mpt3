@@ -8,7 +8,11 @@ P(2) = Polyhedron('lb',-rand(3,1),'He',rand(1,4),'A',[1 -0.4 0],'b',1.5);
 
 v = 5*randn(3,1);
 
-s = P.separate(v);
+% reject arrays
+[~, msg] = run_in_caller('h = P.separate(v);');
+asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
+
+s = P.forEach(@(e) e.separate(v), 'UniformOutput', false);
 
 P1 = Polyhedron('He',s{1});
 P2 = Polyhedron('He',s{2});

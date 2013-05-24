@@ -8,10 +8,10 @@ P(2) = ExamplePoly.randHrep('d',16,'ne',9);
 
 M = P.incidenceMap;
 
-if ~any(M{1}.incVH)
+if ~any(M(1).incVH)
     error('Must be nonempty.');
 end
-if ~any(M{2}.incVH)
+if ~any(M(2).incVH)
     error('Must be nonempty.');
 end
 

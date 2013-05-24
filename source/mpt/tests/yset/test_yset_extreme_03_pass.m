@@ -47,10 +47,10 @@ S2 = YSet(x,F2);
 S = [S1;S2];
 s = S.extreme([5;-2]);
 
-if norm(s{1}.x-[-0.30799;-0.56737])>1e-4
+if norm(s(1).x-[-0.30799;-0.56737])>1e-4
     error('Wrong exreme point.');
 end
-if ~isinf(s{2}.supp)
+if ~isinf(s(2).supp)
     error('Wrong exreme point.');
 end
 

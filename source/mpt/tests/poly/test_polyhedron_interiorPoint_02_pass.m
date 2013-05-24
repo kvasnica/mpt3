@@ -12,14 +12,10 @@ for i=6:10
 end
 
 res = P.interiorPoint;
-
-if ~iscell(res)
-    error('Output must be a struct.');
-end
-if numel(res)~=10
-    error('10 outputs are expected.');
-end
-
-
+assert(isstruct(res));
+assert(numel(res)==numel(P));
+assert(isfield(res(1), 'x'));
+assert(isfield(res(1), 'isStrict'));
+assert(isfield(res(1), 'r'));
 
 end

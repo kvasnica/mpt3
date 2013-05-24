@@ -11,7 +11,16 @@ P(2) = Polyhedron('lb',-20*ones(5,1),'He',randn(4,6));
 t = [randn(4,12) zeros(4,1)];
 P(3) = Polyhedron('H', [randn(5,12) ones(5,1);t;-t]);
 
-a =  P.affineHull;
+% arrays must be rejected
+[~, msg] = run_in_caller('a = P.affineHull();');
+asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
+
+% non-uniform output by default
+[~, msg] = run_in_caller('a = P.forEach(@(e) e.affineHull());');
+asserterrmsg(msg, 'Non-scalar in Uniform output, at index 1, output 1.');
+
+% correct syntax
+a = P.forEach(@(e) e.affineHull(), 'UniformOutput', false);
 
 if ~isempty(a{1})
     error('First affine hull is empty.')

@@ -24,19 +24,10 @@ if isempty(MPTOPTIONS)
 end
 
 error(nargchk(2,2,nargin));
+error(obj.rejectArray());
 
 validate_realvector(x);
 
-% deal with arrays
-no = numel(obj);
-if no>1
-    sep = cell(size(obj));
-    for i=1:no
-        sep{i} = obj(i).separate(x);        
-    end
-    return
-end
-    
 if numel(x)~=obj.Dim
     error('The point "x" must be a vector with the length of %i.', obj.Dim);
 end

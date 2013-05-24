@@ -11,12 +11,16 @@ Y = [YSet(x,F1), YSet(x,F2)];
 
 v = 10*randn(5,1);
 
-s = Y.separate(v);
+% reject arrays
+[~, msg] = run_in_caller('h = Y.separate(v);');
+asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
+
+s = Y.forEach(@(e) e.separate(v), 'UniformOutput', false);
 
 d = distance(Y,v);
 
-x1 = (v+d{1}.y)/2;
-x2 = (v+d{2}.y)/2;
+x1 = (v+d(1).y)/2;
+x2 = (v+d(2).y)/2;
 
 P1 = Polyhedron('He',s{1});
 P2 = Polyhedron('He',s{2});

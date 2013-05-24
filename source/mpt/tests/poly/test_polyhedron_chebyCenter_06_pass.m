@@ -18,7 +18,7 @@ P.minHRep();
 xc = P.chebyCenter;
 
 for i=1:2
-   if xc{i}.exitflag~=MPTOPTIONS.OK
+   if xc(i).exitflag~=MPTOPTIONS.OK
        error('Should be ok here.');
    end
 end
@@ -27,7 +27,7 @@ end
 xn = P.chebyCenter([2 3],5);
 
 for i=1:2
-    if xn{i}.r>5.000001
+    if xn(i).r>5.000001
         error('Radius cannot be greater than t');
     end
 end

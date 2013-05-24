@@ -57,14 +57,14 @@ z = [ -1.9107       1.3343        1.031];
 s = P.project(z);
 
 for i=1:3
-    if ~P(i).contains(s{i}.x)
+    if ~P(i).contains(s(i).x)
         error('The point must be inside the set.');
     end
 end
 
 % slight perturbation must kick the point out of the set
 for i=1:3
-    if P(i).contains(s{i}.x+0.0001*ones(3,1))
+    if P(i).contains(s(i).x+0.0001*ones(3,1))
         error('The point must be inside the set.');
     end
 end

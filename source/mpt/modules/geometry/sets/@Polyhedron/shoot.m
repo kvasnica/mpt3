@@ -50,14 +50,14 @@ else
 end
 
 % deal with arrays
-no = numel(obj);
-if no>1
-    sol = cell(size(obj));    
-    parfor i=1:no
-        sol{i} = obj(i).shoot(r,x0);
-    end
-    return;
+if numel(obj)>1
+	% return an array of structures
+	sol = obj.forEach(@(elem) elem.shoot(r,x0));
+    return
 end
+
+% prealocate output
+sol = struct('exitflag', [], 'x', [], 'alpha', []);
 
 % check sizes of vectors
 if length(r) ~= obj.Dim,

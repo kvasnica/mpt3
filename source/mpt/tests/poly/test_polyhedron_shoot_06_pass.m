@@ -19,16 +19,15 @@ P(2) = Polyhedron('V',...
 r = P.shoot([0 0 1]);
 
 for i=1:2
-    if r{i}.exitflag~=MPTOPTIONS.OK
+    if r(i).exitflag~=MPTOPTIONS.OK
         error('Must be ok handle here.');
-    end
-    if norm(r{1}.alpha-3)>1e-4
-        error('Wrong alpha.');
-    end
-    if norm(r{2}.alpha-30)>1e-4
-        error('Wrong alpha.');
-    end    
+	end
 end
-
+if norm(r(1).alpha-3)>1e-4
+	error('Wrong alpha.');
+end
+if norm(r(2).alpha-30)>1e-4
+	error('Wrong alpha.');
+end
 
 end

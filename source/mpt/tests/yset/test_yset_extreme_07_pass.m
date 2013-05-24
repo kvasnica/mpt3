@@ -21,7 +21,7 @@ A2 = [-0.53144     -0.36517
 b1 = 5*[0.5; 0.62; 0.78; 0.12; 0.67; 3.5];
 b2 = [0.4; 0.78; 0.98; 0.52; 0.5; 0.71; 8.3];
 
-F = set(x'*x <= 1) + set(A1*x<=b1) + set(A2*x<=b2);
+F = [x'*x <= 1] + [A1*x<=b1] + [A2*x<=b2];
 
 S = YSet(x,F);
 
@@ -32,9 +32,10 @@ if ~S.contains(z)
 end
 
 s = S.extreme(z);
+% the extreme point must satisfy all three sets of constraints
 assert(s.x'*s.x<=1);
-assert(all(A1*s.x <= b1));
-assert(all(A2*s.x <= b2));
+assert(max(A1*s.x-b1)<1e-7);
+assert(max(A2*s.x-b2)<1e-7);
 
 % the computed point must lie on the boundary of the set
 if ~S.contains(s.x)

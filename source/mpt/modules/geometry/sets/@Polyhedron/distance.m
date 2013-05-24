@@ -32,15 +32,14 @@ else
     validate_realvector(S);
 end
 
-% deal with arrays
-no = numel(P);
-if no>1
-    ret = cell(size(P));
-    for i=1:no
-        ret{i} = P(i).distance(S);
-    end
-    return;
+if numel(P)>1
+	% return an array of structures
+	ret = P.forEach(@(elem) elem.distance(S));
+    return
 end
+
+% pre-alocate output
+ret = struct('exitflag', [], 'dist', [], 'x', [], 'y', []);
 
 %% S is supposedly a point
 if ~isa(S,'Polyhedron') 

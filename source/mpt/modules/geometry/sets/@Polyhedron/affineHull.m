@@ -7,14 +7,8 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-% deal with arrays
-if numel(P)>1
-    aff = cell(size(P));
-    for i=1:numel(P)
-        aff{i} = P(i).affineHull;
-    end
-    return;
-end
+% use P.forEach() for arrays
+error(P.rejectArray());
 
 %aff = [];
 

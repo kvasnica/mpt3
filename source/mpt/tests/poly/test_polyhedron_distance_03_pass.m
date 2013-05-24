@@ -45,13 +45,13 @@ S = [1;2;3;4;5;6];
 
 s = P.distance(S);
 
-if norm(s{1}.dist-9.3488)>1e-3
+if norm(s(1).dist-9.3488)>1e-3
     error('Wrong distance.');
 end
-if norm(s{2}.dist-4.3536)>1e-3
+if norm(s(2).dist-4.3536)>1e-3
     error('Wrong distance.');
 end
-if norm(s{3}.dist-15.892)>1e-3
+if norm(s(3).dist-15.892)>1e-3
     error('Wrong distance.');
 end
 

@@ -38,13 +38,15 @@ else
 end
 
 %% deal with arrays
-if length(P)>1
-    sol = cell(size(P));
-    parfor i=1:length(P)
-        sol{i} = chebyCenter(P(i), facetI, bound);
-    end
-    return;
+if numel(P)>1
+	% return an array of structures
+	sol = P.forEach(@(elem) elem.chebyCenter(facetI, bound));
+    return
 end
+
+%% allocate output
+% must be here to always have the same ordering of fields
+sol = struct('exitflag', [], 'x', [], 'r', -inf);
 
 %% checks for polyhedra
 if ~P.hasHRep

@@ -8,11 +8,10 @@ for i=1:10,
 end
 
 r=P.chebyCenter;
-
-if ~isa(r,'cell')
-    if length(r)~=10
-        error('Result must be a cell with 10 elements.');
-    end
-end
+assert(isstruct(r));
+assert(numel(r)==numel(P));
+assert(isfield(r(1), 'exitflag'));
+assert(isfield(r(1), 'x'));
+assert(isfield(r(1), 'r'));
 
 end

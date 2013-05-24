@@ -17,13 +17,8 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-if numel(obj)>1
-    aff = cell(size(obj));
-    for i=1:numel(obj)
-        aff{i} = obj(i).affineHull;
-    end
-    return;
-end
+% use forEach for arrays
+error(obj.rejectArray());
 
 % prepare output
 aff = [];

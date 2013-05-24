@@ -39,7 +39,7 @@ x =  [0.2, -0.2, -0.3, 0, -2.5, -0.2, 0.3, -1.2];
 r = P.shoot(x);
 
 for i=1:2
-    if r{i}.exitflag~=MPTOPTIONS.OK
+    if r(i).exitflag~=MPTOPTIONS.OK
         error('Must be ok handle here.');
     end
 end

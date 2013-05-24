@@ -41,7 +41,7 @@ P(2) = Polyhedron(V);
 res = P.interiorPoint;
 
 for i=1:2
-    if ~P(i).contains(res{i}.x)
+    if ~P(i).contains(res(i).x)
         error('The point must lie inside the set.');
     end    
 end

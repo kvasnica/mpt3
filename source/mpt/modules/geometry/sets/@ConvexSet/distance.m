@@ -20,11 +20,9 @@ error(nargchk(2,2,nargin));
 
 % if obj is an array, put the results inside an array
 if numel(obj)>1
-    ret = cell(size(obj));
-    for i=1:numel(obj)
-        ret{i} = obj(i).distance(x);
-    end
-    return;
+	% return an array of structures
+	ret = obj.forEach(@(elem) elem.distance(x));
+    return
 end
 
 validate_realvector(x);

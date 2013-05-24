@@ -19,15 +19,7 @@ if isempty(MPTOPTIONS)
 end
 
 error(nargchk(2,2,nargin));
-
-% deal with arrays
-if numel(P)>1
-    X = cell(size(P));
-    for i=1:numel(P)
-        X{i} = grid(P(i),N);
-    end    
-    return;
-end
+error(P.rejectArray());
 
 if P.isEmptySet
     error('Empty set, there is nothing to be gridded here.');

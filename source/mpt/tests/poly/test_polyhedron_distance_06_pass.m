@@ -23,12 +23,12 @@ S = Polyhedron('lb',[-1;-1],'ub',[1;1]) + [-3;3];
 d=P.distance(S);
 
 % P1 & S intersect -> distance = 0
-if norm(d{1}.dist)>1e-4
+if norm(d(1).dist)>1e-4
     error('Wrong distance.');
 end
 
 % P2 does not intersect, the distance must be greater than 2
-if d{2}.dist<2
+if d(2).dist<2
     error('Wrong distance.');
 end
 

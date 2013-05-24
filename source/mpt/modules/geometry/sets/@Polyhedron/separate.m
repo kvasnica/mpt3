@@ -50,13 +50,7 @@ if numel(S)>1
 end
 
 % deal with arrays
-if numel(P)>1
-    sep = cell(size(P));
-    parfor i=1:numel(P)
-        sep{i} = P(i).separate(S);
-    end
-    return;
-end
+error(P.rejectArray());
 
 if S.Dim ~= P.Dim,
     error('S must be in the dimension %i, the same as P.', P.Dim);

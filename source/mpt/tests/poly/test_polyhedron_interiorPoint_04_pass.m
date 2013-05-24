@@ -58,7 +58,7 @@ f2 = setdiff(1:size(H2,1),2);
 R(2) = Polyhedron('H',H2(f2,:),'He',H2(2,:));
 
 for i=1:2
-    if ~R(i).contains(res{i}.x)
+    if ~R(i).contains(res(i).x)
         error('The point must lie inside the set.');
     end    
 end

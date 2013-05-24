@@ -26,15 +26,15 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-%% deal with arrays
-if length(P)>1
-    iMap = cell(size(P));
-    parfor i=1:length(P)
-        iMap{i} = P(i).incidenceMap;
-    end
-    return;
+% deal with arrays
+if numel(P)>1
+	% return an array of structures
+	iMap = P.forEach(@(elem) elem.incidenceMap);
+    return
 end
 
+% pre-alocate output
+iMap = struct('V', [], 'R', [], 'H', [], 'He', [], 'incRH', [], 'incVH', [])
 
 % Need H-rep and V-rep
 hRep = P.minHRep();

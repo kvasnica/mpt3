@@ -26,11 +26,11 @@ z = [0;0];
 
 s = S.project(z);
 
-if norm(s{1}.dist-1.3577,Inf)>1e-4
+if norm(s(1).dist-1.3577,Inf)>1e-4
     error('Wrong distance.');
 end
 
-if norm(s{2}.dist)>1e-4
+if norm(s(2).dist)>1e-4
     error('The distance should be 0 because the point is inside.');
 end
 

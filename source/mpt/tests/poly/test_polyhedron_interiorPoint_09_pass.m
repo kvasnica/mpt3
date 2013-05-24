@@ -48,7 +48,7 @@ f2 = setdiff(1:size(H2,1),[2,4]);
 S(2) = Polyhedron('H',H2(f2,:),'He',[H2([2,4],:);P(2).He]);
 
 for i=1:2
-    if ~S(i).contains(res{i}.x)
+    if ~S(i).contains(res(i).x)
         error('This point must lie on the both facets.');
     end
 end

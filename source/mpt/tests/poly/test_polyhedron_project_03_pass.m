@@ -8,7 +8,7 @@ P(2) = ExamplePoly.randHrep;
 d = P.project([12;30]);
 
 for i=1:2
-    if isempty(d{i}.dist)
+    if isempty(d(i).dist)
         error('Wrong result.');
     end
 end

@@ -35,16 +35,8 @@ if any(D(1)~=D)
     error('The polyhedron array must be in the same dimension.');
 end
 
-
 % deal with arrays
-no = numel(obj);
-if no>1
-    sol = cell(size(obj));    
-    parfor i=1:no
-        sol{i} = obj(i).project(y);
-    end
-    return;
-end
+error(obj.rejectArray());
 
 dim = obj.Dim;
 if dim<1
