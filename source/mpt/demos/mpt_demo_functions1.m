@@ -99,7 +99,7 @@ P3.addFunction(AffFunction(randn(2)),'power')
 pause
 
 disp(' ');disp(' ');
-disp('Multiple functions can be assign only at separate calls.');
+disp('Multiple functions can be assigned only at separate calls.');
 P4 = Polyhedron('V',randn(6,2));
 L(1) = AffFunction(randn(2),randn(2,1));
 L(2) = AffFunction(randn(2),randn(2,1));
@@ -118,12 +118,12 @@ P3.fplot('power')
 pause
 disp(' ');disp(' ');
 disp('Plot the first element of the vector valued function "a"');
-P4.fplot('a',1)
+P4.fplot('a','position',1,'color','y')
 
 pause
 disp(' ');disp(' ');
 disp('Plot the second element of the vector valued function "b" based on the index.');
-P4.fplot('b',2)
+P4.fplot('b','position',2,'color','m')
 
 pause
 
@@ -133,7 +133,7 @@ disp('Evaluate the function based on the name');
 P3.feval([1;0],'power')
 
 disp(' ');disp(' ');
-disp('Evaluate all functions');
-P3.feval([-1;0])
+disp('Evaluate the function "gain"');
+P3.feval([-1;0],'gain')
 
 end

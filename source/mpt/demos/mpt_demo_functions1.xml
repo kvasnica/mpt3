@@ -81,17 +81,17 @@
             <cmd> P3.fplot('gain') </cmd>
             <cmd> P3.fplot('power') </cmd>
             <descr> Plot the first element of the vector valued function "a" </descr>
-            <cmd> P4.fplot('a',1) </cmd>            
+            <cmd> P4.fplot('a','position',1,'color','y') </cmd>            
             <descr> Plot the second element of the vector valued function "b" based on the index.</descr> 
-            <cmd> P4.fplot('b',2) </cmd>            
+            <cmd> P4.fplot('b','position',2,'color','m') </cmd>            
         </example>
 
         <example>
             <descr> Evaluation of functions </descr>
             <descr> Evaluate the function based on the name </descr>
             <cmd> P3.feval([1;0],'power') </cmd>
-            <descr> Evaluate all functions </descr>
-            <cmd> P3.feval([-1;0]) </cmd>
+            <descr> Evaluate the function "gain" </descr>
+            <cmd> P3.feval([-1;0],'gain') </cmd>
         </example>
     
     

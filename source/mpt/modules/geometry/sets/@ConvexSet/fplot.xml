@@ -5,19 +5,21 @@
 	
 	<!-- one-line description of the function -->
 	<info>
-		Plot function over the set.
+		Plot a single function over a convex set or over an array of convex sets.
 	</info>
 	
-	<syntax>h = fplot(Set, name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
-	<syntax>h = Set.fplot(name, dim, 'Prop1', value1, 'Prop2', value2)</syntax>
+    <syntax>h = Set.fplot()</syntax>
+    <syntax>h = Set.fplot('name', 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = fplot(Set, 'name', 'Prop1', value1, 'Prop2', value2)</syntax>
+
 
 	<!-- long description of the function -->
 	<descr>
-        Plot function over the set. If there are more functions, then the string <tt>name</tt> identifies
-        the function to be plotted. By default, only the first function is plotted. If the function 
-        is vector valued, i.e. its range is greater than 1, than the first element of the 
-        function is plotted by default. For vector valued functions the <tt>dim</tt> indicates 
-        which element of the vector to plot.
+        Plot single function over a convex set. If there are more functions attached to a set, then the string <tt>name</tt> identifies
+        the function to be plotted. 
+        If the function is vector valued, i.e. its range is greater than 1, than the first element of the 
+        function is plotted by default. For vector valued functions, use the <tt>position</tt> property to indicate that
+        you want a different element of the function value to plot. 
 
         Figure properties, such as color, line width, etc, can be specified with "Property" - "Value" pairs. 
 	</descr>
@@ -30,31 +32,30 @@
 	</input>
 	<input>
 		<name>name</name>
-        <descr>If there are more functions over the set, the <tt>pos</tt> indicates the position of the function 
-        in the array by index or by a function name. Stored functions can be accessed inside <tt>Func</tt>
-        property.
+        <descr>If there are more functions attached to the set, this string indicates the <tt>name</tt> of the function to plot.
         </descr>
 		<class name="char"/>
-	</input>
-	<input>
-		<name>dim</name>
-        <descr>For vector valued functions, the <tt>dim</tt> indicates which element of the vector to plot.</descr>
-		<class name="double"/>
-        <default>1</default>
 	</input>
 	<input>
 		<name>Prop1</name>
         <descr>Specification of figure properties.</descr>
 		<class name="char">
-                <option>Grid</option><descr>With how many gridpoints to grid the circle/sphere. Default is 40.</descr>
+                <option>position</option><descr>For vector valued functions, the <tt>position</tt> indicates which element of the function value to plot.</descr>
+                <option>Grid</option><descr>With how many gridpoints to grid the circle/sphere. Default is 20.</descr>
                 <option>Color</option><descr>The color of the plot specified by real RGB vector or a string name of the color (e.g. 'gray');</descr>
-                <option>Wire</option><descr>Highlight or not the edges of the set. Default is false.</descr>
+                <option>Wire</option><descr>Highlight the edges of the set. Default is false.</descr>
                 <option>LineStyle</option><descr>Specify the type of the line to plot edges of the set. Accepted values are '-',':','-.','--', and'none'.</descr>
                 <option>LineWidth</option><descr>Specify the width of the line. Default is 1.</descr>
                 <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
                 <option>Contour</option><descr>Add contour graph. Default is false.</descr>
-                <option>ContourGrid</option><descr>With how many grid point to do the contour graph. Default is 20.</descr>
-                <option>Polyhedron</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
+                <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>ColorMap</option><descr>Color map given either as a M-by-3 matrix, or as a string. Default is 'mpt'.
+                                            Other available options are 'hsv', 'hot', 'gray', 'lightgray', 'bone', 'copper', 
+                                            'pink', 'white', 'flag', 'lines', 'colorcube','vga', 'jet', 'prism', 'cool',
+                                            'autumn', 'spring', 'winter', 'summer'.
+                                            </descr>
+                <option>ColorOrder</option><descr>Either 'fixed' for fixed ordering of colors, or 'random' for a random order. Default is 'fixed'.</descr>
 		</class>
 	</input>
     <input>
@@ -93,7 +94,7 @@
         <descr> Add functions to the set with names "a" and "b". </descr>
         <cmd> S.addFunction(Q,'a'); </cmd>
         <cmd> S.addFunction(L,'b'); </cmd>
-        <descr> Plot the function "b" based on the index  </descr>
+        <descr> Plot the function "b" based on the function name </descr>
         <cmd> S.fplot('b'); </cmd>
     </example>
     <example> 
@@ -111,9 +112,9 @@
         <cmd> S.addFunction(A2, 'wed'); </cmd>
         <cmd> S.addFunction(A3, 'fri'); </cmd>
         <descr> Plot the second element of the function "fri" in gray color.</descr>
-        <cmd> S.fplot('fri',2,'Color','gray') </cmd>
-        <descr> Plot the second element of the function "mon" and the set with some transparency.</descr>
-        <cmd> S.fplot('mon',2,'polyhedron',true,'alpha',0.6) </cmd>
+        <cmd> S.fplot('fri','position',2,'Color','gray') </cmd>
+        <descr> Plot the second element of the function "mon" and the underlying domain with some transparency.</descr>
+        <cmd> S.fplot('mon','position',2,'show_set',true,'alpha',0.6,'colororder','random') </cmd>
 
     </example>
 

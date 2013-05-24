@@ -39,7 +39,7 @@
         <cmd> res2 = problem2.solve </cmd>
         
         <descr> Solution is stored as "primal", we can plot it </descr>
-        <cmd> res2.xopt.fplot('primal',1,'Polyhedron',true,'LineWidth',3), title('Primal solution') </cmd>
+        <cmd> res2.xopt.fplot('primal','show_set',true,'LineWidth',3), title('Primal solution') </cmd>
     </example>
 
     <example>
@@ -51,7 +51,7 @@
         <cmd> res3 = problem3.solve </cmd>
         
         <descr> Plot the objective value </descr>
-        <cmd> res3.xopt.fplot('obj',1,'Polyhedron',true,'LineWidth',3), title('Objective value') </cmd>
+        <cmd> res3.xopt.fplot('obj','show_set',true,'LineWidth',3), title('Objective value') </cmd>
         
     </example>
 

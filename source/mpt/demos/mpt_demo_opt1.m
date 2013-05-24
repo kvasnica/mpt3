@@ -29,7 +29,7 @@ disp('Solve MPLP')
 res2 = problem2.solve
 
 disp('Solution is stored as "primal", we can plot it');
-res2.xopt.fplot('primal',1,'Polyhedron',true,'LineWidth',3)
+res2.xopt.fplot('primal','show_set',true,'LineWidth',3)
 title('Primal solution')
 
 pause
@@ -42,7 +42,7 @@ disp('Solve MPLP using MPT2')
 res3 = problem3.solve
 
 disp('Plot the objective value')
-res3.xopt.fplot('obj',1,'Polyhedron',true,'LineWidth',3)
+res3.xopt.fplot('obj','show_set',true,'LineWidth',3)
 title('Objective value')
 
 pause
