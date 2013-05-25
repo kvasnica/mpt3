@@ -12,12 +12,9 @@ classdef NormFunction < Function
 	%
 	% 2-norms are not supported because they are neither quadratic, nor
 	% piecewise linear.
-    
-	% TODO: Inherit @Function from MPTUIHandle such that we can mark the
-	% state of the object as modified/unmodified
 	
     properties(SetAccess=private)
-		Q=1; % weight (1 by default)
+		weight=1; % weight (1 by default)
 		type=1; % either 1 or Inf
 		D=0; % dimension of the domain
         R=1; % dimension of the range, norms are always scalar-valued
@@ -52,28 +49,28 @@ classdef NormFunction < Function
 			% validation of arguments is done in setters
 			obj.type = type;
 			if nargin==2
-				obj.Q = Q;
+				obj.weight = Q;
 			end
 
-			obj.Handle = @(x) norm(obj.Q*x, obj.type);
+			obj.Handle = @(x) norm(obj.weight*x, obj.type);
 		end
 		
-		function obj = set.Q(obj, Q)
+		function obj = set.weight(obj, Q)
 			% obj.Q setter
 			
 			if isempty(Q)
 				% restore norm(x, type)
-				obj.Q = 1;
+				obj.weight = 1;
 				obj.D = 0;
 			elseif isscalar(Q)
 				% restore unrestricted domain
 				validate_realmatrix(Q);
-				obj.Q = Q;
+				obj.weight = Q;
 				obj.D = 0;
 			else
 				% domain is equal to number of columns of Q
 				validate_realmatrix(Q);
-				obj.Q = Q;
+				obj.weight = Q;
 				obj.D = size(Q, 2);
 			end
 		end
@@ -122,7 +119,7 @@ classdef NormFunction < Function
 					isa(g, 'NormFunction') && ...
 					f.D==g.D && ...
 					f.type==g.type && ...
-					isequal(f.Q, g.Q);
+					isequal(f.weight, g.weight);
 			end
 		end
 

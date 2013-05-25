@@ -8,12 +8,12 @@ s = evalc('f.display()');
 assert(isequal(deblank(s), '1-norm function'));
 assert(isa(f, 'NormFunction'));
 assert(f.D==0); % unrestricted domain by default
-assert(f.Q==1);
+assert(f.weight==1);
 assert(isequal(f.type, n_type));
 
 % check evaluation
 x = randn(4, 1);
-assert(f.feval(x)==norm(f.Q*x, n_type));
+assert(f.feval(x)==norm(f.weight*x, n_type));
 
 % constructor with the weight
 n_Q = randn(4);
@@ -25,7 +25,7 @@ n_type = Inf;
 f = NormFunction(n_type);
 s = evalc('f.display()');
 assert(isequal(deblank(s), 'Inf-norm function'));
-assert(f.feval(x)==norm(f.Q*x, n_type));
+assert(f.feval(x)==norm(f.weight*x, n_type));
 
 % check evaluation with updated weighting matrix
 n_Q = randn(10);

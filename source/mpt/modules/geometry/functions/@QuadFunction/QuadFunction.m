@@ -13,10 +13,21 @@ classdef QuadFunction < Function
         g % affine term
         D=0; % dimension of the domain
         R=0; % dimension of the range        
-    end
+	end
+	properties(Dependent=true, SetAccess=private, Transient=true)
+		weight % used to access the leading term in penalties
+	end
     
-    methods(Access = public)
+    methods
         
+		function weight = get.weight(obj)
+			% QuadFunction.weight getter
+			%
+			% Returns the leading term of x'*H*x+F*x+g, i.e., H, when the
+			% function is employed to represent a penalty
+			weight = obj.H;
+		end
+
         % Constructor
         function obj = QuadFunction(varargin)
             %

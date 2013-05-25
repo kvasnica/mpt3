@@ -12,9 +12,20 @@ classdef AffFunction < Function
         D=0; % dimension of the domain
         R=0; % dimension of the range        
 	end
+	properties(Dependent=true, SetAccess=private, Transient=true)
+		weight % used to access the leading term in penalties
+	end
     
-    methods(Access = public)
+    methods
         
+		function weight = get.weight(obj)
+			% AffFunction.weight getter
+			%
+			% Returns the leading term of F*x+g, i.e., F, when the function
+			% is employed to represent a penalty
+			weight = obj.F;
+		end
+
         % Constructor
         function obj = AffFunction(F, g, data)
             %
