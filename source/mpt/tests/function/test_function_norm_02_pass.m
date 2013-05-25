@@ -22,15 +22,15 @@ assert(f.feval(x)==norm(n_Q*x, n_type));
 
 % check evaluation with updated norm type
 n_type = Inf;
-f.type = n_type;
+f = NormFunction(n_type);
 s = evalc('f.display()');
-assert(isequal(deblank(s), 'Inf-norm function in R^4'));
+assert(isequal(deblank(s), 'Inf-norm function'));
 assert(f.feval(x)==norm(f.Q*x, n_type));
 
 % check evaluation with updated weighting matrix
 n_Q = randn(10);
 x = randn(10, 1);
-f.Q = n_Q;
+f = NormFunction(n_type, n_Q);
 s = evalc('f.display()');
 assert(isequal(deblank(s), 'Inf-norm function in R^10'));
 assert(f.feval(x)==norm(n_Q*x, n_type));
@@ -39,20 +39,20 @@ assert(f.D==size(n_Q, 2));
 % check non-square weights
 x = randn(8, 1);
 n_Q = randn(3, 8);
-f.Q = n_Q;
+f = NormFunction(n_type, n_Q);
 s = evalc('f.display()');
 assert(isequal(deblank(s), 'Inf-norm function in R^8'));
 assert(f.feval(x)==norm(n_Q*x, n_type));
 assert(f.D==size(n_Q, 2));
 
 % empty weifht = unrestricted domain
-f.Q = [];
+f = NormFunction(n_type, []);
 s = evalc('f.display()');
 assert(isequal(deblank(s), 'Inf-norm function'));
 assert(f.D==0);
 
 % switch to 1-norm
-f.type = 1;
+f = NormFunction(1);
 s = evalc('f.display()');
 assert(isequal(deblank(s), '1-norm function'));
 assert(f.type==1);

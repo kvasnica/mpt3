@@ -16,12 +16,10 @@ classdef NormFunction < Function
 	% TODO: Inherit @Function from MPTUIHandle such that we can mark the
 	% state of the object as modified/unmodified
 	
-	properties(AbortSet, SetObservable=true)
+    properties(SetAccess=private)
 		Q=1; % weight (1 by default)
 		type=1; % either 1 or Inf
-	end		
-    properties(SetAccess=protected)
-        D=0; % dimension of the domain
+		D=0; % dimension of the domain
         R=1; % dimension of the range, norms are always scalar-valued
 	end
     
