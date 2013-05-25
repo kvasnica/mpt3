@@ -61,9 +61,9 @@ ip.parse(varargin{:});
 p = ip.Results;
 
 if obj.Dim == 1
-    B = obj.outerApprox;
-    % lb and ub only
-    X = [B.Internal.lb;B.Internal.ub];
+	% compute extremal point in both directions
+	X = [-1; 1];
+	
 elseif obj.Dim == 2
     % Grid the circle
     th = linspace(0,2*pi,p.grid+1)';
