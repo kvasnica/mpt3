@@ -1,6 +1,6 @@
 classdef QuadFunction < Function
     %
-    % class for representing quadratic functions 0.5*x'*H*x + F*x + g
+    % class for representing quadratic functions x'*H*x + F*x + g
     %
     % syntax: Q = QuadFunction(H,F,g)
     %         Q = QuadFunction(H,F)
@@ -37,7 +37,7 @@ classdef QuadFunction < Function
             
             % check H
             Hm = varargin{1};
-            validate_realmatrix3D(Hm);
+            validate_realmatrix(Hm);
 %             if all(abs(Hm(:))<MPTOPTIONS.zero_tol);
 %                 error('The matrix "H" must be different from zero.');
 %             end
