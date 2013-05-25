@@ -217,8 +217,8 @@ else
     };
 
     slide(13).code={
-        'cla; hold on; view(2)'
-        'plot(Q4.slice([1,3],[0.5;0.5]));'
+        'cla; hold on;'
+        'plot(Q4.slice(2,0.5));'
         'axis([0 1 0 1]);'
         'xlabel(''x_1''); ylabel(''x_2'');'
     };
@@ -226,15 +226,15 @@ else
         'It is sometimes useful (and also necessary for dimensions > 3) to plot a section through a Polyhedron.'
         ''
         'This can be done by slicing the polyhedron.'
-        'Plot a cut through Polyhedron along the first and second dimension at value x1=0.5, x2=0.5'
+        'Plot a cut through Polyhedron along the second dimension at value x2=0.5'
         ''
-        '>> plot(Q4.slice([1,3],[0.5;0.5]));'
+        '>> plot(Q4.slice(2,0.5));'
         ''
         'If the values at which to cut are omitted, zero is assuming as default value.'
     };
 
     slide(14).code={
-        'cla; hold on;'
+        'cla; hold on; view(2);'
         'P4D = Q1*Q2;'
         'plot(P4D.projection(1:2),''color'',''plum'',''alpha'',0.6);'
         'axis([0 1 0 1]);'

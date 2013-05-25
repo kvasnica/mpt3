@@ -469,7 +469,7 @@ else
        'Sn = Polyhedron(''Ae'',[0 0 1],''be'',6);'
        'Sm = S.intersect(Sn);'
        'plot(S,''color'',[0.9 0.9 0.9],Sm,''color'',''darkblue'',''linewidth'',3,''wire'',true,''linestyle'',''--'');'
-       'C = S.slice([1,2],6);'
+       'C = S.slice(3,6);'
        ''
        'hold on;'
        'plot(C,''color'',''lightgreen'');'
@@ -486,7 +486,7 @@ else
     '>> S = A*B + v;'
     ''
     'Create a cut through the polytope S by fixing the third dimension x3 = 6 that is shown in wired frame.'
-    '>> C = S.slice([1,2],6);'
+    '>> C = S.slice(3,6);'
     ''
     'The resulting cut C is plotted in light green color.'
    };
