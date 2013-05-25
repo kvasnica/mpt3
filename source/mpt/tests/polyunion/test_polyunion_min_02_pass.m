@@ -5,8 +5,8 @@ function test_polyunion_min_02_pass
 model = LTISystem('A', 1, 'B', 1, 'C', 1);
 model.x.min = -1; model.x.max = 1;
 model.u.min = -1; model.u.max = 1;
-model.x.penalty = Penalty(1, 1);
-model.u.penalty = Penalty(1, 1);
+model.x.penalty = OneNormFunction(1);
+model.u.penalty = OneNormFunction(1);
 E = MPCController(model, 2).toExplicit;
 PUs = [E.optimizer E.optimizer];
 

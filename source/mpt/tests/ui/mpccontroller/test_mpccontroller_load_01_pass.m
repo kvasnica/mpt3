@@ -4,7 +4,8 @@ function test_mpccontroller_load_01_pass
 
 L = LTISystem('A', 1, 'B', 2);
 L.x.min = -1; L.x.max = 1; L.u.min = -2; L.u.max = 3;
-L.x.penalty = Penalty(1, 2); L.u.penalty = Penalty(1, 2);
+L.x.penalty = QuadFunction(1); 
+L.u.penalty = QuadFunction(1);
 
 % save/load a controller without optimizer
 M = MPCController(L, 3);

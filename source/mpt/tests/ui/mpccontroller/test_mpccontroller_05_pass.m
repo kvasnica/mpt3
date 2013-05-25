@@ -13,7 +13,7 @@ M.model.y.max = 8;
 assert(M.model.y.max==8);
 
 M.model.x.with('terminalPenalty');
-M.model.x.terminalPenalty = Penalty(1, 1);
+M.model.x.terminalPenalty = OneNormFunction(1);
 
 M.N = 4;
 

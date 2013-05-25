@@ -1,4 +1,4 @@
-function test_mpccontrolle_soft_03_pass
+function test_mpccontroller_soft_03_pass
 % default setting of softMin/softMax filters must work
 
 A = [1 1; 0 1];
@@ -16,8 +16,8 @@ lti.u.min = -1;
 lti.u.max = 1;
 
 % Use quadratic state penalty with identity weighting matrix
-lti.x.penalty = Penalty(0.1*eye(2), 2);
-lti.u.penalty = Penalty(1, 2);
+lti.x.penalty = QuadFunction(0.1*eye(2));
+lti.u.penalty = QuadFunction(1);
 
 % Define an MPC controller using "lti" as the prediction model
 ctrl = MPCController(lti, 10);

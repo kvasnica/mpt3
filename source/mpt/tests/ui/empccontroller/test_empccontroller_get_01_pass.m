@@ -6,8 +6,8 @@ model.x.max = 5; model.x.min = -5;
 model.u.max = 1; model.u.min = -1;
 
 % mpqp
-model.x.penalty = Penalty(1, 2);
-model.u.penalty = Penalty(1, 2);
+model.x.penalty = QuadFunction(1);
+model.u.penalty = QuadFunction(1);
 E = EMPCController(model, 2);
 E.display();
 assert(E.nr==3);

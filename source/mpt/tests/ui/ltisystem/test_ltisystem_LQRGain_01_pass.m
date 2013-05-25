@@ -10,9 +10,9 @@ Q = eye(nx); R = 10*eye(nu);
 
 L = LTISystem('A', A, 'B', B, 'C', C, 'D', D);
 % L.x.with('penalty');
-L.x.penalty = Penalty(Q, 2);
+L.x.penalty = QuadFunction(Q);
 % L.u.with('penalty');
-L.u.penalty = Penalty(R, 2);
+L.u.penalty = QuadFunction(R);
 
 K = L.LQRGain();
 Kgood = dlqr(A, B, Q, R);

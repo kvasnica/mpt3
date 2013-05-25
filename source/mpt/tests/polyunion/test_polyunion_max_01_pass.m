@@ -4,8 +4,8 @@ function test_polyunion_max_01_pass
 model = LTISystem('A', 1, 'B', 1, 'C', 1);
 model.x.min = -1; model.x.max = 1;
 model.u.min = -1; model.u.max = 1;
-model.x.penalty = Penalty(1, 2);
-model.u.penalty = Penalty(1, 2);
+model.x.penalty = QuadFunction(1);
+model.u.penalty = QuadFunction(1);
 ctrl = MPCController(model, 1).toExplicit;
 PUs = [ctrl.optimizer ctrl.optimizer];
 

@@ -7,8 +7,8 @@ lti.x.min = [-5; -5];
 lti.x.max = [5; 5];
 lti.u.min = -1;
 lti.u.max = 1;
-lti.x.penalty = Penalty(0.1*eye(2), 2);
-lti.u.penalty = Penalty(1, 2);
+lti.x.penalty = QuadFunction(0.1*eye(2));
+lti.u.penalty = QuadFunction(1);
 ctrl = MPCController(lti, 10);
 
 % no additional varibales

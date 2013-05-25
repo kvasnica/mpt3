@@ -4,8 +4,8 @@ function test_mpccontroller_soft_01_pass
 % soft constraints added to the controller's prediction model directly (not
 % influenced by system.copy):
 sys = LTISystem('A', 0.9, 'B', 1, 'C', 1);
-sys.x.penalty = Penalty(1, 2);
-sys.u.penalty = Penalty(1, 2);
+sys.x.penalty = QuadFunction(1);
+sys.u.penalty = QuadFunction(1);
 sys.x.min = -1; sys.x.max = 1;
 sys.u.min = -1; sys.u.max = 1;
 M = MPCController(sys, 4);
@@ -18,8 +18,8 @@ assert(norm(openloop.U-Ugood)<1e-4); % higher tolerance due to gurobi
 
 % soft constraints added to system (affected by sys.copy):
 sys = LTISystem('A', 0.9, 'B', 1, 'C', 1);
-sys.x.penalty = Penalty(1, 2);
-sys.u.penalty = Penalty(1, 2);
+sys.x.penalty = QuadFunction(1);
+sys.u.penalty = QuadFunction(1);
 sys.x.min = -1; sys.x.max = 1;
 sys.u.min = -1; sys.u.max = 1;
 sys.x.with('softMax');

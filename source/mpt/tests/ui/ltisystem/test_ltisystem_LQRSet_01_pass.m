@@ -7,9 +7,9 @@ sysStruct.xmin = sysStruct.ymin;
 
 L = LTISystem(sysStruct);
 % L.x.with('penalty');
-L.x.penalty = Penalty(probStruct.Q, 2);
+L.x.penalty = QuadFunction(probStruct.Q);
 % L.u.with('penalty');
-L.u.penalty = Penalty(probStruct.R, 2);
+L.u.penalty = QuadFunction(probStruct.R);
 
 S = L.LQRSet();
 
