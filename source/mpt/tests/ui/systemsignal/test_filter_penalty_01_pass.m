@@ -21,32 +21,27 @@ assert(isempty(x.penalty));
 
 % 1-norm / non-square weight
 Q = [1 0]; n = 1;
-u.penalty = Penalty(Q, n);
-assert(isequal(u.penalty.Q, Q));
-assert(isequal(u.penalty.norm, n));
+u.penalty = OneNormFunction(Q);
+assert(isequal(u.penalty.weight, Q));
 
 % Inf-norm / non-square weight
 Q = [1 0]; n = Inf;
-u.penalty = Penalty(Q, n);
-assert(isequal(u.penalty.Q, Q));
-assert(isequal(u.penalty.norm, n));
+u.penalty = InfNormFunction(Q);
+assert(isequal(u.penalty.weight, Q));
 
 % 1-norm / square weight
 Q = [1 0; 0 0]; n = 1;
-u.penalty = Penalty(Q, n);
-assert(isequal(u.penalty.Q, Q));
-assert(isequal(u.penalty.norm, n));
+u.penalty = OneNormFunction(Q);
+assert(isequal(u.penalty.weight, Q));
 
 % 2-norm / input (positive definite weight)
 Q = [1 0; 0 1]; n = 2;
-u.penalty = Penalty(Q, n);
-assert(isequal(u.penalty.Q, Q));
-assert(isequal(u.penalty.norm, n));
+u.penalty = QuadFunction(Q);
+assert(isequal(u.penalty.weight, Q));
 
 % 2-norm / state (positive semi-definite weight)
 Q = [1 0; 0 0]; n = 2;
-x.penalty = Penalty(Q, n);
-assert(isequal(x.penalty.Q, Q));
-assert(isequal(x.penalty.norm, n));
+x.penalty = QuadFunction(Q);
+assert(isequal(x.penalty.weight, Q));
 
 end

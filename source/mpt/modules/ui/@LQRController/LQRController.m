@@ -18,7 +18,7 @@ classdef LQRController < EMPCController
 			
 			P = obj.model.domainx;
 			P.addFunction(AffFunction(K, zeros(obj.model.nu, 1)), 'primal');
-			P.addFunction(QuadFunction(Q.Q, zeros(1, obj.model.nx), 0), 'obj');
+			P.addFunction(QuadFunction(Q.weight), 'obj');
 			
 			obj.optimizer = PolyUnion('Set', P, 'Bounded', true, ...
 				'FullDim', true, 'Convex', true);

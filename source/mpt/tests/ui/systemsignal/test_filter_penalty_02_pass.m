@@ -17,28 +17,27 @@ x.userData.kind = 'x';
 Q = eye(u.n);
 [worked, msg] = run_in_caller('u.penalty = Q;');
 assert(~worked);
-assert(~isempty(strfind(msg, 'Input must be a Penalty object.')));
+assert(~isempty(strfind(msg, 'Input must be a Function object.')));
 
 % penalty matrix must have correct number of columns
-P = Penalty([1 0 1], 1);
+P = OneNormFunction([1 0 1]);
 [worked, msg] = run_in_caller('u.penalty = P;');
 assert(~worked);
-assert(~isempty(strfind(msg, 'The weighting matrix must have 2 columns.')));
+assert(~isempty(strfind(msg, 'The weighting matrix must have 2 column(s).')));
 
 % penalty matrix must be square for 2-norms
-P = Penalty([1 1], 2);
-[worked, msg] = run_in_caller('u.penalty = P;');
+[worked, msg] = run_in_caller('P = QuadFunction([1 1]);');
 assert(~worked);
-assert(~isempty(strfind(msg, 'The weighting matrix must be square.')));
+assert(~isempty(strfind(msg, 'The matrix "H" must be square.')));
 
 % input penalties must be positive definite (2-norm):
-P = Penalty([1 0; 0 0], 2);
+P = QuadFunction([1 0; 0 0]);
 [worked, msg] = run_in_caller('u.penalty = P;');
 assert(~worked);
 assert(~isempty(strfind(msg, 'The weighting matrix must be positive definite.')));
 
 % state penalties must be positive semi-definite (2-norm):
-P = Penalty([1 0; 0 -1], 2);
+P = QuadFunction([1 0; 0 -1]);
 [worked, msg] = run_in_caller('x.penalty = P;');
 assert(~worked);
 assert(~isempty(strfind(msg, 'The weighting matrix must be positive semi-definite.')));

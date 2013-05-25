@@ -234,17 +234,24 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
 				MPTOPTIONS = mptopt;
 			end
 			
-			msg = '';
-			if ~isa(P, 'Penalty')
-				msg = 'Input must be a Penalty object.';
-			elseif size(P.Q, 2) ~= obj.n
-				msg = sprintf('The weighting matrix must have %d columns.', obj.n);
-			elseif P.norm == 2
-				if size(P.Q, 1) ~= size(P.Q, 2)
+			if ~isa(P, 'Function')
+				msg = 'Input must be a Function object.';
+				return
+			else
+				msg = '';
+			end
+			
+			Q = P.weight;
+			check_definiteness = isa(P, 'QuadFunction');
+				
+			if size(Q, 2) ~= obj.n
+				msg = sprintf('The weighting matrix must have %d column(s).', obj.n);
+			elseif check_definiteness
+				if size(Q, 1) ~= size(Q, 2)
 					msg = 'The weighting matrix must be square.';
-				elseif obj.isKind('u') && min(eig(P.Q)) < MPTOPTIONS.abs_tol
+				elseif obj.isKind('u') && min(eig(Q)) < MPTOPTIONS.abs_tol
 					msg = 'The weighting matrix must be positive definite.';
-				elseif min(eig(P.Q)) < -MPTOPTIONS.abs_tol
+				elseif min(eig(Q)) < -MPTOPTIONS.abs_tol
 					msg = 'The weighting matrix must be positive semi-definite.';
 				end
 			end

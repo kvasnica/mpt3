@@ -14,26 +14,23 @@ x.terminalPenalty = [];
 
 % 2-norm, positive semi-definite weight
 Q = [1 0; 0 0]; n = 2;
-x.terminalPenalty = Penalty(Q, n);
-assert(isequal(x.terminalPenalty.Q, Q));
-assert(isequal(x.terminalPenalty.norm, n));
+x.terminalPenalty = QuadFunction(Q);
+assert(isequal(x.terminalPenalty.weight, Q));
+assert(isa(x.terminalPenalty, 'QuadFunction'));
 
 % 2-norm, positive definite weight
 Q = [1 0; 0 1]; n = 2;
-x.terminalPenalty = Penalty(Q, n);
-assert(isequal(x.terminalPenalty.Q, Q));
-assert(isequal(x.terminalPenalty.norm, n));
+x.terminalPenalty = QuadFunction(Q);
+assert(isequal(x.terminalPenalty.weight, Q));
 
 % 1-norm, square penalty
 Q = [1 0; 0 0]; n = 1;
-x.terminalPenalty = Penalty(Q, n);
-assert(isequal(x.terminalPenalty.Q, Q));
-assert(isequal(x.terminalPenalty.norm, n));
+x.terminalPenalty = OneNormFunction(Q);
+assert(isequal(x.terminalPenalty.weight, Q));
 
 % 1-norm, non-square penalty
 Q = [1 0]; n = 1;
-x.terminalPenalty = Penalty(Q, n);
-assert(isequal(x.terminalPenalty.Q, Q));
-assert(isequal(x.terminalPenalty.norm, n));
+x.terminalPenalty = OneNormFunction(Q);
+assert(isequal(x.terminalPenalty.weight, Q));
 
 end

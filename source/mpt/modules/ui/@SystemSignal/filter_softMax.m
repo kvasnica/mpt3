@@ -8,7 +8,7 @@ end
 
 % set up the filter
 filter = FilterSetup;
-filter.addField('penalty', Penalty(MPTOPTIONS.infbound*ones(1, obj.n), 0), @(x) isa(x, 'Penalty'));
+filter.addField('penalty', AffFunction(MPTOPTIONS.infbound*ones(1, obj.n)), @(x) isa(x, 'Function'));
 filter.addField('maximalViolation', 1e3*ones(obj.n, 1), @isnumeric);
 
 % this filter depends on the "max" filter
@@ -22,6 +22,7 @@ filter.callback('uninstantiate') = @on_uninstantiate;
 filter.callback('addFilter') = @on_addFilter;
 filter.callback('removeFilter') = @on_removeFilter;
 filter.callback('getVariables') = @on_variables;
+filter.callback('set') = @on_set;
 
 end
 
@@ -73,7 +74,7 @@ function out = on_objective(obj, varargin)
 s = obj.internal_properties.soft_max;
 out = 0;
 for k = 1:obj.N
-	out = out + obj.softMax.penalty.evaluate(s(:, k));
+	out = out + obj.softMax.penalty.feval(s(:, k));
 end
         
 end
@@ -93,5 +94,17 @@ function obj = on_removeFilter(obj)
 
 % we need to re-activate the "max" filter
 obj.enableFilter('max');
+
+end
+
+%------------------------------------------------
+function obj = on_set(obj, value)
+% validation
+
+error(validate_vector(value.maximalViolation, obj.n, 'maximal violation'));
+error(obj.validatePenalty(value.penalty));
+
+obj.softMax.maximalViolation = value.maximalViolation;
+obj.softMax.penalty = value.penalty;
 
 end

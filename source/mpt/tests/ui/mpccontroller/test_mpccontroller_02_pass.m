@@ -18,11 +18,11 @@ assert(isequal(M.model.y.max, sysStruct.ymax));
 assert(isequal(M.model.y.min, sysStruct.ymin));
 assert(M.model.x.hasFilter('terminalSet'));
 assert(M.model.x.hasFilter('terminalPenalty'));
-assert(isequal(M.model.x.terminalPenalty.Q, M.model.LQRPenalty.Q));
-assert(M.model.x.penalty.norm==2);
-assert(M.model.u.penalty.norm==2);
-assert(isequal(M.model.x.penalty.Q, probStruct.Q));
-assert(isequal(M.model.u.penalty.Q, probStruct.R));
+assert(isequal(M.model.x.terminalPenalty.weight, M.model.LQRPenalty.weight));
+assert(isa(M.model.x.penalty, 'QuadFunction'));
+assert(isa(M.model.u.penalty, 'QuadFunction'));
+assert(isequal(M.model.x.penalty.weight, probStruct.Q));
+assert(isequal(M.model.u.penalty.weight, probStruct.R));
 
 % quadratic cost, custom terminal penalty
 clear
@@ -41,7 +41,7 @@ assert(isequal(M.model.y.max, sysStruct.ymax));
 assert(isequal(M.model.y.min, sysStruct.ymin));
 assert(~M.model.x.hasFilter('terminalSet'));
 assert(M.model.x.hasFilter('terminalPenalty'));
-assert(isequal(M.model.x.terminalPenalty.Q, probStruct.P_N));
+assert(isequal(M.model.x.terminalPenalty.weight, probStruct.P_N));
 
 % quadratic cost, custom terminal penalty and terminal set
 clear
@@ -61,7 +61,7 @@ assert(isequal(M.model.y.max, sysStruct.ymax));
 assert(isequal(M.model.y.min, sysStruct.ymin));
 assert(M.model.x.hasFilter('terminalSet'));
 assert(M.model.x.hasFilter('terminalPenalty'));
-assert(isequal(M.model.x.terminalPenalty.Q, probStruct.P_N));
+assert(isequal(M.model.x.terminalPenalty.weight, probStruct.P_N));
 
 % 1-norm cost
 clear
@@ -70,8 +70,8 @@ probStruct.norm = 1;
 M = MPCController(mpt_import(sysStruct, probStruct), probStruct.N);
 assert(M.N==probStruct.N);
 assert(isa(M.model, 'LTISystem'));
-assert(M.model.x.penalty.norm==probStruct.norm);
-assert(M.model.u.penalty.norm==probStruct.norm);
+assert(isa(M.model.x.penalty, 'OneNormFunction'));
+assert(isa(M.model.u.penalty, 'OneNormFunction'));
 
 % Inf-norm cost
 clear
@@ -80,8 +80,8 @@ probStruct.norm = Inf;
 M = MPCController(mpt_import(sysStruct, probStruct), probStruct.N);
 assert(M.N==probStruct.N);
 assert(isa(M.model, 'LTISystem'));
-assert(M.model.x.penalty.norm==probStruct.norm);
-assert(M.model.u.penalty.norm==probStruct.norm);
+assert(isa(M.model.x.penalty, 'InfNormFunction'));
+assert(isa(M.model.u.penalty, 'InfNormFunction'));
 
 % xref
 clear

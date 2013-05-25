@@ -36,11 +36,11 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	end
 	
 	% add penalties
-	out.u.penalty = Penalty(probStruct.R, probStruct.norm);
+	out.u.penalty = create_penalty(probStruct.R, probStruct.norm);
 	if isfield(probStruct, 'Qy')
-		out.y.penalty = Penalty(probStruct.Qy, probStruct.norm);
+		out.y.penalty = create_penalty(probStruct.Qy, probStruct.norm);
 	else
-		out.x.penalty = Penalty(probStruct.Q, probStruct.norm);
+		out.x.penalty = create_penalty(probStruct.Q, probStruct.norm);
 	end
 	
 	% custom settings
@@ -57,7 +57,7 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	elseif ~isfield(probStruct, 'Qy') && probStruct.Tconstraint==1
 		% add terminal state penalty to be consistent with MPT2
 		out.x.with('terminalPenalty');
-		out.x.terminalPenalty = Penalty(probStruct.Q, probStruct.norm);
+		out.x.terminalPenalty = create_penalty(probStruct.Q, probStruct.norm);
 	end
 
 	if isfield(probStruct, 'Nc')
@@ -69,7 +69,7 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 		if ~out.x.hasFilter('terminalPenalty')
 			out.x.with('terminalPenalty');
 		end
-		out.x.terminalPenalty = Penalty(probStruct.P_N, probStruct.norm);
+		out.x.terminalPenalty = create_penalty(probStruct.P_N, probStruct.norm);
 	end
 	if isfield(probStruct, 'Tset') && isfulldim(probStruct.Tset)
 		out.x.with('terminalSet');
@@ -92,15 +92,15 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	if isfield(probStruct, 'Sx') && isfield(probStruct, 'sxmax')
 		out.x.with('softMax');
 		out.x.with('softMin');
-		out.x.softMax.penalty = Penalty(probStruct.Sx, probStruct.norm);
-		out.x.softMin.penalty = Penalty(probStruct.Sx, probStruct.norm);
+		out.x.softMax.penalty = create_penalty(probStruct.Sx, probStruct.norm);
+		out.x.softMin.penalty = create_penalty(probStruct.Sx, probStruct.norm);
 		out.x.softMax.maximalViolation = probStruct.sxmax;
 		out.x.softMin.maximalViolation = probStruct.sxmax;
 	elseif isfield(probStruct, 'Sx')
 		out.x.with('softMax');
 		out.x.with('softMin');
-		out.x.softMax.penalty = Penalty(probStruct.Sx, probStruct.norm);
-		out.x.softMin.penalty = Penalty(probStruct.Sx, probStruct.norm);
+		out.x.softMax.penalty = create_penalty(probStruct.Sx, probStruct.norm);
+		out.x.softMin.penalty = create_penalty(probStruct.Sx, probStruct.norm);
 	elseif isfield(probStruct, 'sxmax')
 		out.x.with('softMax');
 		out.x.with('softMin');
@@ -112,15 +112,15 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	if isfield(probStruct, 'Su') && isfield(probStruct, 'sumax')
 		out.u.with('softMax');
 		out.u.with('softMin');
-		out.u.softMax.penalty = Penalty(probStruct.Su, probStruct.norm);
-		out.u.softMin.penalty = Penalty(probStruct.Su, probStruct.norm);
+		out.u.softMax.penalty = create_penalty(probStruct.Su, probStruct.norm);
+		out.u.softMin.penalty = create_penalty(probStruct.Su, probStruct.norm);
 		out.u.softMax.maximalViolation = probStruct.sumax;
 		out.u.softMin.maximalViolation = probStruct.sumax;
 	elseif isfield(probStruct, 'Su')
 		out.u.with('softMax');
 		out.u.with('softMin');
-		out.u.softMax.penalty = Penalty(probStruct.Su, probStruct.norm);
-		out.u.softMin.penalty = Penalty(probStruct.Su, probStruct.norm);
+		out.u.softMax.penalty = create_penalty(probStruct.Su, probStruct.norm);
+		out.u.softMin.penalty = create_penalty(probStruct.Su, probStruct.norm);
 	elseif isfield(probStruct, 'sumax')
 		out.u.with('softMax');
 		out.u.with('softMin');
@@ -132,15 +132,15 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	if isfield(probStruct, 'Sy') && isfield(probStruct, 'symax')
 		out.y.with('softMax');
 		out.y.with('softMin');
-		out.y.softMax.penalty = Penalty(probStruct.Sy, probStruct.norm);
-		out.y.softMin.penalty = Penalty(probStruct.Sy, probStruct.norm);
+		out.y.softMax.penalty = create_penalty(probStruct.Sy, probStruct.norm);
+		out.y.softMin.penalty = create_penalty(probStruct.Sy, probStruct.norm);
 		out.y.softMax.maximalViolation = probStruct.symax;
 		out.y.softMin.maximalViolation = probStruct.symax;
 	elseif isfield(probStruct, 'Sy')
 		out.y.with('softMax');
 		out.y.with('softMin');
-		out.y.softMax.penalty = Penalty(probStruct.Sy, probStruct.norm);
-		out.y.softMin.penalty = Penalty(probStruct.Sy, probStruct.norm);
+		out.y.softMax.penalty = create_penalty(probStruct.Sy, probStruct.norm);
+		out.y.softMin.penalty = create_penalty(probStruct.Sy, probStruct.norm);
 	elseif isfield(probStruct, 'symax')
 		out.y.with('softMax');
 		out.y.with('softMin');
@@ -189,6 +189,26 @@ end
     
 end
 
+%---------------------------
+function P = create_penalty(W, t)
+% creates a weighted t-norm with weight W
+
+switch t
+	case 1,
+		P = OneNormFunction(W);
+	case Inf,
+		P = InfNormFunction(W);
+	case 2
+		P = QuadFunction(W);
+	otherwise
+		error('Unrecognized norm type "%s".', num2str(t));
+end
+
+% P = Penalty(W, t);
+
+end
+
+%---------------------------
 function out = importSysStruct(sysStruct)
 
 sysStruct = mpt_verifySysStruct(sysStruct);
