@@ -45,10 +45,9 @@ else
 		X = obj.V;
 		V = zeros(size(X,1), 1);
 		
-		% TODO: exploit vectorization:
-		% V = fun.evaluate(V');
+		% TODO: exploit vectorization once Function/feval supports it
+		% V = fun.feval(V');
 		for j=1:size(X,1)
-			% TODO: use fun.evaluate()
 			t = fun.feval(X(j, :)');
 			V(j, 1) = t(options.position);
 		end
@@ -84,7 +83,6 @@ else
 			for k = 1:size(X,2)
 				x = [X(j,k);Y(j,k)];
 				if isnan(x(1)) || isnan(x(2)), continue; end
-				% TODO: use fun.evaluate(x)
 				t = fun.feval(x');
 				if isempty(t) || any(isnan(t)), continue; end
 				V(j,k) = t(options.position);
