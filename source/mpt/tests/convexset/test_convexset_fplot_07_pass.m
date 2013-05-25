@@ -12,7 +12,7 @@ Y = [Y1,Y2];
 
 A1 = AffFunction(rand(3,1),rand(3,1));
 A2 = AffFunction(rand(4,1),rand(4,1));
-Q = QuadFunction(rand(1,1,2),rand(2,1),rand(2,1));
+Q = QuadFunction(rand(1));
 
 Y.addFunction(A1,'A1');
 Y.addFunction(A1,'A2');
