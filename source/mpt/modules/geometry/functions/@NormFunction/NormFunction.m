@@ -51,7 +51,7 @@ classdef NormFunction < Function
 
 			% validation of arguments is done in setters
 			obj.type = type;
-            if nargin==2
+			if nargin==2
 				obj.Q = Q;
 			end
 
