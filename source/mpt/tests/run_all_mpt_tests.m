@@ -37,6 +37,8 @@ function run_all_mpt_tests(varargin)
 persistent test_files
 
 cwd = pwd;
+cleanup = onCleanup(@()cd(cwd));
+
 maindir = fileparts(which(mfilename));
 
 % determine options
@@ -92,8 +94,6 @@ for i = 1:length(test_files)
 			with_warning(i) = true;
 	end
 end
-
-cd(cwd);
 
 % display results
 n_error = length(find(with_error));
