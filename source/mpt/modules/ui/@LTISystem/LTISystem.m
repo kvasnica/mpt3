@@ -313,7 +313,7 @@ classdef LTISystem < AbstractSystem
 				error('This function does not support affine systems.');
 			end
 			error(obj.assert_has_xu_penalties);
-			K = -dlqr(obj.A, obj.B, obj.x.penalty.Q, obj.u.penalty.Q);
+			K = -dlqr(obj.A, obj.B, obj.x.penalty.weight, obj.u.penalty.weight);
 		end
 		
 		function P = LQRPenalty(obj)
@@ -323,8 +323,8 @@ classdef LTISystem < AbstractSystem
 				error('This function does not support affine systems.');
 			end
 			error(obj.assert_has_xu_penalties);
-			[~, Q] = dlqr(obj.A, obj.B,	obj.x.penalty.Q, obj.u.penalty.Q);
-			P = Penalty(Q, 2);
+			[~, Q] = dlqr(obj.A, obj.B,	obj.x.penalty.weight, obj.u.penalty.weight);
+			P = QuadFunction(Q);
 		end
 		
 		function S = LQRSet(obj)

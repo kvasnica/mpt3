@@ -6,8 +6,8 @@ model.x.min = -5;
 model.x.max = 5;
 model.u.min = -1;
 model.u.max = 1;
-model.x.penalty = Penalty(1, 1);
-model.u.penalty = Penalty(1, 1);
+model.x.penalty = OneNormFunction(1);
+model.u.penalty = OneNormFunction(1);
 
 M = MPCController(model, 3).toExplicit;
 Mold = M.copy();

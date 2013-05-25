@@ -6,8 +6,8 @@ model.u.min = S.umin;
 model.u.max = S.umax;
 model.x.min = S.ymin;
 model.x.max = S.ymax;
-model.x.penalty = Penalty(probStruct.Q, 2);
-model.u.penalty = Penalty(probStruct.R, 2);
+model.x.penalty = QuadFunction(probStruct.Q);
+model.u.penalty = QuadFunction(probStruct.R);
 M = MPCController(model, 3);
 
 CL = ClosedLoop(M, model);

@@ -8,7 +8,7 @@ end
 
 % set up the filter
 filter = FilterSetup;
-filter.addField('value', [], @(x) isa(x, 'Penalty'));
+filter.addField('value', []);
 
 % the filter impacts the following calls:
 filter.callback('objective') = @on_objective;
@@ -20,29 +20,29 @@ end
 function out = on_objective(obj, varargin)
 % called when constructing the objective function
 
+out = 0;
+if isempty(obj.terminalPenalty)
+	return
+end
+
 if obj.hasFilter('reference')
 	value = obj.var(:, end) - obj.reference(:, end);
 else
 	value = obj.var(:, end);
 end
 
-out = obj.terminalPenalty.evaluate(value);
+out = obj.terminalPenalty.feval(value);
 
 end
 
 %------------------------------------------------
 function obj = on_set(obj, P)
-% called when the penalty is to be changed
+% called prior to property being set
 
-% empty penalty means no penalization
-if isa(P, 'double') && isempty(P) 
-	obj.terminalPenalty = P;
-	return
+% validate the penalty (empty penalty means no penalization)
+if ~isempty(P)
+	error(obj.validatePenalty(P));
 end
-
-% validate the penalty
-error(obj.validatePenalty(P));
-
 obj.terminalPenalty = P;
 
 end

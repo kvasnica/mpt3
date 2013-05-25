@@ -25,10 +25,10 @@ function test_codegen_03_pass
 
 % add delta u penalty
 model.u.with('deltaPenalty');
-model.u.deltaPenalty = Penalty(1,2);
+model.u.deltaPenalty = QuadFunction(1);
 
 % add penalty on y
-model.y.penalty=Penalty(1,2);
+model.y.penalty=QuadFunction(1);
 model.y.with('reference');
 model.y.reference = dsys.C*expm(eye(3)-dsys.A)*dsys.B;
 

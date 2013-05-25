@@ -23,8 +23,8 @@ function test_codegen_st_04_pass
  model.u.min = -3;
  model.u.max = 3;
 
-model.x.penalty = Penalty(eye(3),2);
-model.u.penalty = Penalty(1,2);
+model.x.penalty = QuadFunction(eye(3));
+model.u.penalty = QuadFunction(1);
 model.x.with('reference');
 model.u.with('reference');
 model.x.reference = [ -0.24; 0.43; 0.19];

@@ -4,7 +4,8 @@ function test_empccontroller_load_01_pass
 
 L = LTISystem('A', 1, 'B', 2);
 L.x.min = -5; L.x.max = 5; L.u.min = -0.2; L.u.max = 0.3;
-L.x.penalty = Penalty(1, 2); L.u.penalty = Penalty(1, 2);
+L.x.penalty = QuadFunction(1); 
+L.u.penalty = QuadFunction(1);
 
 M = EMPCController(L, 3);
 assert(isa(M.optimizer, 'PolyUnion'));

@@ -16,19 +16,13 @@ assert(~isempty(strfind(msg, 'Filter "terminalPenalty" can only be added to stat
 x.with('terminalPenalty');
 
 % penalty matrix must have correct number of columns
-P = Penalty([1 0 1], 1);
+P = OneNormFunction([1 0 1]);
 [worked, msg] = run_in_caller('x.terminalPenalty = P;');
 assert(~worked);
-assert(~isempty(strfind(msg, 'The weighting matrix must have 2 columns.')));
-
-% penalty matrix must be square for 2-norms
-P = Penalty([1 1], 2);
-[worked, msg] = run_in_caller('x.terminalPenalty = P;');
-assert(~worked);
-assert(~isempty(strfind(msg, 'The weighting matrix must be square.')));
+assert(~isempty(strfind(msg, 'The weighting matrix must have 2 column(s).')));
 
 % state penalties must be positive semi-definite (2-norm):
-P = Penalty([1 0; 0 -1], 2);
+P = QuadFunction([1 0; 0 -1]);
 [worked, msg] = run_in_caller('x.terminalPenalty = P;');
 assert(~worked);
 assert(~isempty(strfind(msg, 'The weighting matrix must be positive semi-definite.')));

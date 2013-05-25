@@ -9,7 +9,7 @@ model=mpt_import(sysStruct,probStruct);
 
 % add penalty on u
 model.u.with('deltaPenalty');
-model.u.deltaPenalty = Penalty(1,2);
+model.u.deltaPenalty = QuadFunction(1);
 
 ctrl=MPCController(model,3);
 

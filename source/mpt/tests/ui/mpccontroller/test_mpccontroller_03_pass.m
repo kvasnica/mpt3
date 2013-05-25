@@ -10,10 +10,10 @@ model = mpt_import(sysStruct, probStruct);
 M = MPCController(model, probStruct.N);
 assert(M.N==probStruct.N);
 assert(isa(M.model, 'PWASystem'));
-assert(M.model.x.penalty.norm==probStruct.norm);
-assert(M.model.u.penalty.norm==probStruct.norm);
-assert(isequal(M.model.x.penalty.Q, probStruct.Q));
-assert(isequal(M.model.u.penalty.Q, probStruct.R));
+assert(isa(M.model.x.penalty, 'OneNormFunction'));
+assert(isa(M.model.u.penalty, 'OneNormFunction'));
+assert(isequal(M.model.x.penalty.weight, probStruct.Q));
+assert(isequal(M.model.u.penalty.weight, probStruct.R));
 
 % quadratic cost
 clear
@@ -24,9 +24,9 @@ model = mpt_import(sysStruct, probStruct);
 M = MPCController(model, probStruct.N);
 assert(M.N==probStruct.N);
 assert(isa(M.model, 'PWASystem'));
-assert(M.model.x.penalty.norm==probStruct.norm);
-assert(M.model.u.penalty.norm==probStruct.norm);
-assert(isequal(M.model.x.penalty.Q, probStruct.Q));
-assert(isequal(M.model.u.penalty.Q, probStruct.R));
+assert(isa(M.model.x.penalty, 'QuadFunction'));
+assert(isa(M.model.u.penalty, 'QuadFunction'));
+assert(isequal(M.model.x.penalty.weight, probStruct.Q));
+assert(isequal(M.model.u.penalty.weight, probStruct.R));
 
 end

@@ -8,8 +8,8 @@ model.u.min = S.umin;
 model.u.max = S.umax;
 model.x.min = S.ymin;
 model.x.max = S.ymax;
-model.x.penalty = Penalty(probStruct.Q, 1);
-model.u.penalty = Penalty(probStruct.R, 1);
+model.x.penalty = OneNormFunction(probStruct.Q);
+model.u.penalty = OneNormFunction(probStruct.R);
 M = MPCController(model, 3).toExplicit;
 
 CL = ClosedLoop(M, model);

@@ -16,8 +16,8 @@ Ts = 0.1;
 model = LTISystem('A',A,'B',B,'C',C,'D',D,'Ts',Ts);
 model.u.min = -2;
 model.u.max = 2;
-model.x.penalty = Penalty(eye(2), Inf);
-model.u.penalty = Penalty(0.01, Inf);
+model.x.penalty = InfNormFunction(eye(2));
+model.u.penalty = InfNormFunction(0.01);
 
 N = 6;
 mpc = MPCController(model, N);

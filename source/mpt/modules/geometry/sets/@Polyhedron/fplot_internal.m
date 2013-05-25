@@ -83,7 +83,7 @@ else
 			for k = 1:size(X,2)
 				x = [X(j,k);Y(j,k)];
 				if isnan(x(1)) || isnan(x(2)), continue; end
-				t = fun.feval(x');
+				t = fun.feval(x);
 				if isempty(t) || any(isnan(t)), continue; end
 				V(j,k) = t(options.position);
 			end

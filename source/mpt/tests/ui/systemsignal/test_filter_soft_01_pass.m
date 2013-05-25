@@ -8,12 +8,12 @@ assert(numel(s.min)==n);
 
 s.with('softMax');
 assert(numel(s.softMax.maximalViolation)==n);
-assert(isequal(size(s.softMax.penalty.Q), [1 n]));
-assert(s.softMax.penalty.norm==0);
+assert(isequal(size(s.softMax.penalty.weight), [1 n]));
+assert(isa(s.softMax.penalty, 'AffFunction'));
 
 s.with('softMin');
 assert(numel(s.softMin.maximalViolation)==n);
-assert(isequal(size(s.softMin.penalty.Q), [1 n]));
-assert(s.softMin.penalty.norm==0);
+assert(isequal(size(s.softMin.penalty.weight), [1 n]));
+assert(isa(s.softMin.penalty, 'AffFunction'));
 
 end

@@ -12,12 +12,12 @@ assert(isequal(deblank(s), '1-norm function in R^4'));
 assert(isa(f, 'NormFunction'));
 assert(isa(f, 'OneNormFunction'));
 assert(f.D==size(n_Q, 2));
-assert(isequal(f.Q, n_Q));
+assert(isequal(f.weight, n_Q));
 assert(isequal(f.type, n_type));
 
 % check evaluation
 x = randn(4, 1);
-assert(f.feval(x)==norm(f.Q*x, n_type));
+assert(f.feval(x)==norm(f.weight*x, n_type));
 
 % constructor with the weight
 n_Q = randn(4);

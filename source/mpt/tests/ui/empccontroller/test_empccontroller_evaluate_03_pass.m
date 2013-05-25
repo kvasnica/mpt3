@@ -5,8 +5,8 @@ function test_empccontroller_evaluate_03_pass
 model = LTISystem('A', 1, 'B', 1, 'C', 1, 'D', 0);
 model.x.max = 5; model.x.min = -5;
 model.u.max = 1; model.u.min = -1;
-model.x.penalty = Penalty(1, 1);
-model.u.penalty = Penalty(1, 1);
+model.x.penalty = OneNormFunction(1);
+model.u.penalty = OneNormFunction(1);
 M = MPCController(model, 3);
 Y = M.toYALMIP;
 
@@ -35,8 +35,8 @@ end
 model = LTISystem('A', 1, 'B', 1, 'C', 1, 'D', 0);
 model.x.max = 5; model.x.min = -5;
 model.u.max = 1; model.u.min = -1;
-model.x.penalty = Penalty(1, 2);
-model.u.penalty = Penalty(1, 2);
+model.x.penalty = QuadFunction(1);
+model.u.penalty = QuadFunction(1);
 M = MPCController(model, 3);
 Y = M.toYALMIP;
 sol = solvemp(Y.constraints, Y.objective, sdpsettings('debug', 1), ...
