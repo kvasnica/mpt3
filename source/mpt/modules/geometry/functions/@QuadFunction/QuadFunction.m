@@ -139,19 +139,11 @@ classdef QuadFunction < Function
     methods (Hidden)
         function y=qf(obj,x)
             
-            % check argument
-            validate_realvector(x);
-            if numel(x)~=obj.D
-                error('Argument must be a vector with the dimension %d.',obj.D);
-            end
-            
-            % prepare output
-            y = zeros(obj.R,1);
-            x = x(:);
-            for i=1:obj.R
-                y(i) = x'*obj.H(:,:,i)*x + obj.F(i,:)*x + obj.g(i);
-            end
-            
+			if ~isequal(size(x), [obj.D, 1])
+				error('The input must be a %dx1 vector.', obj.D);
+			end
+            % output
+            y = x'*obj.H*x + obj.F*x + obj.g;
         end
     end
 end

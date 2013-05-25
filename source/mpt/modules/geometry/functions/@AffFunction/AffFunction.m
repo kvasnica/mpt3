@@ -93,17 +93,13 @@ classdef AffFunction < Function
         
     end
     methods (Hidden)
-        function y=af(obj,x)
+        function y=af(obj, x)
             
-            % check argument
-            validate_realvector(x);
-            if numel(x)~=obj.D
-                error('Argument must be a vector with the dimension %d.',obj.D);
-            end
-            
+			if ~isequal(size(x), [obj.D, 1])
+				error('The input must be a %dx1 vector.', obj.D);
+			end
             % output
-            y = obj.F*x(:)+obj.g;
-            
+            y = obj.F*x + obj.g;
         end
     end
     
