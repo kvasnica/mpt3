@@ -54,7 +54,7 @@ validate_realvector(x);
 if n_obj==1
 	% faster implementation for single sets
 	feasible = obj.contains(x);
-	fval = obj.Functions(function_name).Handle(x);
+	fval = obj.Functions(function_name).feval(x);
 	if ~feasible
 		fval = NaN(size(fval));
 	end
@@ -64,7 +64,7 @@ else
 	fval = [];
 	for i = 1:n_obj
 		feasible(i) = obj(i).contains(x);
-		f = obj(i).Functions(function_name).Handle(x);
+		f = obj(i).Functions(function_name).feval(x);
 		if ~feasible(i)
 			f = NaN(size(f));
 		end

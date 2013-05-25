@@ -186,9 +186,9 @@ iscell_set = iscell(obj.Set);
 		% since this is an inline function, "obj" and "x" are taken from
 		% the main function's workspace
 		if iscell_set
-			out = obj.Set{ridx}.Functions(fun).Handle(x);
+			out = obj.Set{ridx}.Functions(fun).feval(x);
 		else
-			out = obj.Set(ridx).Functions(fun).Handle(x);
+			out = obj.Set(ridx).Functions(fun).feval(x);
 		end
 	end
 

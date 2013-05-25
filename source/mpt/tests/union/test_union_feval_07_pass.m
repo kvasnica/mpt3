@@ -17,35 +17,35 @@ U.add(P);
 % not tie-break by default
 x = [1; 1];
 y = U.feval(x);
-assert(isequal(y, [U.Set{1}.Func{1}.Handle(x), ...
-	U.Set{2}.Func{1}.Handle(x)]));
+assert(isequal(y, [U.Set{1}.Func{1}.feval(x), ...
+	U.Set{2}.Func{1}.feval(x)]));
 
 % first-region tiebreak
 x = [1; 1];
 y = U.feval(x, 'tiebreak', @(x) 0);
-assert(isequal(y, U.Set{1}.Func{1}.Handle(x)));
+assert(isequal(y, U.Set{1}.Func{1}.feval(x)));
 
 % point in the intersection of lowdim with fulldim (Y(1), Y(2) and P),
 % first-region tiebreak
 x = [2.7; 1.2];
 [y, ~, ~, tb_value] = U.feval(x);
-assert(isequal(y, [U.Set{1}.Func{1}.Handle(x), ...
-	U.Set{2}.Func{1}.Handle(x), P.Func{1}.Handle(x)]));
+assert(isequal(y, [U.Set{1}.Func{1}.feval(x), ...
+	U.Set{2}.Func{1}.feval(x), P.Func{1}.feval(x)]));
 assert(isempty(tb_value));
 % explicit no tiebreak
 x = [2.7; 1.2];
 [y, ~, ~, tb_value] = U.feval(x, 'tiebreak', []);
-assert(isequal(y, [U.Set{1}.Func{1}.Handle(x), ...
-	U.Set{2}.Func{1}.Handle(x), P.Func{1}.Handle(x)]));
+assert(isequal(y, [U.Set{1}.Func{1}.feval(x), ...
+	U.Set{2}.Func{1}.feval(x), P.Func{1}.feval(x)]));
 assert(isempty(tb_value));
 % last-region tiebreak
 x = [2.7; 1.2];
 [y, ~, ~, tb_value] = U.feval(x, 'tiebreak', @(x) -double(tic));
-assert(isequal(y, U.Set{end}.Func{1}.Handle(x)));
+assert(isequal(y, U.Set{end}.Func{1}.feval(x)));
 assert(isnumeric(tb_value));
 assert(isscalar(tb_value));
 % first-region tiebreak
 x = [2.7; 1.2];
 [y, ~, ~, tb_value] = U.feval(x, 'tiebreak', @(x) 1.12);
-assert(isequal(y, Y(1).Func{1}.Handle(x)));
+assert(isequal(y, Y(1).Func{1}.feval(x)));
 assert(tb_value==1.12);

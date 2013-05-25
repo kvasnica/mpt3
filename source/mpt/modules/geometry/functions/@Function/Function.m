@@ -48,9 +48,19 @@ classdef Function < handle & IterableBehavior
 			  F.Handle = Handle;
 			  F.Data = Data;
 		  end
-      end
-    
+	  end
+	  
+	  function out = feval(obj, x)
+		  % evaluates the function at a point
+		  
+		  % For performance reasons we really don't want to declare "feval"
+		  % as a method. Instead, remove this method, and rename the
+		  % "Handle" property to "feval". Then "obj.feval(x)" works
+		  % correctly without any overhead due to method call.
+		  out = obj.Handle(x);
+	  end
   end
+  
   methods (Hidden)
       
       function obj = setInternal(obj,name,value)

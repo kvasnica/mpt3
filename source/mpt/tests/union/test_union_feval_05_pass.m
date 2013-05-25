@@ -56,7 +56,7 @@ x = 2;
 assert(feasible);
 assert(isequal(f, f2(x)));
 assert(isequal(idx, 2));
-assert(isequal(tb_value, U.Set{2}.Functions('g').Handle(x)));
+assert(isequal(tb_value, U.Set{2}.Functions('g').feval(x)));
 
 % x in multiple regions, custom tiebreak (anonymoys function)
 x = 2;

@@ -28,7 +28,7 @@ if obj.Dim<2
 	x = linspace(obj.Internal.lb, obj.Internal.ub, options.grid)';
 	y = zeros(size(x));
 	for j=1:numel(x)
-		v = fun.Handle(x(j));
+		v = fun.feval(x(j));
 		y(j) = v(options.position);
 	end
 	
@@ -49,7 +49,7 @@ else
 		% V = fun.evaluate(V');
 		for j=1:size(X,1)
 			% TODO: use fun.evaluate()
-			t = fun.Handle(X(j, :)');
+			t = fun.feval(X(j, :)');
 			V(j, 1) = t(options.position);
 		end
 		[~, ~, vv]= svd([X V]);
@@ -74,7 +74,7 @@ else
 		%             if obj.Func{i}.canVectorize
 		%                 q = [X(:) Y(:)];
 		%                 I = ~any(isnan(q),2);
-		%                 v = obj.Func{i}.Handle(q(I,:));
+		%                 v = obj.Func{i}.feval(q(I,:));
 		%                 V = NaN*X(:);
 		%                 V(I,:) = v(pos2);
 		%                 V = reshape(V,size(X,1),size(X,2));
@@ -85,7 +85,7 @@ else
 				x = [X(j,k);Y(j,k)];
 				if isnan(x(1)) || isnan(x(2)), continue; end
 				% TODO: use fun.evaluate(x)
-				t = fun.Handle(x');
+				t = fun.feval(x');
 				if isempty(t) || any(isnan(t)), continue; end
 				V(j,k) = t(options.position);
 			end

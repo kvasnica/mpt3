@@ -12,7 +12,7 @@ Y.addFunction(fun, 'qf');
 % point inside
 x = [-1; .1];
 [y, feasible] = Y.feval(x);
-assert(isequal(y, fun.Handle(x)));
+assert(isequal(y, fun.feval(x)));
 assert(feasible);
 
 % point outside

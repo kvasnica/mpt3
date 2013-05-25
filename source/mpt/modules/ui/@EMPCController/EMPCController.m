@@ -192,7 +192,7 @@ classdef EMPCController < AbstractController
 					% here. but ConvexSet/feval() adds so much unnecessary
 					% overhead that we better evaluate the function
 					% directly
-					J = obj.optimizer.Set(idx).Functions('obj').Handle(xinit);
+					J = obj.optimizer.Set(idx).Functions('obj').feval(xinit);
 				end
 				if feasible
 					opt_partition = 1;
@@ -220,7 +220,7 @@ classdef EMPCController < AbstractController
 						if isempty(J{i})
 							% no cost provided by tie-breaking, compute it
 							% manually
-							J{i} = obj.optimizer(i).Set(idx{i}).Functions('obj').Handle(xinit);
+							J{i} = obj.optimizer(i).Set(idx{i}).Functions('obj').feval(xinit);
 						end
 					end
 					Jmin = cat(2, J{feasible_idx});

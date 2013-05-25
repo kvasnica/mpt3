@@ -25,7 +25,7 @@ P.addFunction(f, 'f');
 % all points inside
 x = [0.1, 0.2, 0.3];
 [y, feasible] = P.feval(x);
-assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(y, [f.feval(x(:, 1)), f.feval(x(:, 2)), f.feval(x(:, 3))]));
 assert(isequal(feasible, [true true true]));
 
 % 1st and 3rd point inside
@@ -33,8 +33,8 @@ x = [0.1, 100, 0.4];
 [y, feasible] = P.feval(x);
 assert(isequal(feasible, [true false true]));
 assert(isequal(size(y), [1 3]));
-assert(y(1)==f.Handle(x(:, 1)));
-assert(y(3)==f.Handle(x(:, 3)));
+assert(y(1)==f.feval(x(:, 1)));
+assert(y(3)==f.feval(x(:, 3)));
 assert(isnan(y(2)));
 
 % 2nd point inside
@@ -44,7 +44,7 @@ assert(isequal(feasible, [false true false]));
 assert(isequal(size(y), [1 3]));
 assert(isnan(y(1)));
 assert(isnan(y(3)));
-assert(y(2)==f.Handle(x(:, 2)));
+assert(y(2)==f.feval(x(:, 2)));
 
 % none inside
 x = [200, 1000, 100];
@@ -61,7 +61,7 @@ P.addFunction(f, 'f');
 % all points inside
 x = [0.1, 0.2, 0.3];
 [y, feasible] = P.feval(x);
-assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(y, [f.feval(x(:, 1)), f.feval(x(:, 2)), f.feval(x(:, 3))]));
 assert(isequal(feasible, [true true true]));
 
 % 1st and 3rd point inside
@@ -69,8 +69,8 @@ x = [0.1, 100, 0.4];
 [y, feasible] = P.feval(x);
 assert(isequal(feasible, [true false true]));
 assert(isequal(size(y), [2 3]));
-assert(isequal(y(:, 1), f.Handle(x(:, 1))));
-assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(isequal(y(:, 1), f.feval(x(:, 1))));
+assert(isequal(y(:, 3), f.feval(x(:, 3))));
 assert(all(isnan(y(:, 2))));
 
 % 2nd point inside
@@ -80,7 +80,7 @@ assert(isequal(feasible, [false true false]));
 assert(isequal(size(y), [2 3]));
 assert(all(isnan(y(:, 1))));
 assert(all(isnan(y(:, 3))));
-assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+assert(isequal(y(:, 2), f.feval(x(:, 2))));
 
 % none inside
 x = [200, 1000, 100];
@@ -98,7 +98,7 @@ P.addFunction(f, 'f');
 % all points inside
 x = [0.1 0.1; 0.2 0.2; 0.3 0.3]';
 [y, feasible] = P.feval(x);
-assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(y, [f.feval(x(:, 1)), f.feval(x(:, 2)), f.feval(x(:, 3))]));
 assert(isequal(feasible, [true true true]));
 
 % 1st and 3rd point inside
@@ -106,8 +106,8 @@ x = [0.1 0.1; 200 0.2; 0.3 0.3]';
 [y, feasible] = P.feval(x);
 assert(isequal(feasible, [true false true]));
 assert(isequal(size(y), [1 3]));
-assert(isequal(y(:, 1), f.Handle(x(:, 1))));
-assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(isequal(y(:, 1), f.feval(x(:, 1))));
+assert(isequal(y(:, 3), f.feval(x(:, 3))));
 assert(all(isnan(y(:, 2))));
 
 % 2nd point inside
@@ -117,7 +117,7 @@ assert(isequal(feasible, [false true false]));
 assert(isequal(size(y), [1 3]));
 assert(all(isnan(y(:, 1))));
 assert(all(isnan(y(:, 3))));
-assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+assert(isequal(y(:, 2), f.feval(x(:, 2))));
 
 % none inside
 x = [100 0.1; 200 0.2; 300 0.3]';
@@ -134,7 +134,7 @@ P.addFunction(f, 'f');
 % all points inside
 x = [0.1 0.1; 0.2 0.2; 0.3 0.3]';
 [y, feasible] = P.feval(x);
-assert(isequal(y, [f.Handle(x(:, 1)), f.Handle(x(:, 2)), f.Handle(x(:, 3))]));
+assert(isequal(y, [f.feval(x(:, 1)), f.feval(x(:, 2)), f.feval(x(:, 3))]));
 assert(isequal(feasible, [true true true]));
 
 % 1st and 3rd point inside
@@ -142,8 +142,8 @@ x = [0.1 0.1; 200 0.2; 0.3 0.3]';
 [y, feasible] = P.feval(x);
 assert(isequal(feasible, [true false true]));
 assert(isequal(size(y), [4 3]));
-assert(isequal(y(:, 1), f.Handle(x(:, 1))));
-assert(isequal(y(:, 3), f.Handle(x(:, 3))));
+assert(isequal(y(:, 1), f.feval(x(:, 1))));
+assert(isequal(y(:, 3), f.feval(x(:, 3))));
 assert(all(isnan(y(:, 2))));
 
 % 2nd point inside
@@ -153,7 +153,7 @@ assert(isequal(feasible, [false true false]));
 assert(isequal(size(y), [4 3]));
 assert(all(isnan(y(:, 1))));
 assert(all(isnan(y(:, 3))));
-assert(isequal(y(:, 2), f.Handle(x(:, 2))));
+assert(isequal(y(:, 2), f.feval(x(:, 2))));
 
 % none inside
 x = [100 0.1; 200 0.2; 300 0.3]';
