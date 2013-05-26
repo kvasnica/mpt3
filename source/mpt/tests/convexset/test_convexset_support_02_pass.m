@@ -4,7 +4,7 @@ function test_convexset_support_02_pass
 %
 
 x = sdpvar(1);
-F = set(x^2 <  1) + set( x<0.5);
+F = [x^2 <= 1] + [ x<=0.5 ];
 Y = YSet(x,F);
 
 v = -0.5;
