@@ -241,6 +241,12 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
 				msg = '';
 			end
 			
+			if isempty(P.findprop('weight'))
+				% "P" is a Function object, no validation is possible, use
+				% at your own risk
+				return
+			end
+			
 			Q = P.weight;
 			check_definiteness = isa(P, 'QuadFunction');
 				
