@@ -1,5 +1,8 @@
 function filter = filter_penalty(varargin)
 % Penalizes the signal in the cost function
+%
+% If the signal is a state variable, this filter DOES NOT penalize the
+% final predicted state (aka the "terminal state").
 
 % set up the filter
 filter = FilterSetup;
