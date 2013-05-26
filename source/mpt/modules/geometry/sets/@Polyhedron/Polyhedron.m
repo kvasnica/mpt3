@@ -548,6 +548,19 @@ classdef Polyhedron < ConvexSet
 			
 		end
 		
+		function Q = copy(P)
+			% Copy constructor for Polyhedron objects
+			
+			if numel(P)==0
+				% special treatment of empty arrays
+				Q = Polyhedron;
+				Q = Q([]);
+			else
+				% copying is done by the constructor
+				Q = Polyhedron(P);
+			end
+		end
+		
 	end
 	
 	methods(Hidden)
