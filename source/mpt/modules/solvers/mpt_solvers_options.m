@@ -47,30 +47,43 @@ options.cplex.lpmethod = 2; % dual-simplex
 options.cplex.qpmethod = 2; % dual-simplex
 
 %% PLCP options
-options.plcp.bfs = true; % [ 0|1 (default 1)] perform breadth first search for exploration in the parameter space 
-options.plcp.dfs = false; % [ 0|1 (default 0) ] perform depth first search for exploration in the parameter space
-options.plcp.debug = 0; % [0|1|2 (default 0)] debugging level, 1-no plots, 2-including plots
+options.plcp.bfs = true;
+% [ 0|1 (default 1)] perform breadth first search for exploration in the parameter space 
+
+options.plcp.dfs = false;
+% [ 0|1 (default 0) ] perform depth first search for exploration in the parameter space
+
+options.plcp.debug = 0;
+% [0|1|2 (default 0)] debugging level, 1-no plots, 2-including plots
+
 options.plcp.fixedstep = false; % [ 0| 1 (default 0)]
 % always perform fixed step over the facet to detect neighbors
+
 options.plcp.maxlayers = inf;
 % This option limits the number of layers to be explored only for BFS type
 % of exploration in the parameter space. This is particularly of interest
 % when there are too many regions far from the initial region that can be
 % discarded. By default it is not limited.
+
 options.plcp.maxregions = inf;
 % Maximum number of regions to be generated. By default it is not limited.
+
 options.plcp.QRfactor = false; %[ false by default ]
 % use recursive QR factorization for pivoting (faster but numerically bad)
+
 options.plcp.checkoverlaps = false; %[ false by default ]
 % check for overlaps while exploring (significantly slows down the
 % computation)
+
 options.plcp.rescue = false; %[ false by default ]
 % if the variable step approach fails to find a neighbor, retry with a
 % fixed step
+
 options.plcp.maxsteps = 200; %[ 200 ], minimum number of steps are 2
 % maximum number of steps to compute with the fixed-step approach
 %options.plcp.stepsize = 1e-5; % [1e-3 < stepsize <abs_tol (1e-5 by default)],
 % step size to be performed with the fixed step approach
+
 options.plcp.maxpivots = 100; %[ default 100, maximum 500 unless default recursion limit is not changed in Matlab settings ],
 % maximum number of pivots to perform for searching a neighbor
 
