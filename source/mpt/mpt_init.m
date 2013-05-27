@@ -12,11 +12,6 @@ function mpt_init
 % global iteration counter (to detect how often mpt_solve is called)
 global MPTOPTIONS
 
-% check if java is running 
-if ~usejava('jvm')
-    error('Java virtual machine must be running.');
-end
-
 % check matlab compatibility. We need at least R2011a (7.12.0) or newer
 % since we rely on the copyable class
 try
