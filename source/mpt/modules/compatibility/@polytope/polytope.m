@@ -578,8 +578,7 @@ classdef polytope
 			
 			if ~isfield(obj, 'Array')
 				% unitialized object
-				out.P = [];
-				out = class(out, 'polytope');
+				out = polytope;
 			elseif isempty(obj.Array)
 				out = polytope(obj.H, obj.K);
 			else
