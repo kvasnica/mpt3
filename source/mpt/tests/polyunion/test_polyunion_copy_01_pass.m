@@ -5,6 +5,7 @@ function test_polyunion_copy_01_pass
 
 U = PolyUnion;
 Un = U.copy;
+assert(isa(Un, 'PolyUnion'));
 
 if ~isempty(Un.Set)
     error('Empty polyunion.');

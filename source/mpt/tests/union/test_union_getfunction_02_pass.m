@@ -19,8 +19,7 @@ x = sdpvar(1);
 P = YSet(x, [-1 <= x <= 1]);
 P.addFunction(@(z) z, 'f1');
 P.addFunction(@(z) z, 'f2');
-U = Union;
-U.add(P);
+U = Union(P);
 F = U.getFunction('f1');
 assert(U.hasFunction('f1'));
 assert(U.hasFunction('f2'));
@@ -43,3 +42,5 @@ assert(U.hasFunction('f1'));
 assert(U.hasFunction('f2'));
 assert(F.hasFunction('f1'));
 assert(~F.hasFunction('f2'));
+
+end

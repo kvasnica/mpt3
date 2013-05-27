@@ -7,6 +7,8 @@ P = ExamplePoly.randHrep;
 P.addFunction(Function(@(x)x), 'a');
 U = PolyUnion(P);
 Un = U.copy;
+assert(isa(U, 'PolyUnion'));
+assert(isa(Un, 'PolyUnion'));
 
 if isempty(Un.Set)
     error('Here must be one polyhedron.');

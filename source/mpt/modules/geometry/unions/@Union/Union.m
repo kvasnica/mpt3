@@ -67,23 +67,55 @@ classdef Union < handle & IterableBehavior
 	  end
 	 
 	  function U = copy(obj)
+		  % Creates a copy of the union
+		  %
+		  %   copy = U.copy()
 		  
-		  if isa(obj.Set, 'Polyhedron')
-			  U = Union('Set', Polyhedron(obj.Set), 'Data', obj.Data);
-		  elseif all(cellfun(@(x) isa(x, 'Polyhedron'), obj.Set))
-			  % all are polyhedra
-			  U = Union;
-			  U.Data = obj.Data;
+		  % Note: we implicitly assume that each element of the union is an
+		  % instance of a class that supports the copy() method.
+		  
+		  % deal with arrays
+		  if numel(obj)>1
+			  U = obj.forEach(@(elem) elem.copy());
+			  return
+		  end
+
+		  % since we don't know which union class we are copying, we
+		  % need to dynamcially call the correct constructor
+		  constructor = str2func(class(obj));
+
+		  if iscell(obj.Set)
+			  % per-element copying
+			  U = constructor();
 			  U.Set = cell(size(obj.Set));
 			  for i = 1:numel(obj.Set)
-				  U.Set{i} = Polyhedron(obj.Set{i});
+				  U.Set{i} = obj.Set{i}.copy();
 			  end
 		  else
-			  % TODO: we really do need a consistent copyable behavior!
-			  % NOTE: UNLESS WE FIX COPYING, WE GET WRONG BEHAVIOR
-			  U = obj;
+			  % resort to Polyhedron/copy or YSet/copy
+			  U = constructor(copy(obj.Set));
 		  end
-		  U.Internal = obj.Internal;
+		  
+		  % now make a deep copy of the Internal and Data properties
+		  %
+		  % copy them field by field, otherwise they will refer to the same
+		  % data 
+		  if isstruct(obj.Internal)
+			  nf = fieldnames(obj.Internal);
+			  for i=1:numel(nf)
+				  U.Internal.(nf{i}) = obj.Internal.(nf{i});
+			  end
+		  else
+			  U.Internal = obj.Internal;
+		  end
+		  if isstruct(obj.Data)
+			  nd = fieldnames(obj.Data);
+			  for i=1:numel(nd)
+				  U.Data.(nd{i}) = obj.Data.(nd{i});
+			  end
+		  else
+			  U.Data = obj.Data;
+		  end
 	  end
 	  
 	  function obj = addFunction(obj, fun, FuncName)
