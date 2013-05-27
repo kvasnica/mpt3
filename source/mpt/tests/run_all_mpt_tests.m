@@ -77,6 +77,7 @@ previous_dir = '';
 runtime = 0;
 first = true;
 dir_runtime = 0;
+dir_mode = false;
 for i = 1:length(test_files)
 	this_dir = fileparts(test_files{i});
 	
@@ -84,10 +85,11 @@ for i = 1:length(test_files)
 	if ~options.rerunfailed && ~isequal(this_dir, previous_dir)
 		% display runtime of the previous directory
 		if ~first,
-			fprintf('\n--- Completed in %.1f ---\n', dir_runtime);
+			fprintf('\n--- Completed in %.1f secs ---\n', dir_runtime);
 		end
 		dir_runtime = 0;
 		first = false;
+		dir_mode = true;
 
 		previous_dir = this_dir;
 		shortdirname = this_dir(length(maindir)+2:end);
@@ -102,6 +104,11 @@ for i = 1:length(test_files)
 			with_error(i) = true;
 		case 'warning',
 			with_warning(i) = true;
+	end
+end
+if dir_mode
+	if ~first,
+		fprintf('\n--- Completed in %.1f secs ---\n', dir_runtime);
 	end
 end
 
