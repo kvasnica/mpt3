@@ -2248,6 +2248,12 @@ function [MAP, rewrite] = map_put(MAP, key, new_value)
 % implicitly assumes "key" is a vector of integers! (because int2str is so
 % much faster than num2str)
 
+% Note: containers.Map does not offer the option to retrieve the index of a
+% key. In fact, keys are sorted alphabetically in containers.Map. Since
+% adjacency list depends on indices, we store the value as a structure:
+%   stored_value.value = user-provided value
+%   stored_value.index = automatically incremented index of the key
+
 key = int2str(key);
 rewrite = MAP.isKey(key);
 if rewrite
