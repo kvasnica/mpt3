@@ -75,10 +75,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			%
 			
 			xinit = xinit(:);
-			nx = obj.getNumberOf('x');
-			if numel(xinit)~=nx
-				error('The initial state must be a %dx1 vector.', nx);
-			end
+			error(validate_vector(xinit, obj.nx, 'initial state'));
 
 			x = obj.getComponents('x');
 			cx = 1;
@@ -131,7 +128,6 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			% Simulates the system using a given sequence of inputs
 			%
 			
-			%nu = obj.getNumberOf('u');
 			nu = obj.nu;
 			if nu>0 && nargin==1
 				error('System is not autonomous, you must provide sequence of inputs as well.');
@@ -292,16 +288,6 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			
 			[optcost, sol] = obj.solve(C, cost);
 		end
-
-		function out = getNumberOf(obj, kind)
-			% Returns number of variables of given kind
-			%
-			%    obc.getNumberOf('u') -- returns number of inputs
-			
-			out = obj.forEachComponent(kind, @(x) x.n);
-			out = sum(cat(2, out{:}));
-		end
-		
 
 		function obj = prepareForControl(obj)
 			% Prepares the model for control purposes by adding the min/max
