@@ -19,6 +19,19 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
+% Artificial bound on the radius. Logic:
+% 1) Solve the LP with this big bound on the radius.
+% 2) If the LP is infeasible => exit, infeasible.
+% 3) If the radius is smaller than big_bound => exit, bounded polytope.
+% 4) If the radius is larger, we either have a larger polytope, or an
+%    unbounded polyhedron. Drop the bound altogether and solve the LP
+%    again. Then:
+% 4.1) If the LP without bounds on the radius is feasible => polytope
+% 4.2) Otherwise => unbounded polyhedron
+%
+% Note: this logic is skipped if user specifies his own non-inf bound
+BIG_BOUND = 1.234e6;
+
 if nargin < 2,
 	facetI = [];
 	bound = Inf;
@@ -118,10 +131,14 @@ end
 S.A = [S.A; zeros(1,P.Dim), -1];
 S.b = [S.b; 0];
 % upper bounds
-if ~isinf(bound)
-    S.A = [S.A; zeros(1,P.Dim), 1];
-    S.b = [S.b; bound];
+inf_bound = isinf(bound);
+if inf_bound
+	% always introduce at least an artificial upper bound on the radius
+	bound = BIG_BOUND;
 end
+% make sure the bound on the radius is always the last constraint!
+S.A = [S.A; zeros(1,P.Dim), 1];
+S.b = [S.b; bound];
 
 % the last value is -1 because it is maximization
 S.f = [zeros(size(H, 2)-1,1);-1];
@@ -134,41 +151,48 @@ ret = mpt_solve(S);
 sol.exitflag = ret.exitflag;
 
 if ret.exitflag == MPTOPTIONS.OK
-    if -ret.obj>MPTOPTIONS.zero_tol
-        sol.x = ret.xopt(1:end-1);
-        sol.r = ret.xopt(end);
-    else
-        sol.x = ret.xopt(1:end-1);
-        sol.r = 0;
-    end
+	if -ret.obj>MPTOPTIONS.zero_tol
+		sol.x = ret.xopt(1:end-1);
+		sol.r = ret.xopt(end);
+	else
+		sol.x = ret.xopt(1:end-1);
+		sol.r = 0;
+	end
+	if inf_bound && sol.r >= BIG_BOUND-1
+		% The radius is too large, potentially we have an unbounded
+		% polyhedron. Re-solve the LP without bounds to be sure.
+		%
+		% Introduce a numerical tolerance when comparing the radius to
+		% BIG_BOUND.
+		%
+		% Remove the bound. If we get a bounded solution, then we have a
+		% polytope. Otherwise we have a polyhedron.
+		%
+		% NOTE: as noted above, make sure the bounds are always the last
+		% constraint!
+		S.A = S.A(1:end-1, :);
+		S.b = S.b(1:end-1);
+		
+		% Note that the LP can also be infeasible. But that indicates
+		% unboundedness, since it was feasible with the bound included.
+		ret = mpt_solve(S);
+		if ret.exitflag == MPTOPTIONS.OK
+			% bounded solution even without bounds on the radius => polytope
+			sol.x = ret.xopt(1:end-1);
+			sol.r = ret.xopt(end);
+		else
+			% unbounded => polyhedron
+			sol.r = Inf;
+		end
+	end
 else
-    % Solution can be unbounded/infeasible. This is not a problem for
-    % unbounded polyhedra. A simple remedy is to put bound on the radius to
-    % get feasible result but we mark the radius as Inf.
-    
-    S.A = [S.A; zeros(1,P.Dim), 1];
-    S.b = [S.b; 1];
-
-    % solve problem
-    ret = mpt_solve(S);
-    
-    if ret.exitflag == MPTOPTIONS.OK
-        sol.exitflag = MPTOPTIONS.OK;
-        sol.x = ret.xopt(1:end-1);
-        sol.r = Inf;
-    else
-        % infeasible
-        sol.x = [];
-        sol.r = -Inf;
-    end
+	% infeasible
+	sol.x = [];
+	sol.r = -Inf;
 end
 
-
-
-
-
-% store internally if empty facet and the bound is provided
-if isempty(facetI) && isinf(bound)
+% store internally if empty facet and the bound was not provided
+if isempty(facetI) && inf_bound
     P.Internal.ChebyData = sol;
 end
 
