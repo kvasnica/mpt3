@@ -84,10 +84,8 @@ end
 %   lc.Ht = zeros(0, lc.d+1);
 % end
 
-
 % Initialize hash table
-HASH = HashTable(lc);
-
+HASH = containers.Map;
 
 %% region exploration
 
@@ -229,7 +227,7 @@ UNEX = R;
 % store index set I and data determining the region R
 hdat.basis = R.Internal.I;
 hdat.redundant_rows = R.Internal.redundant_rows;
-HASH.put(Io,hdat);
+HASH = map_put(HASH, Io, hdat);
 
 % initialize counters
 regions = Polyhedron('H',zeros(0,lc.d+1));
@@ -316,7 +314,7 @@ while ~builtin('isempty',UNEX)
      
   % Store solution
   iter = iter + 1; % current iteration
-  actual_region = HASH.getIndex(R.Internal.I);
+  actual_region = map_getIndex(HASH, R.Internal.I);
   regions(actual_region) = R; % store regions in array as they were explored
   er = ([regions.Dim]==0); % empty regions
   regions(er) = Polyhedron('H',zeros(0,lc.d+1)); % set the dimensio of empty regions to lc.d
@@ -352,9 +350,9 @@ while ~builtin('isempty',UNEX)
            ip = regions(ii).chebyCenter;
            if ~regions(ii).isEmptySet
                if lc.d==1
-                   text(ip.x,0,num2str(HASH.getIndex(regions(ii).Internal.I)));
+                   text(ip.x,0,num2str(map_getIndex(HASH, regions(ii).Internal.I)));
                elseif lc.d==2
-                   text(ip.x(1),ip.x(2),num2str(HASH.getIndex(regions(ii).Internal.I)));
+                   text(ip.x(1),ip.x(2),num2str(map_getIndex(HASH, regions(ii).Internal.I)));
                end
            end
         end        
@@ -442,7 +440,7 @@ while ~builtin('isempty',UNEX)
               % the overlap
               hdat.basis = Radj{i}(j).Internal.I;
               hdat.redundant_rows = Radj{i}(j).Internal.redundant_rows;
-              S = HASH.put(Radj{i}(j).Internal.I,hdat);
+              [HASH, S] = map_put(HASH, Radj{i}(j).Internal.I,hdat);
               
               % count discovered regions
               if (S==0)
@@ -450,7 +448,7 @@ while ~builtin('isempty',UNEX)
               end
               
               % build graph represented by adjacency list              
-              region_index = HASH.getIndex(Radj{i}(j).Internal.I);
+              region_index = map_getIndex(HASH, Radj{i}(j).Internal.I);
                            
               % for each facet i we found j neighbors
               adj_list{actual_region}{i}(j) = region_index;
@@ -680,7 +678,7 @@ if nargin < 6
 end
  
 % check if region already exist
-s = HASH.getIndex(I);
+s = map_getIndex(HASH, I);
 % region exist, get it from the list and return quickly
 if ~isempty(s)
     nR = numel(regions);
@@ -2239,3 +2237,45 @@ end
 hull = Polyhedron(H(:, 1:end-1), H(:, end));
 
 end
+
+
+%-----------------------------------------------------------
+function [MAP, rewrite] = map_put(MAP, key, new_value)
+% insers into HASH "value" under "key"
+% returns the updated map as the first input
+% returns rewrite=true if the key existed before, false otherwise
+%
+% implicitly assumes "key" is a vector of integers! (because int2str is so
+% much faster than num2str)
+
+key = int2str(key);
+rewrite = MAP.isKey(key);
+if rewrite
+	% just update the stored value, do not change its index!
+	old = MAP(key);
+	old.value = new_value;
+	MAP(key) = old;
+else
+	% insert new value, update its index
+	MAP(key) = struct('value', new_value, 'index', MAP.Count+1);
+end
+
+end
+
+%-----------------------------------------------------------
+function idx = map_getIndex(MAP, key)
+% returns index of a key. idx=[] if the key does not exist in the map
+%
+% implicitly assumes "key" is a vector of integers! (because int2str is so
+% much faster than num2str)
+
+key = int2str(key);
+if MAP.isKey(key)
+	value = MAP(key);
+	idx = double(value.index); % make sure the index is a double
+else
+	idx = [];
+end
+
+end
+
