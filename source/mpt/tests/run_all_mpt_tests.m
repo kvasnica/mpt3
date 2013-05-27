@@ -75,18 +75,27 @@ with_error = false(1, length(test_files));
 with_warning = false(1, length(test_files));
 previous_dir = '';
 runtime = 0;
+first = true;
 for i = 1:length(test_files)
 	this_dir = fileparts(test_files{i});
 	
 	% show a delimiter for each test directory
 	if ~options.rerunfailed && ~isequal(this_dir, previous_dir)
+		% display runtime of the previous directory
+		if ~first,
+			fprintf('\n--- Completed in %.1f ---\n', dir_run_time);
+		end
+		dir_run_time = 0;
+		first = false;
+
 		previous_dir = this_dir;
 		shortdirname = this_dir(length(maindir)+2:end);
-		fprintf('\n%s\n', repmat('-', 1, 60));
-		fprintf('Tests for %s:\n\n', shortdirname);
+		%fprintf('\n%s\n', repmat('-', 1, 60));
+		fprintf('\n=== Tests for %s ===\n\n', shortdirname);
 	end
 	[status, et] = run_test(test_files{i}, options);
 	runtime = runtime + et;
+	dir_run_time = dir_run_time + et;
 	switch status
 		case 'error',
 			with_error(i) = true;
