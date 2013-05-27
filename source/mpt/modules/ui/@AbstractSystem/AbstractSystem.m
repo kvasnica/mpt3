@@ -9,20 +9,6 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 
 		% Domain of the system in the x-space
 		domainx 
-		
-		% The "functions" property is a containers.Map object which defines
-		% state-update and output functions by function handles.
-		%
-		% Each class derived from AbstractSystem must define the
-		% "functions" property as follows:
-		%   obj.functions = containers.Map;
-		%   obj.functions('update') = @(x, u) A*x+B*u;
-		%   obj.functions('output') = @(x, u) sin(x);
-		functions
-
-		% The "feedthrough" property must be set to true if the system has
-		% direct feed-through
-		feedthrough
 	end
 	
 	properties(SetAccess=protected)
@@ -32,6 +18,20 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
         ny % Number of outputs
 	end
 
+	methods(Abstract, Hidden)
+		% Methods which all derived classes must implement.
+		
+		% state-update equation
+		[xn, y, z, d] = update_equation(obj, x, u)
+		
+		% output equation
+		y = output_equation(obj, x, u)
+		
+		% feedthrough indication. must return true if the system has direct
+		% feedthrough, false otherwise
+		out = has_feedthrough(obj)		
+	end
+	
 	methods
 		
 		function obj = AbstractSystem()
@@ -211,10 +211,14 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			new.saveAllComponents();
 		end
 
-		function [xn, y] = update(obj, u)
+		function varargout = update(obj, u)
             % Evaluates the state-update and output equations and updates
             % the internal state of the system
-            
+            %
+			% xn = obj.update(u)
+			% [xn, y] = obj.update(u)
+			% [xn, y, z, d] = obj.update(u)
+			
 			if nargin<2
 				u = [];
 			end
@@ -224,11 +228,18 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			if isempty(x)
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
-			
-			xn = feval(obj.functions('update'), x, u);
-			if nargout>1
-				y = feval(obj.functions('output'), x, u);
+
+			varargout = cell(1, nargout);
+			if nargout>2
+				% MLD systems return [xn, y, z, d]
+				[varargout{:}] = obj.update_equation(x, u);
+			else
+				varargout{1} = obj.update_equation(x, u);
+				if nargout>1
+					varargout{2} = obj.output_equation(x, u);
+				end
 			end
+			xn = varargout{1};
 			
 			% update the internal state
             obj.initialize(xn);
@@ -242,7 +253,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 			
-			if nargin==1 && obj.feedthrough
+			if nargin==1 && obj.has_feedthrough
 				error('Input is required for systems with direct feed-through.')
 			end
 			if nargin<2
@@ -250,7 +261,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			end
 			u = obj.validateInput(u);
 			
-			y = feval(obj.functions('output'), x, u);
+			y = obj.output_equation(x, u);
 		end
 		
 	end

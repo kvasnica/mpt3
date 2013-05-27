@@ -130,14 +130,6 @@ classdef MLDSystem < AbstractSystem
 			obj.z.min = S.zl;
 			obj.z.max = S.zu;
 
-			% TODO: add state-update and output functions via the simulator
-% 			obj.functions = containers.Map;
-% 			obj.functions('update') = @(x, u) obj.simulator(x, u, 'state');
-% 			obj.functions('output') = @(x, u) obj.simulator(x, u, 'output');
-
-			% every class derived from AbstractSystem must define the
-			% "feedthrough" property 
-			obj.feedthrough = true;
         end
         
         function out = toPWA(obj)
@@ -178,25 +170,26 @@ classdef MLDSystem < AbstractSystem
                     S.E1*u(:, k) + S.E4*x(:, k) + S.E5 ];
             end
 		end
+		
+	end
+	
+	methods(Hidden)
+		% implementation of abstract methods
 
-		function [xn, y, z, d] = update(obj, u)
+		% no validation in these functions! it was already performed in
+		% AbstractSystem/update() and output()
+
+		function varargout = update_equation(obj, x0, u)
             % Evaluates the state-update and output equations and updates
             % the internal state of the system
-            
+            %
+			% [xn, y, z, d] = obj.update_equation(x, u)
+			
 			global MPTOPTIONS
 			if isempty(MPTOPTIONS)
 				MPTOPTIONS = mptopt;
 			end
 			
-			if nargin<2
-				u = [];
-			end
-			u = obj.validateInput(u);
-			x0 = obj.getStates();
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-
 			feasible = false;
 			if size(obj.E1, 1)==0
 				% no constraints, compute 'xn' and 'y' directly
@@ -256,29 +249,28 @@ classdef MLDSystem < AbstractSystem
 				y = NaN(obj.ny, 1);
 				d = NaN(obj.nd, 1);
 				z = NaN(obj.nz, 1);
-			else
-				obj.initialize(xn);
 			end
+			varargout{1} = xn;
+			varargout{2} = y;
+			varargout{3} = z;
+			varargout{4} = d;
 			
 		end
         
-		function y = output(obj, u)
+		function y = output_equation(obj, x, u)
             % Evaluates the output equation
         
-			error(nargchk(2, 2, nargin));
-			
-			x0 = obj.getStates();
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-			
 			warning('Computing the output for MLD systems is costly, use the "update()" method instead.');
-			[~, y] = obj.update(u);
-			
-			% Running the output() method should not update the state, so
-			% make sure we restore it.
-			obj.initialize(x0);
+			[~, y] = obj.update_equation(x, u);
 		end
+		
+		function out = has_feedthrough(obj)
+			% feedthrough indication. must return true if the system has
+			% direct feedthrough, false otherwise
+
+			out = true;
+		end
+
 	end
 	
 	

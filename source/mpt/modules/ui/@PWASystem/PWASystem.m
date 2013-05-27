@@ -19,6 +19,34 @@ classdef PWASystem < AbstractSystem
 		polyunion % state-update and output equations as a PolyUnion object
 	end
             
+	methods(Hidden)
+		% implementation of abstract methods
+		
+		% no validation in these functions! it was already performed in
+		% AbstractSystem/update() and output()
+		
+		function xn = update_equation(obj, x, u)
+			% returns the state update
+			
+			% use the first-region tiebreak
+			xn = obj.polyunion.feval([x; u], 'update', 'tiebreak', @(q) 0);
+		end
+		
+		function y = output_equation(obj, x, u)
+			% output equation
+
+			% use the first-region tiebreak
+			y = obj.polyunion.feval([x; u], 'output', 'tiebreak', @(q) 0);
+		end
+		
+		function out = has_feedthrough(obj)
+			% feedthrough indication. must return true if the system has
+			% direct feedthrough, false otherwise
+
+			out = (nnz(cat(2, obj.D{:}))~=0);
+		end
+	end
+
     methods
         
         function obj = PWASystem(varargin)
@@ -214,13 +242,6 @@ classdef PWASystem < AbstractSystem
 			end
 			obj.polyunion = PolyUnion(P);
 			
-			% define state-update and output equations
-			obj.functions = containers.Map;
-			obj.functions('update') = @(x, u) obj.polyunion.feval([x; u], ...
-				'update', 'tiebreak', @(q) 0); % first-region tiebreak
-			obj.functions('output') = @(x, u) obj.polyunion.feval([x; u], ...
-				'output', 'tiebreak', @(q) 0); % first-region tiebreak
-			
 			% store the individual modes as an array of LTISystems
 			modes = [];
 			for pwa_index = 1:obj.ndyn
@@ -234,10 +255,6 @@ classdef PWASystem < AbstractSystem
 				modes = [modes, lti];
 			end
 			obj.modes = modes;
-			
-			% every class derived from AbstractSystem must define the
-			% "feedthrough" property 
-			obj.feedthrough = (nnz(cat(2, obj.D{:}))~=0);
 		end
         
 		function out = toLTI(obj, pwa_index)

@@ -16,6 +16,32 @@ classdef LTISystem < AbstractSystem
 		g % Matrix of the output equation y(t) = C*x(t)+D*u(t)+g
 	end
 	
+	methods(Hidden)
+		% implementation of abstract methods
+		
+		% no validation in these functions! it was already performed in
+		% AbstractSystem/update() and output()
+
+		function xn = update_equation(obj, x, u)
+			% returns the state update
+			
+			xn = obj.A*x + obj.B*u + obj.f;
+		end
+
+		function y = output_equation(obj, x, u)
+			% output equation
+			
+			y = obj.C*x + obj.D*u + obj.g;
+		end
+
+		function out = has_feedthrough(obj)
+			% feedthrough indication. must return true if the system has
+			% direct feedthrough, false otherwise
+			
+			out = (nnz(obj.D)~=0);
+		end
+	end
+	
     methods
         
         function obj = LTISystem(varargin)
@@ -167,14 +193,6 @@ classdef LTISystem < AbstractSystem
                 obj.importSysStructConstraints(S);
 			end
 
-			% state-update and output functions
-			obj.functions = containers.Map;
-			obj.functions('update') = @(x, u) obj.A*x + obj.B*u + obj.f;
-			obj.functions('output') = @(x, u) obj.C*x + obj.D*u + obj.g;
-			
-			% every class derived from AbstractSystem must define the
-			% "feedthrough" property 
-			obj.feedthrough = (nnz(obj.D)~=0);
 		end
 		
         function out = toSS(obj)
