@@ -11,16 +11,12 @@ classdef PWASystem < AbstractSystem
         D % Matrices of the output equation y(t)=C_i*x(t)+D_i*u(t)+g_i
         f % Matrices of the state-update equation x(t+Ts)=A_i*x(t)+B_i*u(t)+f_i
         g % Matrices of the output equation y(t)=C_i*x(t)+D_i*u(t)+g_i
-        Ts % Sampling time
-        nx % Number of state
-        nu % Number of inputs
-        ny % Number of outputs
         ndyn % Number of local dynamics
 	end
 
 	properties(SetAccess=private, GetAccess=private, Hidden)
-		functions % state-update and output functions as a PolyUnion
 		modes % local affine modes as an array of LTISystem
+		polyunion % state-update and output equations as a PolyUnion object
 	end
             
     methods
@@ -216,7 +212,14 @@ classdef PWASystem < AbstractSystem
 				P(i).addFunction(update, 'update');
 				P(i).addFunction(output, 'output');
 			end
-			obj.functions = PolyUnion(P);
+			obj.polyunion = PolyUnion(P);
+			
+			% define state-update and output equations
+			obj.functions = containers.Map;
+			obj.functions('update') = @(x, u) obj.polyunion.feval([x; u], ...
+				'update', 'tiebreak', @(q) 0); % first-region tiebreak
+			obj.functions('output') = @(x, u) obj.polyunion.feval([x; u], ...
+				'output', 'tiebreak', @(q) 0); % first-region tiebreak
 			
 			% store the individual modes as an array of LTISystems
 			modes = [];
@@ -231,6 +234,10 @@ classdef PWASystem < AbstractSystem
 				modes = [modes, lti];
 			end
 			obj.modes = modes;
+			
+			% every class derived from AbstractSystem must define the
+			% "feedthrough" property 
+			obj.feedthrough = (nnz(cat(2, obj.D{:}))~=0);
 		end
         
 		function out = toLTI(obj, pwa_index)
@@ -402,45 +409,6 @@ classdef PWASystem < AbstractSystem
                 end
                 C = C + [ sum(d(:, k)) == 1 ];
             end
-        end
-        
-        function [xn, y] = update(obj, u)
-            % Evaluates the state-update and output equations and updates
-            % the internal state of the system
-
-			if nargin<2
-				u = [];
-			end
-			u = obj.validateInput(u);
-
-			x0 = obj.getValues('x');
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-
-			% TODO: compute state updates using all detected dynamics
-			% and only trigger the warning if the updates differ
-			[xn, ~, idx] = obj.functions.feval([x0; u], 'update', 'tiebreak', @(x) 0);
-			y = obj.functions.feval([x0; u], 'output', 'regions', idx);
-			obj.initialize(xn);
-        end
-        
-        function y = output(obj, u)
-            % Evaluates the output equation
-            
-            x0 = obj.getValues('x');
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-
-			if nargin < 2
-				u = zeros(obj.nu, 1);
-			end
-			u = obj.validateInput(u);
-
-			% TODO: compute state updates using all detected dynamics
-			% and only trigger the warning if the updates differ
-			y = obj.functions.feval([x0; u], 'output', 'tiebreak', @(x) 0);
         end
         
     end

@@ -23,9 +23,6 @@ classdef MLDSystem < AbstractSystem
 		E4 % E2*d + E3*z <= E1*u + E4*x + E5
 		E5 % E2*d + E3*z <= E1*u + E4*x + E5
 		S  % Full MLD structure returned from HYSDEL
-		nx % Number of states
-		nu % Number of inputs
-		ny % Number of outputs
 		nz % Number of auxiliary real variables
 		nd % Number of auxiliary binary variables
 	end
@@ -132,7 +129,15 @@ classdef MLDSystem < AbstractSystem
             obj.addComponent('z', z);
 			obj.z.min = S.zl;
 			obj.z.max = S.zu;
-            
+
+			% TODO: add state-update and output functions via the simulator
+% 			obj.functions = containers.Map;
+% 			obj.functions('update') = @(x, u) obj.simulator(x, u, 'state');
+% 			obj.functions('output') = @(x, u) obj.simulator(x, u, 'output');
+
+			% every class derived from AbstractSystem must define the
+			% "feedthrough" property 
+			obj.feedthrough = true;
         end
         
         function out = toPWA(obj)

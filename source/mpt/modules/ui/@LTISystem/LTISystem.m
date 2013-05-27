@@ -14,10 +14,6 @@ classdef LTISystem < AbstractSystem
         C % Matrix of the output equation y(t) = C*x(t)+D*u(t)+g
         D % Matrix of the output equation y(t) = C*x(t)+D*u(t)+g
 		g % Matrix of the output equation y(t) = C*x(t)+D*u(t)+g
-        Ts % Sampling time
-        nx % Number of states
-        nu % Number of inputs
-        ny % Number of outputs
 	end
 	
     methods
@@ -169,7 +165,16 @@ classdef LTISystem < AbstractSystem
 			if nargin==1 && isstruct(varargin{1})
                 % import constraints from sysStruct
                 obj.importSysStructConstraints(S);
-            end
+			end
+
+			% state-update and output functions
+			obj.functions = containers.Map;
+			obj.functions('update') = @(x, u) obj.A*x + obj.B*u + obj.f;
+			obj.functions('output') = @(x, u) obj.C*x + obj.D*u + obj.g;
+			
+			% every class derived from AbstractSystem must define the
+			% "feedthrough" property 
+			obj.feedthrough = (nnz(obj.D)~=0);
 		end
 		
         function out = toSS(obj)
@@ -240,71 +245,6 @@ classdef LTISystem < AbstractSystem
 					error('Unrecognized option "%s".', type);
 			end
 		end
-        
-        function [xn, y] = update(obj, u)
-            % Evaluates the state-update and output equations and updates
-            % the internal state of the system
-            
-			if nargin<2
-				u = [];
-			end
-			u = obj.validateInput(u);
-			
-			x0 = obj.getValues('x');
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-			
-            xn = x0; y = [];
-            if obj.ny > 0
-                y = obj.output(u);
-            end
-            if obj.nx > 0
-                xn = obj.A*x0;
-			end
-			if obj.nu > 0
-				xn = xn + obj.B*u;
-			end
-			if ~isempty(obj.f)
-				xn = xn + obj.f;
-			end
-            obj.initialize(xn);
-        end
-        
-        function y = output(obj, u)
-            % Evaluates the output equation
-            
-            x0 = obj.getValues('x');
-			if isempty(x0)
-				error('Internal state not set, use "sys.initialize(x0)".');
-			end
-
-            if nnz(obj.D)>0 && nargin==1
-                error('Input is required for systems with direct feed-through.')
-            end
-            if nargin<2
-                u = zeros(obj.nu, 1);
-			end
-			u = obj.validateInput(u);
-			
-            if obj.ny > 0
-                % catch cases with empty C matrix (e.g. for linear
-                % controllers)
-                if isempty(obj.C)
-                    y = zeros(obj.ny, 1);
-                else
-                    y = obj.C*x0;
-				end
-				if obj.nu > 0
-					y = y + obj.D*u;
-				end
-				if ~isempty(obj.g)
-					y = y + obj.g;
-				end
-            else
-                y = [];
-            end
-        end
         
 		function K = LQRGain(obj)
 			% Returns the LQR gain u=K*x

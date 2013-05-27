@@ -4,10 +4,32 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 	% It serves as a storage for signals
 	
 	properties(SetAccess=protected, Hidden)
-		domain % Domain of the system in the x-u space (can be changed by setDomain)
+		% Domain of the system in the x-u space (can be changed by setDomain)
+		domain 
+
+		% Domain of the system in the x-space
+		domainx 
+		
+		% The "functions" property is a containers.Map object which defines
+		% state-update and output functions by function handles.
+		%
+		% Each class derived from AbstractSystem must define the
+		% "functions" property as follows:
+		%   obj.functions = containers.Map;
+		%   obj.functions('update') = @(x, u) A*x+B*u;
+		%   obj.functions('output') = @(x, u) sin(x);
+		functions
+
+		% The "feedthrough" property must be set to true if the system has
+		% direct feed-through
+		feedthrough
 	end
-	properties(SetAccess=protected, Hidden)
-		domainx % Domain of the system in the x-space
+	
+	properties(SetAccess=protected)
+        Ts % Sampling time
+        nx % Number of states
+        nu % Number of inputs
+        ny % Number of outputs
 	end
 
 	methods
@@ -189,6 +211,48 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			new.saveAllComponents();
 		end
 
+		function [xn, y] = update(obj, u)
+            % Evaluates the state-update and output equations and updates
+            % the internal state of the system
+            
+			if nargin<2
+				u = [];
+			end
+			u = obj.validateInput(u);
+			
+			x = obj.getValues('x');
+			if isempty(x)
+				error('Internal state not set, use "sys.initialize(x0)".');
+			end
+			
+			xn = feval(obj.functions('update'), x, u);
+			if nargout>1
+				y = feval(obj.functions('output'), x, u);
+			end
+			
+			% update the internal state
+            obj.initialize(xn);
+		end
+		
+		function y = output(obj, u)
+			% Evaluates the output equation
+			
+			x = obj.getValues('x');
+			if isempty(x)
+				error('Internal state not set, use "sys.initialize(x0)".');
+			end
+			
+			if nargin==1 && obj.feedthrough
+				error('Input is required for systems with direct feed-through.')
+			end
+			if nargin<2
+				u = zeros(obj.nu, 1);
+			end
+			u = obj.validateInput(u);
+			
+			y = feval(obj.functions('output'), x, u);
+		end
+		
 	end
 	
 	
