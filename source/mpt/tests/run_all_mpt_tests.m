@@ -76,6 +76,7 @@ with_warning = false(1, length(test_files));
 previous_dir = '';
 runtime = 0;
 first = true;
+dir_runtime = 0;
 for i = 1:length(test_files)
 	this_dir = fileparts(test_files{i});
 	
@@ -83,9 +84,9 @@ for i = 1:length(test_files)
 	if ~options.rerunfailed && ~isequal(this_dir, previous_dir)
 		% display runtime of the previous directory
 		if ~first,
-			fprintf('\n--- Completed in %.1f ---\n', dir_run_time);
+			fprintf('\n--- Completed in %.1f ---\n', dir_runtime);
 		end
-		dir_run_time = 0;
+		dir_runtime = 0;
 		first = false;
 
 		previous_dir = this_dir;
@@ -95,7 +96,7 @@ for i = 1:length(test_files)
 	end
 	[status, et] = run_test(test_files{i}, options);
 	runtime = runtime + et;
-	dir_run_time = dir_run_time + et;
+	dir_runtime = dir_runtime + et;
 	switch status
 		case 'error',
 			with_error(i) = true;
