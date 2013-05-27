@@ -235,31 +235,35 @@ switch result.status
         end
     case 'INF_OR_UNBD'
         R.how = 'infeasible or unbounded';
-        % recast once more to find out if it is unbounded
-        if S.test
-            model.lb = -1e6*ones(S.n,1);
-            model.ub = 1e6*ones(S.n,1);
-        else
-            model.lb = -MPTOPTIONS.infbound*ones(S.n,1);
-            model.ub = MPTOPTIONS.infbound*ones(S.n,1);
-        end
-        result = gurobi(model,opts);
-        if strcmpi(result.status,'OPTIMAL')
-            % feasible -> unbounded
-            if S.test
-                R.exitflag = 3;
-            else
-                R.exitflag = MPTOPTIONS.UNBOUNDED;
-            end
-            R.how = 'unbounded';
-        else
-            if S.test
-                R.exitflag = 2;
-            else
-                R.exitflag = MPTOPTIONS.INFEASIBLE;
-            end
-            R.how = 'infeasible';
-        end
+		
+		% according to the docs we should switch off presolve:
+		% http://www.gurobi.com/documentation/4.6/example-tour/node77
+		opts.Presolve = 0; % 0 = off
+		result = gurobi(model, opts);
+		switch result.status,
+			case {'OPTIMAL', 'UNBOUNDED'}
+				if S.test
+					R.exitflag = 3;
+				else
+					R.exitflag = MPTOPTIONS.UNBOUNDED;
+				end
+				R.how = 'unbounded';
+				
+				% do not forget to update the optimizer
+				if isfield(result, 'x')
+					R.xopt = result.x;
+				end
+				if isfield(result, 'objval')
+					R.obj = result.objval;
+				end
+			otherwise
+				if S.test
+					R.exitflag = 2;
+				else
+					R.exitflag = MPTOPTIONS.INFEASIBLE;
+				end
+				R.how = 'infeasible';
+		end
     case 'UNBOUNDED'
         R.how = 'unbounded';
         if S.test
