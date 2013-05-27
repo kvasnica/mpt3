@@ -41,56 +41,11 @@ classdef YSet < ConvexSet
       % @param constraints The YALMIP constraints describing this object.
       %
       
+	  if nargin==0
+		  return
+	  end
+	  
       error(nargchk(2,3,nargin));
-
-% Prepared for future, if we want to copy YSet objects.
-% The problem here is that simple reassigning of sdpvar data still refers
-% to the same variable. The new variables and constraints must be recreated
-% again, using sdpvar/binvar and set commands.
-%       if nargin==1
-%           % copy constructor
-%           if ~isa(vars,'YSet')
-%               error('The input argument must be object of "YSet" class, in order to create a copy of the object.');
-%           end
-%           % deal with arrays
-%           if numel(vars)>1
-%               for i=1:numel(vars)
-%                   obj(i) = YSet(vars(i));
-%               end
-%               return;
-%           end
-%           
-%           if numel(vars)==0
-%               error('The input argument must be non-empty.');
-%           end
-%                     
-%           obj = YSet(vars.vars,vars.constraints, vars.opts);
-% 			  keys = obj.Functions.keys;
-% 			  values = obj.Functions.values;
-% 			  for j = 1:numel(keys)
-% 				  obj.Functions(keys{j}) = values{j};
-% 			  end
-%           
-%           % copy internal data field by field, otherwise it will refer to the same data
-%           if isstruct(vars.Internal)
-%               nf = fieldnames(vars.Internal);
-%               for i=1:numel(nf)
-%                   obj.Internal.(nf{i}) = vars.Internal.(nf{i});
-%               end
-%           else
-%               obj.Internal = vars.Internal;
-%           end
-%           % copy internal data field by field, otherwise it will refer to the same data
-%           if isstruct(vars.Data)
-%               nf = fieldnames(vars.Data);
-%               for i=1:numel(nf)
-%                   obj.Data.(nf{i}) = vars.Data.(nf{i});
-%               end
-%           else
-%               obj.Data = vars.Data;
-%           end          
-%           return
-%       end
       
       if ~isvector(vars)
           error('Variables must be provided as vectors only.');
@@ -178,8 +133,147 @@ classdef YSet < ConvexSet
       obj.maxsep = optimizer(obj.constraints, 0.5*(obj.x0-obj.vars(:))'*(obj.x0-obj.vars(:)),obj.opts,obj.x0,obj.vars);
 
       
-    end
+	end
+	
+	function C = copy(obj)
+		% Copy method for YSet objects
+		
+		if numel(obj)==0
+			% special treatment of empty arrays
+			C = YSet;
+			C = obj([]);
+			return
+			
+		elseif numel(obj)>1
+			% copy array
+			for i = 1:numel(obj)
+				C(i) = obj(i).copy();
+			end
+			return
+		end
+		
+		if numel(obj.vars)>0
+			% create a copy of variables and constraints
+			[new_vars, new_cons] = obj.copy_Y_constraints(obj.vars, obj.constraints);
+		
+			% create a copy of the object
+			C = YSet(new_vars, new_cons, obj.opts);
+		else
+			C = YSet;
+		end
+		
+		% copy functions
+		keys = obj.Functions.keys;
+		values = obj.Functions.values;
+		for j = 1:numel(keys)
+			C.Functions(keys{j}) = values{j};
+		end
+		
+		% copy internal data field by field, otherwise it will refer to the same data
+		if isstruct(obj.Internal)
+			nf = fieldnames(obj.Internal);
+			for i=1:numel(nf)
+				C.Internal.(nf{i}) = obj.Internal.(nf{i});
+			end
+		else
+			C.Internal = obj.Internal;
+		end
+		
+		% copy internal data field by field, otherwise it will refer to the same data
+		if isstruct(obj.Data)
+			nf = fieldnames(obj.Data);
+			for i=1:numel(nf)
+				C.Data.(nf{i}) = obj.Data.(nf{i});
+			end
+		else
+			C.Data = obj.Data;
+		end
+		
+	end
         
+  end
+  
+  methods (Static, Hidden)
+	  
+	  function [new_vars, new_con, new_con_s] = copy_Y_constraints(vars, constraints)
+		  % Internal helper to create a copy of YALMIP's constraints
+		  %
+		  %   [new_vars, new_con] = mpt_copyConstraints(variables, constraints)
+		  %
+		  % Creates a copy of "constraints", which employ "variables". The output are
+		  % new variables in "new_vars" and new constraints in "new_con"
+		  %
+		  % Examples:
+		  %   x = sdpvar(2, 1);
+		  %   C = [-1 <= x <= 1] + [ x'*x >= 2 ] + [ sin(cos(x(2))) <= x(1)^2 ];
+		  %   [nx, nC, Cstr] = copy_Y_constraints(x, C)
+		  %
+		  %   x = sdpvar(2, 1); p = polytope(randn(5, 2), rand(5, 1));
+		  %   C = [ ismember(x, p) ];
+		  %   [nx, nC, Cstr] = copy_Y_constraints(x, C)
+		  %
+		  %   x = sdpvar(1, 1);
+		  %   C = [-1 <= x <= 1] + [ x == 0 ];
+		  %   [nx, nC, Cstr] = copy_Y_constraints(x, C)
+		  
+		  if size(vars, 2)~=1
+			  error('Variable must be a column vector.');
+		  end
+		  
+		  if is(vars, 'binary') || is(vars, 'integer')
+			  error('Binary and integer variables not yet supported.');
+		  end
+		  
+		  % create new variables
+		  new_vars = sdpvar(length(vars), 1); % implicitly assumes a column vector
+		  
+		  % prepare string name of each component of "new_vars":
+		  % 1) determine which YALMIP variables are part of the constraints
+		  % 2) allocate enough "names"
+		  % 3) set names of variables obtained in step 1
+		  
+		  % get total number of YALMIP sdpvar objects
+		  s = yalmip('getinternalsdpvarstate');
+		  n_total = numel(s.variabletype);
+		  new_names = cell(1, n_total);
+		  [new_names{:}] = deal('');
+		  
+		  % set names of variables of interest
+		  vars_idx = getvariables(vars);
+		  local_idx = 0;
+		  for i = vars_idx
+			  local_idx = local_idx + 1;
+			  % implicitly assumes the variables are contiguous
+			  % TODO: deal with non-contiguous variables
+			  new_names{i} = sprintf('new_vars(%d)', local_idx);
+		  end
+		  
+		  % separate equalities from inequalities
+		  idx_eq = find(is(constraints, 'equality'));
+		  idx_ineq = setdiff(1:length(constraints), idx_eq);
+		  new_con = [];
+		  new_con_s = cell(length(sdpvar(constraints)), 1);
+		  old_cons = { constraints(idx_eq), constraints(idx_ineq) };
+		  signs = { '==', '>=' };
+		  idx = 1;
+		  for i = 1:numel(old_cons)
+			  % create new constraints
+			  if length(old_cons{i})==0, continue, end
+			  con_s = sdisplay2(sdpvar(old_cons{i}), new_names);
+			  if ~iscell(con_s)
+				  % just for future. right now the output of sdisplay2() is
+				  % already a cell
+				  con_s = { con_s };
+			  end
+			  for j = 1:numel(con_s)
+				  new_con_s{idx} = sprintf('%s %s 0', con_s{j}, signs{i});
+				  new_con = new_con + eval(new_con_s{idx});
+				  idx = idx + 1;
+			  end
+		  end
+		  
+	  end
+ 
   end
   
 end
