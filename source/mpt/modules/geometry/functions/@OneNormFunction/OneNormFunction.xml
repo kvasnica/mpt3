@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>OneNormFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Class representing 1-norm function.
+	</info>
+
+    <syntax>f = OneNormFunction(Q)</syntax>    
+
+	<!-- long description of the function -->
+	<descr>
+        The object for representing 1-norm function given as <i>f=\|Qx\|_{1}</i>.
+        The function is given as a sum of absolute values of the product <i>y=Qx</i>.
+        <latex>
+            $$ f = \sum_{i=1}^{n} |y_i| $$
+        </latex>
+        where <i>n</i> is the dimension of the vector <i>y</i>. The weight <tt>Q</tt>
+        does not need to be square. Function value is always scalar. <br />			        
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Q</name>
+		<descr>Weighing matrix where the number of columns determines the dimension of the vector argument.
+         </descr>
+        <class name="double"/>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>f</name>
+		<descr> The <tt>OneNormFunction</tt> object. </descr>
+        <class name="OneNormFunction"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr>Construct 1-norm function <i>f = |5x_1| + |-2x_2|</i>.</descr>		
+        <cmd>f = OneNormFunction(diag([5,-2]))</cmd>
+        <descr> Evaluate the function in the point [-1;2]. </descr>
+        <cmd> f.feval([-1;2]) </cmd>
+    </example>    
+
+	<!-- multiple related function can be defined -->
+    <related>InfNormFunction</related>
+    <related>AffFunction</related>
+	<related>QuadFunction</related>
+
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>
