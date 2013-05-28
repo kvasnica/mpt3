@@ -88,11 +88,16 @@ classdef NormFunction < Function
 			
 			% TODO: inherit from Function, see how it's done in
 			% AbstractController
-			if numel(obj)>1
+            if numel(obj)>1
 				fprintf('Array of %d norm functions\n',numel(obj));
 				return
-			end
+            end
 			
+            if numel(obj)==0
+                disp('Empty function');
+                return
+            end
+
 			if obj.D==0
 				fprintf('%s-norm function\n', num2str(obj.type));
 			else
