@@ -300,6 +300,7 @@ classdef EMPCController < AbstractController
 			options = ip.Results;
 			
 			obj.optimizer.plot('alpha', options.alpha);
+			axis tight
 			hold on
 			button = 1;
 			while button~=3
