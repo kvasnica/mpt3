@@ -21,13 +21,30 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 	methods(Abstract, Hidden)
 		% Methods which all derived classes must implement.
 		
-		% state-update equation
+		% State-update equation.
+		%
+		% Mandatory inputs:
+		%   obj: the system object
+		%     x: the state vector
+		%     u: the input vector
+		% Mandatory outputs:
+		%    xn: the successor state
+		%     y: system's output
+		% Optional outputs:
+		%    as many as you wish
 		[xn, y, z, d] = update_equation(obj, x, u)
-		
-		% output equation
+
+		% Output equation.
+		%
+		% Mandatory inputs:
+		%   obj: the system object
+		%     x: the state vector
+		%     u: the input vector
+		% Mandatory outputs:
+		%     y: system's output
 		y = output_equation(obj, x, u)
 		
-		% feedthrough indication. must return true if the system has direct
+		% Feedthrough indication. Must return true if the system has direct
 		% feedthrough, false otherwise
 		out = has_feedthrough(obj)		
 	end
