@@ -208,17 +208,16 @@ if feasible
 	fval = zeros(m, n);
 	if n>1 && ~isempty(options.tiebreak) && isempty(options.regions)
 		% tie-breaking (not applied if regions are provided)
-		if ischar(options.tiebreak)
-			% assumes "tiebreak" is a function of the union
-			tb_fun = @(i, z) eval_region(i, options.tiebreak);
-		else
-			% tiebreak is a function handle
-			tb_fun = @(i, z) options.tiebreak(z);
-		end
 		tval = zeros(1, n);
 		for i = 1:n
 			% evaluate the tie-break function in each region
-			tb_val = tb_fun(idx(i), x);
+			if ischar(options.tiebreak)
+				% assumes "tiebreak" is a function of the union
+				tb_val = eval_region(idx(i), options.tiebreak);
+			else
+				% tiebreak is a function handle
+				tb_val = options.tiebreak(x);
+			end
 			if ~isscalar(tb_val)
 				error('The tie breaker must be a scalar-valued function.');
 			end
