@@ -10,12 +10,12 @@ sys.x.min = [-5; -5]; sys.x.max = [5; 5];
 sys.u.min = -1; sys.u.max = 1;
 sys.x.penalty = OneNormFunction(eye(2));
 sys.u.penalty = QuadFunction(1);
-E = EMPCController(sys, 5);
-assert(E.nr==155);
+E = EMPCController(sys, 3);
+assert(E.nr==58);
 
 % only points in the optimizer
 X = E.optimizer.convexHull.grid(40);
-assert(size(X, 1)==1122);
+assert(size(X, 1)==1014);
 t=clock;
 for i = 1:size(X, 1),
 	u = E.evaluate(X(i, :)');
