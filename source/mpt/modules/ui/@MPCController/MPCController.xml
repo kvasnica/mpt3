@@ -35,7 +35,7 @@
     The terminal cost is given by <i>J(x_N) = \| Q x_N \|_p</i>, where
     <i>Q</i> is the weighting matrix and <i>p</i> is the type of the
     norm (if <i>p=2</i>, then <i>J(x_N) = x_N^T Q x_N</i>, see
-    "<tt>help Penalty</tt>" for more information). The type
+    "<tt>help Function</tt>" for more information). The type
     of the norm as well as the weighting matrix are specified by the
     <tt>terminalPenalty</tt> property of the state signal (see
     "<tt>help SystemSignal/filter_terminalPenalty</tt>").<br/>
@@ -131,8 +131,8 @@
 	<descr>Add penalties (we use squared two-norm with unity
     weights here)</descr>
     <cmd>
-		ctrl.model.x.penalty = Penalty(1, 2);
-		ctrl.model.u.penalty = Penalty(1, 2);
+		ctrl.model.x.penalty = QuadFunction(1);
+		ctrl.model.u.penalty = QuadFunction(1);
 	</cmd>
 
 	<descr>Specify the prediction horizon</descr>

@@ -44,8 +44,8 @@
     <cmd>
 		ctrl.model.x.min = -5; ctrl.model.x.max = 5;
 		ctrl.model.u.min = -5; ctrl.model.u.max = 5;
-		ctrl.model.x.penalty = Penalty(1, 2);
-		ctrl.model.u.penalty = Penalty(1, 2);
+		ctrl.model.x.penalty = QuadFunction(1);
+		ctrl.model.u.penalty = QuadFunction(1);
 		ctrl.N = 3;
 	</cmd>
 

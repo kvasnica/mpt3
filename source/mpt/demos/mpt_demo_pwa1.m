@@ -44,8 +44,8 @@ pwa.u.max = 1;
 horizon = 2;
 onl_ctrl = MPCController(pwa, horizon);
 % Set panalties used in the cost function:
-onl_ctrl.model.x.penalty = Penalty(10*eye(2), 1);
-onl_ctrl.model.u.penalty = Penalty(1, 1);
+onl_ctrl.model.x.penalty = OneNormFunction(10*eye(2));
+onl_ctrl.model.u.penalty = OneNormFunction(1);
 
 % Construct the explicit solution
 exp_ctrl = onl_ctrl.toExplicit();

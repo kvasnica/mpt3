@@ -29,8 +29,7 @@
     violation of the constraint in
     <tt>model.signal.softMin.maximalViolation</tt>, and specify
     penalization of the slack variables by setting
-    <tt>model.signal.softMin.penalty</tt> (see "<tt>help
-    Penalty</tt>").<br/>
+    <tt>model.signal.softMin.penalty</tt>.<br/>
 
     To remove this filter, call
     <tt>model.signal.without('softMin')</tt>.
@@ -44,8 +43,8 @@
     on the terminal state)</descr>
 
 	<cmd>
-		sys.x.penalty = Penalty(1, 2);
-		sys.u.penalty = Penalty(1, 2);
+		sys.x.penalty = QuadFunction(1);
+		sys.u.penalty = QuadFunction(1);
 	</cmd>
 
     <descr>Define hard state constraints</descr>

@@ -23,8 +23,8 @@ model.u.min = -1;
 model.u.max = 1;
 
 % weights on states/inputs
-model.x.penalty = Penalty(eye(2),2);
-model.u.penalty = Penalty(1,2);
+model.x.penalty = QuadFunction(eye(2));
+model.u.penalty = QuadFunction(1);
 
 % terminal set
 Tset = model.LQRSet;

@@ -29,8 +29,7 @@
     violation of the constraint in
     <tt>model.signal.softMax.maximalViolation</tt>, and specify
     penalization of the slack variables by setting
-    <tt>model.signal.softMax.penalty</tt> (see "<tt>help
-    Penalty</tt>").<br/>
+    <tt>model.signal.softMax.penalty</tt>.<br/>
 
     To remove this filter, call
     <tt>model.signal.without('softMax')</tt>.

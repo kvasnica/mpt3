@@ -16,10 +16,11 @@
 	<!-- long description of the function -->
 	<descr>
         The <tt>QuadFunction</tt> class represents quadratic functions of the form <i>f(x) = x'*H*x + F*x + g </i> 
-        where <i>H</i> is a real three-dimensional matrix, <i>F</i> is a real two-dimensional matrix and <i>g</i>
+        where <i>H</i> is a real matrix, <i>F</i> is a real matrix and <i>g</i>
         is a real column vector. Dimensions of <i>H</i>, <i>F</i> and <i>g</i> must coincide such that the output 
-        is a vector or scalar. For vectorized output, <i>H</i> must comprise of three dimensions, where the third 
-        dimension corresponds to function range.
+        is a scalar. 
+        <!-- For vectorized output, <i>H</i> must comprise of three dimensions, where the third 
+        dimension corresponds to function range. -->
 	</descr>
 	<!-- now describe input arguments -->
 	
@@ -57,17 +58,18 @@
 	<!-- we can provide multiple code examples -->
     <example>
             <!-- each example is a combination of descriptions and commands -->
-            <descr>Construct quadratic function <i>q_1(x) = x^2 + 1</i> </descr>		
+            <descr>Construct a quadratic function <i>q_1(x) = x^2 + 1</i> </descr>		
             <cmd>q1 = QuadFunction(1,0,1)</cmd>
-            <descr>Construct quadratic function <i>q_2(x) = 0.5x^2 + 3x -1</i> </descr>
+            <descr>Construct a quadratic function <i>q_2(x) = 0.5x^2 + 3x -1</i> </descr>
             <cmd>q2 = QuadFunction(0.5,3,-1)</cmd>
     </example>
     <example>
-            <descr>Construct vectorized quadratic function <i>f(x) = x'*H*x + F*x + g </i>  where
+            <descr>Construct a quadratic function <i>f(x) = x'*H*x + F*x + g </i>  where
                 <i>H</i>, <i>F</i>, <i>g</i> will be randomly generated and <i>x</i> is a vector in dimension 2.
             </descr>
             <cmd> f = QuadFunction(randn(2),randn(1,2),randn(1)) </cmd>       
     </example>
+    <!--
     <example>
             <descr>Construct vectorized quadratic function <i>f(x) = x'*H*x + F*x + g </i>  where
                 the function maps from <i>\mathbb{R}^5</i> to <i>\mathbb{R}^2</i>. Therefore, 
@@ -76,6 +78,7 @@
             </descr>
             <cmd> f = QuadFunction(randn(5,5,2),randn(2,5),randn(2,1)) </cmd>       
     </example>
+    -->
     <example>
         <descr> Construct quadratic function <i>x'*H*x+Fx+g</i> where <i>H</i>, <i>F</i> and <i>g</i> are regression coefficients from
         the data <i>x</i> and <i>y</i>. </descr>

@@ -29,8 +29,8 @@
 			ctrl.model.x.max = [5; 5];
 			ctrl.model.u.min = -1;
 			ctrl.model.u.max = 1;
-			ctrl.model.x.penalty = Penalty(eye(ctrl.model.nx), 2);
-			ctrl.model.u.penalty = Penalty(eye(ctrl.model.nu), 2);
+			ctrl.model.x.penalty = QuadFunction(eye(ctrl.model.nx));
+			ctrl.model.u.penalty = QuadFunction(eye(ctrl.model.nu));
 		</cmd>
         <descr>Compute the explicit solution</descr>
 		<cmd> exp_ctrl = ctrl.toExplicit()</cmd>

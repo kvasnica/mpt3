@@ -34,8 +34,8 @@
 	<descr>Add constraints and penalties</descr>
     <cmd>
 		model.x.min = -4; model.x.max = 4;
-		model.x.penalty = Penalty(1, 1);
-		model.u.penalty = Penalty(0.1, 1);
+		model.x.penalty = OneNormFunction(1);
+		model.u.penalty = OneNormFunction(0.1);
 	</cmd>
     <descr>Create an MPC controller with prediction horizon 3</descr>
     <cmd>M = MPCController(model, 3);</cmd>

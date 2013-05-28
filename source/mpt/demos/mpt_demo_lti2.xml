@@ -38,10 +38,10 @@
         <cmd> ctrl.model.u.max = 1; </cmd>
 
         <descr> Set quadratic state penalty </descr>
-        <cmd> ctrl.model.x.penalty = Penalty(eye(2), 2); </cmd>
+        <cmd> ctrl.model.x.penalty = QuadFunction(eye(2)); </cmd>
 
         <descr> Set quadratic input penalty </descr>
-        <cmd> ctrl.model.u.penalty = Penalty(1, 2); </cmd>
+        <cmd> ctrl.model.u.penalty = QuadFunction(1); </cmd>
 
         <descr> Obtain the optimal control input for a given initial condition.</descr>
         <cmd> x0 = [-4; 0]; Uonl = ctrl.evaluate(x0)</cmd>

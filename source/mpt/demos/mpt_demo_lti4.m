@@ -22,8 +22,8 @@ ctrl.model.x.max = [5; 5];
 ctrl.model.u.min = -1;
 ctrl.model.u.max = 1;
 % Use quadratic cost function
-ctrl.model.x.penalty = Penalty(eye(model.nx), 2);
-ctrl.model.u.penalty = Penalty(eye(model.nu), 2);
+ctrl.model.x.penalty = QuadFunction(eye(model.nx));
+ctrl.model.u.penalty = QuadFunction(eye(model.nu));
 
 % Finally, we can convert the controller to an explicit form:
 disp('Generating the explicit solution:');

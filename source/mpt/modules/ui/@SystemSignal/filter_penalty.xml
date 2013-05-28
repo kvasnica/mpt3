@@ -13,8 +13,8 @@
     This filter, which is enabled by default, allows to penalize a
     particular signal in the MPC cost function. The penalty function
     can be specified by setting the <tt>model.signal.penalty</tt>
-    property to an instance of the <tt>Penalty</tt> class (see
-    "<tt>help Penalty</tt>" for more information). Penalization of
+    property to an instance of the <tt>Function</tt> class (see
+    "<tt>help Function</tt>" for more information). Penalization of
     state variables is achieved by setting <tt>model.x.penalty</tt>,
     while <tt>model.u.penalty</tt> and <tt>model.y.penalty</tt>
     specify penalization of input and output variables, respectively.<br/>

@@ -67,8 +67,8 @@
 	<descr>Define penalties (we use squared two-norm with unity
     weights here)</descr>
     <cmd>
-		sys.x.penalty = Penalty(eye(2), 2);
-		sys.u.penalty = Penalty(1, 2);
+		sys.x.penalty = QuadFunction(eye(2));
+		sys.u.penalty = QuadFunction(1);
 	</cmd>
 
 	<descr>Construct the explicit MPC controller</descr>

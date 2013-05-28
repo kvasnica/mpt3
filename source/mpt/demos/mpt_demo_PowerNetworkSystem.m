@@ -39,12 +39,12 @@ ctrl.model.u.with('reference');
 % zero terminal set
 ctrl.model.x.with('terminalSet');
 % ctrl.model.x.with('terminalPenalty');
-% ctrl.model.x.terminalPenalty = Penalty(eye(16),2);
+% ctrl.model.x.terminalPenalty = QuadFunction(eye(16));
 
 % add quadratic penalty on the outputs
-ctrl.model.u.penalty = Penalty(R, 2);
+ctrl.model.u.penalty = QuadFunction(R);
 % penalty must be positive definite
-ctrl.model.x.penalty = Penalty(blkdiag(Q,zeros(4)), 2);
+ctrl.model.x.penalty = QuadFunction(blkdiag(Q,zeros(4)));
 
 
 %% Simulate the closed loop

@@ -16,7 +16,7 @@
     Note that this function requires that penalties on states and
     inputs are defined in <tt>system.x.penalty</tt> and
     <tt>system.u.penalty</tt> (see "<tt>help SystemSignal</tt>" and
-    "<tt>help Penalty</tt>").
+    "<tt>help Function</tt>").
   </descr>
 
   <output>

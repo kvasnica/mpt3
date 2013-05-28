@@ -41,8 +41,8 @@
     <cmd>
 		model.x.min = -4; model.x.max = 4;
 		model.u.min = -1; model.u.max = 1;
-		model.x.penalty = Penalty(1, 2);
-		model.u.penalty = Penalty(1, 2);
+		model.x.penalty = QuadFunction(1);
+		model.u.penalty = QuadFunction(1);
 	</cmd>
 
 	<descr>Create an MPC controller with prediction horizon 10</descr>

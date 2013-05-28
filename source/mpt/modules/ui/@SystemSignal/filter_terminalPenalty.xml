@@ -12,8 +12,8 @@
   <descr> 
     This filter adds the term <i> \| Q x_N \|_p</i> to the MPC cost
     function. Properties of the penalty (i.e., the weighting matrix
-    <i>Q</i> and the norm <i>p</i>) are provided by the
-    <tt>Penalty</tt> class.<br/>
+    <i>Q</i> and the norm <i>p</i>) are provided by objects derived 
+    from the <tt>Function</tt> class.<br/>
 
     Note that if the state signal has the <tt>reference</tt> filter
     enabled, the terminal penalty becomes <i>\| Q (x_N - x_{ref})
@@ -24,7 +24,7 @@
     <tt>model.x.with('terminalPenalty')</tt>. Then you can specify
     parameters of the penalty function by setting the
     <tt>model.x.terminalPenalty</tt> property to an instance of the
-    <tt>Penalty</tt> class (see "<tt>help Penalty</tt>").<br/>
+    <tt>Function</tt> class (see "<tt>help Function</tt>").<br/>
 
     To remove this filter, call
     <tt>model.x.without('terminalPenalty')</tt>.
@@ -37,8 +37,8 @@
     <descr>Add unity quadratic penalties on states and inputs (but not
     on the terminal state)</descr>
     <cmd>
-		sys.x.penalty = Penalty(1, 2);
-		sys.u.penalty = Penalty(1, 2);
+		sys.x.penalty = QuadFunction(1);
+		sys.u.penalty = QuadFunction(1);
 	</cmd>
 
     <descr>Compute an LQR terminal penalty and use it as a terminal

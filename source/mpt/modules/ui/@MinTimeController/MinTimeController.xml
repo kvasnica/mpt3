@@ -58,8 +58,8 @@
     <cmd>sys.u.min = -1; sys.u.max = 1;</cmd>
     <descr>Define penalties (we use squared two-norm with unity
     weights here)</descr>
-    <cmd>sys.x.penalty = Penalty(1, 2);</cmd>
-    <cmd>sys.u.penalty = Penalty(1, 2);</cmd>
+    <cmd>sys.x.penalty = QuadFunction(1);</cmd>
+    <cmd>sys.u.penalty = QuadFunction(1);</cmd>
     <descr>Construct the minimum-time controller</descr>
     <cmd>ctrl = MinTimeController(sys)</cmd>
     <descr>Convert the controller to its explicit form</descr>

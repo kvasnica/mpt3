@@ -49,10 +49,10 @@ ctrl.model.y.reference = [0;0;1;0;0;0;zeros(6,1)];
 % active slew rate constraints
 ctrl.model.u.with('deltaPenalty');
 % add quadratic penalty on the input rates
-ctrl.model.u.deltaPenalty = Penalty(0.1*eye(4),2);
+ctrl.model.u.deltaPenalty = QuadFunction(0.1*eye(4));
 
 % add quadratic penalty on the outputs
-ctrl.model.y.penalty = Penalty(diag([0 0 10 10 10 10 0 0 0 5 5 5]), 2);
+ctrl.model.y.penalty = QuadFunction(diag([0 0 10 10 10 10 0 0 0 5 5 5]));
 
 
 %% Simulate the closed loop

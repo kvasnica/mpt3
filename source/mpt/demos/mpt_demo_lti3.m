@@ -22,8 +22,8 @@ ctrl.model.x.min = [-5; -5];
 ctrl.model.x.max = [5; 5];
 ctrl.model.u.min = -1;
 ctrl.model.u.max = 1;
-ctrl.model.x.penalty = Penalty(eye(model.nx), 1); % 1-norm type penalty
-ctrl.model.u.penalty = Penalty(eye(model.nu), Inf); % Inf-norm type penalty
+ctrl.model.x.penalty = OneNormFunction(eye(model.nx)); % 1-norm type penalty
+ctrl.model.u.penalty = InfNormFunction(eye(model.nu)); % Inf-norm type penalty
 
 % Create the closed-loop system:
 loop = ClosedLoop(ctrl, model);

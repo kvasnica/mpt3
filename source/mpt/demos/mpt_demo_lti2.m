@@ -28,11 +28,11 @@ ctrl.model.u.max = 1;
 
 % Use quadratic state penalty with identity weighting matrix
 W = eye(2);
-ctrl.model.x.penalty = Penalty(W, 2);
+ctrl.model.x.penalty = QuadFunction(W);
 
 % Set quadratic input penalty with identity weighting matrix
 W = 1;
-ctrl.model.u.penalty = Penalty(W, 2);
+ctrl.model.u.penalty = QuadFunction(W);
 
 % Obtain the optimal control input for a given initial condition
 x0 = [-4; 0];

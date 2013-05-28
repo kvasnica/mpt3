@@ -46,8 +46,8 @@
 		model.u.with('reference');
 		model.x.reference = 0.4;
 		model.u.reference = 1;
-		model.x.penalty = Penalty(1, 2);
-		model.u.penalty = Penalty(1, 2);
+		model.x.penalty = QuadFunction(1);
+		model.u.penalty = QuadFunction(1);
 	</cmd>
 
   </example>

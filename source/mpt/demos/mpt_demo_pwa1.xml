@@ -62,9 +62,9 @@
         <cmd> horizon = 2; </cmd>
         <cmd> onl_ctrl = MPCController(pwa, horizon); </cmd>
         
-        <descr> Set panalties used in the cost function: </descr>
-        <cmd>onl_ctrl.model.x.penalty = Penalty(10*eye(2), 1); </cmd>
-        <cmd>onl_ctrl.model.u.penalty = Penalty(1, 1); </cmd>
+        <descr> Set one-norm penalties used in the cost function: </descr>
+        <cmd>onl_ctrl.model.x.penalty = OneNormFunction(10*eye(2)); </cmd>
+        <cmd>onl_ctrl.model.u.penalty = OneNormFunction(1); </cmd>
 
         <descr> Construct the explicit solution </descr>
         <cmd> exp_ctrl = onl_ctrl.toExplicit(); </cmd>

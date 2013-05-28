@@ -24,9 +24,9 @@
         <cmd> ctrl = MPCController(lti, horizon); </cmd>
         
         <descr> Define quadratic penalties </descr>
-        <cmd> ctrl.model.x.penalty = Penalty(eye(2), 2); </cmd>
-        <cmd> ctrl.model.u.penalty = Penalty(1, 2); </cmd>
-        <cmd> onl_ctrl.model.x.terminalPenalty = Penalty(10*eye(2), 2); </cmd>
+        <cmd> ctrl.model.x.penalty = QuadFunction(eye(2)); </cmd>
+        <cmd> ctrl.model.u.penalty = QuadFunction(1); </cmd>
+        <cmd> onl_ctrl.model.x.terminalPenalty = QuadFunction(10*eye(2)); </cmd>
         
         <descr> Add a terminal set constraint (see <tt>help SystemSignal/filter_terminalSet</tt>) </descr>
         <cmd>ctrl.model.x.with('terminalSet');</cmd>

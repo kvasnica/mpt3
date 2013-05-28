@@ -22,7 +22,7 @@
       <li><tt>signal.min</tt>: lower bound on the variable in MPC problems</li>
       <li><tt>signal.max</tt>: upper bound on the variable in MPC problems</li>
       <li><tt>signal.penalty</tt>: penalization of the variable in the
-      MPC cost function (see <tt>help Penalty</tt>)</li>
+      MPC cost function given as <tt>Function</tt> object</li>
     </ul>
 
     Many additional properties can be set by the concept of
