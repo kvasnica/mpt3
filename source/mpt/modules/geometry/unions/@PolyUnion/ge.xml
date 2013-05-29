@@ -10,7 +10,7 @@
   
   <descr>
       Check if the union of polyhedra <tt>U1</tt> is a non-strict superset of another union <tt>U2</tt>.
-      The result it the logical statement if <i>U1 &gt;= U2</i> and false otherwise.
+      The result it the logical statement if <tt>U1 &gt;= U2</tt> and false otherwise.
   </descr>
   
   <input required="true">
@@ -26,7 +26,7 @@
   
   <output>
     <name>tf</name>
-    <descr>True if <i>U1 &gt;= U2</i> and false otherwise.</descr>
+    <descr>True if <tt>U1 &gt;= U2</tt> and false otherwise.</descr>
     <class name="logical">
       <option>true</option>
       <option>false</option>
