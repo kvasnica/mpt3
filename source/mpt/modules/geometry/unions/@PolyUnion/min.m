@@ -116,8 +116,7 @@ for ipart = 1:numel(PUs)
 						
 						% TODO: correcly compare piecewise constant
 						% functions (probably requires lifting)
-						if norm(Fj)<=MPTOPTIONS.zero_tol && ...
-								norm(Fi)<=MPTOPTIONS.zero_tol
+						if norm(Fdiff) <= MPTOPTIONS.zero_tol
 							% lift by one dimension to deal with constant
 							% cost
 							infbox = Polyhedron('lb', 0, ...
