@@ -12,16 +12,6 @@ if isempty(MPTOPTIONS)
 	MPTOPTIONS = mptopt;
 end
 
-if numel(PUs)<2
-	% TODO: support single polyunion with overlapping regions
-	if PUs.isOverlapping
-		error('Single polyunion with overlapping regions not yet supported.');
-	else
-		out = PUs;
-	end
-	return
-end
-
 if nargin < 2 || isempty(func)
 	% if no function is specified, take the first one
 	if length(PUs(1).listFunctions)>1
@@ -46,7 +36,6 @@ for i = 2:length(PUs)
 	end
 end
 
-
 if nargin<3
 	% coefficient=1 means we are looking for the maximum
 	% coefficient=-1 will search for the maximum
@@ -64,6 +53,21 @@ if ~isa(fun, 'AffFunction')
 elseif fun.R~=1
 	error('Only scalar-valued functions can be handled.');
 end
+
+% deal with overlaps within of individual polyunions
+newPUs = [];
+for i = 1:numel(PUs)
+	if PUs(i).isOverlapping
+		% treat regions of overlapping partitions as one-region polyunions
+		for j = 1:PUs(i).Num
+			newPUs = [newPUs, PolyUnion(PUs(i).Set(j))];
+		end
+	else
+		% add the full polyunion if it does not contain overlaps
+		newPUs = [newPUs, PUs(i)];
+	end
+end
+PUs = newPUs;
 
 nR = 0;
 Pfinal = []; % list of regions

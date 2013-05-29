@@ -2,6 +2,7 @@ function test_polyunion_min_10_pass
 % the output should not have overlaps
 %
 
+% all functions must be scalar-valued, see e7b230152242
 
 % polyunion 1
 V1 = [-1.7820    0.3957
@@ -16,9 +17,9 @@ V2 = [-0.9981   -1.8427
    -1.1554    1.5497
     0.9190   -1.1936];
 P(1) = Polyhedron(V1);
-P(1).addFunction(AffFunction(eye(2),[1;-2]),'a');
+P(1).addFunction(AffFunction([1 0],1),'a');
 P(2) = Polyhedron(V2);
-P(2).addFunction(AffFunction(-2*eye(2),[-1;0]),'a');
+P(2).addFunction(AffFunction(-2*[1 0],-1),'a');
 
 % polyunion 2
 V3 = [-0.6434   -0.5520
@@ -32,17 +33,16 @@ V4 = [ -0.4356    1.6444
     1.5000   -1.8399];
 Q(1) = Polyhedron(V3);
 Q(2) = Polyhedron(V4);
-Q.addFunction(AffFunction(2*eye(2),[-1;1]),'a');
-Q(1).addFunction(AffFunction(eye(2),[1;-2]),'a');
-Q(1).addFunction(AffFunction(-2*eye(2),[-1;0]),'a');
+Q.addFunction(AffFunction(2*[1 0],-1),'a');
+Q(1).addFunction(AffFunction([1 0],1),'a');
+Q(1).addFunction(AffFunction(-2*[1 0],-1),'a');
 
 % array of polyunions
 U(1) = PolyUnion(P);
 U(2) = PolyUnion(Q);
 
-[worked, msg] = run_in_caller('T=U.min');
-
-assert(worked);
+T=U.min;
+assert(T.Num==22);
 
 Unew = PolyUnion(T.Set);
 

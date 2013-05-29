@@ -2,7 +2,6 @@ function test_polyunion_min_09_pass
 % the output should not have overlaps
 %
 
-
 % polyunion 1
 V1 = [-1.7820    0.3957
     0.4419    0.6045
@@ -18,7 +17,7 @@ V2 = [-0.9981   -1.8427
 P(1) = Polyhedron(V1);
 P(2) = Polyhedron(V2);
 % attach the same function
-P.addFunction(AffFunction(eye(2),[1;-2]),'a');
+P.addFunction(AffFunction([1 0],1),'a');
 
 % polyunion 2
 V3 = [-0.6434   -0.5520
@@ -33,20 +32,17 @@ V4 = [ -0.4356    1.6444
 Q(1) = Polyhedron(V3);
 Q(2) = Polyhedron(V4);
 % attach the same function
-Q.addFunction(AffFunction(2*eye(2),[-1;1]),'a');
+Q.addFunction(AffFunction(2*[1 0],-1),'a');
 
 % array of polyunions
 U(1) = PolyUnion(P);
 U(2) = PolyUnion(Q);
 
-[worked, msg] = run_in_caller('T=U.min');
-
-assert(worked);
-
-Unew = PolyUnion(T.Set);
+T=U.min;
+assert(T.Num==16);
 
 % new polyunion should not have overlaps as indicated in T
+Unew = PolyUnion(T.Set);
 assert(Unew.isOverlapping==0)
-
 
 end
