@@ -28,6 +28,9 @@ if nargin < 2 || isempty(func)
 		error('Please specify which function to use for comparison.');
 	else
 		fnames = PUs(1).listFunctions;
+		if isempty(fnames)
+			error('The object has no functions.');
+		end
 		func = fnames{1};
 	end
 end

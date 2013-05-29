@@ -15,6 +15,6 @@ U(2) = PolyUnion(Q);
 
 assert(~worked)
 
-asserterrmsg(msg, 'PolyUnion must have affine function attached.')
+asserterrmsg(msg, 'The object has no functions.')
 
 end
