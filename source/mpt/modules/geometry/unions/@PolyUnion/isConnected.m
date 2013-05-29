@@ -21,6 +21,10 @@ end
 if obj.Num==0
     ts = false;
     return;
+elseif obj.Num==1
+	% single region is connected
+	ts = true;
+	return
 end
 
 % check connectivity
