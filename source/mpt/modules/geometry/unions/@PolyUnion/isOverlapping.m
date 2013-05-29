@@ -18,7 +18,9 @@ if numel(obj)>1
 end
 
 % empty obj
-if obj.Num==0
+if obj.Num <= 1
+	% no regions = no overlaps
+	% single region = no overlaps
     ts = false;
     return;
 end
