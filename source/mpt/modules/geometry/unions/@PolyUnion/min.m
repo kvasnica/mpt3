@@ -56,10 +56,13 @@ end
 % TODO: make sure all regions are in H-representation
 %code goes here
 
-% make sure that the comparing function is PWA
-if ~isa(PUs(1).Set(1).getFunction(func), 'AffFunction')
-	% TODO: extend this check to all regions of all polyunions
+% make sure that the comparing function is a scalar PWA function
+% TODO: extend this check to all regions of all polyunions
+fun = PUs(1).Set(1).getFunction(func);
+if ~isa(fun, 'AffFunction')
 	error('Only PWA functions can be used for comparison.');
+elseif fun.R~=1
+	error('Only scalar-valued functions can be handled.');
 end
 
 nR = 0;
