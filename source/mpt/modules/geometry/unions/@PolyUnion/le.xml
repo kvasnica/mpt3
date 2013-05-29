@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>le</function>
+  
+  <info>
+    Test if a union of polyhedra is contained inside another union.
+  </info>
+  <syntax>U1 &lt;= U2</syntax>
+  
+  <descr>
+      Check if the union of polyhedra <tt>U1</tt> is a non-strict subset of the union <tt>U2</tt>.
+      The result it the logical statement if <i>U1 &lt;= U2</i> and false otherwise.
+  </descr>
+  
+  <input required="true">
+    <name>U1</name>
+    <descr>Union of polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  <input required="true">
+    <name>U2</name>
+    <descr>Union of polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  
+  <output>
+    <name>tf</name>
+    <descr>True if <i>U1 &lt;= U2</i> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  
+  <example>
+      <descr> Consider a rectangle in 2D. </descr>
+      <cmd> rectangle = Polyhedron('lb',[-2;-1],'ub',[4;5]); </cmd>
+      <descr> Cut the the rectangle into pieces by extracting an inner part. </descr>
+      <cmd> T = rectangle \ (0.2*rectangle); </cmd>
+      <descr> Create an union of these pieces. </descr>
+      <cmd> U1 = PolyUnion('Set',T,'FullDim',true,'Connected',true,'Convex',false,'Overlaps',false,'Bounded',true); </cmd>
+      <cmd> U1.plot </cmd>
+      <descr> The union <tt>U1</tt> is contained inside the rectangle, so we verify that this statement is true. </descr>
+      <cmd> U2 = PolyUnion(rectangle); </cmd>
+      <cmd> U1 &lt;= U2 </cmd>
+      <descr> The inner rectangle is not contained inside the union. </descr>
+      <cmd> U3 = PolyUnion(0.2*rectangle); </cmd>
+      <cmd> U1 &lt;= U3 </cmd>
+  </example>
+    
+  <related>ge</related>
+  
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>
