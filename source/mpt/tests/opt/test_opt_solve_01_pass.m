@@ -5,6 +5,7 @@ function test_opt_solve_01_pass
 clear sysStruct probStruct
 Double_Integrator
 probStruct.N = 2;
+probStruct.Tconstraint = 0;
 M = mpt_constructMatrices(sysStruct, probStruct);
 P = Opt(M);
 assert(isequal(P.problem_type, 'QP'));
@@ -39,6 +40,7 @@ end
 %% LCP
 clear sysStruct probStruct
 Double_Integrator
+probStruct.Tconstraint = 0;
 probStruct.N = 2;
 M = mpt_constructMatrices(sysStruct, probStruct);
 P = Opt(M);
