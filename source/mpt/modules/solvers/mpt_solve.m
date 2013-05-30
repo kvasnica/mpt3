@@ -1,4 +1,4 @@
-function R=mpt_solve(Sin)
+function R=mpt_solve(Sin, param_value)
 %
 %  A gateway function to solve non-parametric optimization problems
 %  (without exhausting errorchecks)
@@ -36,6 +36,7 @@ elseif isstruct(Sin) && isfield(Sin, 'quickqp')
 	return
 end
 
+error(nargchk(1,2,nargin));
 
 % assuming that the problem is defined in a structure S of Opt class
 % 
@@ -89,9 +90,6 @@ arg_set = {'H','f','pF','A','b','pB','Ae','be','pE','lb','ub','Ath','bth', ...
 %   routine - routine to choose for LCP solver
 
 opt_arg_set = {'x0','vartype','problem_type','test','routine'};
-
-% only one argument is allowed
-error(nargchk(1,1,nargin));
 
 % construct new object with empty fields
 S = sub_initialize_args(arg_set, opt_arg_set);
@@ -193,6 +191,44 @@ else
     
 end
 
+if nargin==2 && isfield(S, 'isParametric') && S.isParametric
+	% solve the parametric problem for a particular value of the parameter
+
+	% set solver
+	switch S.problem_type
+		case 'QP',
+			S.solver = MPTOPTIONS.qpsolver;
+		case 'LP'
+			S.solver = MPTOPTIONS.lpsolver;
+		case 'LCP'
+			S.solver = MPTOPTIONS.lcpsolver;
+		otherwise
+			error('%s problems not supported.', S.problem_type);
+	end
+
+	% substitute the parameter into constraints
+	if ~isempty(S.Q)
+		% PLCP problem
+		S.q = S.q + S.Q*param_value;
+		% unset parametric constraints
+		S.Q = [];
+	else
+		% PLP/PQP
+		S.b = S.b + S.pB*param_value;
+		S.be = S.be + S.pE*param_value;
+		S.f = S.f + S.pF*param_value;
+		S.c = S.c + param_value'*S.Y*param_value;
+		% unset parametric constraints
+		S.pB = [];
+		S.pE = [];
+		S.pF = [];
+		S.Y = [];
+	end
+	
+	% mark the problem as non-parametric
+	S.d = 0;
+	S.isParametric = 0;
+end
 
 if isempty(S.test)
     S.test = 0;

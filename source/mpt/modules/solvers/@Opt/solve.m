@@ -1,4 +1,4 @@
-function [ret,opt] = solve(opt)
+function [ret,opt] = solve(opt, varargin)
 %
 % Solve the problem
 %
@@ -19,13 +19,16 @@ if numel(opt)>1
 end
 
 % Determine problem type
-if opt.isParametric
+if opt.isParametric && nargin==1
     % for parametric solvers use "mpt_solvemp" which depends
     % on OPT and POLYHEDRON classes
     ret = mpt_solvemp(opt);
 else
-    % non-parametric solvers can be called directly,
-    ret = mpt_solve(opt);
+    % non-parametric solvers can be called directly.
+	%
+	% alternatively, we can solve a parametric problem for a particular
+	% value of the parameter
+    ret = mpt_solve(opt, varargin{:});
 end
 
 end
