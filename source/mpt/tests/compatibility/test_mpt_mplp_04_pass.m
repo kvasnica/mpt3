@@ -9,16 +9,8 @@ model = mpt_import(sysStruct, probStruct);
 M = MPCController(model, 2);
 Y = M.toYALMIP;
 O = Opt(Y.constraints, Y.objective, Y.variables.x(:, 1), Y.variables.u(:));
-
 % force the MPLP solver
-w = warning; warning off
-S = struct(O);
-warning(w);
-
-S.solver = 'MPLP';
-O = Opt(S);
-assert(isequal(O.solver, 'MPLP'));
-assert(isa(O, 'Opt'));
+O.solver = 'mpLP';
 
 T = evalc('sol = O.solve;');
 disp(T);

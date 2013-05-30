@@ -5,16 +5,8 @@ model = mpt_import(sysStruct, probStruct);
 M = MPCController(model, 3);
 Y = M.toYALMIP;
 O = Opt(Y.constraints, Y.objective, Y.variables.x(:, 1), Y.variables.u(:));
-
 % force the MPQP solver
-w = warning; warning off
-S = struct(O);
-warning(w);
-
-S.solver = 'MPQP';
-O = Opt(S);
-assert(isequal(O.solver, 'MPQP'));
-assert(isa(O, 'Opt'));
+O.solver = 'mpqp';
 
 T = evalc('sol = O.solve;');
 disp(T);

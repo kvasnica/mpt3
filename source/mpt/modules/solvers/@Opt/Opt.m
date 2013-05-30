@@ -54,16 +54,29 @@ classdef Opt < handle
         % "MIQP" - mixed integer quadratic problem
 
         problem_type = '';
-        solver = ''; % actual solver name
         vartype = ''; % type of variables C-continuous, I-integer, B-binary, S-semicontinuous, N-semiinteger        
         isParametric = false;
         
         recover = []; % Mapping from solved problem to original problem data
         varOrder = [];
         Internal = [];
-        
-    end
+	end
+	
+	properties
+		solver = ''
+	end
     
+	methods
+		function set.solver(obj, new_solver)
+			% Opt.solver setter
+			
+			if ~ischar(new_solver)
+				error('The solver must be a string.');
+			end
+			obj.solver = upper(new_solver);
+		end
+	end
+	
     methods(Access = public)
         
         % Constructor

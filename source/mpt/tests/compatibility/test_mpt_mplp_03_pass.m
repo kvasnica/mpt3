@@ -5,15 +5,7 @@ sdpvar x u
 C = [-1 <= x+u <= 1; -1<=x<=1; -1<=u<=1];
 obj = abs(u)+abs(x);
 O = Opt(C, obj, x, u);
-
-w = warning; warning off
-S = struct(O);
-warning(w);
-
-S.solver = 'MPLP';
-O = Opt(S);
-assert(isequal(O.solver, 'MPLP'));
-assert(isa(O, 'Opt'));
+O.solver = 'mplp';
 
 T = evalc('sol = O.solve;');
 disp(T);
