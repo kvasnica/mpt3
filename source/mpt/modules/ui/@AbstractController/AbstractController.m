@@ -151,7 +151,17 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			add('x') = obj.model.x.applyFilters('getVariables', 'map');
 			add('u') = obj.model.u.applyFilters('getVariables', 'map');
 			add('y') = obj.model.y.applyFilters('getVariables', 'map');
-			if ~isempty(add('x')) || ~isempty(add('u')) || ~isempty(add('y'))
+			add('model') = obj.model.applyFilters('getVariables', 'map');
+			keys = add.keys;
+			% any variables introduced by filters?
+			new_variables = false;
+			for i = 1:length(keys)
+				if ~isempty(add(keys{i}))
+					new_variables = true;
+					break
+				end
+			end
+			if new_variables
 				Y.variables.filters = map2struct(add);
 			end
 		end
