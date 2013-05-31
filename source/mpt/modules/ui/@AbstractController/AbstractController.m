@@ -411,21 +411,21 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			%
 			% Returns xinit = { x0, r, u0 }, where the elements are sorted
 			% in the way expected by MPCController/construct()
-			
-			if nargin==2
-				% only x0
+
+			format = obj.xinitFormat;
+			xinit = x0(:);
+
+			if nargin==2 && length(format.names)==1
+				% only x0 required
 				xinit = x0;
 				return
 			elseif mod(length(varargin), 2)~=0
 				error('Arguments must come in key/value pairs.');
 			end
-
-			format = obj.xinitFormat;
-			xinit = x0(:);
 			
 			% parse varargin
 			options = [];
-			for i = 1:2:length(varargin)/2
+			for i = 1:2:length(varargin)
 				% validate each ['option', value] pair
 				key = varargin{i};
 				value = varargin{i+1};
