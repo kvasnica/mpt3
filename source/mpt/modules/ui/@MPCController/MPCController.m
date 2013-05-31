@@ -86,7 +86,7 @@ classdef MPCController < AbstractController
 			obj.markAsUnmodified();
 		end
 		
-        function [u, feasible, openloop] = evaluate(obj, xinit)
+        function [u, feasible, openloop] = evaluate(obj, xinit, varargin)
             % Solves the MPC optimization problem for a given initial
             % condition
 			%
@@ -104,6 +104,10 @@ classdef MPCController < AbstractController
 			% outputs in "openloop.X", "openloop.Y", and "openloop.Y",
 			% respectively. Value of the optimal cost is returned in
 			% openloop.cost. 
+			%
+			% u = controller.evaluate(x0, 'x.reference', ref, 'u.prev', u0)
+			% includes "ref" and "u0" into the vector of initial
+			% conditions.
 
 			% make sure we have the prediction horizon available
 			error(obj.assert_controllerparams_defined);
@@ -115,6 +119,11 @@ classdef MPCController < AbstractController
 				% changed
 				obj.construct();
 			end
+
+			% assemble the vector of initial conditions. Include any
+			% variables that were declared by filters as those which need
+			% proper initialization.
+			xinit = obj.parse_xinit(xinit, varargin{:});
 			
 			% use a pre-constructed optimizer object for faster
 			% evaluation
@@ -124,6 +133,8 @@ classdef MPCController < AbstractController
 				J = Inf;
 				u = NaN(obj.nu, 1);
 				U = NaN(size(U));
+			elseif isempty(U)
+				error('Ooops, something went wrong. Please report to mpt@control.ee.ethz.ch');
 			else
 				J = U(1);
 				u = U(2:obj.nu+1);

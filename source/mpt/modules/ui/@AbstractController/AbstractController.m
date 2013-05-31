@@ -400,6 +400,70 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			end
 		end
 	end
+		
+	methods(Hidden)
+		% internal APIs
+		
+		function xinit = parse_xinit(obj, x0, varargin)
+			% Constructs initial conditions for the optimizer
+			%
+			%    xinit = ctrl.parse_xinit(x0, 'u.prev', u0, 'x.reference', r)
+			%
+			% Returns xinit = { x0, r, u0 }, where the elements are sorted
+			% in the way expected by MPCController/construct()
+			
+			if nargin==2
+				% only x0
+				xinit = x0;
+				return
+			elseif mod(length(varargin), 2)~=0
+				error('Arguments must come in key/value pairs.');
+			end
+
+			format = obj.xinitFormat;
+			xinit = x0(:);
+			
+			% parse varargin
+			options = [];
+			for i = 1:2:length(varargin)/2
+				% validate each ['option', value] pair
+				key = varargin{i};
+				value = varargin{i+1};
+				if ~ischar(key)
+					error('Each option must be a string.');
+				elseif ~isnumeric(value)
+					error('Each value must be a double vector.');
+				end
+				% replace dots by underscores, e.g. "x.ref" -> "x_ref"
+				key = strrep(key, '.', '_');
+				% covert the key/value pair into a field of "options"
+				options.(key) = value;
+			end
+			
+			% now check that we have all required options
+			%
+			% obj.xinitFormat.names{1} always corresponds to 'x.init',
+			% which we already have in xinit
+			for i = 2:length(format.names)
+				sane_name = strrep(format.names{i}, '.', '_');
+				% validate presence
+				if ~isfield(options, sane_name)
+					% option is required
+					error('Please provide initial value of "%s".', format.names{i});
+				end
+				value = options.(sane_name);
+				% validate dimensions
+				if ~isequal(size(value), format.dims{i})
+					error('"%s" must be a %dx%d vector.', format.names{i}, ...
+						format.dims{i}(1), format.dims{i}(2));
+				end
+				% validation passed, include the initial value into xinit
+				xinit = [xinit; value];
+			end
+		end
+		
+	end
+	
 end
 
 %--------------------------------------------------

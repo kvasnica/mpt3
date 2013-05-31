@@ -137,7 +137,7 @@ classdef EMPCController < AbstractController
 		% 			end
 		% 		end
 		
-		function [u, feasible, openloop] = evaluate(obj, xinit)
+		function [u, feasible, openloop] = evaluate(obj, xinit, varargin)
             % Evaluates the explicit solution for a given point
 			%
 			% u = controller.evaluate(x0) evaluates the explicit MPC
@@ -154,6 +154,10 @@ classdef EMPCController < AbstractController
 			% "openloop.Y" will be set to NaN. This is due to the fact that
 			% storing open-loop predictions of states and outputs in the
 			% explicit solution would considerably increase its size.
+			%
+			% u = controller.evaluate(x0, 'x.reference', ref, 'u.prev', u0)
+			% includes "ref" and "u0" into the vector of initial
+			% conditions.
 
 			% TODO: point location should be a method of PolyUnion
 
@@ -166,7 +170,12 @@ classdef EMPCController < AbstractController
 			
             % evaluate the explicit optimizer
 			error(validate_vector(xinit, obj.nx, 'initial state'));
-
+			
+			% assemble the vector of initial conditions. Include any
+			% variables that were declared by filters as those which need
+			% proper initialization.
+			xinit = obj.parse_xinit(xinit, varargin{:});
+			
 			% index of the optimizer and index of the region from which the
 			% control action was extracted
 			opt_region = [];
