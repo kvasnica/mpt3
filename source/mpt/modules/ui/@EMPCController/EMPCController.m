@@ -88,13 +88,13 @@ classdef EMPCController < AbstractController
 			end
 			% TODO: remove the debug flag for beta
 			options = sdpsettings('debug', 1);
-			
+
 			speedhack = false;
 
 			if speedhack
 				% bypass Opt() since it's so slow now (Aug 2012)
 				sol = solvemp(Y.constraints, Y.objective, options, ...
-					Y.variables.x(:, 1), Y.variables.u(:));
+					Y.internal.parameters, Y.variables.u(:));
 				if isempty(sol) || isempty(sol{1})
 					error('Problem is infeasible.');
 				end
@@ -106,13 +106,13 @@ classdef EMPCController < AbstractController
 				% TODO: Opt() should allow MILP/MIQP problems to be constructed
 				% even if MPLP/MPQP parametric solvers are chosen
 				problem = Opt(Y.constraints, Y.objective, ...
-					Y.variables.x(:, 1), Y.variables.u(:));
+					Y.internal.parameters, Y.variables.u(:));
 				
 				if isequal(problem.problem_type,'MILP') || ...
 						isequal(problem.problem_type, 'MIQP')
 					% use YALMIP for pMILP/pMIQP problems
 					sol = solvemp(Y.constraints, Y.objective, options, ...
-						Y.variables.x(:, 1), Y.variables.u(:));
+						Y.internal.parameters, Y.variables.u(:));
 					if isempty(sol) || isempty(sol{1})
 						error('Problem is infeasible.');
 					end

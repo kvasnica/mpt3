@@ -77,48 +77,11 @@ classdef MPCController < AbstractController
 				Y = obj.yalmipData;
 			end
 			
-			% list of variables which we ask for from the optimizer in the
-			% following order:
-			%  * cost (scalar)
-			%  * inputs (nu*N)
-			%  * states (nx*N)
-			%  * outputs (ny*N)
-			%  * all other model variables
-			vars = Y.objective;			
-			main_variables = {'u', 'x', 'y'};
-			for i = 1:length(main_variables)
-				v = Y.variables.(main_variables{i});
-				vars = [vars; v(:)];
-			end
-			
-			% now add all other variables (e.g. 'd' for PWA, 'd','z' for
-			% MLD), dive recursively into automatically introduced
-			% variables
-			function v = struct2vars(s, v)
-				% extracts sdpvar objects from all fields of a structure
-				% "s" and concatenates them into a single column vector
-				% "v". dives recursively into fields of "s".
-				if isa(s, 'sdpvar')
-					v = [v; s(:)];
-				elseif isstruct(s)
-					n = fieldnames(s);
-					for j = 1:length(n)
-						v = struct2vars(s.(n{j}), v);
-					end
-				end
-			end
-			f = fieldnames(Y.variables);
-			for i = 1:length(f)
-				if ~ismember(f{i}, main_variables)
-					v = Y.variables.(f{i});
-					vars = struct2vars(v(:), vars);
-				end
-			end
-			
 			% construct YALMIP's optimizer object with the first state as
 			% the initial condition
 			obj.optimizer = optimizer(Y.constraints, Y.objective, ...
-				sdpsettings('verbose', 0), Y.variables.x(:, 1), vars);
+				sdpsettings('verbose', 0), ...
+				Y.internal.parameters, Y.internal.requested);
 			
 			obj.markAsUnmodified();
 		end
