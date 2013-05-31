@@ -149,7 +149,7 @@ classdef FilterBehavior < MPTUIHandle
 		function out = applyFilters(obj, from, concat_type)
 			% Applies all filters
 			%
-			% concat_type can be either '+' or 'map'
+			% concat_type can be either '+', 'map', or '[]'
 			
 			if nargin<3
 				concat_type = '+';
@@ -162,6 +162,11 @@ classdef FilterBehavior < MPTUIHandle
 				out = containers.Map;
 				for i = 1:length(filters)
 					out(filters{i}) = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
+				end
+			elseif isequal(concat_type, '[]')
+				out = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
+				for i = 2:length(filters)
+					out = [out, obj.callFilterFrom(filters{i}, from, obj.(filters{i}))];
 				end
 			else
 				out = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
