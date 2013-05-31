@@ -32,15 +32,24 @@ else
 	M = obj.N;
 end
 
+reference = [];
 if obj.hasFilter('reference')
-	reference = obj.reference;
-	if size(reference, 2)~=M
-		reference = [reference repmat(reference(:, end), 1, M-size(reference, 2))];
+	if isfield(obj.internal_properties, 'reference') && ...
+			obj.internal_properties.reference.free
+		% symbolic reference, we implicitly assume it's a vector
+		reference = repmat(obj.internal_properties.reference.var, 1, M);
+	elseif ~isempty(obj.reference)
+		% numerical reference, make sure we have enough of them to cover
+		% the whole prediction horizon
+		reference = obj.reference;
+		if size(reference, 2)~=M
+			reference = [reference repmat(reference(:, end), 1, M-size(reference, 2))];
+		end
 	end
 end
 
 for k = 1:M
-	if obj.hasFilter('reference')
+	if ~isempty(reference)
 		value = obj.var(:, k) - reference(:, k);
 	else
 		value = obj.var(:, k);
