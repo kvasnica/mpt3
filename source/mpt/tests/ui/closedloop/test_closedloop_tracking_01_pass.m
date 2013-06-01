@@ -20,9 +20,9 @@ assert(norm(d.X(:, end)-xref) <= 1e-4);
 
 E = EMPCController(L, 2);
 assert(E.nr==17);
-d = ctrl.simulate(x0, 30, 'x.reference', xref);
-assert(abs(sum(d.cost) - Jgood) <= 1e-8);
-assert(isequal(d.X(:, 1), x0));
-assert(norm(d.X(:, end)-xref) <= 1e-4);
+dexp = E.simulate(x0, 30, 'x.reference', xref);
+assert(abs(sum(dexp.cost) - Jgood) <= 1e-7);
+assert(isequal(dexp.X(:, 1), x0));
+assert(norm(dexp.X(:, end)-xref) <= 1e-4);
 
 end
