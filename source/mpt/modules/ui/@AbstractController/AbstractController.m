@@ -255,7 +255,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 
 		end
 		
-		function out = simulate(obj, x0, N_sim)
+		function out = simulate(obj, x0, N_sim, varargin)
 			% Simulate the closed-loop system using the prediction model
 			%
 			%   data = controller.simulate(x0, N_sim)
@@ -271,7 +271,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			%
 			% See ClosedLoop/simulate for more information.
 			
-			out = ClosedLoop(obj, obj.model).simulate(x0, N_sim);
+			out = ClosedLoop(obj, obj.model).simulate(x0, N_sim, varargin{:});
 		end
 
 	end
