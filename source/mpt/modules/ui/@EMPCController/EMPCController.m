@@ -298,6 +298,9 @@ classdef EMPCController < AbstractController
 				error('Only 2D partitions can be plotted.');
 			end
 			ip = inputParser;
+			% important: use keepUnmatched=true to propage free references
+			% to ctrl.simulate()
+			ip.KeepUnmatched = true;
 			ip.addParamValue('x0', []);
 			ip.addParamValue('N_sim', 50, @isnumeric);
 			ip.addParamValue('alpha', 1, @isnumeric);
@@ -307,8 +310,15 @@ classdef EMPCController < AbstractController
 			ip.addParamValue('markersize', 20);
 			ip.parse(varargin{:});
 			options = ip.Results;
-			
-			obj.optimizer.plot('alpha', options.alpha);
+
+			% if we have free references or other variables which extend
+			% the vector of initial conditions, plot the section
+			if isstruct(obj.xinitFormat) && obj.xinitFormat.n_xinit>obj.nx
+				P = obj.optimizer.Set.slice(obj.nx+1:obj.optimizer.Dim);
+			else
+				P = obj.partition;
+			end
+			P.plot('alpha', options.alpha);
 			axis tight
 			hold on
 			button = 1;
@@ -320,7 +330,7 @@ classdef EMPCController < AbstractController
 					x0 = options.x0;
 					button = 3;
 				end
-				data = obj.simulate(x0, options.N_sim);
+				data = obj.simulate(x0, options.N_sim, varargin{:});
 				plot(data.X(1, :), data.X(2, :), options.color, ...
 					'linewidth', options.linewidth, ...
 					'marker', options.marker, ...
