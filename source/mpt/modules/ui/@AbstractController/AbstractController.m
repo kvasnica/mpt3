@@ -209,6 +209,8 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 					obj.xinitFormat.dims{end+1} = size(initvars(k).var);
 				end
 			end
+			% number of required initial conditions
+			obj.xinitFormat.n_xinit = length(xinit_variables);
 			
 			% sdpvars of initial conditions
 			Y.internal.parameters = xinit_variables;
