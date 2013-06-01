@@ -77,6 +77,10 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				error('Overlapping partitions not supported.');
 			end
 			
+			if obj.controller.optimizer.Dim ~= obj.controller.model.nx
+				error('Tracking controllers not supported.');
+			end
+			
 			if isa(obj.system, 'LTISystem') && length(obj.controller.optimizer.Set)==1
 				% LTI system + linear controller = LTI system with
 				% domain restricted to the set where the controller
