@@ -35,4 +35,12 @@ asserterrmsg(msg, '"values" must be a vector with 1 element(s).');
 [~, msg] = run_in_caller('P.slice([1 3], [0.1])');
 asserterrmsg(msg, '"values" must be a vector with 2 element(s).');
 
+% wrong options
+P = Polyhedron('lb', [-1; -1], 'ub', [1; 1]);
+[~, msg] = run_in_caller('P.slice(1, 0, ''bogus'', 1)');
+asserterrmsg(msg, 'Argument ''bogus'' did not match any valid parameter of the parser.');
+[~, msg] = run_in_caller('P.slice(1, 0, ''keepDim'', ''yes'')');
+asserterrmsg(msg, 'Argument ''keepDim'' failed validation islogical.');
+
+
 end
