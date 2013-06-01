@@ -34,12 +34,12 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			I = obj.toSystem().invariantSet(varargin{:});
 		end
 		
-		function out = simulate(obj, x0, N_sim, varargin)
+		function out = simulate(obj, x0, N_sim)
 			%
 			% Simulates the closed-loop system for a given number of steps
 			%
 			
-			error(nargchk(3, Inf, nargin));
+			error(nargchk(3, 3, nargin));
 			error(validate_vector(x0, obj.system.nx, 'initial state'));
 
 			obj.system.initialize(x0);
@@ -49,8 +49,7 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			%Y = NaN(obj.system.ny, N_sim);
 			%J = Inf(1, N_sim);
 			for k = 1:N_sim
-				% include optional setting of initial values
-				[u, feasible, openloop] = obj.controller.evaluate(x0, varargin{:});
+				[u, feasible, openloop] = obj.controller.evaluate(x0);
 				if ~feasible
 					warning('No control action found at step %d, aborting.', k);
 					break

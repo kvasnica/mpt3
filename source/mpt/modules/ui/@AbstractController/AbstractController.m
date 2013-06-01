@@ -415,9 +415,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			format = obj.xinitFormat;
 			xinit = x0(:);
 
-			% TODO: automatically assign default obj.xinitFormat when
-			% importing from solvemp/polyunion
-			if nargin==2 && (~isstruct(format) || length(format.names)==1)
+			if nargin==2 && length(format.names)==1
 				% only x0 required
 				xinit = x0;
 				return

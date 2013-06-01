@@ -1,4 +1,4 @@
-function msg = validate_vector(x, nx, label, nc)
+function msg = validate_vector(x, nx, label)
 % Validates that "x" is an (nx x 1) vector
 %
 % Returns a non-empty string if "x0" does not match dimension
@@ -8,11 +8,8 @@ function msg = validate_vector(x, nx, label, nc)
 if nargin<3
 	label = 'point';
 end
-if nargin<4
-	nc = 1;
-end
-if ~isequal(size(x), [nx nc])
-	msg = sprintf('The %s must be a %dx%d vector.', label, nx, nc);
+if ~isequal(size(x), [nx 1])
+	msg = sprintf('The %s must be a %dx1 vector.', label, nx);
 else
 	msg = '';
 end
