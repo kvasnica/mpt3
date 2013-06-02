@@ -29,6 +29,6 @@ Jgood = 0.301119997932832;
 ugood = 0.498975470439407;
 assert(feasible);
 assert(abs(openloop.cost - Jgood) <= 1e-8); % leave as a strict test!
-assertwarning(abs(u - ugood) <= 1e-8); % leave as a strict test!
+assert(abs(u - ugood) <= 1e-8); % leave as a strict test!
 
 end
