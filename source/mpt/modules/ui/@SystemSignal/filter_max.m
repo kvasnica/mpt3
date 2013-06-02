@@ -17,6 +17,7 @@ function out = on_constraints(obj, varargin)
 
 out = [];
 for i = 1:obj.n
+	% Do not include +/-Inf bounds
 	if any(~isinf(obj.max(i, :)))
         out = out + [ obj.var(i, :) <= obj.max(i, :) ];
     end
