@@ -402,9 +402,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			% Creates YALMIP variables representing individual variables
 			%
 			
-			obj.internal_properties.system.N = N;
-			obj.applyFilters('instantiate');
-			
+			% instantiate signals first
 			vars = properties(obj);
 			for i = 1:length(vars)
 				var = obj.(vars{i});
@@ -414,6 +412,11 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 					end
 				end
 			end
+			
+			% only instantiate the system afterwards
+			obj.internal_properties.system.N = N;
+			obj.applyFilters('instantiate');
+
 			obj.internal_properties.system.instantiated = true;
 		end
 		
