@@ -25,13 +25,22 @@ if isempty(obj.terminalPenalty)
 	return
 end
 
+% no reference by default
+reference = zeros(obj.n, 1);
+
 if obj.hasFilter('reference')
-	value = obj.var(:, end) - obj.reference(:, end);
-else
-	value = obj.var(:, end);
+	% reference can either be free (sdpvar) or fixed (last column)
+	if isfield(obj.internal_properties, 'reference') && ...
+			obj.internal_properties.reference.free
+		% symbolic reference, we implicitly assume it's a vector
+		reference = obj.internal_properties.reference.var;
+	elseif ~isempty(obj.reference)
+		% fixed reference
+		reference = obj.reference(:, end);
+	end
 end
 
-out = obj.terminalPenalty.feval(value);
+out = obj.terminalPenalty.feval(obj.var(:, end) - reference);
 
 end
 
