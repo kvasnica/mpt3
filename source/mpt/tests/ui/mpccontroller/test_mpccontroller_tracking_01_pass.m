@@ -30,4 +30,17 @@ assert(feasible);
 assert(abs(openloop.cost - Jgood) <= 1e-8);
 assertwarning(abs(u - ugood) <= 1e-8);
 
+% check xinitFormat (must automatically call toYALMIP)
+ctrl = MPCController(L, N);
+ctrl.construct();
+format = ctrl.xinitFormat;
+assert(isstruct(format));
+assert(isequal(format.names{1}, 'x.init'));
+assert(isequal(format.names{2}, 'x.reference'));
+assert(isequal(format.components{1}, 'x'));
+assert(isequal(format.components{2}, 'x'));
+assert(isequal(format.dims{1}, [2 1]));
+assert(isequal(format.dims{2}, [2 1]));
+assert(format.n_xinit==4);
+
 end

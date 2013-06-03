@@ -131,26 +131,6 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				Y.variables.z = obj.model.getVariables('z');
 			end
 			
-			% include additional variables introduced by filters
-
-			add = containers.Map;
-			add('x') = obj.model.x.applyFilters('getVariables', 'map');
-			add('u') = obj.model.u.applyFilters('getVariables', 'map');
-			add('y') = obj.model.y.applyFilters('getVariables', 'map');
-			add('model') = obj.model.applyFilters('getVariables', 'map');
-			keys = add.keys;
-			% any variables introduced by filters?
-			new_variables = false;
-			for i = 1:length(keys)
-				if ~isempty(add(keys{i}))
-					new_variables = true;
-					break
-				end
-			end
-			if new_variables
-				Y.variables.filters = map2struct(add);
-			end
-			
 			% list of variables which we ask for from the optimizer in the
 			% following order:
 			%  * cost (scalar)
@@ -160,7 +140,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			%  * all other model variables
 			f = fieldnames(Y.variables);
 			% the cost must always be the first variable
-			vars = Y.objective;			
+			vars = Y.objective;
 			main_variables = {'u', 'x', 'y'};
 			for i = 1:length(main_variables)
 				v = Y.variables.(main_variables{i});
@@ -180,38 +160,50 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				end
 			end
 			
-			% initial conditions for the optimizer
-			xinit_variables = Y.variables.x(:, 1);
-			obj.xinitFormat.names = { 'x.init' };
-			obj.xinitFormat.signals = { 'x' };
-			obj.xinitFormat.dims = { [obj.nx 1] };
+			% include additional variables introduced by filters
+			add = containers.Map;
+			keys = fields(Y.variables);
+			for i = 1:length(keys)
+				add(keys{i}) = obj.model.(keys{i}).applyFilters('getVariables', 'map');
+			end
+			% always add 'model' filters
+			add('model') = obj.model.applyFilters('getVariables', 'map');
+			% any variables introduced by filters?
+			new_variables = false;
+			keys = add.keys;
+			for i = 1:length(keys)
+				if ~isempty(add(keys{i}))
+					new_variables = true;
+					break
+				end
+			end
 			
-			% include into initial conditions any variables which are
-			% required to initialize the optimization. These can be
-			% obtained by applying the "getInitVariables" filter method.
-			% Each filter which introduces such variables must respond to
-			% the call with the following structure:
-			%  .name: name of the signal
-			%  .filter: string containing name of the filter (e.g.
-			%         'reference')
-			%  .var: sdpvar representation of the variable
-			for i = 1:length(f)
-				if isequal(f{i}, 'filters')
-					% skip filters
-					continue
-				end
-				initvars = obj.model.(f{i}).applyFilters('getInitVariables', '[]');
-				for k = 1:numel(initvars)
-					% variable needs to be added to xinit
-					xinit_variables = [xinit_variables; initvars(k).var(:)];
-					obj.xinitFormat.names{end+1} = [f{i} '.' initvars(k).filter];
-					obj.xinitFormat.signals{end+1} = f{i};
-					obj.xinitFormat.dims{end+1} = size(initvars(k).var);
-				end
+			% initial conditions for the optimization
+			init_vars = struct('component', 'x', ...
+				'name', 'x.init', ...
+				'var', obj.model.x.var(:, 1), ...
+				'dims', size(obj.model.x.var(:, 1)));
+			
+			if new_variables
+				% include variables introduced by filters
+				[filter_vars, init_vars] = map2struct(add, init_vars);
+				Y.variables.filters = filter_vars;
+			end
+			
+			% store format of the initial condition
+			xinit_variables = [];
+			obj.xinitFormat.names = {};
+			obj.xinitFormat.components = {};
+			obj.xinitFormat.dims = {};
+			for i = 1:length(init_vars)
+				xinit_variables = [xinit_variables; init_vars(i).var];
+				obj.xinitFormat.names{end+1} = init_vars(i).name;
+				obj.xinitFormat.components{end+1} = init_vars(i).component;
+				obj.xinitFormat.dims{end+1} = init_vars(i).dims;
 			end
 			% number of required initial conditions
 			obj.xinitFormat.n_xinit = length(xinit_variables);
-			
+
 			% sdpvars of initial conditions
 			Y.internal.parameters = xinit_variables;
 			% sdpvars of all requested variables
@@ -471,7 +463,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 end
 
 %--------------------------------------------------
-function s = map2struct(m)
+function [s, inits] = map2struct(m, inits, master_component, master_key)
 % converts a containers.Map to a structure (operates recursively)
 
 if isa(m, 'containers.Map')
@@ -479,12 +471,33 @@ if isa(m, 'containers.Map')
 	s = [];
 	for i = 1:length(k)
 		v = m(k{i});
+		if nargin<3
+			master_component = k{i};
+		end
+		if nargin<4
+			master_key = k{i};
+		else
+			master_key = [master_key '.' k{i}];
+		end
 		if ~isempty(v)
-			s.(k{i}) = map2struct(v);
+			[new_s, inits] = map2struct(v, inits, master_component, master_key);
+			s.(k{i}) = new_s;
 		end
 	end
 else
-	s = m;
+	s = m.var;
+	if m.parametric
+		% include this variable into list of initial conditions
+		v_init.component = master_component;
+		v_init.name = master_key;
+		v_init.var = s;
+		v_init.dims = size(s);
+		if isempty(inits)
+			inits = v_init;
+		else
+			inits(end+1) = v_init;
+		end
+	end
 end
 
 end

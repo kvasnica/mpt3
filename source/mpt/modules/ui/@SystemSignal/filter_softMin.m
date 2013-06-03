@@ -30,7 +30,13 @@ end
 function out = on_variables(obj, varargin)
 % called when filter's variables are requested
 
-out = obj.internal_properties.soft_min;
+% Response: structure (or an array of structures) with following fields:
+%
+%  .var: sdpvar representation of the introduced variable
+%  .parametric: logical, if true, the variable will become part of the
+%              vector of initial conditions
+out.var = obj.internal_properties.soft_min;
+out.parametric = false;
 
 end
 

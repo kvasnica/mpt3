@@ -43,8 +43,15 @@ end
 function out = on_variables(obj, varargin)
 % called when filter's variables are requested
 
+% Response: structure (or an array of structures) with following fields:
+%
+%  .var: sdpvar representation of the introduced variable
+%  .parametric: logical, if true, the variable will become part of the
+%              vector of initial conditions
+
 % return the variable which represents epigraphs of convex functions
-out = obj.internal_properties.PWApenalty_epigraph;
+out.var = obj.internal_properties.PWApenalty_epigraph;
+out.parametric = false;
 
 end
 

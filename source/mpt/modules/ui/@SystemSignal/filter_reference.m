@@ -7,7 +7,6 @@ filter.addField('value', zeros(obj.n, 1));
 
 % the filter impacts the following calls:
 filter.callback('set') = @on_set;
-filter.callback('getInitVariables') = @on_getInitVariables;
 filter.callback('getVariables') = @on_variables;
 filter.callback('instantiate') = @on_instantiate;
 filter.callback('uninstantiate') = @on_uninstantiate;
@@ -16,26 +15,17 @@ filter.callback('constraints') = @on_constraints;
 end
 
 %------------------------------------------------
-function out = on_getInitVariables(obj, varargin)
-% called when variables used to initialize the optimization problem are
-% requested
-
-if obj.internal_properties.reference.free
-	out.name = obj.name;
-	out.filter = 'reference';
-	out.var = obj.internal_properties.reference.var;
-else
-	out = [];
-end
-
-end
-
-%------------------------------------------------
 function out = on_variables(obj, varargin)
 % called when filter's variables are requested
-
+%
+% Response: structure (or an array of structures) with following fields:
+%
+%  .var: sdpvar representation of the introduced variable
+%  .parametric: logical, if true, the variable will become part of the
+%              vector of initial conditions
 if obj.internal_properties.reference.free
-	out = obj.internal_properties.reference.var;
+	out.var = obj.internal_properties.reference.var;
+	out.parametric = true;
 else
 	out = [];
 end
