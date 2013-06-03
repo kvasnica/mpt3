@@ -13,7 +13,14 @@ L.u.max = 1;
 L.x.with('reference');
 L.x.reference = 'free';
 ctrl = EMPCController(L, N);
+% 63 regions without x.min, x.max (implies no bounds on x.reference)
 assert(ctrl.nr==63);
+
+% 53 regions with bounding of the reference
+L.x.min = [-5; -5];
+L.x.max = [5; 5];
+ctrl = EMPCController(L, N);
+assert(ctrl.nr==53);
 
 % bogus settings must alert the user
 [~, msg] = run_in_caller('ctrl.evaluate(x0)');

@@ -20,16 +20,20 @@ L.y.reference = 'free';
 
 % on-line MPC
 online = MPCController(L, N);
-[u_on, feasible, openloop_on] = online.evaluate(x0, 'u.reference', uref, 'y.reference', yref);
+[u_on, feasible, openloop] = online.evaluate(x0, 'u.reference', uref, 'y.reference', yref);
 Jgood = 1.23264105902116;
+Jcomp = openloop.X(:, end)'*online.model.x.terminalPenalty.weight*openloop.X(:, end)+...
+	online.model.y.penalty.weight*(openloop.Y-yref)*(openloop.Y-yref)'+...
+	online.model.u.penalty.weight*(openloop.U-uref)*(openloop.U-uref)';
 ugood = -0.27561501340568;
 assert(feasible);
-assert(abs(openloop_on.cost - Jgood) <= 1e-8);
+assert(abs(Jgood - Jcomp) <= 1e-8);
+assert(abs(openloop.cost - Jgood) <= 1e-8);
 assert(abs(u_on - ugood) <= 1e-8); 
 
 % explicit MPC
 explicit = online.toExplicit();
-assert(explicit.nr==31); % N=3: 83
+assert(explicit.nr==13); % 31 without bounding the reference
 
 % bogus settings must alert the user
 [~, msg] = run_in_caller('explicit.evaluate(x0)');

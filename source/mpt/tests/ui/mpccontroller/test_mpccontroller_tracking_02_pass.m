@@ -24,28 +24,42 @@ asserterrmsg(msg, '"u.reference" must be a 1x1 vector.');
 
 % correct settings
 [u, feasible, openloop] = ctrl.evaluate(x0, 'u.reference', uref);
+Jcomp = sum(diag(ctrl.model.x.penalty.weight*openloop.X(:, 1:end-1)*openloop.X(:, 1:end-1)'))+...
+	ctrl.model.u.penalty.weight*(openloop.U-uref)*(openloop.U-uref)';
+% compute the cost manually:
 Jgood = 195.915561546513;
 ugood = 0.186037667506576;
 assert(feasible);
+assert(abs(Jgood-Jcomp) <= 1e-8);
 assert(abs(openloop.cost - Jgood) <= 1e-8);
 assertwarning(abs(u - ugood) <= 1e-8);
 
 % changing the reference must work
 uref = -1;
 [u, feasible, openloop] = ctrl.evaluate(x0, 'u.reference', uref);
+% compute the cost manually:
+Jcomp = sum(diag(ctrl.model.x.penalty.weight*openloop.X(:, 1:end-1)*openloop.X(:, 1:end-1)'))+...
+	ctrl.model.u.penalty.weight*(openloop.U-uref)*(openloop.U-uref)';
 Jgood = 218.418966173325;
 assert(feasible);
+assert(abs(Jgood-Jcomp) <= 1e-8);
 assert(abs(openloop.cost - Jgood) <= 1e-8);
 
 % updating constraints must take effect
 ctrl.model.u.min = -0.6;
+uref = -1; % reference must be inside of umin/umax constraints
 [u, feasible, openloop] = ctrl.evaluate(x0, 'u.reference', uref);
-ugood = -0.6;
-Jgood = 390.66960020478;
-Ugood = repmat(ugood, 1, 20);
+assert(~feasible);
+uref = -0.6; % correct reference
+[u, feasible, openloop] = ctrl.evaluate(x0, 'u.reference', uref);
+ugood = -0.45342181194255;
+% compute the cost manually:
+Jcomp = sum(diag(ctrl.model.x.penalty.weight*openloop.X(:, 1:end-1)*openloop.X(:, 1:end-1)'))+...
+	ctrl.model.u.penalty.weight*(openloop.U-uref)*(openloop.U-uref)';
+Jgood = 51.8430942909014;
 assert(feasible);
+assert(abs(Jgood-Jcomp) <= 1e-8);
 assert(abs(openloop.cost - Jgood) <= 1e-8);
 assert(abs(u-ugood) <= 1e-8);
-assert(norm(openloop.U-Ugood) <= 1e-8);
 
 end

@@ -11,6 +11,7 @@ filter.callback('getInitVariables') = @on_getInitVariables;
 filter.callback('getVariables') = @on_variables;
 filter.callback('instantiate') = @on_instantiate;
 filter.callback('uninstantiate') = @on_uninstantiate;
+filter.callback('constraints') = @on_constraints;
 
 end
 
@@ -37,6 +38,28 @@ if obj.internal_properties.reference.free
 	out = obj.internal_properties.reference.var;
 else
 	out = [];
+end
+
+end
+
+%------------------------------------------------
+function out = on_constraints(obj, varargin)
+% called when constructing constraints
+
+out = [];
+if obj.internal_properties.reference.free
+	% bound symbolic references using signal's min/max values
+	%
+	% do not include +/-Inf bounds
+	v = obj.internal_properties.reference.var;
+	for i = 1:length(v)
+		if ~isinf(obj.min(i))
+			out = out + [ obj.min(i) <= v(i) ];
+		end
+		if ~isinf(obj.max(i))
+			out = out + [ v(i) <= obj.max(i) ];
+		end
+	end
 end
 
 end
