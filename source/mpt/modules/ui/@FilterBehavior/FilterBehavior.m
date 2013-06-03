@@ -437,8 +437,7 @@ classdef FilterBehavior < MPTUIHandle
 			switch from
 				case {'constraints', 'instantiate', 'uninstantiate', ...
 						'generate', 'construct', 'getVariables', ...
-						'setup', 'addFilter', 'removeFilter', ...
-						'getInitVariables' }
+						'setup', 'addFilter', 'removeFilter' };
 					out = [];
 				case 'objective'
 					out = 0;
