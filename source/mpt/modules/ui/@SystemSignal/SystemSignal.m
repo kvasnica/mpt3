@@ -84,7 +84,13 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
             
             out = isfield(obj.userData, 'kind') && ...
                 ismember(obj.userData.kind, kind);
-        end
+		end
+		
+		function setKind(obj, kind)
+			% Sets the kind of a signal
+			
+			obj.userData.kind = kind;
+		end
         
         function obj = initialize(obj, init)
             % Sets the initial value of the signal
