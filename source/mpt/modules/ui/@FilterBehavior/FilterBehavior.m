@@ -185,6 +185,9 @@ classdef FilterBehavior < MPTUIHandle
 				return
 			end
 			
+			% mark the object as modified
+			obj.markAsModified();
+			
 			% call the filter to determine the setup
 			setup = feval(obj.filterFunction(filter), obj);
 			if ~isa(setup, 'FilterSetup')
@@ -266,6 +269,9 @@ classdef FilterBehavior < MPTUIHandle
 		function obj = removeFilter(obj, filter)
 			% Remove a filter
 			
+			% mark the object as modified
+			obj.markAsModified();
+
 			if iscell(filter)
 				% support removing multiple filters
 				for i = 1:length(filter)
