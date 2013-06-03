@@ -20,7 +20,7 @@ dy = diff([yprev d.Y]);
 assert(max(dy) <= L.y.deltaMax);
 assert(min(dy) >= L.y.deltaMin);
 Jgood = 369.455218282397;
-assert(abs(sum(d.cost) - Jgood) <= 1e-8);
+assert(abs(sum(d.cost) - Jgood) <= 1e-6);
 
 % must nicely complain if y.previous is not provided
 [~, msg] = run_in_caller('ctrl.simulate(x0, 30)');
