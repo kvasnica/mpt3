@@ -8,6 +8,7 @@ classdef FilterSetup
 		callback
 		dependsOn
 		hidden
+		transient % transient filters are not saved
 		parser
 		filter_name
 	end
@@ -24,6 +25,7 @@ classdef FilterSetup
 			obj.dependsOn = containers.Map;
 			obj.parser = inputParser;
 			obj.hidden = false;
+			obj.transient = false;
 			
 			% determine the filter name
 			s = dbstack;

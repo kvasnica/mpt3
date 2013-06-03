@@ -289,6 +289,12 @@ classdef FilterBehavior < MPTUIHandle
 			filters = obj.internal_properties.filter_map.keys;
 			% TODO: add filters in the order in which they were added
 			for i = 1:length(filters)
+				% do not copy transient filters
+				filter = obj.internal_properties.filter_map(filters{i});
+				if filter.setup.transient
+					% do not copy transient filters
+					continue
+				end
 				new.addFilter(filters{i});
 				% re-assign values
 				new.(filters{i}) = obj.(filters{i});
@@ -303,6 +309,11 @@ classdef FilterBehavior < MPTUIHandle
 			filters = obj.internal_properties.filter_map.keys;
 			arguments = [];
 			for i = 1:length(filters)
+				filter = obj.internal_properties.filter_map(filters{i});
+				if filter.setup.transient
+					% do not save transient filters
+					continue
+				end
 				arguments.(filters{i}) = obj.(filters{i});
 			end
 			obj.internal_properties.save.filters = arguments;
