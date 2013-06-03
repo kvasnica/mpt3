@@ -162,17 +162,17 @@ classdef LTISystem < AbstractSystem
 
             x = SystemSignal(obj.nx);
             x.name = 'x';
-            x.userData.kind = 'x';
+            x.setKind('x');
             obj.addComponent('x', x);
             
             u = SystemSignal(obj.nu);
             u.name = 'u';
-            u.userData.kind = 'u';
+            u.setKind('u');
             obj.addComponent('u', u);
             
             y = SystemSignal(obj.ny);
             y.name = 'y';
-            y.userData.kind = 'y';
+            y.setKind('y');
             obj.addComponent('y', y);
                
 			% domain is a polyhedron in the x-u space

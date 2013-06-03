@@ -80,7 +80,7 @@ classdef MLDSystem < AbstractSystem
 			% create variables
 			x = SystemSignal(obj.nx);
             x.name = 'x';
-            x.userData.kind = 'x';
+            x.setKind('x');
             obj.addComponent('x', x);
 			obj.x.min = S.xl;
 			obj.x.max = S.xu;
@@ -92,7 +92,7 @@ classdef MLDSystem < AbstractSystem
 			
 			u = SystemSignal(obj.nu);
             u.name = 'u';
-            u.userData.kind = 'u';
+            u.setKind('u');
             obj.addComponent('u', u);
 			obj.u.min = S.ul;
 			obj.u.max = S.uu;
@@ -104,7 +104,7 @@ classdef MLDSystem < AbstractSystem
 			
 			y = SystemSignal(obj.ny);
             y.name = 'y';
-            y.userData.kind = 'y';
+            y.setKind('y');
             obj.addComponent('y', y);
 			obj.y.min = S.yl;
 			obj.y.max = S.yu;
@@ -116,7 +116,7 @@ classdef MLDSystem < AbstractSystem
 			
 			d = SystemSignal(obj.nd);
             d.name = 'd';
-            d.userData.kind = 'd';
+            d.setKind('d');
             obj.addComponent('d', d);
 			obj.d.min = S.dl;
 			obj.d.max = S.du;
@@ -125,7 +125,7 @@ classdef MLDSystem < AbstractSystem
 			
 			z = SystemSignal(obj.nz);
             z.name = 'z';
-            z.userData.kind = 'z';
+            z.setKind('z');
             obj.addComponent('z', z);
 			obj.z.min = S.zl;
 			obj.z.max = S.zu;

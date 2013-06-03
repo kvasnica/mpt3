@@ -201,12 +201,12 @@ classdef PWASystem < AbstractSystem
 
             x = SystemSignal(obj.nx);
             x.name = 'x';
-            x.userData.kind = 'x';
+            x.setKind('x');
             obj.addComponent('x', x);
             
             u = SystemSignal(obj.nu);
             u.name = 'u';
-            u.userData.kind = 'u';
+            u.setKind('u');
             obj.addComponent('u', u);
 			if isfield(S, 'Uset')
 				% mark inputs as binary
@@ -216,7 +216,7 @@ classdef PWASystem < AbstractSystem
 
 			y = SystemSignal(obj.ny);
 			y.name = 'y';
-			y.userData.kind = 'y';
+			y.setKind('y')
 			obj.addComponent('y', y);
             
             % create additional binary selectors for the PWA dynamics
@@ -224,7 +224,7 @@ classdef PWASystem < AbstractSystem
 			d.addFilter('binary');
 			d.binary = true;
             d.name = 'd';
-            d.userData.kind = 'd';
+            d.setKind('d');
             obj.addComponent('d', d);
             
             if nargin==1
