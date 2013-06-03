@@ -44,11 +44,22 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 
 			obj.system.initialize(x0);
 			X = x0(:); U = []; Y = []; J = [];
-			%X = [x0(:) NaN(obj.system.nx, N_sim)];
-			%U = NaN(obj.system.nu, N_sim);
-			%Y = NaN(obj.system.ny, N_sim);
-			%J = Inf(1, N_sim);
 			for k = 1:N_sim
+
+				if k>1
+					% update u.previous and y.previous
+					u_position = find(cellfun(@(z) isequal(z, 'u.previous'), varargin));
+					if ~isempty(u_position)
+						varargin{u_position+1} = u;
+					end
+					y_position = find(cellfun(@(z) isequal(z, 'y.previous'), varargin));
+					if ~isempty(y_position)
+						varargin{y_position+1} = y;
+					end
+					% TODO: reject updating variables which are not
+					% simulated (e.g. "d", "z")
+				end
+				
 				[u, feasible, openloop] = obj.controller.evaluate(x0, varargin{:});
 				if ~feasible
 					warning('No control action found at step %d, aborting.', k);
