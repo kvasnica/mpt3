@@ -27,7 +27,8 @@ end
 % Get the parametric variables
 temp = [];
 for i = 1:length(th), temp = [temp;getvariables(th(i))]; end
-interfacedata.parametric_variables = find(ismember(recoverdata.used_variables,temp));
+% respect ordering of parametric variables!
+[~, interfacedata.parametric_variables] = ismember(temp, recoverdata.used_variables);
 
 % Get the optimization variables
 interfacedata.requested_variables = [];
