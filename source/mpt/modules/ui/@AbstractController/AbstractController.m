@@ -427,8 +427,6 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				value = varargin{i+1};
 				if ~ischar(key)
 					error('Each option must be a string.');
-				elseif ~isnumeric(value)
-					error('Each value must be a double vector.');
 				end
 				% replace dots by underscores, e.g. "x.ref" -> "x_ref"
 				key = strrep(key, '.', '_');
@@ -449,7 +447,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				end
 				value = options.(sane_name);
 				% validate dimensions
-				if ~isequal(size(value), format.dims{i})
+				if ~isnumeric(value) || ~isequal(size(value), format.dims{i})
 					error('"%s" must be a %dx%d vector.', format.names{i}, ...
 						format.dims{i}(1), format.dims{i}(2));
 				end
