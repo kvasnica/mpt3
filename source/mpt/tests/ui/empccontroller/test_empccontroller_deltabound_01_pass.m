@@ -25,12 +25,13 @@ if N==3
 else
 	Jgood = 178.942307695058;
 end
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% only deltaMin
 L.u.without('deltaMax');
 L.u.with('deltaMin');
 L.u.deltaMin = -0.5;
+ctrl = EMPCController(L, N);
 [~, feasible, openloop] = ctrl.evaluate(x0, 'u.previous', uprev);
 assert(feasible);
 du = diff([uprev, openloop.U]);
@@ -40,23 +41,24 @@ if N==3
 else
 	Jgood = 212.06250000004;
 end
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% deltaMax and deltaMin
 L.u.with('deltaMax');
 L.u.deltaMin = -2;
 L.u.deltaMax = 1.3;
+ctrl = EMPCController(L, N);
 [~, feasible, openloop] = ctrl.evaluate(x0, 'u.previous', uprev);
 assert(feasible);
 du = diff([uprev, openloop.U]);
 assert(min(du) >= ctrl.model.u.deltaMin-1e-6);
 assert(max(du) <= ctrl.model.u.deltaMax+1e-6);
 if N==3
-	Jgood = 236.046923148207
+	Jgood = 236.046923148207;
 else
 	Jgood = 186.490000013152;
 end
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% previous value out of bounds
 [~, feasible, openloop] = ctrl.evaluate(x0, 'u.previous', L.u.max*2);
