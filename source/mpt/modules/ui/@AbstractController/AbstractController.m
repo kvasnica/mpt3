@@ -196,7 +196,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			obj.xinitFormat.components = {};
 			obj.xinitFormat.dims = {};
 			for i = 1:length(init_vars)
-				xinit_variables = [xinit_variables; init_vars(i).var];
+				xinit_variables = [xinit_variables; init_vars(i).var(:)];
 				obj.xinitFormat.names{end+1} = init_vars(i).name;
 				obj.xinitFormat.components{end+1} = init_vars(i).component;
 				obj.xinitFormat.dims{end+1} = init_vars(i).dims;
