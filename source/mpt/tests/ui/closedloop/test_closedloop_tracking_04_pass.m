@@ -26,4 +26,16 @@ assert(abs(sum(d.cost) - Jgood) <= 1e-6);
 [~, msg] = run_in_caller('ctrl.simulate(x0, 30)');
 asserterrmsg(msg, 'Please provide initial value of "y.previous".');
 
+% now with 1-norm
+L.x.penalty = OneNormFunction(eye(2));
+L.u.penalty = OneNormFunction(1);
+ctrl = MPCController(L, 5);
+d = ctrl.simulate(x0, Nsim, 'y.previous', yprev);
+assert(length(d.U)==Nsim);
+dy = diff([yprev d.Y]);
+assert(max(dy) <= L.y.deltaMax+1e-6);
+assert(min(dy) >= L.y.deltaMin-1e-6);
+Jgood = 141.519981384277;
+assert(abs(sum(d.cost) - Jgood) <= 1e-6);
+
 end
