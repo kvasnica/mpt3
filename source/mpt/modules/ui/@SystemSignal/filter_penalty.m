@@ -32,28 +32,23 @@ else
 	M = obj.N;
 end
 
-reference = [];
+reference = zeros(obj.n, M);
 if obj.hasFilter('reference')
 	if isfield(obj.internal_properties, 'reference') && ...
 			obj.internal_properties.reference.free
-		% symbolic reference, we implicitly assume it's a vector
-		reference = repmat(obj.internal_properties.reference.var, 1, M);
+		% symbolic reference (vector or matrix)
+		reference = obj.internal_properties.reference.var;
 	elseif ~isempty(obj.reference)
-		% numerical reference, make sure we have enough of them to cover
-		% the whole prediction horizon
+		% numerical reference (vector or matrix)
 		reference = obj.reference;
-		if size(reference, 2)~=M
-			reference = [reference repmat(reference(:, end), 1, M-size(reference, 2))];
-		end
 	end
 end
 
 for k = 1:M
-	if ~isempty(reference)
-		value = obj.var(:, k) - reference(:, k);
-	else
-		value = obj.var(:, k);
-	end
+	% if "k" exceeds number of references, repeat with the last provided
+	% reference. If size(reference,2)>1, then we get trajectory preview.
+	k_ref = min(k, size(reference, 2));
+	value = obj.var(:, k) - reference(:, k_ref);
 	out = out + obj.penalty.feval(value);
 end
 
