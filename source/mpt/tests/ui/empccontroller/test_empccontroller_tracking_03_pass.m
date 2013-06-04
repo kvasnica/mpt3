@@ -35,6 +35,13 @@ assert(abs(u_on - ugood) <= 1e-8);
 explicit = online.toExplicit();
 assert(explicit.nr==13); % 31 without bounding the reference
 
+% make sure the ordering of parametric variables is correct (used to be a
+% bug in Opt/private/setYalmipData and in YALMIP itself)
+x0 = explicit.partition.Set(1).chebyCenter.x;
+% the third coordinate should be the input, which is bounded by +/- 1 (see
+% explicit.xinitFormat for ordering);
+assert((x0(3)<=1) && (x0(3)>=-1));
+
 % bogus settings must alert the user
 [~, msg] = run_in_caller('explicit.evaluate(x0)');
 asserterrmsg(msg, 'Please provide initial value of "u.reference".');
