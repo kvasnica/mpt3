@@ -288,6 +288,8 @@ classdef EMPCController < AbstractController
 			%  'N_sim': length of the closed-loop simulation (default: 100)
 			%  'x0': initial point, if provided, the method exits
 			%        immediately (default: [])
+			%  'model': model for the closed-loop simulation
+			%           (default is controller.model)
 			%  'alpha': transparency of the partition (default: 1)
 			%  'color': color of the closed-loop profiles (default: 'k')
 			%  'linewidth': width of the line (default: 2)
@@ -308,9 +310,13 @@ classdef EMPCController < AbstractController
 			ip.addParamValue('color', 'k');
 			ip.addParamValue('marker', '.');
 			ip.addParamValue('markersize', 20);
+			ip.addParamValue('model', obj.model);
 			ip.parse(varargin{:});
 			options = ip.Results;
 
+			% closed-loop system
+			loop = ClosedLoop(obj, options.model);
+			
 			% if we have free references or other variables which extend
 			% the vector of initial conditions, plot the section
 			if isstruct(obj.xinitFormat) && obj.xinitFormat.n_xinit>obj.nx
@@ -330,7 +336,7 @@ classdef EMPCController < AbstractController
 					x0 = options.x0;
 					button = 3;
 				end
-				data = obj.simulate(x0, options.N_sim, varargin{:});
+				data = loop.simulate(x0, options.N_sim, varargin{:});
 				plot(data.X(1, :), data.X(2, :), options.color, ...
 					'linewidth', options.linewidth, ...
 					'marker', options.marker, ...
