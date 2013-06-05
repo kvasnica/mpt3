@@ -5,20 +5,20 @@ classdef ComponentBehavior < MPTUIHandle
         function obj = ComponentBehavior()
             % Constructor
             
-            obj.internal_properties.component.type = '';
-            obj.internal_properties.component.map = containers.Map;
+            obj.Internal.component.type = '';
+            obj.Internal.component.map = containers.Map;
         end
         
         function out = getType(obj)
             % Returns component's type
             
-            out = obj.internal_properties.component.type;
+            out = obj.Internal.component.type;
         end
 
         function obj = setType(obj, t)
             % Sets component's type
             
-            obj.internal_properties.component.type = t;
+            obj.Internal.component.type = t;
         end
         
         
@@ -33,7 +33,7 @@ classdef ComponentBehavior < MPTUIHandle
             % name
             
             % check that the name is allowed
-            forbidden_names = {'internal_properties'};
+            forbidden_names = {'Internal'};
             if ~isempty(strmatch(name, forbidden_names, 'exact'))
                 error('Name "%s" is not allowed.', name);
             end
@@ -42,14 +42,14 @@ classdef ComponentBehavior < MPTUIHandle
             if ~isempty(strmatch(name, props, 'exact'))
                 % update existing property
                 obj.(name)(end+1) = data;
-				m = obj.internal_properties.component.map(name);
+				m = obj.Internal.component.map(name);
 				m{end+1} = data;
-				obj.internal_properties.component.map(name) = m;
+				obj.Internal.component.map(name) = m;
             else
                 % create a new dynamic property
                 addprop(obj, name);
                 obj.(name) = data;
-				obj.internal_properties.component.map(name) = {data};
+				obj.Internal.component.map(name) = {data};
 			end
         end
         
@@ -63,7 +63,7 @@ classdef ComponentBehavior < MPTUIHandle
             if nargin<2
                 kind = 'all';
 			end
-			map = obj.internal_properties.component.map;
+			map = obj.Internal.component.map;
 			keys = map.keys;
             for i = 1:length(keys)
 				components = map(keys{i});
@@ -123,9 +123,9 @@ classdef ComponentBehavior < MPTUIHandle
 		function new = copyComponentsFrom(new, obj)
 			% copies components of 'obj' to 'new'
 			
-			new.internal_properties.component.type = '';
-			new.internal_properties.component.map = containers.Map;
-			map = obj.internal_properties.component.map;
+			new.Internal.component.type = '';
+			new.Internal.component.map = containers.Map;
+			map = obj.Internal.component.map;
 			keys = map.keys;
 			for i = 1:length(keys)
 				c = map(keys{i});
@@ -137,14 +137,14 @@ classdef ComponentBehavior < MPTUIHandle
 
 		function obj = saveAllComponents(obj)
 			% saves arguments of all components to
-			% obj.internal_properties.save.components
+			% obj.Internal.save.components
 			
-			components = obj.internal_properties.component.map.keys();
+			components = obj.Internal.component.map.keys();
 			arguments = [];
 			for i = 1:length(components)
-				arguments.(components{i}) = obj.internal_properties.component.map(components{i});
+				arguments.(components{i}) = obj.Internal.component.map(components{i});
 			end
-			obj.internal_properties.save.components = arguments;
+			obj.Internal.save.components = arguments;
 			% TODO: should we remove all components before saving,
 			% similarly to how we remove filters in
 			% FilterBehavior/saveAllFilters() ??
@@ -152,16 +152,16 @@ classdef ComponentBehavior < MPTUIHandle
 		
 		function obj = loadSavedComponents(obj)
 			% re-initializes components using arguments stored in
-			% obj.internal_properties.save.filters
+			% obj.Internal.save.filters
 			
-			if isfield(obj.internal_properties, 'save') && ...
-					isfield(obj.internal_properties.save, 'components') & ...
-					isstruct(obj.internal_properties.save.components)
-				arguments = obj.internal_properties.save.components;
+			if isfield(obj.Internal, 'save') && ...
+					isfield(obj.Internal.save, 'components') & ...
+					isstruct(obj.Internal.save.components)
+				arguments = obj.Internal.save.components;
 				components = fieldnames(arguments);
 				% clear components
-				obj.internal_properties.component.type = '';
-				obj.internal_properties.component.map = containers.Map;
+				obj.Internal.component.type = '';
+				obj.Internal.component.map = containers.Map;
 				for i = 1:length(components)
 					c = arguments.(components{i});
 					for j = 1:length(c)

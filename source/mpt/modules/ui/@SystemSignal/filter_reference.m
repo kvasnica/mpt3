@@ -23,8 +23,8 @@ function out = on_variables(obj, varargin)
 %  .var: sdpvar representation of the introduced variable
 %  .parametric: logical, if true, the variable will become part of the
 %              vector of initial conditions
-if obj.internal_properties.reference.free
-	out.var = obj.internal_properties.reference.var;
+if obj.Internal.reference.free
+	out.var = obj.Internal.reference.var;
 	out.parametric = true;
 else
 	out = [];
@@ -37,11 +37,11 @@ function out = on_constraints(obj, varargin)
 % called when constructing constraints
 
 out = [];
-if obj.internal_properties.reference.free
+if obj.Internal.reference.free
 	% bound symbolic references using signal's min/max values
 	%
 	% do not include +/-Inf bounds
-	v = obj.internal_properties.reference.var;
+	v = obj.Internal.reference.var;
 	for i = 1:length(v)
 		if ~isinf(obj.min(i))
 			out = out + [ obj.min(i) <= v(i) ];
@@ -58,8 +58,8 @@ end
 function out = on_instantiate(obj, varargin)
 % called after the object was instantiated
 
-if obj.internal_properties.reference.free
-	obj.internal_properties.reference.var = sdpvar(obj.n, 1);
+if obj.Internal.reference.free
+	obj.Internal.reference.var = sdpvar(obj.n, 1);
 end
 out = [];
 
@@ -69,7 +69,7 @@ end
 function out = on_uninstantiate(obj, varargin)
 % called when the YALMIP representation of variables is removed
 
-obj.internal_properties.reference.var = [];
+obj.Internal.reference.var = [];
 out = [];
 
 end
@@ -83,14 +83,14 @@ if isa(value, 'double')
 	if ~isempty(value) && (size(value, 1) ~= obj.n)
 		error('The refence must have %d rows.', obj.n);
 	end
-	obj.internal_properties.reference.free = false;
+	obj.Internal.reference.free = false;
 	
 elseif isa(value, 'char')
 	value = lower(value);
 	if ~isequal(value, 'free')
 		error('The value of reference must be ''free''.');
 	end
-	obj.internal_properties.reference.free = true;
+	obj.Internal.reference.free = true;
 	
 else
 	error('Value of "reference" must be either a double or a string.');

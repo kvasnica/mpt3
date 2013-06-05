@@ -58,7 +58,7 @@ end
 
 if ~obj.isKind('x')
 	% non-state signals require a symbolic previous value
-	previous = obj.internal_properties.previous.var;
+	previous = obj.Internal.previous.var;
 	% penalization of the first step
 	out = out + obj.deltaPenalty.feval(obj.var(:, 1)-previous);
 	% now penalize remaining steps

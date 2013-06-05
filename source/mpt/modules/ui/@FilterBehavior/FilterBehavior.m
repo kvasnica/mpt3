@@ -7,7 +7,7 @@ classdef FilterBehavior < MPTUIHandle
     methods
         function obj = FilterBehavior()
             % Constructor
-			obj.internal_properties.filter_map = containers.Map;
+			obj.Internal.filter_map = containers.Map;
 		end
 
 		function obj = with(obj, filter)
@@ -35,7 +35,7 @@ classdef FilterBehavior < MPTUIHandle
 			ip.parse(varargin{:});
 			options = ip.Results;
 
-			keys = obj.internal_properties.filter_map.keys;
+			keys = obj.Internal.filter_map.keys;
 			
 			if ~isempty(options.actsOn)
 				keep = false(1, length(keys));
@@ -82,7 +82,7 @@ classdef FilterBehavior < MPTUIHandle
 			
 			% TODO: return a logical array if 'name' is a cell array
 
-			out = any(obj.internal_properties.filter_map.isKey(name));
+			out = any(obj.Internal.filter_map.isKey(name));
 			if ~out && ~isempty(varargin)
 				% Should we dive recursively? Note that parsing inputs
 				% before determining the status of "out" would be an
@@ -118,9 +118,9 @@ classdef FilterBehavior < MPTUIHandle
 			if ~iscell(names), names = {names}; end
 			for i = 1:length(names)
 				if obj.hasFilter(names{i})
-					f = obj.internal_properties.filter_map(names{i});
+					f = obj.Internal.filter_map(names{i});
 					f.active = false;
-					obj.internal_properties.filter_map(names{i}) = f;
+					obj.Internal.filter_map(names{i}) = f;
 				end
 			end
 		end
@@ -133,9 +133,9 @@ classdef FilterBehavior < MPTUIHandle
 			if ~iscell(names), names = {names}; end
 			for i = 1:length(names)
 				if obj.hasFilter(names{i})
-					f = obj.internal_properties.filter_map(names{i});
+					f = obj.Internal.filter_map(names{i});
 					f.active = true;
-					obj.internal_properties.filter_map(names{i}) = f;
+					obj.Internal.filter_map(names{i}) = f;
 				end
 			end
 		end
@@ -143,7 +143,7 @@ classdef FilterBehavior < MPTUIHandle
 		function out = isFilterEnabled(obj, name)
 			% Returns activity status of the filter
 
-			out = obj.hasFilter(name) && obj.internal_properties.filter_map(name).active;
+			out = obj.hasFilter(name) && obj.Internal.filter_map(name).active;
 		end
 		
 		function out = applyFilters(obj, from, concat_type)
@@ -253,7 +253,7 @@ classdef FilterBehavior < MPTUIHandle
 			f.handle = H;
 			f.setup = setup;
 			f.active = true;
-			obj.internal_properties.filter_map(filter) = f;
+			obj.Internal.filter_map(filter) = f;
 			
 			try
 				% immediately execute the filter if needed
@@ -282,8 +282,8 @@ classdef FilterBehavior < MPTUIHandle
 				% remove this filter
 				
 				obj.callFilterFrom(filter, 'removeFilter');
-				delete(obj.internal_properties.filter_map(filter).handle);
-				obj.internal_properties.filter_map.remove(filter);
+				delete(obj.Internal.filter_map(filter).handle);
+				obj.Internal.filter_map.remove(filter);
 			end
 		end
 
@@ -291,12 +291,12 @@ classdef FilterBehavior < MPTUIHandle
 			% removes all filters from 'new' and replaces them by filters
 			% defined for 'obj'
 			
-			new.internal_properties.filter_map = containers.Map;
-			filters = obj.internal_properties.filter_map.keys;
+			new.Internal.filter_map = containers.Map;
+			filters = obj.Internal.filter_map.keys;
 			% TODO: add filters in the order in which they were added
 			for i = 1:length(filters)
 				% do not copy transient filters
-				filter = obj.internal_properties.filter_map(filters{i});
+				filter = obj.Internal.filter_map(filters{i});
 				if filter.setup.transient
 					% do not copy transient filters
 					continue
@@ -309,38 +309,38 @@ classdef FilterBehavior < MPTUIHandle
 		
 		function obj = saveAllFilters(obj)
 			% saves arguments of all filters to
-			% obj.internal_properties.save.filters
+			% obj.Internal.save.filters
 			
 			% store arguments of filters
-			filters = obj.internal_properties.filter_map.keys;
+			filters = obj.Internal.filter_map.keys;
 			arguments = [];
 			for i = 1:length(filters)
-				filter = obj.internal_properties.filter_map(filters{i});
+				filter = obj.Internal.filter_map(filters{i});
 				if filter.setup.transient
 					% do not save transient filters
 					continue
 				end
 				arguments.(filters{i}) = obj.(filters{i});
 			end
-			obj.internal_properties.save.filters = arguments;
+			obj.Internal.save.filters = arguments;
 			% remove all filters from the object before saving (note that
 			% we need to work with a copy of the object in saveobj).
 			% removing filters is necessary, or otherwise "clear classes"
 			% would no longer work correctly after subsequent load.
-			obj.removeFilter(obj.internal_properties.filter_map.keys);
+			obj.removeFilter(obj.Internal.filter_map.keys);
 		end
 		
 		function obj = loadSavedFilters(obj)
 			% re-initializes filters using arguments stored in
-			% obj.internal_properties.save.filters
+			% obj.Internal.save.filters
 
-			if isfield(obj.internal_properties, 'save') && ...
-					isfield(obj.internal_properties.save, 'filters') && ...
-					isstruct(obj.internal_properties.save.filters)
-				arguments = obj.internal_properties.save.filters;
+			if isfield(obj.Internal, 'save') && ...
+					isfield(obj.Internal.save, 'filters') && ...
+					isstruct(obj.Internal.save.filters)
+				arguments = obj.Internal.save.filters;
 				filters = fieldnames(arguments);
 				% clear filters
-				obj.internal_properties.filter_map = containers.Map;
+				obj.Internal.filter_map = containers.Map;
 				% now add the filters back and re-assign arguments
 				%
 				% TODO: we should respect the order in which filters were added
@@ -357,7 +357,7 @@ classdef FilterBehavior < MPTUIHandle
 		function out = callFilterFrom(obj, name, from, varargin)
 			% Executes a given filter
 
-			filters = obj.internal_properties.filter_map;
+			filters = obj.Internal.filter_map;
 			if filters(name).active && ...
 					filters(name).setup.actsOn(from)
 				setup = filters(name).setup;
@@ -381,7 +381,7 @@ classdef FilterBehavior < MPTUIHandle
 			% Returns setup of a given filter
 			
 			if obj.hasFilter(name)
-				f = obj.internal_properties.filter_map(name);
+				f = obj.Internal.filter_map(name);
 				out = f.setup;
 			else
 				out = [];

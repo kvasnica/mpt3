@@ -35,7 +35,7 @@ function out = on_variables(obj, varargin)
 %  .var: sdpvar representation of the introduced variable
 %  .parametric: logical, if true, the variable will become part of the
 %              vector of initial conditions
-out.var = obj.internal_properties.soft_max;
+out.var = obj.Internal.soft_max;
 out.parametric = false;
 
 end
@@ -45,7 +45,7 @@ function out = on_instantiate(obj, varargin)
 % called after the object was instantiated
 
 % soft constraint require introducing new variables
-obj.internal_properties.soft_max = sdpvar(obj.n, obj.N);
+obj.Internal.soft_max = sdpvar(obj.n, obj.N);
 out = [];
 
 end
@@ -55,7 +55,7 @@ function out = on_uninstantiate(obj, varargin)
 % called when the YALMIP representation of variables is removed
 
 % soft constraint require introducing new variables
-obj.internal_properties.soft_max = [];
+obj.Internal.soft_max = [];
 out = [];
 
 end
@@ -64,7 +64,7 @@ end
 function out = on_constraints(obj, varargin)
 % called when creating constraints
 
-s = obj.internal_properties.soft_max;
+s = obj.Internal.soft_max;
 out = [];
 for i = 1:obj.n
 	out = out + [ obj.var(i, :) <= obj.max(i, :) + s(i, :) ];
@@ -77,7 +77,7 @@ end
 function out = on_objective(obj, varargin)
 % called when creating the objective function
 
-s = obj.internal_properties.soft_max;
+s = obj.Internal.soft_max;
 out = 0;
 for k = 1:obj.N
 	out = out + obj.softMax.penalty.feval(s(:, k));

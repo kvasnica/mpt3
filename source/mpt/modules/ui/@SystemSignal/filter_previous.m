@@ -25,8 +25,8 @@ function out = on_variables(obj, varargin)
 %  .parametric: logical, if true, the variable will become part of the
 %               vector of initial conditions
 
-if isa(obj.internal_properties.previous.var, 'sdpvar')
-	out.var = obj.internal_properties.previous.var;
+if isa(obj.Internal.previous.var, 'sdpvar')
+	out.var = obj.Internal.previous.var;
 	out.parametric = true;
 else
 	out = [];
@@ -39,11 +39,11 @@ function out = on_constraints(obj, varargin)
 % called when constructing constraints
 
 out = [];
-if isa(obj.internal_properties.previous.var, 'sdpvar')
+if isa(obj.Internal.previous.var, 'sdpvar')
 	% bound symbolic variables using signal's min/max values
 	%
 	% do not include +/-Inf bounds
-	v = obj.internal_properties.previous.var;
+	v = obj.Internal.previous.var;
 	for i = 1:length(v)
 		if ~isinf(obj.min(i))
 			out = out + [ obj.min(i) <= v(i) ];
@@ -62,10 +62,10 @@ function out = on_instantiate(obj, varargin)
 
 if obj.isKind('x')
 	% state signals already have the initial value in obj.var(:, 1)
-	obj.internal_properties.previous.var = [];
+	obj.Internal.previous.var = [];
 else
 	% create new variable for other signals
-	obj.internal_properties.previous.var = sdpvar(obj.n, 1);
+	obj.Internal.previous.var = sdpvar(obj.n, 1);
 end
 out = [];
 
@@ -75,8 +75,8 @@ end
 function out = on_uninstantiate(obj, varargin)
 % called when the YALMIP representation of variables is removed
 
-if isa(obj.internal_properties.previous.var, 'sdpvar')
-	obj.internal_properties.previous.var = [];
+if isa(obj.Internal.previous.var, 'sdpvar')
+	obj.Internal.previous.var = [];
 end
 out = [];
 

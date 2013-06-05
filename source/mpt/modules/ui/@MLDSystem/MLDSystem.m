@@ -157,7 +157,7 @@ classdef MLDSystem < AbstractSystem
             S = obj.S;
 
             % add the MLD constraints
-            for k = 1:obj.internal_properties.system.N
+            for k = 1:obj.Internal.system.N
                 if ~isempty(x)
                     C = C + [ x(:, k+1) == S.A*x(:, k) + S.B1*u(:, k) + ...
                         S.B2*d(:, k) + S.B3*z(:, k) + S.B5 ];

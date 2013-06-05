@@ -32,8 +32,8 @@ function out = on_constraints(obj, varargin)
 out = [];
 if ~obj.isKind('x')
 	% non-state signals have the previous value in
-	% obj.internal_properties.previous.var
-	previous = obj.internal_properties.previous.var;
+	% obj.Internal.previous.var
+	previous = obj.Internal.previous.var;
 
 	% constraints
 	delta = obj.var(:, 1)-previous;

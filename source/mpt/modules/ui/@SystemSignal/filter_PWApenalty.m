@@ -50,7 +50,7 @@ function out = on_variables(obj, varargin)
 %              vector of initial conditions
 
 % return the variable which represents epigraphs of convex functions
-out.var = obj.internal_properties.PWApenalty_epigraph;
+out.var = obj.Internal.PWApenalty_epigraph;
 out.parametric = false;
 
 end
@@ -63,7 +63,7 @@ function out = on_instantiate(obj, varargin)
 local_validate(obj);
 
 % PWA penalties are modeled using an additional epigraph variable
-obj.internal_properties.PWApenalty_epigraph = sdpvar(1, 1);
+obj.Internal.PWApenalty_epigraph = sdpvar(1, 1);
 out = [];
 
 end
@@ -73,7 +73,7 @@ function out = on_uninstantiate(obj, varargin)
 % called when the YALMIP representation of variables is removed
 
 % clear the internal variable
-obj.internal_properties.PWApenalty_epigraph = [];
+obj.Internal.PWApenalty_epigraph = [];
 out = [];
 
 end
@@ -86,7 +86,7 @@ if ~obj.PWApenalty.isconvex
 	error('Only convex PWA penalties are supported.');
 end
 
-e = obj.internal_properties.PWApenalty_epigraph;
+e = obj.Internal.PWApenalty_epigraph;
 k = obj.PWApenalty.step;
 out = [];
 % create the epigraph
@@ -107,7 +107,7 @@ function out = on_objective(obj, varargin)
 % called when creating the objective function
 
 % just minimize the epigraph variable
-out = obj.internal_properties.PWApenalty_epigraph;
+out = obj.Internal.PWApenalty_epigraph;
         
 end
 

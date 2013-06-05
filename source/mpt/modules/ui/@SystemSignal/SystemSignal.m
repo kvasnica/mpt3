@@ -25,7 +25,7 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
 
             if nargin == 0
                 return
-            end
+			end
             
             obj.n = n;
             obj.N = 1;
@@ -271,20 +271,20 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
 		
 		function obj = saveSdpvarValue(obj)
 			% saves the current value of the sdpvar to
-			% obj.internal_properties.save.value
+			% obj.Internal.save.value
 
 			if isa(obj.var, 'sdpvar')
-				obj.internal_properties.save.value = double(obj.var);
+				obj.Internal.save.value = double(obj.var);
 			end
 		end
 
 		function obj = loadSdpvarValue(obj)
 			% loads value of an sdpvar stored in
-			% obj.internal_properties.save.value
+			% obj.Internal.save.value
 
-			if isfield(obj.internal_properties, 'save') && ...
-					isfield(obj.internal_properties.save, 'value')
-				value = obj.internal_properties.save.value;
+			if isfield(obj.Internal, 'save') && ...
+					isfield(obj.Internal.save, 'value')
+				value = obj.Internal.save.value;
 				if ~isa(obj.var, 'sdpvar')
 					% re-instantiate first
 					obj.var = sdpvar(size(value, 1), size(value, 2), 'full');

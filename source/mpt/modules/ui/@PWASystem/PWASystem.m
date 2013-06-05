@@ -400,7 +400,7 @@ classdef PWASystem < AbstractSystem
             u = obj.u.var;
             y = obj.y.var;
             d = obj.d.var;
-            for k = 1:obj.internal_properties.system.N
+            for k = 1:obj.Internal.system.N
                 if obj.nx > 0
                     for dyn = 1:obj.ndyn
                         C = C + [ implies(d(dyn, k), ...

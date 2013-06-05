@@ -54,8 +54,8 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 		function obj = AbstractSystem()
 			% Constructor
 			
-			obj.internal_properties.system.instantiated = false;
-			obj.internal_properties.system.N = [];
+			obj.Internal.system.instantiated = false;
+			obj.Internal.system.N = [];
 		end
 		
 		function display(obj)
@@ -414,10 +414,10 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			end
 			
 			% only instantiate the system afterwards
-			obj.internal_properties.system.N = N;
+			obj.Internal.system.N = N;
 			obj.applyFilters('instantiate');
 
-			obj.internal_properties.system.instantiated = true;
+			obj.Internal.system.instantiated = true;
 		end
 		
 		function obj = uninstantiate(obj)
@@ -425,7 +425,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			% Removes the YALMIP's representation of signals
 			%
 			
-			obj.internal_properties.system.N = [];
+			obj.Internal.system.N = [];
 			obj.applyFilters('uninstantiate');
 		
 			vars = properties(obj);
@@ -437,13 +437,13 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 					end
 				end
 			end
-			obj.internal_properties.system.instantiated = false;
+			obj.Internal.system.instantiated = false;
 		end
 		
 		function out = isInstantiated(obj)
 			% Returns true if all variables have been instantiated
 			
-			out = obj.internal_properties.system.instantiated;
+			out = obj.Internal.system.instantiated;
 			
 		end
 		
@@ -453,7 +453,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			% Plots values of object's signals over the prediction horizon
 			%
 			
-			T = 0:obj.internal_properties.system.N-1;
+			T = 0:obj.Internal.system.N-1;
 			D = []; L = {};
 			styles = { 'r-', 'g--', 'b-.', 'm:', 'c-' };
 			styles = { styles{:} styles{:} styles{:} styles{:} };
@@ -465,7 +465,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 				if ~ismethod(var, 'plot'), continue, end
 				for j = 1:length(var)
 					d = obj.(vars{i})(j).value;
-					stairs(T, d(:, 1:obj.internal_properties.system.N)', ...
+					stairs(T, d(:, 1:obj.Internal.system.N)', ...
 						styles{idx}, 'LineWidth', 2);
 					hold('on');
 					if length(var) > 1
@@ -502,7 +502,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 	methods(Access = protected)
 		
 		function assert_is_instantiated(obj)
-			if ~obj.internal_properties.system.instantiated
+			if ~obj.Internal.system.instantiated
 				error('Call obj.instantiate(N) first.');
 			end
 		end

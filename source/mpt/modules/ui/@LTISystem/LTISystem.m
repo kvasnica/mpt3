@@ -456,7 +456,7 @@ classdef LTISystem < AbstractSystem
 			x = obj.x.var;
 			u = obj.u.var;
 			y = obj.y.var;
-			for k = 1:obj.internal_properties.system.N
+			for k = 1:obj.Internal.system.N
 				if obj.nx > 0
 					C = C + [ x(:, k+1) == obj.A*x(:, k) + obj.B*u(:, k) + obj.f];
 				end

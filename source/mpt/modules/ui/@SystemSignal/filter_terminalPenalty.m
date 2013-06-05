@@ -30,10 +30,10 @@ reference = zeros(obj.n, 1);
 
 if obj.hasFilter('reference')
 	% reference can either be free (sdpvar) or fixed (last column)
-	if isfield(obj.internal_properties, 'reference') && ...
-			obj.internal_properties.reference.free
+	if isfield(obj.Internal, 'reference') && ...
+			obj.Internal.reference.free
 		% symbolic reference, we implicitly assume it's a vector
-		reference = obj.internal_properties.reference.var;
+		reference = obj.Internal.reference.var;
 	elseif ~isempty(obj.reference)
 		% fixed reference
 		reference = obj.reference(:, end);

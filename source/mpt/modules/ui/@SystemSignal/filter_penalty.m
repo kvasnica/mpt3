@@ -34,10 +34,10 @@ end
 
 reference = zeros(obj.n, M);
 if obj.hasFilter('reference')
-	if isfield(obj.internal_properties, 'reference') && ...
-			obj.internal_properties.reference.free
+	if isfield(obj.Internal, 'reference') && ...
+			obj.Internal.reference.free
 		% symbolic reference (vector or matrix)
-		reference = obj.internal_properties.reference.var;
+		reference = obj.Internal.reference.var;
 	elseif ~isempty(obj.reference)
 		% numerical reference (vector or matrix)
 		reference = obj.reference;
