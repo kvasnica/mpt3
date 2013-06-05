@@ -307,7 +307,12 @@ classdef polytope
 			else
 				arg2 = arg;
 			end
-			P = polytope(obj.P + arg2);
+			if isa(obj, 'polytope')
+				arg1 = obj.P;
+			else
+				arg1 = obj;
+			end
+			P = polytope(arg1 + arg2);
 		end
 		
 		function P = minus(obj, arg, varargin)
