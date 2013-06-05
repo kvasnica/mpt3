@@ -36,6 +36,11 @@ function PpS = plus(P,S)
 %   PpS - Minkowski sum of P and S
 %
 
+if isnumeric(P) && isa(S, 'Polyhedron')
+	% v+P
+	PpS = plus(S, P);
+	return
+end
 
 % deal with arrays
 if numel(P)>1
