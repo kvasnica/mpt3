@@ -1,4 +1,4 @@
-classdef Union < handle & IterableBehavior
+classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
   %%
   % ConvexSet
   %
@@ -66,58 +66,6 @@ classdef Union < handle & IterableBehavior
           obj.Data = p.Data;
 	  end
 	 
-	  function U = copy(obj)
-		  % Creates a copy of the union
-		  %
-		  %   copy = U.copy()
-		  
-		  % Note: we implicitly assume that each element of the union is an
-		  % instance of a class that supports the copy() method.
-		  
-		  % deal with arrays
-		  if numel(obj)>1
-			  U = obj.forEach(@(elem) elem.copy());
-			  return
-		  end
-
-		  % since we don't know which union class we are copying, we
-		  % need to dynamcially call the correct constructor
-		  constructor = str2func(class(obj));
-
-		  if iscell(obj.Set)
-			  % per-element copying
-			  U = constructor();
-			  U.Set = cell(size(obj.Set));
-			  for i = 1:numel(obj.Set)
-				  U.Set{i} = obj.Set{i}.copy();
-			  end
-		  else
-			  % resort to Polyhedron/copy or YSet/copy
-			  U = constructor(copy(obj.Set));
-		  end
-		  
-		  % now make a deep copy of the Internal and Data properties
-		  %
-		  % copy them field by field, otherwise they will refer to the same
-		  % data 
-		  if isstruct(obj.Internal)
-			  nf = fieldnames(obj.Internal);
-			  for i=1:numel(nf)
-				  U.Internal.(nf{i}) = obj.Internal.(nf{i});
-			  end
-		  else
-			  U.Internal = obj.Internal;
-		  end
-		  if isstruct(obj.Data)
-			  nd = fieldnames(obj.Data);
-			  for i=1:numel(nd)
-				  U.Data.(nd{i}) = obj.Data.(nd{i});
-			  end
-		  else
-			  U.Data = obj.Data;
-		  end
-	  end
-	  
 	  function obj = addFunction(obj, fun, FuncName)
 		  % adds a function to each member of the union
 		  
@@ -342,6 +290,30 @@ classdef Union < handle & IterableBehavior
   
   methods (Access=protected)
 	  % internal APIs
+
+	  function U = copyElement(obj)
+		  % Creates a copy of the union
+		  %
+		  %   copy = U.copy()
+
+		  % Note: matlab.mixin.Copyable.copy() automatically properly
+		  % copies arrays and empty arrays, no need to do it here.
+		  % Moreover, it automatically creates the copy of proper class.
+		  U = copyElement@matlab.mixin.Copyable(obj);
+
+		  % deep copy of obj.Set
+		  if iscell(obj.Set)
+			  % per-element copying
+			  U.Set = cell(size(obj.Set));
+			  for i = 1:numel(obj.Set)
+				  U.Set{i} = obj.Set{i}.copy();
+			  end
+		  else
+			  % resort to ConvexSet/copy
+			  U.Set = obj.Set.copy();
+		  end
+		  
+	  end
 	  
 	  function displayFunctions(obj)
 		  % displays attached functions (to be used from a disp() method)

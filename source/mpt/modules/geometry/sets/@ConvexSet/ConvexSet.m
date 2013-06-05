@@ -1,4 +1,4 @@
-classdef ConvexSet < ConvexSetInterface & IterableBehavior
+classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyable
   %%
   % ConvexSet
   %
@@ -210,6 +210,22 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior
 	  % function prototypes
 	  h = fplot_internal(obj, function_name, options)
 
+	  function new = copyElement(obj)
+		  % Create a copy of an object
+
+		  % shallow copy of obj.Internal and obj.Data
+		  new = copyElement@matlab.mixin.Copyable(obj);
+		  
+		  % deep copy of obj.Functions
+		  keys = obj.Functions.keys;
+		  if isempty(keys)
+			  new.Functions = containers.Map;
+		  else
+			  new.Functions = containers.Map(keys, obj.Functions.values);
+		  end
+		  		  
+	  end
+	  
 	  function displayFunctions(obj)
 		  % displays attached functions (to be used from a disp() method)
 		  
