@@ -36,10 +36,14 @@ function PpS = plus(P,S)
 %   PpS - Minkowski sum of P and S
 %
 
-if isnumeric(P) && isa(S, 'Polyhedron')
-	% v+P
-	PpS = plus(S, P);
-	return
+if ~isa(P, 'Polyhedron')
+	% v+P (issue #59)
+	
+	% note that "S" is for sure a Polyhedron object, or otherwise this
+	% method would not even be called by matlab
+	Sold = S;
+	S = P;
+	P = Sold;
 end
 
 % deal with arrays
