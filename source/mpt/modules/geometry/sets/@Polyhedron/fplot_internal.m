@@ -11,10 +11,11 @@ h = [];
 
 % if the Polyhedon consist of just one point change the default marker to "."
 if size(obj.He,1)>=obj.Dim
-	marker = '.';
+	options.marker = '.';
 else
-	marker = 'none';
+	options.marker = 'none';
 end
+options.markerSize = 6;
 
 % get color as RGB vector
 if ischar(options.color) || isempty(options.color)
@@ -35,7 +36,7 @@ if obj.Dim<2
 	hl = line(x, y, 'Color', options.color, ...
 		'LineStyle', options.linestyle, ...
 		'LineWidth', options.linewidth, ...
-		'Marker', marker);
+		'Marker', options.marker);
 	h = [h; hl(:)];
 	
 else
@@ -63,7 +64,7 @@ else
 			'FaceLighting', 'phong',...
 			'AmbientStrength', 0.7,...
 			'FaceColor', options.color,...
-			'Marker', marker);
+			'Marker', options.marker);
 		h = [h; hp(:)];
 		
 	else
@@ -101,7 +102,7 @@ else
 					'facealpha', options.alpha,...
 					'facelighting', 'phong',...
 					'AmbientStrength', 0.7,...
-					'Marker', marker);
+					'Marker', options.marker);
 			else
 				hs = surf(X,Y,V,'facecolor', options.color,...
 					'linestyle', options.linestyle, ...
@@ -109,7 +110,7 @@ else
 					'facealpha', options.alpha,...
 					'facelighting', 'phong',...
 					'AmbientStrength', 0.7,...
-					'Marker', marker);
+					'Marker', options.marker);
 			end
 		end
 		h = [h; hs(:)];
@@ -129,7 +130,7 @@ end
 
 % plot the polyhedron if required
 if options.show_set
-	hv = obj.plot(options);
+	hv = obj.plot_internal(options);
 	h = [h; hv(:)];
 end
 

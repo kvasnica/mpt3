@@ -205,10 +205,20 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
       end
   end
   
+  methods (Sealed)
+	  
+	  % plotting dispatchers (actual plotting is done by plot_internal and
+	  % fplot_internal)
+	  h = fplot(obj, varargin)
+	  h = plot(varargin)
+	  
+  end
+  
   methods (Access=protected)
 
-	  % function prototypes
+	  % function prototypes (plotting methods must remain protected)
 	  h = fplot_internal(obj, function_name, options)
+	  h = plot_internal(obj, options)
 
 	  function new = copyElement(obj)
 		  % Create a copy of an object
