@@ -291,6 +291,9 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
   methods (Access=protected)
 	  % internal APIs
 
+	  % function prototypes (plotting methods must remain protected)
+	  h = plot_internal(obj, idx, varargin)
+
 	  function U = copyElement(obj)
 		  % Creates a copy of the union
 		  %
@@ -347,6 +350,13 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  end
 	  end
 
+  end
+
+  methods (Sealed)
+	  
+	  % plotting dispatchers (actual plotting is done by plot_internal)
+	  h = plot(varargin)
+	  
   end
 
   methods      

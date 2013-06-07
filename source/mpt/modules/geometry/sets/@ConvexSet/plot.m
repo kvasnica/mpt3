@@ -101,6 +101,9 @@ ip.addParamValue('colormap', 'mpt', @(x) (isnumeric(x) && size(x, 2)==3) || isch
 ip.addParamValue('colororder', 'fixed', @(x) isequal(x, 'fixed') || isequal(x, 'random'));
 ip.addParamValue('grid', 40, @isnumeric);
 
+% internal: array_index denotes index of the element to plot
+ip.addParamValue('array_index', 1, @isnumeric);
+
 dim3plot = false;
 for i = 1:numel(objects)
 	if any([objects{i}.Dim]>3)
@@ -130,7 +133,6 @@ hold('on');
 % plot each element of each object
 tic
 h = [];
-array_index = 1;
 for i=1:numel(objects)
 	if toc > MPTOPTIONS.report_period,
 		% refresh the plot every 2 seconds
@@ -139,9 +141,8 @@ for i=1:numel(objects)
 	end
 	for j = 1:numel(objects{i})
 		% index of the element in this array
-		options_struct{i}.array_index = array_index;
-		array_index = array_index + 1;
 		hij = plot_internal(objects{i}(j), options_struct{i});
+		options_struct{i}.array_index = options_struct{i}.array_index + 1;
 		h = [h; hij];
 	end
 end
