@@ -34,6 +34,9 @@ global MPTOPTIONS
 %     string, default='fixed'
 %  'grid': density of the grid (only used when plotting YSets)
 %     numeric, default=40
+%  'showindex': if true, displays index of the plotted element (only for
+%               bounded polyhedra in 2D)
+%     logical, default=false
 
 % Implementation:
 % ---------------
@@ -100,6 +103,7 @@ ip.addParamValue('markerSize', 6, @isnumeric);
 ip.addParamValue('colormap', 'mpt', @(x) (isnumeric(x) && size(x, 2)==3) || ischar(x)); 
 ip.addParamValue('colororder', 'fixed', @(x) isequal(x, 'fixed') || isequal(x, 'random'));
 ip.addParamValue('grid', 40, @isnumeric);
+ip.addParamValue('showindex', false, @islogical);
 
 % internal: array_index denotes index of the element to plot
 ip.addParamValue('array_index', 1, @isnumeric);
