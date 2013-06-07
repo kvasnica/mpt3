@@ -60,7 +60,7 @@ else
 			'LineStyle', options.linestyle, ...
 			'LineWidth', options.linewidth, ...
 			'FaceAlpha', options.alpha,...
-			'EdgeColor', [0 0 0],...
+			'EdgeColor', options.edgecolor,...
 			'FaceLighting', 'phong',...
 			'AmbientStrength', 0.7,...
 			'FaceColor', options.color,...
@@ -70,15 +70,6 @@ else
 	else
 		[X,Y] = obj.meshGrid(options.grid);
 		
-		% Sample the function at the X,Y points
-		%             if obj.Func{i}.canVectorize
-		%                 q = [X(:) Y(:)];
-		%                 I = ~any(isnan(q),2);
-		%                 v = obj.Func{i}.feval(q(I,:));
-		%                 V = NaN*X(:);
-		%                 V(I,:) = v(pos2);
-		%                 V = reshape(V,size(X,1),size(X,2));
-		%             else
 		V = NaN*X;
 		for j = 1:size(X,1)
 			for k = 1:size(X,2)
@@ -89,41 +80,81 @@ else
 				V(j,k) = t(options.position);
 			end
 		end
-		%             end
+
+		if options.showgrid
+			edgealpha = 1;
+			AlphaData = ones(size(V));
+		else
+			% plot all edges with alpha=0 to hide them
+			AlphaData = zeros(size(V));
+			edgealpha = 'flat';
+		end
 		
 		% Plot the function
 		if options.alpha == 0 && strcmp(options.linestyle, 'none')
 			hs = [];
 		else
 			if options.contour
-				hs = surfc(X,Y,V,'facecolor', options.color,...
-					'linestyle', options.linestyle, ...
-					'linewidth', options.linewidth, ...
-					'facealpha', options.alpha,...
-					'facelighting', 'phong',...
-					'AmbientStrength', 0.7,...
-					'Marker', options.marker);
+				surf_fun = @surfc;
 			else
-				hs = surf(X,Y,V,'facecolor', options.color,...
+				surf_fun = @surf;
+			end
+			hs = surf_fun(X,Y,V,'facecolor', options.color,...
+				'linestyle', options.linestyle, ...
+				'linewidth', options.linewidth, ...
+				'facealpha', options.alpha,...
+				'facelighting', 'phong',...
+				'AmbientStrength', 0.7,...
+				'AlphaData', AlphaData, ...
+				'edgealpha', edgealpha, ...
+				'Marker', options.marker);
+			
+			if ~options.showgrid && obj.isFullDim()
+				% plot the outline
+				
+				% detect outer boundaries
+				B = zeros(size(X));
+				for i = 1:size(B, 2)
+					p_nan = find(~isnan(X(:, i)));
+					if ~isempty(p_nan)
+						B(p_nan(1), i) = 1;
+						B(p_nan(end), i) = 1;
+					end
+				end
+				for i = 1:size(B, 1)
+					p_nan = find(~isnan(X(i, :)));
+					if ~isempty(p_nan)
+						B(i, p_nan(1)) = 1;
+						B(i, p_nan(end)) = 1;
+					end
+				end
+
+				% prepare points
+				P = [];
+				[irow, icol] = find(B);
+				for i = 1:numel(irow)
+					px = X(irow(i), icol(i));
+					py = Y(irow(i), icol(i));
+					pz = V(irow(i), icol(i));
+					P = [P; px py pz];
+				end
+				
+				% sort vertices in a cyclic way
+				xc = obj.chebyCenter.x;
+				ang = angle((P(:, 1)-xc(1))+(P(:, 2)-xc(2))*sqrt(-1));
+				[~, ind] = sort(ang);
+				x1 = P(ind, 1);
+				x2 = P(ind, 2);
+				x3 = P(ind, 3);
+				
+				% plot the outline
+				hb = line([x1; x1(1)], [x2; x2(1)], [x3; x3(1)]);
+				set(hb, 'Color', options.edgecolor, ...
 					'linestyle', options.linestyle, ...
-					'linewidth', options.linewidth, ...
-					'facealpha', options.alpha,...
-					'facelighting', 'phong',...
-					'AmbientStrength', 0.7,...
-					'Marker', options.marker);
+					'linewidth', options.linewidth);
 			end
 		end
 		h = [h; hs(:)];
-		
-		%                 % Add a contour plot
-		%                 if  options.contour
-		%                     held=ishold;
-		%                     hold on;
-		%                     [C,c] = contour3(X,Y,V,options.contourGrid);
-		%                     set(c,'linewidth',options.linewidth,'linestyle',options.linestyle);
-		%                     h = [h;c(:)];
-		%                     if ~held, hold off; end
-		%                 end
 		
 	end
 end
