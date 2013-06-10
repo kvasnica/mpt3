@@ -237,7 +237,7 @@ if size(R,1) > 0
 	h = [h(:); hl(:)];
 end
 
-if options.showindex && P.Dim==2 && P.isBounded()
+if isfield(options, 'showindex') && options.showindex && P.Dim==2 && P.isBounded()
 	xc = P.chebyCenter.x;
 	text(xc(1), xc(2), num2str(options.array_index));
 end
