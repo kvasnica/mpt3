@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <help>
-	<function>disp</function>
+	<function>display</function>
 	
 	<!-- one-line description of the function -->
 	<info>
-        Overload display for <tt>YSet</tt> class.
+        Overload display for <tt>Opt</tt> class.
 	</info>
 	
-	<syntax>disp(S)</syntax>
-    <syntax>S.disp</syntax>
+	<syntax>display(problem)</syntax>
+    <syntax>problem.display()</syntax>
 
 	<!-- long description of the function -->
 	<descr>
-        Default display for <tt>YSet</tt> class.
+        Default display for <tt>Opt</tt> class.
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
-		<name>S</name>
-        <descr><tt>YSet</tt> object.</descr>
+		<name>problem</name>
+        <descr>Object of the <tt>Opt</tt> class that defines optimization problem.</descr>
 		<!-- any class name can be used, it can even be omitted -->
-		<class name="YSet"/>
+		<class name="Opt"/>
 	</input>
 
 	<!-- multiple related function can be defined -->
-    <related>YSet</related>
+    <related>mpt_solve</related>
 	
 	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
 	<author macro="author_herceg"/>
 
 	<!-- finally, the text of the license -->

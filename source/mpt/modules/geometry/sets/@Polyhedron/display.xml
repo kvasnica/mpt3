@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <help>
-	<function>disp</function>
+	<function>display</function>
 	
 	<!-- one-line description of the function -->
 	<info>
-        Overload display for <tt>Function</tt> class.
+        Overload display for <tt>Polyhedron</tt> class.
 	</info>
 	
-	<syntax>disp(F)</syntax>
-    <syntax>F.disp</syntax>
+	<syntax>display(P)</syntax>
+    <syntax>P.display</syntax>
 
 	<!-- long description of the function -->
 	<descr>
-        Default display for <tt>Function</tt> class.
+        Default display for <tt>Polyhedron</tt> class.
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
-		<name>F</name>
-        <descr><tt>Function</tt> object.</descr>
+		<name>P</name>
+        <descr><tt>Polyhedron</tt> object.</descr>
 		<!-- any class name can be used, it can even be omitted -->
-		<class name="Function"/>
+		<class name="Polyhedron"/>
 	</input>
 
 	<!-- multiple related function can be defined -->
-    <related>Function</related>
-    <related>AffFunction</related>
-	<related>QuadFunction</related>
-    <related>setHandle</related>	
-
+    <related>Polyhedron</related>
 	
 	<!-- multiple authors can be defined -->
-	<author macro="author_herceg"/>
+    <author macro="author_cnj"/>
 
 	<!-- finally, the text of the license -->
 	<license macro="GPL2"/>
