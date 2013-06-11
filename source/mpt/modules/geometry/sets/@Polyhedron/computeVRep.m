@@ -20,6 +20,12 @@ elseif ~obj.hasHRep
 	% empty set
 	obj.hasVRep = true;
 	return
+elseif obj.isEmptySet()
+	% empty set = empty vertices and rays
+	obj.V_int = zeros(0, obj.Dim);
+	obj.R_int = zeros(0, obj.Dim);
+	obj.hasVRep = true;
+	return
 end
 
 done = false;
