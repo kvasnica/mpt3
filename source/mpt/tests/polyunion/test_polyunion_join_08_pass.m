@@ -1,4 +1,4 @@
-function test_polyunion_join_02_fail
+function test_polyunion_join_08_pass
 %
 % check of boundedness
 %
@@ -16,6 +16,8 @@ Q(6) = ExamplePoly.randVrep('d',5,'nr',1);
 U(1) = PolyUnion('Set',P,'Bounded',true,'FullDim',false);
 U(2) = PolyUnion(Q);
 
-Un = U.join;
+[worked, msg] = run_in_caller('Un = U.join; ');
+assert(~worked);
+asserterrmsg(msg,'All unions must be bounded.');
 
 end

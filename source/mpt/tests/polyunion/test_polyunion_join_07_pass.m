@@ -1,4 +1,4 @@
-function test_polyunion_join_01_fail
+function test_polyunion_join_07_pass
 %
 % check of full-dimensionality
 %
@@ -15,6 +15,8 @@ end
 U(1) = PolyUnion('Set',P,'Bounded',false,'FullDim',true);
 U(2) = PolyUnion(Q);
 
-Un = U.join;
+[worked, msg] = run_in_caller('Un = U.join; ');
+assert(~worked);
+asserterrmsg(msg,'All unions must be full-dimensional.');
 
 end

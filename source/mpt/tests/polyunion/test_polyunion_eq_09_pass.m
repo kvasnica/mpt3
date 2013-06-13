@@ -1,4 +1,4 @@
-function test_polyunion_eq_02_fail
+function test_polyunion_eq_09_pass
 %
 % polyunion arrays, different dimension
 %
@@ -16,7 +16,9 @@ U(2) = PolyUnion('Set',Q,'FullDim',true,'Bounded',true);
 
 Un = PolyUnion(P);
 
-ts = (U == Un);
+[worked, msg] = run_in_caller('ts = (U == Un); ');
+assert(~worked);
+asserterrmsg(msg,'Unions must have the same dimension.');
 
 
 end

@@ -1,4 +1,4 @@
-function test_polyunion_getfunction_03_fail
+function test_polyunion_getfunction_07_pass
 %
 % random polyhedra, index out of the range
 %
@@ -11,6 +11,8 @@ end
     
 U = PolyUnion('Set',P,'Overlaps',true);
 
-Un = U.getFunction(3);
+[worked, msg] = run_in_caller('Un = U.getFunction(3); ');
+assert(~worked);
+asserterrmsg(msg,'No such function "" in the object.');
 
 end

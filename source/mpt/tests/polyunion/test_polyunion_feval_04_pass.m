@@ -1,4 +1,4 @@
-function test_polyunion_feval_01_fail
+function test_polyunion_feval_04_pass
 %
 % different function names
 %
@@ -12,7 +12,8 @@ P(2).addFunction(Function(@(x)x.^2-0.1*x),'anonymous');
 P(2).addFunction(Function(@(x)x), 'c');
 
 
-U = PolyUnion('Set',P,'FullDim',true,'Bounded',true);
-
+[worked, msg] = run_in_caller('U = PolyUnion(''Set'',P,''FullDim'',true,''Bounded'',true);');
+assert(~worked);
+asserterrmsg(msg,'All sets must have associated the same number of functions.');
 
 end

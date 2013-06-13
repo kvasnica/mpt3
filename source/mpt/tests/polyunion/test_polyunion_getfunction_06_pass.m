@@ -1,6 +1,6 @@
-function test_polyunion_getfunction_04_fail
+function test_polyunion_getfunction_06_pass
 %
-% random polyhedra, more than one index
+% random polyhedra, no matching string
 %
 
 for i=1:5
@@ -11,6 +11,8 @@ end
     
 U = PolyUnion('Set',P,'Overlaps',true);
 
-Un = U.getFunction([1,3]);
+[worked, msg] = run_in_caller('Un = U.getFunction(''func''); ');
+assert(~worked);
+asserterrmsg(msg,'No such function "func" in the object.');
 
 end

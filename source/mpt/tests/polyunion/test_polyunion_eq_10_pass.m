@@ -1,4 +1,4 @@
-function test_polyunion_eq_03_fail
+function test_polyunion_eq_10_pass
 %
 % different dimension
 %
@@ -14,7 +14,9 @@ end
 U1 = PolyUnion('Set',P,'Overlaps',true);
 U2 = PolyUnion('Set',Q,'FullDim',true,'Bounded',true);
 
-ts = U1.eq(U2);
+[worked, msg] = run_in_caller('ts = U1.eq(U2); ');
+assert(~worked);
+asserterrmsg(msg,'Unions must have the same dimension.');
 
 
 end

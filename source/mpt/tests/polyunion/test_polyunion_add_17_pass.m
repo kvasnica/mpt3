@@ -1,4 +1,4 @@
-function test_polyunion_add_05_fail
+function test_polyunion_add_17_pass
 %
 % unly full-dim
 %
@@ -12,7 +12,9 @@ Q(1) = ExamplePoly.randHrep;
 Q(2) = Polyhedron('He',rand(1,3),'lb',zeros(1,2));
 
 % if Q is added, the convexity remains
-PU.add(Q);
+[worked, msg] = run_in_caller('PU.add(Q); ');
+assert(~worked);
+asserterrmsg(msg,'The polyhedra cannot be added because it conflicts with "Bounded, Fulldim" property.');
 
 
 end
