@@ -75,14 +75,16 @@ if isfield(mat, 'binary_var_index')
     opt.vartype(opt.varOrder.binary_var_index) = 'B';
 end
 
-if size(mat.H,1) == size(mat.H,2)
-    mat.qp = true;
-    % if all elements of hessian zeros ->LP
-    if all(all(abs(mat.H)<MPTOPTIONS.zero_tol))
+if ~isfield(mat,'qp')
+    if size(mat.H,1) == size(mat.H,2)
+        mat.qp = true;
+        % if all elements of hessian zeros ->LP
+        if all(all(abs(mat.H)<MPTOPTIONS.zero_tol))
+            mat.qp = false;
+        end
+    else
         mat.qp = false;
     end
-else
-    mat.qp = false;
 end
 
 if mat.qp
