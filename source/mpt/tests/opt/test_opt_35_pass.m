@@ -1,4 +1,4 @@
-function test_opt_12_fail
+function test_opt_35_pass
 %
 % MPMIQP
 %
@@ -36,6 +36,8 @@ c = 100;
 problem=Opt('H',H,'f',f,'c',c,'A',A,'b',b,'pB',pB,'vartype','CCB');
 
 
-res = problem.solve;
+[worked, msg] = run_in_caller('res = problem.solve; ');
+assert(~worked);
+asserterrmsg(msg,'mpt_call_plcp: PLCP solver does not solve MIQP problems.');
 
 end

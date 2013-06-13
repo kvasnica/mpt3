@@ -1,4 +1,4 @@
-function test_opt_09_fail
+function test_opt_32_pass
 %
 % opt constructor fail test
 % 
@@ -12,4 +12,6 @@ S.solver='mpqp';
 % the value of f must be 1x10
 S.f=randn(6,10);
 
-Opt(S);
+[worked, msg] = run_in_caller('Opt(S);');
+assert(~worked);
+asserterrmsg(msg,'Input argument must be a "Polyhedron" class.');

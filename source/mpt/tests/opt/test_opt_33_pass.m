@@ -1,4 +1,4 @@
-function test_opt_10_fail
+function test_opt_33_pass
 % problem contains lower bound that is actually bigger than upper bound
 
 % simple lower and upper bounds
@@ -13,6 +13,8 @@ b = randn(5,1);
 f = randn(5,1);
 
 % call to Opt must throw an error
-Opt('A',A,'b',b,'f',f,'lb',lb,'ub',ub);
+[worked, msg] = run_in_caller('Opt(''A'',A,''b'',b,''f'',f,''lb'',lb,''ub'',ub); ');
+assert(~worked);
+asserterrmsg(msg,'Lower bound 3 is higher than its upper bound.');
 
 end

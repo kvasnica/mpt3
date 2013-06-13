@@ -1,4 +1,4 @@
-function test_opt_eliminateEquations_01_fail
+function test_opt_eliminateEquations_16_pass
 %
 % too many equalities, inconsistent
 %
@@ -18,6 +18,8 @@ S.f = ones(12,1);
 res=mpt_solve(S);
 
 % construct problem must fail due constraint validation
-problem = Opt(S);
+[worked, msg] = run_in_caller('problem = Opt(S); ');
+assert(~worked);
+asserterrmsg(msg,'Opt: Equality constraints are not consistent.');
 
 end

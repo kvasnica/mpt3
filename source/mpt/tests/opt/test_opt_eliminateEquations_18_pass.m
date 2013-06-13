@@ -1,4 +1,4 @@
-function test_opt_eliminateEquations_03_fail
+function test_opt_eliminateEquations_18_pass
 %
 % equalities on the parameter
 %
@@ -17,6 +17,8 @@ problem = Opt(S);
 
 % solve problem must throw an error because the parameter space is not
 % full-dimensional
-problem.solve;
+[worked, msg] = run_in_caller('problem.solve; ');
+assert(~worked);
+asserterrmsg(msg,'Opt: Equality constraints are not consistent.');
 
 end
