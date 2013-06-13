@@ -6,18 +6,18 @@ function test_opt_21_pass
 
 sdpvar x
 binvar u
-mptopt('pqpsolver', 'MPQP');
+mptopt('plpsolver', 'MPLP');
 
 problem = Opt([-1 <= x+u <= 1; -1<=x<=1], x+u, x, u);
 
-mptopt('pqpsolver', 'PLCP');
-
-if ~strcmp(problem.solver,'MPQP')
-    error('The solver here is MPQP.');
+if ~strcmp(problem.solver,'MPLP')
+    error('The solver here is MPLP.');
 end
 
+mptopt('plpsolver', 'PLCP');
+
 a=mptopt;
-if ~strcmp(a.pqpsolver,'PLCP')
+if ~strcmp(a.plpsolver,'PLCP')
     error('The global solver should be PLCP.');
 end
 

@@ -30,19 +30,19 @@ elseif nargin==1
             y = s.QP{1};
         case 'MILP'
             if isempty(s.MILP)
-                y = [];
+                y = '';
             else
                 y = s.MILP{1};
             end
         case 'MIQP'            
             if isempty(s.MIQP)
-                y = [];
+                y = '';
             else
                 y = s.MIQP{1};
             end
         case 'LCP'
 			if isempty(s.LCP)
-				y = [];
+				y = '';
 			else
 				y = s.LCP{1};
 			end
@@ -52,7 +52,7 @@ elseif nargin==1
             y = s.parametric.QP{1};
         case 'PLCP'
             if isempty(s.parametric.LCP)
-                y = [];
+                y = '';
 			else
                 y = s.parametric.LCP{1};
             end
@@ -60,7 +60,7 @@ elseif nargin==1
             error('Unrecognized string.');
     end
 else
-    y = [];
+    y = '';
 end
 
 end
