@@ -1,4 +1,4 @@
-function test_convexset_plot_01_fail
+function test_convexset_plot_12_pass
 %
 % 1D unbounded set not supported
 %
