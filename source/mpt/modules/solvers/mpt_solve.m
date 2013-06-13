@@ -217,12 +217,13 @@ if nargin==2 && isfield(S, 'isParametric') && S.isParametric
 		S.b = S.b + S.pB*param_value;
 		S.be = S.be + S.pE*param_value;
 		S.f = S.f + S.pF*param_value;
-		S.c = S.c + param_value'*S.Y*param_value;
+		S.c = S.c + param_value'*S.Y*param_value + S.C*param_value;
 		% unset parametric constraints
 		S.pB = [];
 		S.pE = [];
 		S.pF = [];
 		S.Y = [];
+        S.C = [];
 	end
 	
 	% mark the problem as non-parametric
@@ -514,6 +515,11 @@ end
 
 R = sub_callsolver(S, MPTOPTIONS);
 
+% add constant term
+if ~isempty(R.obj)
+    R.obj = R.obj + S.c;
+end
+
 %-------------------------------------------------------------------------------
 function R=sub_callsolver(S, MPTOPTIONS)
 
@@ -623,11 +629,6 @@ else
     catch
         error('mpt_solve: Yalmip error when calling %s solver!',S.solver);
     end
-end
-
-% add constant term
-if ~isempty(R.obj)
-    R.obj = R.obj + S.c;
 end
 
 % DISABLED
