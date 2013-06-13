@@ -7,7 +7,6 @@ mpt_init
 run_lp_tests
 run_qp_tests
 run_milp_tests
-%run_nag_tests (NAG solver is no longer present)
 
 % test parametric solver
 run_plcp_tests
@@ -18,7 +17,6 @@ test_qp_MPC
 % other tests to be added here...
 run_polyhedron_tests
 run_opt_tests
-run_hash_tests
 run_function_tests
 run_convexset_tests
 run_yset_tests
