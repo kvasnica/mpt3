@@ -1,4 +1,4 @@
-function test_yset_extreme_01_fail
+function test_yset_extreme_13_pass
 %
 % matrix variable, wrong assignment
 %
@@ -16,7 +16,9 @@ V = [ -1.1453
       0.5
       0.6
       -2.7078];
-s = S.extreme(V);
+[worked, msg] = run_in_caller('s = S.extreme(V); ');
+assert(~worked);
+asserterrmsg(msg,'Inconsistent assignment');
 
 
 end

@@ -1,4 +1,4 @@
-function test_yset_10_fail
+function test_yset_22_pass
 %
 % hybrid MPC - fails because it is nonconvex set
 %
@@ -31,6 +31,8 @@ end
 constraints = [constraints , -5<=x(:,k+1)<=5];
 
 % eventually throw different error because of yalmip bug
-S = YSet([x;u sdpvar(1)],constraints);
+[worked, msg] = run_in_caller('S = YSet([x(:);u(:); sdpvar(1)],constraints); ');
+assert(~worked);
+%asserterrmsg(msg,'Variables must be provided as vectors only.');
 
 end
