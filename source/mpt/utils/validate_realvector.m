@@ -4,7 +4,7 @@ function y=validate_realvector(v)
 %
 % empty argument (v=[]) is considered as valid
 
-if isnumeric(v) && (isvector(v) || isempty(v)) && all(isfinite(v))
+if isnumeric(v) && (isvector(v) || isempty(v)) && all(isfinite(v)) && isreal(v)
     y=true;
 else
     error('Input argument must be a real vector.');
