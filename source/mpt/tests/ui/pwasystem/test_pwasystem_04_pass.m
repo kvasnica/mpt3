@@ -1,4 +1,4 @@
-function test_pwasystem_01_fail
+function test_pwasystem_04_pass
 % import from multiple LTISystems should fail if systems have various
 % dimensions
 
@@ -9,6 +9,8 @@ clear sysStruct
 ThirdOrder;
 L2 = LTISystem(sysStruct);
 
-P = PWASystem([L1 L2]);
+[worked, msg] = run_in_caller('P = PWASystem([L1 L2]); ');
+assert(~worked);
+asserterrmsg(msg,'All systems must have identical state dimensions.');
 
 end

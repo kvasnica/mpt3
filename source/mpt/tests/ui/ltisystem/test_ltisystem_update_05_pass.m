@@ -1,4 +1,4 @@
-function test_ltisystem_update_02_fail
+function test_ltisystem_update_05_pass
 % LTISystem/update() with non-autonomous system should fail if input has
 % wrong dimensions
 
@@ -14,7 +14,9 @@ L = LTISystem('A', A, 'B', B, 'C', C, 'D', D, 'f', f, 'g', g);
 x0 = randn(nx, 1);
 
 L.initialize(x0);
-L.update(randn(nu+1, 1));
+[worked, msg] = run_in_caller('L.update(randn(nu+1, 1)); ');
+assert(~worked);
+asserterrmsg(msg,'The input must be a 2x1 vector.');
 
 end
 

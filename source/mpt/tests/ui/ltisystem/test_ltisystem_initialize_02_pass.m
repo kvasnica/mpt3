@@ -1,4 +1,4 @@
-function test_ltisystem_initialize_01_fail
+function test_ltisystem_initialize_02_pass
 % tests LTISystem/initialize() with wrong dimension of the state
 
 nu = 2; nx = 3; ny = 4;
@@ -12,7 +12,9 @@ s = ss(A, B, C, D, Ts);
 L = LTISystem('A', A, 'B', B, 'C', C, 'D', D, 'f', f, 'g', g);
 
 x0 = randn(nx-1, 1);
-L.initialize(x0);
+[worked, msg] = run_in_caller('L.initialize(x0); ');
+assert(~worked);
+asserterrmsg(msg,'The initial state must be a 3x1 vector.');
 
 end
 

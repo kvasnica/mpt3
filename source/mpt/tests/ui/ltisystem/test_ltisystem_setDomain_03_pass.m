@@ -1,4 +1,4 @@
-function test_ltisystem_setDomain_01_fail
+function test_ltisystem_setDomain_03_pass
 % LTISystem/setDomain() should fail on incorrect dimenensions
 
 nu = 0; nx = 3; ny = 4;
@@ -15,6 +15,8 @@ L = LTISystem('A', A, 'B', B, 'C', C, 'D', D, 'f', f, 'g', g);
 nx = nx+1;
 X = Polyhedron('lb', -ones(nx, 1), 'ub', 2*ones(nx, 1));
 U = L.u.boundsToPolyhedron();
-L.setDomain('x', X);
+[worked, msg] = run_in_caller('L.setDomain(''x'', X); ');
+assert(~worked);
+asserterrmsg(msg,'The domain must have dimension 3.');
 
 end

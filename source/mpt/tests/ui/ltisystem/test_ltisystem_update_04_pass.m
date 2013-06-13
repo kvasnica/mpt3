@@ -1,4 +1,4 @@
-function test_ltisystem_update_01_fail
+function test_ltisystem_update_04_pass
 % LTISystem/update() with non-autonomous system should fail if no input is
 % provided
 
@@ -14,7 +14,9 @@ L = LTISystem('A', A, 'B', B, 'C', C, 'D', D, 'f', f, 'g', g);
 x0 = randn(nx, 1);
 
 L.initialize(x0);
-L.update();
+[worked, msg] = run_in_caller('L.update(); ');
+assert(~worked);
+asserterrmsg(msg,'System is not autonomous, please provide the input.');
 
 end
 

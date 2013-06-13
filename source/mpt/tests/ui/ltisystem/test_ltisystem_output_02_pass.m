@@ -1,4 +1,4 @@
-function test_ltisystem_output_01_fail
+function test_ltisystem_output_02_pass
 % LTISystem/output() with direct feedthrough should fail if no input is
 % provided
 
@@ -9,11 +9,13 @@ C = randn(ny, nx); D = randn(ny, nu);
 Ts = 1;
 
 s = ss(A, B, C, D, Ts);
-L = LTISystem('A', A, 'B', B, 'C', C, 'D', D, 'f', f, 'g', g);
+L = LTISystem('A', A, 'B', B, 'C', C, 'D', D);
 x0 = randn(nx, 1);
 
 L.initialize(x0);
-L.output()
+[worked, msg] = run_in_caller('L.output() ');
+assert(~worked);
+asserterrmsg(msg,'Input is required for systems with direct feed-through.');
 
 end
 

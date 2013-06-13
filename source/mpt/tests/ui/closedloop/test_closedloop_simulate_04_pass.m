@@ -1,5 +1,5 @@
-function test_closedloop_simulate_01_fail
-% simulation requires initialization
+function test_closedloop_simulate_04_pass
+% simulation requires number of steps
 
 Double_Integrator; S = sysStruct;
 model = LTISystem('A', S.A, 'B', S.B, 'C', S.C, 'D', S.D);
@@ -12,6 +12,8 @@ model.u.penalty = QuadFunction(probStruct.R);
 M = MPCController(model, 3);
 
 CL = ClosedLoop(M, model);
-D = CL.simulate(10);
+[worked, msg] = run_in_caller('D = CL.simulate([1;1]); ');
+assert(~worked);
+asserterrmsg(msg,'Not enough input arguments.');
 
 end
