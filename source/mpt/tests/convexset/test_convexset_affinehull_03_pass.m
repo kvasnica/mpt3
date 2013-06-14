@@ -4,7 +4,7 @@ function test_convexset_affinehull_03_pass
 %
 
 x = sdpvar(2,1);
-S = YSet(x, set(norm(x)<=10),  sdpsettings('solver','sedumi','verbose',0)) ;
+S = YSet(x, norm(x)<=10,  sdpsettings('solver','sedumi','verbose',0)) ;
 
 if ~isempty(S.affineHull)
     error('Should be empty.');

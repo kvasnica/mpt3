@@ -3,9 +3,9 @@ function test_convexset_isbounded_05_pass
 % bounded:  1 0 0 array
 % 
  x = sdpvar(15,1);
- F1 = set( -5<= x <= 5);
- F2 = set(randn(8,15)*x<=ones(8,1)); 
- F3 = set(randn(3,15)*x<=ones(3,1)); 
+ F1 = ( -5<= x <= 5);
+ F2 = (randn(8,15)*x<=ones(8,1)); 
+ F3 = (randn(3,15)*x<=ones(3,1)); 
  
  Y1 = YSet(x,F1);
  Y2 = YSet(x,F2);

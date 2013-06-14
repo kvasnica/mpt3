@@ -5,7 +5,7 @@ function test_yset_extreme_02_pass
 
 x = sdpvar(1,2);
 
-F = set( x*x' <= 1 );
+F = ( x*x' <= 1 );
 
 S = YSet(x,F);
 

@@ -10,7 +10,7 @@ f = 0.1*rand(10,1);
 w = sdpvar(2,1);
 x = sdpvar(2,1);
 
-F = set([A*(x+w) <= b, E*w <= f]);
+F = [A*(x+w) <= b, E*w <= f];
 
 % solve using mpt2
 SOL = solvemp(F,0,sdpsettings('verbose',0),x,w);

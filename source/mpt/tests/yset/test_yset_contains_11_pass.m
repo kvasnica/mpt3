@@ -5,7 +5,7 @@ function test_yset_contains_11_pass
 
 x = sdpvar(1,2);
 
-F1 = set(randn(2)*x'<=randn(2,1));
+F1 = [randn(2)*x'<=randn(2,1)];
 
 S1 = YSet(x,F1);
 

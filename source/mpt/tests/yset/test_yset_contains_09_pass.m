@@ -5,8 +5,8 @@ function test_yset_contains_09_pass
 
 x = sdpvar(2,1);
 
-F1 = set(randn(2)*x<=randn(2,1));
-F2 = set(randn(2)*x<=randn(2,1));
+F1 = (randn(2)*x<=randn(2,1));
+F2 = (randn(2)*x<=randn(2,1));
 
 S1 = YSet(x,F1);
 S2 = YSet(x,F2);

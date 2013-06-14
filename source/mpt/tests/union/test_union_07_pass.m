@@ -4,7 +4,7 @@ function test_union_07_pass
 %
 
 x = sdpvar(5,1);
-F = set( -1<=x<=-2);
+F = ( -1<=x<=-2);
 U = Union(YSet(x,F));
 
 if U.Num~=0

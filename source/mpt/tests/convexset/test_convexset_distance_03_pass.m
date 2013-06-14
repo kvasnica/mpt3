@@ -9,7 +9,7 @@ if isempty(MPTOPTIONS)
 end
 
 x = sdpvar(2,1);
-S = YSet(x, set(norm(0.1*x)<=1), sdpsettings('solver','sedumi','verbose',0));
+S = YSet(x, norm(0.1*x)<=1, sdpsettings('solver','sedumi','verbose',0));
 
 x = [4;3];
 d = S.distance(x);

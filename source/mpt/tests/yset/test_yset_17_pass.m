@@ -4,7 +4,7 @@ function test_yset_17_pass
 %
 
 x = sdpvar(2,1);
-F = set(abs(x)>=1) + set(-2 <= x <= 2);
+F = [abs(x)>=1, -2 <= x <= 2];
 
 [worked, msg] = run_in_caller('Y = YSet(x,F); ');
 assert(~worked);

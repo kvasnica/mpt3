@@ -4,8 +4,8 @@ function test_convexset_isempty_05_pass
 %
 
 x = sdpvar(3,1);
-F1 = set( randn(2,3)*x<=ones(2,1));
-F2 = set( randn(2,3)*x<=ones(2,1));
+F1 = ( randn(2,3)*x<=ones(2,1));
+F2 = ( randn(2,3)*x<=ones(2,1));
 Y1 = YSet(x,F1);
 Y2 = YSet(x,F2);
 

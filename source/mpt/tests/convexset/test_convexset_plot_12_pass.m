@@ -4,7 +4,7 @@ function test_convexset_plot_12_pass
 %
 
 x = sdpvar(1);
-F = set(x<=1);
+F = (x<=1);
 
 Y = YSet(x,F,sdpsettings('verbose',0));
 Y.plot;

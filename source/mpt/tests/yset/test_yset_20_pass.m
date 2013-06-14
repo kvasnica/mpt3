@@ -6,8 +6,8 @@ function test_yset_20_pass
 x = sdpvar(5,1);
 y = sdpvar(2,1);
 
-F = set(-1<=y<=1);
-G = set( randn(5)*x<=ones(5,1) );
+F = (-1<=y<=1);
+G = ( randn(5)*x<=ones(5,1) );
 
 
 % ok

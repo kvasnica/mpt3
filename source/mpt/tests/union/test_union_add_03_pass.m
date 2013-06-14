@@ -12,7 +12,7 @@ if U.Num~=1
 end
 
 x = sdpvar(1);
-F = set(x>=0);
+F = (x>=0);
 U.add(YSet(x,F));
 
 if U.Num~=2

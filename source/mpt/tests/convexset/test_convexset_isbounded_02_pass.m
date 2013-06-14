@@ -3,7 +3,7 @@ function test_convexset_isbounded_02_pass
 % trivially unbounded
 % 
  x = sdpvar(1);
- F = set( x <= 1);
+ F = [ x <= 1];
  Y = YSet(x,F);
  
  if Y.isBounded

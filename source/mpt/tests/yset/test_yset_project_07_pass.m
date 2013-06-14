@@ -18,7 +18,7 @@ b = [  2.3939
        4.4504
        4.7486
        6.0834];
-G = set( A*x<=b );
+G = ( A*x<=b );
 S = [Y; YSet(x,G)];
 
 % the origin does not lie in S(1), but in S(2) 

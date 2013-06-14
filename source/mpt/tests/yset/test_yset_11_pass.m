@@ -10,8 +10,8 @@ r = sdpvar(1);
 solvesdp(A*xc+r*sqrt(sum(A.^2,2)) <= b,-r,sdpsettings('verbose',0));
 
 x = sdpvar(2,1);
-F1 = set(A*x <= b);
-F2 = set(norm(x-double(xc),2)<=double(r));
+F1 = (A*x <= b);
+F2 = (norm(x-double(xc),2)<=double(r));
 
 
 S1 = YSet(x,F1);

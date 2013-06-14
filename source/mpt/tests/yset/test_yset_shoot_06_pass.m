@@ -4,7 +4,7 @@ function test_yset_shoot_06_pass
 %
 
 x = sdpvar(78,1);
-F = set(x>=0);
+F = (x>=0);
 
  
 S = YSet(x,F);

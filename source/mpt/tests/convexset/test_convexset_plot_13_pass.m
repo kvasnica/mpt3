@@ -4,7 +4,7 @@ function test_convexset_plot_13_pass
 %
 
 x = sdpvar(2,1);
-F1 = set( -1<= x <= 2)  + set( rand(1,2)*x<=3 );
+F1 = [ -1<= x <= 2; rand(1,2)*x<=3 ];
 
 Y1 = YSet(x,F1,sdpsettings('verbose',0));
 

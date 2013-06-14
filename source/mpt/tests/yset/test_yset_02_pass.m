@@ -4,7 +4,7 @@ function test_yset_02_pass
 %
 
 x = sdpvar(1);
-F = set(x<=1);
+F = (x<=1);
 
 Y = YSet(x,F,sdpsettings('solver','sedumi','verbose',0));
 

@@ -7,8 +7,8 @@ function test_convexset_plot_07_pass
 %
 
 x = sdpvar(3,1);
-F1 = set(0.3*x'*x <= 1.5);
-F2 = set(0.4*x'*x <= 2.5) + set( -0.1*x(2)+2.3*x(3)<=0.5);
+F1 = (0.3*x'*x <= 1.5);
+F2 = [0.4*x'*x <= 2.5; -0.1*x(2)+2.3*x(3)<=0.5];
 
 Y1 = YSet(x,F1,sdpsettings('verbose',0));
 Y2 = YSet(x,F2,sdpsettings('verbose',0));

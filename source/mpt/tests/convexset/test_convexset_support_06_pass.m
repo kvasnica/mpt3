@@ -4,8 +4,8 @@ function test_convexset_support_06_pass
 %
 
 x = sdpvar(5,1);
-F1 = set(randn(17,5)*x <= ones(17,1));
-F2 = set(randn(54,5)*x <= 2*ones(54,1)) + set(randn(3,5)*x==0.2*rand(3,1));
+F1 = (randn(17,5)*x <= ones(17,1));
+F2 = [(randn(54,5)*x <= 2*ones(54,1)) ; (randn(3,5)*x==0.2*rand(3,1))];
 
 Y = [YSet(x,F1), YSet(x,F2)];
 

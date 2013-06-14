@@ -4,8 +4,8 @@ function test_convexset_plot_04_pass
 %
 
 x = sdpvar(1);
-F1 = set(0<=x<=3);
-F2 = set(x<=1) + set(0.3*x^2 <= 0.5);
+F1 = (0<=x<=3);
+F2 = [x<=1; 0.3*x^2 <= 0.5];
 
 Y1 = YSet(x,F1,sdpsettings('verbose',0));
 Y2 = YSet(x,F2,sdpsettings('verbose',0));

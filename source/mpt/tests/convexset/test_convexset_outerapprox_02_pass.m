@@ -9,7 +9,7 @@ if isempty(MPTOPTIONS)
 end
 
 x = sdpvar(2,1);
-F = set( x'*x <= 1);
+F = [ x'*x <= 1 ];
 
 Y = YSet(x,F);
 

@@ -4,7 +4,7 @@ function test_convexset_feval_05_pass
 %
 
 x = sdpvar(2,1);
-F = set([-1;-2] <= x <= [1;2]);
+F = ([-1;-2] <= x <= [1;2]);
 Y = YSet(x,F,sdpsettings('verbose',0));
 fun = QuadFunction(rand(2),[1 -1]);
 Y.addFunction(fun, 'qf');

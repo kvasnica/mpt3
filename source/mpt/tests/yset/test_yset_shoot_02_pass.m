@@ -6,7 +6,7 @@ function test_yset_shoot_02_pass
 
 x = sdpvar(2,1);
 
-F = set( -2*x(2) <= x(1)) + set( -1<= x <= 1);
+F = [( -2*x(2) <= x(1)) ; ( -1<= x <= 1)];
 
 % if we leave default solver it throws an unknown error
 %S = YSet(x,F,sdpsettings('solver','sedumi','verbose',0));

@@ -9,7 +9,7 @@ if isempty(MPTOPTIONS)
 end
 
 x = sdpvar(15,1);
-F = set( randn(8,15)*x <= rand(8,1));
+F = ( randn(8,15)*x <= rand(8,1));
 
 Y = YSet(x,F);
 

@@ -4,8 +4,8 @@ function test_union_removeAllFunctions_02_pass
 %
 
 x = sdpvar(3,1);
-F1=set(randn(12,3)*x<=ones(12,1));
-F2=set(randn(12,3)*x<=ones(12,1));
+F1=(randn(12,3)*x<=ones(12,1));
+F2=(randn(12,3)*x<=ones(12,1));
 
 
 Y(1) = YSet(x,F1);

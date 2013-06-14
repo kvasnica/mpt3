@@ -14,7 +14,7 @@ end
 
 
 x = sdpvar(1);
-F = set(-1<=x<=-2);
+F = (-1<=x<=-2);
 U.add(YSet(x,F));
 
 if U(1).Num~=1

@@ -11,7 +11,7 @@ f = 5*rand(10,1);
 w = sdpvar(2,1);
 x = sdpvar(2,1);
 
-F = set([A*x <= b + B*w, E*w <= f]);
+F = [A*x <= b + B*w, E*w <= f];
 lt = randn(5,2)*x + randn(5,1);
 obj = lt'*lt;
 

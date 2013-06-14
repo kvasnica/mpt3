@@ -5,8 +5,8 @@ function test_convexset_fplot_15_pass
 %
 
 x = sdpvar(2,1);
-F1 = set(-[1;3]<=x<=[5;4]) + set(0.5*x'*x<=0.2) + set(randn(1,2)*x<=0.5);
-F2 = set(-[1;3]<=x<=[5;4]) + set(0.1*rand(1)*x'*x<=0.2) + set(randn(1,2)*x<=0.5);
+F1 = [-[1;3]<=x<=[5;4]; 0.5*x'*x<=0.2;  randn(1,2)*x<=0.5];
+F2 = [-[1;3]<=x<=[5;4]; 0.1*rand(1)*x'*x<=0.2; randn(1,2)*x<=0.5];
 Y1 = YSet(x,F1,sdpsettings('verbose',0));
 Y2 = YSet(x,F1,sdpsettings('verbose',0));
 Y = [Y1;Y2];

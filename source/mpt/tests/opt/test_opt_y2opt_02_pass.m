@@ -26,9 +26,9 @@ u = sdpvar(m,N-1,'full');
 cost = 0;
 F = [];
 for i=1:N-1
-  F = F + set(x(:,i+1) == A*x(:,i) + B*u(:,i));
-  F = F + set(xlb*(1-0.1*i) <= x(:,i) <= xub*(1-0.1*i)); % use contractive constraints
-  F = F + set(ulb <= u(:,i) <= uub);
+  F = [F; (x(:,i+1) == A*x(:,i) + B*u(:,i))];
+  F = [F; (xlb*(1-0.1*i) <= x(:,i) <= xub*(1-0.1*i))]; % use contractive constraints
+  F = [F; (ulb <= u(:,i) <= uub)];
   
   if i > 1
     cost = cost + x(:,i)'*Q*x(:,i);
@@ -36,7 +36,7 @@ for i=1:N-1
   cost = cost + u(:,i)'*R*u(:,i);
 end
 % equality constraints on the end of horizon
-F = F + set( x(:,end) == x(:,end-1) );
+F = [F; ( x(:,end) == x(:,end-1) )];
 
 cost = cost + x(:,end)'*Q*x(:,end);
 

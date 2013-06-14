@@ -5,8 +5,8 @@ function test_yset_19_pass
 
 x = sdpvar(15,1);
 
-F = set(x<=1);
-G = set( randn(3,15)*x==0 );
+F = (x<=1);
+G = ( randn(3,15)*x==0 );
 
 
 [worked, msg] = run_in_caller('YSet(x(3:4),[F;G]); ');

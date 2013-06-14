@@ -4,7 +4,7 @@ function test_polyunion_09_pass
 %
 
 x =sdpvar(2,1);
-F = set(x<=0);
+F = (x<=0);
 Y = YSet(x,F);
 
 [worked, msg] = run_in_caller('U = PolyUnion(Y); ');

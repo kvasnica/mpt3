@@ -5,7 +5,7 @@ function test_yset_extreme_08_pass
 
 x = sdpvar(1,2);
 
-F = set(randn(5,2)*x'<= [1;2;3;4;5]);
+F = (randn(5,2)*x'<= [1;2;3;4;5]);
 
 S = YSet(x,F);
 

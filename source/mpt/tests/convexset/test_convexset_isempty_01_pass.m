@@ -4,7 +4,7 @@ function test_convexset_isempty_01_pass
 %
 
 x = sdpvar(1);
-F = set(x<=0);
+F = (x<=0);
 Y = YSet(x,F);
 
 if Y.isEmptySet

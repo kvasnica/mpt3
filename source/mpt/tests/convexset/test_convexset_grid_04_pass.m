@@ -4,7 +4,7 @@ function test_convexset_grid_04_pass
 % 
 
 x = sdpvar(2,1);
-F1 = set( -1<= x <= 2)  + set( x<=-1 );
+F1 = [ -1<= x <= 2;  x<=-1 ];
 
 Y1 = YSet(x,F1);
 

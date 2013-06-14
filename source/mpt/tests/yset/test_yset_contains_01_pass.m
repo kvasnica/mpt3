@@ -6,7 +6,7 @@ function test_yset_contains_01_pass
 
 x = sdpvar(1);
 
-F = set( norm(x) <= 1);
+F = ( norm(x) <= 1);
 
 S = YSet(x,F);
 

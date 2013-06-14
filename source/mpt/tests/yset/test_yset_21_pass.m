@@ -5,7 +5,7 @@ function test_yset_21_pass
 
 x = sdpvar(5,2,3);
 
-F = set(x<=1);
+F = (x<=1);
 
 % false
 [worked, msg] = run_in_caller('Y = YSet(x,F); ');

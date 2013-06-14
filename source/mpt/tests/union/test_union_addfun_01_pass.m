@@ -2,7 +2,7 @@ function test_union_addfun_01_pass
 %
 % tests adding a function to all elements of the union's set
 x = sdpvar(1);
-F = set(x>=0);
+F = (x>=0);
 P1 = YSet(x, F);
 P2 = Polyhedron('lb', -1, 'ub', 1);
 U = Union;
@@ -35,7 +35,7 @@ assert(isequal(L{2}, 'name'));
 
 % now test array of unions
 x = sdpvar(1);
-F = set(x>=0);
+F = (x>=0);
 P1 = YSet(x, F);
 P2 = Polyhedron('lb', -1, 'ub', 1);
 P3 = Polyhedron('lb', 2, 'ub', 3);

@@ -11,7 +11,7 @@ f = 5*rand(10,1);
 w = sdpvar(2,1);
 x = sdpvar(2,1);
 
-F = set([A*x <= b + B*w, E*w <= f]);
+F = [A*x <= b + B*w, E*w <= f];
 
 % solve using mpt2
 SOL = solvemp(F,x(1)-x(2),sdpsettings('verbose',0),w,x);

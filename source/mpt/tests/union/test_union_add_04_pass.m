@@ -15,7 +15,7 @@ if U(2).Num~=2
 end
 
 x = sdpvar(1);
-F = set(x>=0);
+F = (x>=0);
 U.add(YSet(x,F));
 
 if U(1).Num~=2

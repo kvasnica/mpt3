@@ -8,10 +8,10 @@ if isempty(MPTOPTIONS)
 end
 
 x = sdpvar(2,1);
-S1 = YSet(x, set(norm(x)<=1)+set(randn(2)*x<=0.5*ones(2,1)), sdpsettings('solver','sedumi','verbose',0));
+S1 = YSet(x, [norm(x)<=1; randn(2)*x<=0.5*ones(2,1)], sdpsettings('solver','sedumi','verbose',0));
 
 a = 5*rand(size(x,1),1);
-S2 = YSet(x, set(norm(x-a)<=1), sdpsettings('solver','sedumi','verbose',0));
+S2 = YSet(x, norm(x-a)<=1, sdpsettings('solver','sedumi','verbose',0));
 
 S=[S1,S2];
 

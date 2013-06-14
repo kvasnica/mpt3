@@ -6,7 +6,7 @@ function test_convexset_removefunction_04_pass
 P = Polyhedron;
 P.addFunction(Function(@(x)x),'primal');
 
-[worked, msg] = run_in_caller('P.removeFunction(1)');
+[worked, msg] = run_in_caller('P.removeFunction(1);');
 assert(~worked);
 asserterrmsg(msg,'The argument must be given as string');
 

@@ -24,16 +24,16 @@ u = sdpvar(m,N-1,'full');
 cost = 0;
 F = [];
 for i=1:N-1
-  F = F + set(x(:,i+1) == A*x(:,i) + B*u(:,i));
-  F = F + set(xlb <= x(:,i) <= xub);
-  F = F + set(ulb <= u(:,i) <= uub);
+  F = [F; (x(:,i+1) == A*x(:,i) + B*u(:,i))];
+  F = [F; (xlb <= x(:,i) <= xub)];
+  F = [F; (ulb <= u(:,i) <= uub)];
 
   if i > 1
     cost = cost + x(:,i)'*Q*x(:,i);
   end
   cost = cost + u(:,i)'*R*u(:,i);
 end
-F = F + set(xlb <= x(:,end) <= xub);
+F = [F; (xlb <= x(:,end) <= xub)];
 cost = cost + x(:,end)'*Q*x(:,end);
 
 % convert to MPT3.0 format

@@ -8,7 +8,7 @@ U(2) = Union(ExamplePoly.randHrep);
 
 % add Yset
 x = sdpvar(2,1);
-F = set(0<=x<=1);
+F = (0<=x<=1);
 Y = YSet(x,F);
 U.add([Y,Y]);
 

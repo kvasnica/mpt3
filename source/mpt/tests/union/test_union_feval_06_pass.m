@@ -4,8 +4,8 @@ function test_union_feval_06_pass
 
 x = sdpvar(2,1);
 A = [1 -0.2; 0.4 -1];
-F = set(norm(A*x-[1;1])<=2) + set( [1 -2]*x<=0.4 );
-G = set([1 -2]*x>=0.4) + set(-1.5<=x <=1.5);
+F = [(norm(A*x-[1;1])<=2) ; ( [1 -2]*x<=0.4 )];
+G = [([1 -2]*x>=0.4), (-1.5<=x <=1.5)];
 
 Y(1) = YSet(x,F).addFunction(AffFunction(2*eye(2),[1;-1]), 'f');
 Y(2) = YSet(x,G).addFunction(AffFunction(3*eye(2),[-1;1]), 'f');

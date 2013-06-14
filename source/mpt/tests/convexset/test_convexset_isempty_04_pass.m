@@ -4,9 +4,9 @@ function test_convexset_isempty_04_pass
 %
 
 x = sdpvar(3,1);
-F1 = set(x'*x + x <= -1);
-F2 = set( 0.2*x'*x + 0.5*x <= -2);
-F3 = set( abs(x) <= -1);
+F1 = (x'*x + x <= -1);
+F2 = ( 0.2*x'*x + 0.5*x <= -2);
+F3 = ( abs(x) <= -1);
 Y1 = YSet(x,F1);
 Y2 = YSet(x,F2);
 Y3 = YSet(x,F3);

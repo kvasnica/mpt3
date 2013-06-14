@@ -4,7 +4,7 @@ function test_yset_shoot_05_pass
 %
 
 x = sdpvar(15,1);
-F = set(randn(142,15)*x<=10*randn(142,1)) + set(randn(18,15)*x==randn(18,1));
+F = [(randn(142,15)*x<=10*randn(142,1)) ; (randn(18,15)*x==randn(18,1))];
 
  
 S = YSet(x,F);

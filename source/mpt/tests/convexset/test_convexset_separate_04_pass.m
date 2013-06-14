@@ -4,7 +4,7 @@ function test_convexset_separate_04_pass
 %
 
 x = sdpvar(2,1);
-F = set(x'*x <=  1) + set( 2*x(1)-0.5*x(2)<=0.5);
+F = [(x'*x <=  1); ( 2*x(1)-0.5*x(2)<=0.5)];
 Y = YSet(x,F);
 
 v = [0,1];

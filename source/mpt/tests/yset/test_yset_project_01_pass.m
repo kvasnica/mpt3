@@ -4,7 +4,7 @@ function test_yset_project_01_pass
 %
 
 x = sdpvar(1);
-F = set(x'*x<=1);
+F = (x'*x<=1);
 S = YSet(x,F);
 
 % the point is inside the set

@@ -3,8 +3,8 @@ function test_convexset_outerapprox_01_pass
 % empty set
 %
 
-x =sdpvar(2,1);
-F = set( x <= 1) + set(x >= 2);
+x = sdpvar(2,1);
+F = [ x <= 1; x >= 2 ];
 
 Y = YSet(x,F);
 
