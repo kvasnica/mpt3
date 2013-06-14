@@ -1,7 +1,7 @@
 function run_all_mpt_tests(varargin)
 % Runs tests in subdirectories.
 %
-% NOTE: only tests matching "test_*_pass.m" are considered.
+% NOTE: only tests matching "test_*.m" are considered.
 %
 % To run all tests
 %   run_all_mpt_tests
@@ -293,6 +293,7 @@ for i = 1:length(dirs)
 	p = dir([dirs{i} 'test_*.m']);
 	for j = 1:length(p)
 		[~, testname] = fileparts(p(j).name);
+		% do not consider fail tests
 		if isempty(strfind(testname, '_fail'))
 			test_files{end+1} = [dirs{i} testname];
 		end
