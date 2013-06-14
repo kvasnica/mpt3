@@ -5,31 +5,30 @@
 	
 	<!-- one-line description of the function -->
 	<info>
-        Overload display for <tt>Opt</tt> class.
+        Overload display for <tt>PolyUnion</tt> class.
 	</info>
 	
-	<syntax>disp(problem)</syntax>
-    <syntax>problem.disp</syntax>
+	<syntax>display(U)</syntax>
+    <syntax>U.display</syntax>
 
 	<!-- long description of the function -->
 	<descr>
-        Default display for <tt>Opt</tt> class.
+        Default display for <tt>PolyUnion</tt> class.
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
-		<name>problem</name>
-        <descr>Object of the <tt>Opt</tt> class that defines optimization problem.</descr>
+		<name>U</name>
+        <descr><tt>PolyUnion</tt> object.</descr>
 		<!-- any class name can be used, it can even be omitted -->
-		<class name="Opt"/>
+		<class name="PolyUnion"/>
 	</input>
 
 	<!-- multiple related function can be defined -->
-    <related>mpt_solve</related>
+    <related>Union</related>
 	
 	<!-- multiple authors can be defined -->
-    <author macro="author_cnj"/>
 	<author macro="author_herceg"/>
 
 	<!-- finally, the text of the license -->

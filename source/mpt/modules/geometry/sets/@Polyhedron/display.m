@@ -1,4 +1,4 @@
-function disp(P)
+function display(P)
 %
 % display function
 %

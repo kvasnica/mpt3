@@ -13,4 +13,6 @@ S.lb = []; S.ub = [];
 S.quicklp = true;
 ret = mpt_solve(S);
 
-status = (ret.exitflag == MPTOPTIONS.OK) && (-ret.obj>MPTOPTIONS.zero_tol);
+status = (ret.exitflag == MPTOPTIONS.OK) && (-2*ret.obj>MPTOPTIONS.region_tol);
+
+end

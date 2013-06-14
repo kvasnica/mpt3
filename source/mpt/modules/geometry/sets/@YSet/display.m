@@ -1,4 +1,4 @@
-function disp(obj)
+function display(obj)
 %
 % overloads display for YSet objects
 %

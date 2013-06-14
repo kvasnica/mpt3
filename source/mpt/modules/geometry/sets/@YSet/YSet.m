@@ -134,59 +134,27 @@ classdef YSet < ConvexSet
 
       
 	end
-	
-	function C = copy(obj)
+	        
+  end
+  
+  methods(Access=protected)
+	  
+	  function new = copyElement(obj)
 		% Copy method for YSet objects
 		
-		if numel(obj)==0
-			% special treatment of empty arrays
-			C = YSet;
-			C = obj([]);
-			return
-			
-		elseif numel(obj)>1
-			% copy array
-			for i = 1:numel(obj)
-				C(i) = obj(i).copy();
-			end
-			return
-		end
+		% Note: matlab.mixin.Copyable.copy() automatically properly
+		% copies arrays and empty arrays, no need to do it here.
+
+		% deep copy of Functions, shallow copy of Internal and Data
+		new = copyElement@ConvexSet(obj);
 		
 		if numel(obj.vars)>0
 			% create a copy of variables and constraints
 			[new_vars, new_cons] = obj.copy_Y_constraints(obj.vars, obj.constraints);
 		
-			% create a copy of the object
-			C = YSet(new_vars, new_cons, obj.opts);
-		else
-			C = YSet;
-		end
-		
-		% copy functions
-		keys = obj.Functions.keys;
-		values = obj.Functions.values;
-		for j = 1:numel(keys)
-			C.Functions(keys{j}) = values{j};
-		end
-		
-		% copy internal data field by field, otherwise it will refer to the same data
-		if isstruct(obj.Internal)
-			nf = fieldnames(obj.Internal);
-			for i=1:numel(nf)
-				C.Internal.(nf{i}) = obj.Internal.(nf{i});
-			end
-		else
-			C.Internal = obj.Internal;
-		end
-		
-		% copy internal data field by field, otherwise it will refer to the same data
-		if isstruct(obj.Data)
-			nf = fieldnames(obj.Data);
-			for i=1:numel(nf)
-				C.Data.(nf{i}) = obj.Data.(nf{i});
-			end
-		else
-			C.Data = obj.Data;
+			% use new variables and constraints
+			new.vars = new_vars;
+			new.constraints = new_cons;
 		end
 		
 	end

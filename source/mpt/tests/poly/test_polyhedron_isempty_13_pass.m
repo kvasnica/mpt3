@@ -4,8 +4,8 @@ function test_polyhedron_isempty_13_pass
 % 
 % 
 
-V = [0 0 0]; % empty
+V = [0 0 0]; % non-empty vertices = set is NOT empty
 P = Polyhedron('V',V);
-if ~isEmptySet(P)
-    error('Given polyhedron object should be empty');
+assert(~P.isEmptySet);
+
 end

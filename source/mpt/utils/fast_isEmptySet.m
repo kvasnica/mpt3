@@ -17,3 +17,5 @@ S.quicklp = true;
 ret = mpt_solve(S);
 
 status = ~(ret.exitflag == MPTOPTIONS.OK);
+
+end

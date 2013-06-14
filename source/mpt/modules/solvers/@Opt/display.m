@@ -1,4 +1,4 @@
-function disp(opt)
+function display(opt)
 %
 % Overload display
 %

@@ -15,7 +15,7 @@ Y = YSet(x, [ (x-4)^2 <= 1.5 ]);
 h = Y.plot();
 bounds = get(h, 'XData');
 good = [2.77525512860841 5.22474487139159];
-assert(norm(bounds-good, Inf)<1e-10);
+assert(norm(bounds-good, Inf)<1e-6);
 
 % both bounds negative
 lb = -4;
