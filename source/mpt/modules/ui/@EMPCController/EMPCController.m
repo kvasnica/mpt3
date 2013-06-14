@@ -350,6 +350,26 @@ classdef EMPCController < AbstractController
 			
 		end
 		
+		function out = binaryTree(obj)
+			% Creates a binary tree representation of the optimizer
+			%
+			% ctrl.binaryTree() converts the controller's optimizer into a
+			% BinTreePolyUnion object. Subsequent evaluation via
+			% ctrl.evaluate() will then automatically use
+			% BinTreePolyUnion/contains() to perform point location.
+			%
+			% new = ctrl.binaryTree() will leave "ctrl" intact, and instead
+			% creates a copy "new", and converts that one into binary tree.
+			
+			if nargout>0
+				out = obj.copy();
+			else
+				out = obj;
+			end
+			out.optimizer = BinTreePolyUnion(obj.optimizer);
+						
+		end
+		
 	end
 	
 	methods(Static, Hidden)

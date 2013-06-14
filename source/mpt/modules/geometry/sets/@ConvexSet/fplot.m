@@ -26,6 +26,10 @@ function h = fplot(obj, varargin)
 %     string, default='-'
 %  'linewidth': width of lines, same as in matlab's plot
 %     numeric, default=1
+%  'edgecolor': color of edges
+%     string/numeric, default='k'
+%  'showgrid': if true, the grid will be shown
+%     logical, default=false
 %  'contour': if true, contour lines of the function will be plotted
 %     logical, default=false
 %  'colormap': color map to use
@@ -103,12 +107,14 @@ ip.addParamValue('color',  [], @validate_color);
 ip.addParamValue('wire',       false,  @(x) islogical(x) || x==1 || x==0);
 ip.addParamValue('linestyle',  '-', @validate_linestyle);
 ip.addParamValue('linewidth',  1,   @isnumeric);
+ip.addParamValue('edgecolor', 'k', @validate_color);
 ip.addParamValue('alpha',      1, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('contour',    false, @(x) islogical(x) || x==1 || x==0);
 ip.addParamValue('grid',  20,   @isnumeric);
 ip.addParamValue('contourGrid',  30,   @isnumeric);
 ip.addParamValue('colormap', 'mpt', @(x) (isnumeric(x) && size(x, 2)==3) || ischar(x)); 
 ip.addParamValue('colororder', 'fixed', @(x) isequal(x, 'fixed') || isequal(x, 'random'));
+ip.addParamValue('showgrid', false, @islogical);
 % show_set=true plots the underlying polyhedron
 ip.addParamValue('show_set', false, @islogical);
 % position=i plots the i-th element f(i) of f=fun(x)

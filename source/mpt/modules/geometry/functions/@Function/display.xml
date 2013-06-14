@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <help>
-	<function>disp</function>
+	<function>display</function>
 	
 	<!-- one-line description of the function -->
 	<info>
-        Overload display for <tt>AffFunction</tt> class.
+        Overload display for <tt>Function</tt> class.
 	</info>
 	
-	<syntax>disp(F)</syntax>
-    <syntax>F.disp</syntax>
+	<syntax>display(F)</syntax>
+    <syntax>F.display</syntax>
 
 	<!-- long description of the function -->
 	<descr>
-        Default display for <tt>AffFunction</tt> class.
+        Default display for <tt>Function</tt> class.
 	</descr>
 	<!-- now describe input arguments -->
 	
 	<!-- mark inputs as mandatory by providing the "required" attribute -->
 	<input required="true">
 		<name>F</name>
-        <descr><tt>AffFunction</tt> object.</descr>
+        <descr><tt>Function</tt> object.</descr>
 		<!-- any class name can be used, it can even be omitted -->
 		<class name="Function"/>
 	</input>
@@ -29,6 +29,7 @@
     <related>Function</related>
     <related>AffFunction</related>
 	<related>QuadFunction</related>
+    <related>setHandle</related>	
 
 	
 	<!-- multiple authors can be defined -->

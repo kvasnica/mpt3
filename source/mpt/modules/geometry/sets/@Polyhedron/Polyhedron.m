@@ -329,27 +329,7 @@ classdef Polyhedron < ConvexSet
 				
 			elseif nargin==1 && isa(varargin{1}, 'Polyhedron')
 				% copy constructor
-				P = varargin{1};
-				for i=1:numel(P)
-					obj(i).Dim = P(i).Dim;
-					obj(i).H_int  = P(i).H_int;
-					obj(i).V_int  = P(i).V_int;
-					obj(i).R_int  = P(i).R_int;
-					obj(i).He_int = P(i).He_int;
-					obj(i).hasHRep = P(i).hasHRep;
-					obj(i).hasVRep = P(i).hasVRep;
-					obj(i).irredundantVRep = P(i).irredundantVRep;
-					obj(i).irredundantHRep = P(i).irredundantHRep;
-					obj(i).Internal = P(i).Internal;
-					obj(i).Data = P(i).Data;
-					% copy functions
-					obj(i).Functions = containers.Map;
-					keys = P(i).Functions.keys;
-					values = P(i).Functions.values;
-					for j = 1:numel(keys)
-						obj(i).Functions(keys{j}) = values{j};
-					end
-				end
+				obj = varargin{1}.copy();
 				return
 				
 			elseif nargin==1 && isnumeric(varargin{1})
@@ -547,20 +527,6 @@ classdef Polyhedron < ConvexSet
 			obj.minAffineRep;
 			
 		end
-		
-		function Q = copy(P)
-			% Copy constructor for Polyhedron objects
-			
-			if numel(P)==0
-				% special treatment of empty arrays
-				Q = Polyhedron;
-				Q = Q([]);
-			else
-				% copying is done by the constructor
-				Q = Polyhedron(P);
-			end
-		end
-		
 	end
 	
 	methods(Hidden)
@@ -609,9 +575,10 @@ classdef Polyhedron < ConvexSet
 	
 	methods (Access=protected)
 		
-		% function prototypes
+		% function prototypes (plotting methods must remain protected)
 		h = fplot_internal(obj, function_name, options)
-		
+		h = plot_internal(obj, options)
+
 	end
 	
 end

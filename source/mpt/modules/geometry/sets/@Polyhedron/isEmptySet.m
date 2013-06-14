@@ -51,28 +51,8 @@ for i=1:length(P)
 		elseif any(isnan(ip.x))
             % NaN in interior point means empty polyhedron
             P(i).Internal.Empty = true;
-        elseif ~isempty(P(i).V_int) && all(all(P(i).V_int==0)) && isempty(P(i).R_int)
-            % if all vertices for given polyhedron are 0 and no rays -> empty
-            % polyhedron
-            P(i).Internal.Empty = true;
-        else
-            if ~isempty(ip.x)
-                if norm(ip.x,Inf)<MPTOPTIONS.abs_tol
-                    if isempty(ip.r) && all(all(P(i).V_int==0)) && isempty(P(i).R_int)
-                        P(i).Internal.Empty = true;
-                    else
-                       if ip.r<MPTOPTIONS.abs_tol
-                           P(i).Internal.Empty = true;
-                       else
-                           P(i).Internal.Empty = isempty(ip.x);
-                       end
-                    end
-                else
-                    P(i).Internal.Empty = false;
-                end
-            else       
-                P(i).Internal.Empty = isempty(ip.x);
-            end
+		else
+			P(i).Internal.Empty = isempty(ip.x);
         end
     end
     tf(i) = P(i).Internal.Empty;
