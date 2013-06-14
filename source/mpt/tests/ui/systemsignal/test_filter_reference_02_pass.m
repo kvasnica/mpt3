@@ -7,7 +7,7 @@ x.with('reference');
 
 % bogus settings
 [~, msg] = run_in_caller('x.reference = ''bogus''');
-asserterrmsg(msg, 'The value of reference must be ''free''.');
+asserterrmsg(msg, 'Unrecognized settings. Can only use "free" or "symbolic".');
 
 % correct settings
 x.reference = 'free';
