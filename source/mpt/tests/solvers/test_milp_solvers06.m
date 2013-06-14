@@ -1,6 +1,9 @@
 function test_milp_solvers06(solver, tol)
 % test program
 
+fname = mfilename;
+check_MILPsolvers;
+
 % initial data
 load data_test_milp06
 

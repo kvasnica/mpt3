@@ -3,6 +3,9 @@ function test_lp_solvers13(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 n=4;
 
 % equality constraints

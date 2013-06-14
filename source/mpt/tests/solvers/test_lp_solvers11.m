@@ -4,6 +4,9 @@ function test_lp_solvers11(solver, tol)
  m = 120; % inequality constraints
  me = 42; % equality constraints
 
+fname = mfilename;
+check_LPsolvers;
+ 
 % random system An*x=bn
 An = randn(n,n);
 bn = rand(n,1);

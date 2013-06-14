@@ -1,7 +1,10 @@
-function test_parametric_2D_qp_NN2(solver)
+function test_mpqp_2D_NN2(solver)
 %
 % 2D case NN2 from Compleib library
 %
+
+fname = mfilename;
+check_PQPsolvers;
 
  A=[0,1;-1,0];
  B=[0;1];

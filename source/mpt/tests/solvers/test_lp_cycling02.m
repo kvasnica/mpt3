@@ -2,6 +2,9 @@ function test_lp_cycling02(solver, tol)
 % testing cycling in LP problems
 % web.ist.utl.pt/ist11038/acad/or/LP/GassVinja.pdf
 
+fname = mfilename;
+check_LPsolvers;
+
 % problem 4.2
 S.f = [-3/4, 150, -1/50, 6, 0, 0, 0];
 

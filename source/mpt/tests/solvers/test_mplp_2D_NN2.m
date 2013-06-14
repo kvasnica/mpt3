@@ -3,6 +3,9 @@ function test_mplp_2D_NN2(solver)
 % 2D case NN2 from Compleib library
 %
 
+fname = mfilename;
+check_PLPsolvers;
+
  A=[0,1;-1,0];
  B=[0;1];
  C=[0,1];

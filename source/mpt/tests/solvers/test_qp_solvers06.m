@@ -6,6 +6,8 @@ function test_qp_solvers06(solver, tol)
 % Bunch J R and Kaufman L C (1980): A Computational Method for the Indefinite
 % Quadratic Programming Problem Linear Algebra and its Applications, 34, 341–37
 
+fname = mfilename;
+check_QPsolvers;
 
 % NOTE THAT H is not positive semi-definite (some solvers have troubles
 % with that)

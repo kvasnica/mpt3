@@ -4,6 +4,9 @@ function test_lp_solvers08(solver, tol)
 % nc = 0; inequality constraints
 % nceq = 15; equality constraints
 
+fname = mfilename;
+check_LPsolvers;
+
 % initial data
 load data_test_lp08
 

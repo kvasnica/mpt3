@@ -1,6 +1,9 @@
 function test_milp_solvers02(solver, tol)
 % test program
 
+fname = mfilename;
+check_MILPsolvers;
+
 % initial data
 A = [-2.4240   -0.4542   -0.0766   -0.2928    0.9967
    -0.2238   -0.6521    1.7382    0.0828    1.2159

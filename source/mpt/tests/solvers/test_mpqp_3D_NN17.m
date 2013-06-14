@@ -3,6 +3,9 @@ function test_mpqp_3D_NN17(solver)
 % 3D case NN15 from Compleib library
 %
 
+fname = mfilename;
+check_PQPsolvers;
+
  A=[0,-1,2; 1,-2,3; 0,1,0];
  B=[1,0; 0,0; 0,-1];
  C=[1 0 0];    

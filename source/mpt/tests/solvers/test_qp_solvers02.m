@@ -1,6 +1,9 @@
 function test_qp_solvers02(solver,tol)
 % example test2
 
+fname = mfilename;
+check_QPsolvers;
+
 % one eigenvalue is very close to 0
 H =[  1.3738   -0.4425   -2.5045    0.3011
    -0.4425    4.8346    3.1816    0.2346

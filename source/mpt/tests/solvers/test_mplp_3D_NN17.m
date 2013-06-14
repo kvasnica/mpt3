@@ -3,6 +3,9 @@ function test_mplp_3D_NN17(solver)
 % 3D case NN17 from Compleib library
 %
 
+fname = mfilename;
+check_PLPsolvers;
+
  A=[0,-1,2; 1,-2,3; 0,1,0];
  B=[1,0; 0,0; 0,-1];
  C=[1 0 0];    

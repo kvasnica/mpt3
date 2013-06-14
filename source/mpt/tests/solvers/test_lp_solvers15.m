@@ -1,6 +1,9 @@
 function test_lp_solvers15(solver, tol)
 % problem contains double sided inequalities
 
+fname = mfilename;
+check_LPsolvers;
+
 % simple lower and upper bounds
 S.lb = -100*ones(4,1);
 S.ub = 90*ones(4,1);

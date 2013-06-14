@@ -3,6 +3,9 @@ function test_mpqp_3D_ROC6(solver)
 % 3D case ROC6 from Compleib library
 %
 
+fname = mfilename;
+check_PQPsolvers;
+
  A=[1 -1 0;1 1 -1; 0 1 -2];
  B=[1; 0; 1];
  C=[0 -1 1];

@@ -2,6 +2,9 @@ function test_qp_solvers04(solver, tol)
 % no equality constraints
 % n = 17 variables
 
+fname = mfilename;
+check_QPsolvers;
+
 load data_test_qp04
 
 % solution via MPT interface

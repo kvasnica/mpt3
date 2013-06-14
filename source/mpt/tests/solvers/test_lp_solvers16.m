@@ -2,6 +2,9 @@ function test_lp_solvers16(solver, tol)
 % chebycenter problem
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 load data_lp_solvers_16
 
 S.A  = [P.A sqrt(sum(P.A.*P.A,2))];

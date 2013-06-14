@@ -2,6 +2,9 @@ function test_lp_solvers03(solver, tol)
 % testing only equality constraints
 % 
 
+fname = mfilename;
+check_LPsolvers;
+
 % initial data
 A = [];
 

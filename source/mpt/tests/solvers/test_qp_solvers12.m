@@ -3,6 +3,8 @@ function test_qp_solvers12(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_QPsolvers;
 
 load data_qp_problem_lcp_02
 S.solver = solver;

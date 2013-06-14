@@ -3,6 +3,9 @@ function test_mplp_3D_NN1(solver)
 % 3D case NN1 from Compleib library
 %
 
+ fname = mfilename;
+ check_PLPsolvers;
+
  A=[0 1 0;0 0 1;0 13 0];B=[0;0;1];C=[0 5 -1;-1 -1 0];D = 0;
 
  % continuous system

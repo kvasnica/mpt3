@@ -3,6 +3,9 @@ function test_qp_solvers14(solver,tol)
 % test provided by Michal
 %
 
+fname = mfilename;
+check_QPsolvers;
+
 load data_test_qp11
 
 o = Opt('H', H, 'f', f, 'A', A, 'b', B, 'Ae', Aeq, 'be', Beq,'solver',solver);

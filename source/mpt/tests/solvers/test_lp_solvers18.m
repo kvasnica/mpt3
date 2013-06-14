@@ -3,6 +3,9 @@ function test_lp_solvers18(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 S.f = [-1.6, 0.25, -1, 1, -0.8, 0.5];
 S.A = [-1.3745      -2.3792      -0.8905       1.2538       1.5374      0.24808
      -0.83929     -0.83819      0.13906        -2.52      0.14007    -0.076633

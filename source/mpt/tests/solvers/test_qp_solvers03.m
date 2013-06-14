@@ -1,6 +1,9 @@
 function test_qp_solvers03(solver, tol)
 % load examples from qpOASES
 
+fname = mfilename;
+check_QPsolvers;
+
 load example1   % Get matrices
 %xstart = zeros(size(lb));
 

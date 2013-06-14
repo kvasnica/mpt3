@@ -1,6 +1,9 @@
 function test_lp_solvers14(solver, tol)
 % inequality matrix A constains a lot of linearly dependent rows
 
+fname = mfilename;
+check_LPsolvers;
+
 % simple lower and upper bounds
 S.lb = -10*ones(4,1);
 S.ub = 8*ones(4,1);

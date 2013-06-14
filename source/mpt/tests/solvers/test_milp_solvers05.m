@@ -2,6 +2,9 @@ function test_milp_solvers05(solver, tol)
 % test program
 % no equality constraints
 
+fname = mfilename;
+check_MILPsolvers;
+
 % initial data
 load data_test_lp05
 

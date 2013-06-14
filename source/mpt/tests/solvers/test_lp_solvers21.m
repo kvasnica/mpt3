@@ -5,6 +5,9 @@ function test_lp_solvers21(solver,tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 load data_lp_problem_lcp_02
 
 S.solver = solver;

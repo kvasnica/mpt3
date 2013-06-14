@@ -2,6 +2,9 @@ function test_milp_solvers03(solver, tol)
 % testing only equality constraints
 % 
 
+fname = mfilename;
+check_MILPsolvers;
+
 % initial data
 A = [];
 

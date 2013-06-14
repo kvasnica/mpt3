@@ -2,6 +2,9 @@ function test_lp_solvers17(solver, tol)
 % chebycenter problem
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 load data_lp_solvers_17
 
 

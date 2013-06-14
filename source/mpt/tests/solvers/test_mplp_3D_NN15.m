@@ -3,6 +3,9 @@ function test_mplp_3D_NN15(solver)
 % 3D case NN15 from Compleib library
 %
 
+fname = mfilename;
+check_PLPsolvers;
+
  A=[0,1,0;-79.285,-0.113,0;28.564,0.041,0];
  B=[0,0;0.041,-0.0047;-0.03,-0.0016];
  C=[0,0,1;1,0,0];

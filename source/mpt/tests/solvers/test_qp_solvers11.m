@@ -3,6 +3,9 @@ function test_qp_solvers11(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_QPsolvers;
+
 S.H = eye(6);
 S.f = [-1.6, 0.25, -1, 1, -0.8, 0.5];
 S.A = [-1.3745      -2.3792      -0.8905       1.2538       1.5374      0.24808

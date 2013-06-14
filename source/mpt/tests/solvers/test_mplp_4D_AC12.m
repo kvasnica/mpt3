@@ -3,6 +3,9 @@ function test_mplp_4D_AC12(solver)
 % 4D case AC12 from Compleib library
 %
 
+fname = mfilename;
+check_PLPsolvers;
+
  A=[-0.0017, 0.0413,-5.3257,-9.7565;
     -0.0721,-0.3393,49.5146,-1.0097;
     -0.0008, 0.0138,-0.2032, 0.0009;

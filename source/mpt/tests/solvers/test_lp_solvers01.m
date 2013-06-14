@@ -2,6 +2,9 @@ function test_lp_solvers01(solver, tol)
 % load example file (taken from
 % http://www.mathworks.com/access/helpdesk/help/toolbox/optim/ug/brn4nj4.html)
 
+fname = mfilename;
+check_LPsolvers;
+
 load sc50b
 %solution 
 

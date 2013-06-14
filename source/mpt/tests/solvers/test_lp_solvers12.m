@@ -3,6 +3,9 @@ function test_lp_solvers12(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_LPsolvers;
+
 n = 40; % variables
  m = 120; % inequality constraints
  me = 42; % equality constraints

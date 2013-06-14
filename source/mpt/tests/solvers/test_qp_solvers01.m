@@ -2,6 +2,9 @@ function test_qp_solvers01(solver, tol)
 % load example file (taken from
 % http://www.mathworks.com/access/helpdesk/help/toolbox/optim/ug/brn4nlc.html
 
+fname = mfilename;
+check_QPsolvers;
+
 load qpbox1   % Get H
 %H = full(H);
 lb = zeros(400,1); lb(400) = -1e6;

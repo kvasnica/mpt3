@@ -2,6 +2,9 @@ function test_milp_solvers01(solver, tol)
 % load example file and change it slightly (taken from
 % http://www.mathworks.com/access/helpdesk/help/toolbox/optim/ug/brn4nj4.html)
 
+fname = mfilename;
+check_MILPsolvers;
+
 load sc50b
 x0 = zeros(1,size(A,2));
 

@@ -3,6 +3,9 @@ function test_mplp_4D_AC15(solver)
 % 4D case AC15 from Compleib library
 %
 
+fname = mfilename;
+check_PLPsolvers;
+
   A=[-.037 .0123 .00055 -1;0 0 1 0;-6.37 0 -.23 .0618;1.25 0 .016 -.0457];
  B=[.00084 .000236;0 0;.08 .804;-.0862 -.0665];
  C=[0 1 0 0;0 0 1 0;0 0 0 1];

@@ -3,6 +3,9 @@ function test_milp_solvers04(solver, tol)
 % 
 global MPTOPTIONS
 
+fname = mfilename;
+check_MILPsolvers;
+
 % initial data
 % x1 <= -1 should not be feasible with lower bound x>=0
 A = [1 0 0 0 0 0];

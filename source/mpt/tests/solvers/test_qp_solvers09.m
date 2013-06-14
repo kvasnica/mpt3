@@ -4,6 +4,9 @@ function test_qp_solvers09(solver, tol)
 % nc = 124; inequality constraints
 % nceq = 86; equality constraints
 
+fname = mfilename;
+check_QPsolvers;
+
 load data_test_qp09
 
 % solution via MPT interface

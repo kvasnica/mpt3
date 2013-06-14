@@ -3,6 +3,9 @@ function test_mpqp_4D_AC4(solver)
 % 4D case AC4 from Compleib library
 %
 
+fname = mfilename;
+check_PQPsolvers;
+
  A=[-0.876 1 -0.1209 0; 8.9117 0 -130.75 0; 0 0 -150 0; -1 0 0 -0.05];
  B=[0;0;150;0];
  C=[-1 0 0 0;0 -1 0 0];

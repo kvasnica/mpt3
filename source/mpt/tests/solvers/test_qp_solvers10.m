@@ -3,6 +3,9 @@ function test_qp_solvers10(solver, tol)
 
 global MPTOPTIONS
 
+fname = mfilename;
+check_QPsolvers;
+
 load data_test_qp10
 
 % solution via MPT interface

@@ -3,6 +3,9 @@ function test_mpqp_3D_NN8(solver)
 % 3D case NN8 from Compleib library
 %
 
+fname = mfilename;
+check_PQPsolvers;
+
  A=[-0.2 0.1 1;-0.05 0 0;0 0 -1];
  B=[0 1; 0 0.7;1 0];
  C=[1 0 0; 0 1 0];
