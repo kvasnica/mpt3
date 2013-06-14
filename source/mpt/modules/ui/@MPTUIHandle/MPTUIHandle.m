@@ -1,10 +1,10 @@
 classdef MPTUIHandle < dynamicprops & matlab.mixin.Copyable
     % Class representing a storage of components and filters
    
-    properties(SetAccess=protected)
+    properties(Hidden,SetAccess=protected)
         Internal
 	end
-	properties(Constant)
+	properties(Hidden,Constant)
 		Version = 1.1
 		% History:
 		%   1.1 (June 5, 2013): "internal_properties" changed to "Internal"
