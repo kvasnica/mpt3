@@ -1,4 +1,4 @@
-function test_polyhedron_isFullDim_01_pass
+function test_polyhedron_isfulldim_11_pass
 %
 % isFullDim test
 % 
