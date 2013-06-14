@@ -123,6 +123,102 @@ classdef BinTreePolyUnion < PolyUnion
 			
 		end
 		
+		function toC(obj, function_name, file_name)
+			% Exports the binary tree to a C-code
+			%
+			%   tree.toC('function', 'output.c')
+			
+			global MPTOPTIONS
+			
+			error(nargchk(3, 3, nargin));
+			error(obj.rejectArray());
+
+			% is the request function present?
+			if ~obj.hasFunction(function_name)
+				error('No such function "%s" in the object.', function_name);
+			end
+			% we only support affine functions for now
+			if ~isa(obj.Set(1).Functions(function_name), 'AffFunction')
+				error('Only affine functions are supported in this version.');
+			end
+			
+			fun = obj.Set(1).Functions(function_name);
+			out = sprintf('/* Generated on %s by MPT %s */', ...
+				datestr(now), MPTOPTIONS.version);
+
+			% read code from our template
+			template_file = which('BinTreePolyUnion/mpt_searchTree.c');
+			if isempty(template_file),
+				error('Cannot find file "BinTreePolyUnion/mpt_searchTree.c". Check your path setup.');
+			end
+			template = fileread(template_file);
+			
+			% data of the search tree
+			ST = obj.Tree'; ST = ST(:);
+			out = char(out, sprintf('#define MPT_RANGE %d', fun.R));
+			out = char(out, sprintf('#define MPT_DOMAIN %d', fun.D));
+			out = char(out, 'static float MPT_ST[] = {');
+			temp = '';
+			for i = 1:length(ST),
+				temp = [temp sprintf('%e,\t', ST(i))];
+				if mod(i, 5)==0 || i==length(ST),
+					out = char(out, temp);
+					temp = '';
+				end
+			end
+			out = char(out, '};');
+			
+			% data of the function
+			
+			% linear term
+			out = char(out, 'static float MPT_F[] = {');
+			for i = 1:obj.Num
+				F = obj.Set(i).Functions(function_name).F;
+				for j = 1:fun.R
+					f = F(j, :);
+					temp = '';
+					for k = 1:length(f),
+						temp = [temp sprintf('%e,\t', f(k))];
+					end
+					out = char(out, temp);
+				end
+			end
+			out = char(out, '};');
+			
+			% constant term
+			out = char(out, 'static float MPT_G[] = {');
+			for i = 1:obj.Num,
+				g = obj.Set(i).Functions(function_name).g;
+				for j = 1:fun.R,
+					f = g(j, :);
+					temp = '';
+					for k = 1:length(f),
+						temp = [temp sprintf('%e,\t', f(k))];
+					end
+					out = char(out, temp);
+				end
+			end
+			out = char(out, '};');
+
+			% convert into a single string, add line breaks
+			out_nl = [];
+			for i = 1:size(out, 1),
+				out_nl = [out_nl sprintf('%s\n', deblank(out(i, :)))];
+			end
+			
+			% inject data into the template
+			template = strrep(template, '/* placeholder, do not edit or remove!!! */', out_nl);
+
+			% write to a file
+			outfid = fopen(file_name, 'w');
+			if outfid < 0,
+				error('Cannot open file "%s" for writing!', file_name);
+			end
+			fprintf(outfid, '%s', template);
+			fclose(outfid);
+			fprintf('Output written to "%s".\n', file_name);
+		end
+		
 		function display(obj)
 			% Display method for BinTreePolyUnion objects
 			
