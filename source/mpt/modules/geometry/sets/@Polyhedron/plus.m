@@ -48,9 +48,19 @@ end
 
 % deal with arrays
 if numel(P)>1
-    PpS(size(P)) = Polyhedron;
-    parfor i=1:numel(P)
-        PpS(i) = plus(P(i),S);
+    if isa(S,'Polyhedron')
+        PpS(numel(P)*numel(S),1) = Polyhedron;
+        % match each polyhedron together
+        for i=1:numel(P)
+            for j=1:numel(S)
+                PpS(numel(S)*(i-1)+j) = plus(P(i),S(j));
+            end
+        end
+    else
+        PpS(size(P)) = Polyhedron;
+        for i=1:numel(P)
+           PpS(i) = plus(P(i),S);
+        end
     end
     return;
 end
@@ -154,7 +164,7 @@ switch type
     otherwise
         
         validate_realvector(S);
-		if size(S, 2)~=1 || numel(S)~=P.Dim
+        if size(S, 2)~=1 || numel(S)~=P.Dim
             error('The point must be a %dx1 vector', P.Dim);
         end
         x = S(:);
