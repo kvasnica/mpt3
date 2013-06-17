@@ -55,13 +55,23 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
 	  
 	  function F = getFunction(obj, FuncName)
 		  % returns function indexed by the string FuncName
-		  for i = 1:numel(obj)
-			  F(i) = obj(i).Functions(FuncName);
-		  end
+          if ~isa(FuncName,'char')
+              error('The function name must be given as a string.');
+          end
+          for i = 1:numel(obj)
+              F(i) = obj(i).Functions(FuncName);
+          end
 	  end
 	  
 	  function obj = removeFunction(obj, FuncNames)
 		  % removes function indexed by the string FuncName
+          if iscell(FuncNames)
+               if any(~cellfun('isclass',FuncNames,'char'))
+                   error('The function name must be given as a string.');
+               end
+          elseif ~isa(FuncNames,'char')
+              error('The function name must be given as a string.');
+          end
 		  for i = 1:numel(obj)
 			  obj(i).Functions.remove(FuncNames);
 		  end
