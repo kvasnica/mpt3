@@ -12,7 +12,7 @@ if numel(P)>1
 end
 
 % construct non-empty object with minimal arguments such the error is not thrown
-Q(size(P)) = Opt('A',P(1).A,'b',P(1).b,'Ae',P(1).Ae,'be',P(1).be,'lb',P(1).lb,'ub',P(1).ub,'M',P(1).M,'q',P(1).q);
+Q(size(P)) = Opt('A',P(1).A,'b',P(1).b,'pB',P(1).pB,'Ae',P(1).Ae,'be',P(1).be,'pE',P(1).pE,'lb',P(1).lb,'ub',P(1).ub,'M',P(1).M,'q',P(1).q);
 
 % copy remaining elements field by field because struct on object may be disabled in the
 % future

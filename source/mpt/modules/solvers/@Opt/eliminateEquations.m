@@ -101,7 +101,7 @@ if rank(full(Ue(:,1:re)))~=re
     % try full factorization but we with different combination of
     % variables
     [Le,Ue,pe] = lu(Ae(:,2:re+1),'vector');
-    qe = 1:n;
+    qe = 1:S.n;
     if rank(Ue(:,1:re))~=re
         error('EliminateEquations: Could not find invertible submatrix for removing equalities.');
     end
@@ -149,7 +149,7 @@ end
 
 % modify cost
 if isempty(S.H)
-    f = C'*S.f(Bc) + S.f(Nc);
+    f = C'*S.f(Bc) + S.f(Nc,:);
     c = S.f(Bc)'*D1 + S.c;
     if S.isParametric
         pF = C'*S.pF(Bc,:) + S.pF(Nc,:);
@@ -160,7 +160,7 @@ else
     H = S.H(Nc,Nc) + C'*S.H(Bc,Bc)*C + C'*S.H(Bc,Nc) + S.H(Nc,Bc)*C;
     % make sure H is symmetric due numerical problems
     H = 0.5*(H'+H);
-    f = 0.5*(C'*S.H(Bc,Bc)*D1 + C'*S.H(Bc,Bc)'*D1 + S.H(Bc,Nc)'*D1 + S.H(Nc,Bc)*D1) + C'*S.f(Bc) + S.f(Nc);
+    f = 0.5*(C'*S.H(Bc,Bc)*D1 + C'*S.H(Bc,Bc)'*D1 + S.H(Bc,Nc)'*D1 + S.H(Nc,Bc)*D1) + C'*S.f(Bc) + S.f(Nc,:);
     c = 0.5*D1'*S.H(Bc,Bc)*D1 + S.f(Bc)'*D1 + S.c;
     if S.isParametric
         pF = 0.5*(C'*S.H(Bc,Bc)*D2 + C'*S.H(Bc,Bc)'*D2 + S.H(Bc,Nc)'*D2 + S.H(Nc,Bc)*D2) + C'*S.pF(Bc,:) + S.pF(Nc,:);

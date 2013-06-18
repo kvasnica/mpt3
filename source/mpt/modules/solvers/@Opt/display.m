@@ -18,7 +18,7 @@ if numel(opt)==0
     return;
 end
 
-if opt.n==0
+if opt.n==0 && ~opt.isParametric
     fprintf('Empty problem.\n');
     return;
 end

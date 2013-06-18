@@ -19,6 +19,6 @@ problem = Opt(S);
 % full-dimensional
 [worked, msg] = run_in_caller('problem.solve; ');
 assert(~worked);
-asserterrmsg(msg,'Opt: Equality constraints are not consistent.');
+asserterrmsg(msg,'EliminateEquations: Could not find invertible submatrix for removing equalities.');
 
 end

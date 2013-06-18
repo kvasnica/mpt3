@@ -78,8 +78,15 @@ else
     opt.d = max([size(opt.pF,2) size(opt.pB,2) size(opt.pE,2) size(opt.Ath,2)]);
     opt.m  = size(opt.A,1);
     opt.me = size(opt.Ae,1);
-        
-    if isempty(opt.A) && isempty(opt.Ae) && isempty(opt.lb) && isempty(opt.ub)
+    
+    % Validate parametric inputs
+    if ~isempty(opt.pF) || ~isempty(opt.pB) || ~isempty(opt.pE)        
+        opt.isParametric = true;
+    else
+        opt.isParametric = false;
+    end   
+    
+    if isempty(opt.A) && isempty(opt.Ae) && isempty(opt.lb) && isempty(opt.ub) && ~opt.isParametric
         if isempty(opt.H) && isempty(opt.f)
             error('Opt: Empty problem');
         elseif isempty(opt.H) && ~isempty(opt.f)
@@ -175,8 +182,10 @@ else
             error('Opt: b must be %i x 1\n', opt.m); 
         end
     else
-        opt.A = zeros(0, opt.n);
-        opt.b = zeros(0,1);
+        opt.A = zeros(opt.m, opt.n);
+    end
+    if isempty(opt.b)
+       opt.b = zeros(opt.m, 1);
     end
     
     opt.b = opt.b(:);
@@ -193,8 +202,10 @@ else
             error('Opt: be must be %i x 1\n', opt.me);
         end
     else
-        opt.Ae = zeros(0, opt.n);
-        opt.be = zeros(0,1);
+        opt.Ae = zeros(opt.me, opt.n);
+    end
+    if isempty(opt.be)
+        opt.be = zeros(opt.me, 1);
     end
     
     if ~isempty(opt.lb)
@@ -229,14 +240,7 @@ else
     else        
         opt.c = 0;
     end
-    
-    % Validate parametric inputs
-    if ~isempty(opt.pF) || ~isempty(opt.pB) || ~isempty(opt.pE)        
-        opt.isParametric = true;
-    else
-        opt.isParametric = false;
-    end
-    
+        
     if opt.isParametric
         if ~isempty(opt.pF)
             if size(opt.pF,2) ~= opt.d || size(opt.pF,1) ~= opt.n
@@ -315,7 +319,7 @@ else
     re = rank(full(opt.Ae));
     
     % overdetermined system, no degrees of freedom
-    if re>=opt.n
+    if re>opt.n
         error('Opt: Overdetermined system, no degrees of freedom.');
     end
     
