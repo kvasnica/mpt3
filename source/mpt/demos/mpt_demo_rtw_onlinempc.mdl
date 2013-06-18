@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.26"
+    ComputedModelVersion    "1.29"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "machine"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Feb 18 15:05:05 2013"
-  RTWModifiedTimeStamp	  283100595
-  ModelVersionFormat	  "1.%<AutoIncrement:26>"
+  LastModifiedDate	  "Tue Jun 18 13:15:12 2013"
+  RTWModifiedTimeStamp	  293462089
+  ModelVersionFormat	  "1.%<AutoIncrement:29>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -67,6 +67,7 @@ Model {
     $ObjectID		    1
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
     model_		    "mpt_demo_rtw_onlinempc"
+    signals_		    []
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
@@ -443,8 +444,9 @@ Model {
 	  ConfigAtBuild		  off
 	  RTWUseLocalCustomCode	  off
 	  RTWUseSimCustomCode	  off
-	  CustomInclude		  "\"C:\\mpt\\lcp\\lcp_r2012a\\openwatcom\\lib\""
-	  CustomSource		  "lcp_main.c lcp_matrix.c lumod_dense.c"
+	  CustomInclude		  "\"C:\\mpt\\mpt_devel\\tbxmanager\\toolboxes\\lcprtw\\1.0\\pcwin\\lcp_rtw2012a\\lib\" \"C:\\mpt\\m"
+	  "pt_devel\\tbxmanager\\toolboxes\\lcp\\1.0.2\\pcwin\\source\" "
+	  CustomSource		  "lcp_main.c lcp_matrix.c lumod_dense.c "
 	  CustomLibrary		  "lcp_rtwin.lib"
 	  IncludeHyperlinkInReport off
 	  LaunchReport		  off
@@ -1262,7 +1264,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "60"
+    SIDHighWatermark	    "62"
     Block {
       BlockType		      Sum
       Name		      "Add"
@@ -1475,10 +1477,11 @@ Model {
     }
     Block {
       BlockType		      S-Function
-      Name		      "lcp_sfun"
-      SID		      "14"
+      Name		      "lcp_sfun_rtw2012a"
+      SID		      "62"
       Ports		      [2, 6]
-      Position		      [540, 242, 610, 548]
+      Position		      [545, 242, 625, 548]
+      ZOrder		      -4
       BlockMirror	      on
       BackgroundColor	      "lightBlue"
       NamePlacement	      "alternate"
@@ -1587,51 +1590,56 @@ Model {
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
       MaskInitialization      "% find where LCP solver is installed\np = which('lcp');\n\nif isempty(p)\n    error('Co"
-      "uld not find path to LCP solver. Add LCP solver to Matlab path.');\nend\n\nif ispc\n    lib_path = ['\"',filepar"
-      "ts(p),filesep,'openwatcom',filesep,'lib\"'];\n    \n    % set path to external libs\n    set_param(strtok(gcs,'/"
-      "'),'CustomInclude',lib_path);\n    \n    % set sources\n    set_param(strtok(gcs,'/'),'CustomSource','lcp_main.c"
-      " lcp_matrix.c lumod_dense.c');\n    \n    % what is the target ?\n    target = get_param(strtok(gcs,'/'),'System"
-      "TargetFile');\n    \n    if strcmp(target,'rtwin.tlc')\n        \n        % set LCP template\n        try\n     "
-      "       set_param(strtok(gcs,'/'),'TemplateMakefile','lcp_rtwin.tmf');\n        catch\n            msgbox('LCP in"
-      "itialization script have changed the default settings, try to compile the scheme again with \"CTRL+B\".');\n    "
-      "        set_param(strtok(gcs,'/'),'TemplateMakefile','lcp_rtwin.tmf');\n        end\n        % set libs\n       "
-      " set_param(strtok(gcs,'/'),'CustomLibrary','lcp_rtwin.lib');\n        \n    elseif strcmp(target,'xpctarget.tlc'"
-      ")\n        \n        % check for OpenWatcom compiler\n        if ~strcmpi(getxpcenv('CCompiler'),'Watcom')\n    "
-      "        error('You need to set OpenWatcom compiler for XPC target to work with LCP. You can download the compile"
-      "r from \"www.openwatcom.org\".');\n        end\n        \n        % set LCP template\n        try\n            s"
-      "et_param(strtok(gcs,'/'),'TemplateMakefile','lcp_xpc_watc.tmf');\n        catch\n            msgbox('LCP initial"
-      "ization script have changed the default settings, try to compile the scheme again with \"CTRL+B\".');\n         "
-      "   set_param(strtok(gcs,'/'),'TemplateMakefile','lcp_xpc_watc.tmf');\n        end\n        % set libs\n        s"
-      "et_param(strtok(gcs,'/'),'CustomLibrary','lcp_mex.lib flib7s.lib');\n        \n    elseif strcmp(target,'grt.tlc"
-      "')\n        \n        % check for a compiler\n        cn = mex.getCompilerConfigurations;\n        \n        % s"
-      "et libs\n        if ~isempty(regexpi(cn(1).Name,'microsoft'))\n            dirstr='microsoft';\n            libs"
-      " = [matlabroot,filesep,'extern',filesep,'lib',filesep,'win32',filesep,dirstr,filesep];\n            \n          "
-      "  % set default template\n            try\n                set_param(strtok(gcs,'/'),'TemplateMakefile','grt_def"
-      "ault_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'libmwblas.lib\" \"',libs,'lib"
-      "mwlapack.lib\"']);\n            catch\n                msgbox('LCP initialization script have changed the defaul"
-      "t settings, try to compile the scheme again with \"CTRL+B\".');\n                set_param(strtok(gcs,'/'),'Temp"
-      "lateMakefile','grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'libmwbl"
-      "as.lib\" \"',libs,'libmwlapack.lib\"']);\n            end\n            \n        elseif ~isempty(regexpi(cn(1).N"
-      "ame,'watcom'))\n          \n            % set LCP template\n            try\n                set_param(strtok(gc"
-      "s,'/'),'TemplateMakefile','lcp_grt_watc.tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary','lcp_m"
-      "ex.lib flib7s.lib');\n            catch\n                msgbox('LCP initialization script have changed the defa"
-      "ult settings, try to compile the scheme again with \"CTRL+B\".');\n                set_param(strtok(gcs,'/'),'Te"
-      "mplateMakefile','lcp_grt_watc.tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary','lcp_mex.lib fli"
-      "b7s.lib');\n            end\n            \n        elseif ~isempty(regexpi(cn(1).Name,'lcc'))\n            dirst"
-      "r='lcc';\n            libs = [matlabroot,filesep,'extern',filesep,'lib',filesep,'win32',filesep,dirstr,filesep];"
-      "\n            \n            % set default template\n            try\n                set_param(strtok(gcs,'/'),'"
-      "TemplateMakefile','grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'lib"
-      "mwblas.lib\" \"',libs,'libmwlapack.lib\"']);\n            catch\n                msgbox('LCP initialization scri"
-      "pt have changed the default settings, try to compile the scheme again with \"CTRL+B\".');\n                set_p"
-      "aram(strtok(gcs,'/'),'TemplateMakefile','grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLi"
-      "brary',['\"',libs,'libmwblas.lib\" \"',libs,'libmwlapack.lib\"']);\n            end\n             \n        else"
-      "\n            error('You don''t have a suitable C-compiler installed.');\n        end\n        \n        \n    e"
-      "lse\n        if ~isempty(which('rtwbuild'))\n            disp(' ');\n            disp('========================="
-      "===================================================');\n            disp('This target for Real-Time Workshop has"
-      " not been tested with LCP, you may experience problems when compiling, linking and running. Please, choose RTWIN"
-      " or XPC target.');\n            disp('=========================================================================="
-      "==');\n            disp(' ');\n        end\n    end\nend"
-      MaskDisplay	      "disp('LCP solver');"
+      "uld not find path to LCP solver. Add LCP solver to Matlab path.');\nend\n\nif ispc\n    % find where RTW templat"
+      "es are installed\n    s = which('lcp_rtwin.tmf');\n    if isempty(s)\n        error('Could not find RTW template"
+      "s for LCP solver. Add the path to the LCP solver configured for for Real-Time Workshop \"lcprtw\" or install it "
+      "using tbxmanager.');\n    end\n    \n    lib_path = ['\"',fileparts(s),filesep,'lib\" '];\n    src_path = ['\"',"
+      "fileparts(p),'\" '];\n    \n    % set path to external libs\n    set_param(strtok(gcs,'/'),'CustomInclude',[lib_"
+      "path,src_path]);\n    \n    % set sources\n    set_param(strtok(gcs,'/'),'CustomSource','lcp_main.c lcp_matrix.c"
+      " lumod_dense.c ');\n    \n    % what is the target ?\n    target = get_param(strtok(gcs,'/'),'SystemTargetFile')"
+      ";\n    \n    if strcmp(target,'rtwin.tlc')\n        \n        % set LCP template\n        try\n            set_p"
+      "aram(strtok(gcs,'/'),'TemplateMakefile','lcp_rtwin.tmf');\n        catch\n            msgbox('LCP initialization"
+      " script have changed the default settings, try to compile the scheme again with \"CTRL+B\".');\n            set_"
+      "param(strtok(gcs,'/'),'TemplateMakefile','lcp_rtwin.tmf');\n        end\n        % set libs\n        set_param(s"
+      "trtok(gcs,'/'),'CustomLibrary','lcp_rtwin.lib');\n        \n    elseif strcmp(target,'xpctarget.tlc')\n        \n"
+      "        % check for OpenWatcom compiler\n        if ~strcmpi(getxpcenv('CCompiler'),'Watcom')\n            error"
+      "('You need to set OpenWatcom compiler for XPC target to work with LCP. You can download the compiler from \"www."
+      "openwatcom.org\".');\n        end\n        \n        % set LCP template\n        try\n            set_param(strt"
+      "ok(gcs,'/'),'TemplateMakefile','lcp_xpc_watc.tmf');\n        catch\n            msgbox('LCP initialization scrip"
+      "t have changed the default settings, try to compile the scheme again with \"CTRL+B\".');\n            set_param("
+      "strtok(gcs,'/'),'TemplateMakefile','lcp_xpc_watc.tmf');\n        end\n        % set libs\n        set_param(strt"
+      "ok(gcs,'/'),'CustomLibrary','lcp_mex.lib flib7s.lib');\n        \n    elseif strcmp(target,'grt.tlc')\n        \n"
+      "        % check for a compiler\n        cn = mex.getCompilerConfigurations;\n        \n        % set libs\n     "
+      "   if ~isempty(regexpi(cn(1).Name,'microsoft'))\n            dirstr='microsoft';\n            libs = [matlabroot"
+      ",filesep,'extern',filesep,'lib',filesep,'win32',filesep,dirstr,filesep];\n            \n            % set defaul"
+      "t template\n            try\n                set_param(strtok(gcs,'/'),'TemplateMakefile','grt_default_tmf');\n "
+      "               set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'libmwblas.lib\" \"',libs,'libmwlapack.lib\""
+      "']);\n            catch\n                msgbox('LCP initialization script have changed the default settings, tr"
+      "y to compile the scheme again with \"CTRL+B\".');\n                set_param(strtok(gcs,'/'),'TemplateMakefile',"
+      "'grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'libmwblas.lib\" \"',l"
+      "ibs,'libmwlapack.lib\"']);\n            end\n            \n        elseif ~isempty(regexpi(cn(1).Name,'watcom'))"
+      "\n            \n            % set LCP template\n            try\n                set_param(strtok(gcs,'/'),'Temp"
+      "lateMakefile','lcp_grt_watc.tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary','lcp_mex.lib flib7"
+      "s.lib');\n            catch\n                msgbox('LCP initialization script have changed the default settings"
+      ", try to compile the scheme again with \"CTRL+B\".');\n                set_param(strtok(gcs,'/'),'TemplateMakefi"
+      "le','lcp_grt_watc.tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary','lcp_mex.lib flib7s.lib');\n"
+      "            end\n            \n        elseif ~isempty(regexpi(cn(1).Name,'lcc'))\n            dirstr='lcc';\n  "
+      "          libs = [matlabroot,filesep,'extern',filesep,'lib',filesep,'win32',filesep,dirstr,filesep];\n          "
+      "  \n            % set default template\n            try\n                set_param(strtok(gcs,'/'),'TemplateMake"
+      "file','grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"',libs,'libmwblas.lib\""
+      " \"',libs,'libmwlapack.lib\"']);\n            catch\n                msgbox('LCP initialization script have chan"
+      "ged the default settings, try to compile the scheme again with \"CTRL+B\".');\n                set_param(strtok("
+      "gcs,'/'),'TemplateMakefile','grt_default_tmf');\n                set_param(strtok(gcs,'/'),'CustomLibrary',['\"'"
+      ",libs,'libmwblas.lib\" \"',libs,'libmwlapack.lib\"']);\n            end\n            \n        else\n           "
+      " error('You don''t have a suitable C-compiler installed.');\n        end\n        \n        \n    else\n        "
+      "if ~isempty(which('rtwbuild'))\n            disp(' ');\n            disp('======================================"
+      "======================================');\n            fprintf('This target for Real-Time Workshop has not been "
+      "tested with LCP solver,\\nyou may experience problems when compiling, linking and running.\\nPlease, choose RTWI"
+      "N or XPC target.\\n');\n            fprintf('Alternatively, you can recompile the source fils for this target\\n"
+      "on your own. The source files are located in \"openwatcom/DBLAS_DLAPAC_SRC\" directory.\\n');\n            disp("
+      "'============================================================================');\n            disp(' ');\n      "
+      "  end\n    end\nend"
+      MaskDisplay	      "disp('LCP solver\\n for RTW 2012a');"
       MaskIconFrame	      on
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
@@ -1824,9 +1832,9 @@ Model {
     }
     Line {
       Name		      "z"
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      1
-      Points		      [-65, 0]
+      Points		      [-70, 0]
       Branch {
 	DstBlock		"z"
 	DstPort			1
@@ -1841,14 +1849,14 @@ Model {
     Line {
       SrcBlock		      "M"
       SrcPort		      1
-      DstBlock		      "lcp_sfun"
+      DstBlock		      "lcp_sfun_rtw2012a"
       DstPort		      1
     }
     Line {
       Name		      "w"
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      2
-      Points		      [-50, 0]
+      Points		      [-55, 0]
       Branch {
 	DstBlock		"w"
 	DstPort			1
@@ -1861,25 +1869,25 @@ Model {
       }
     }
     Line {
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      3
       DstBlock		      "basis"
       DstPort		      1
     }
     Line {
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      4
       DstBlock		      "exitflag"
       DstPort		      1
     }
     Line {
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      5
       DstBlock		      "pivots"
       DstPort		      1
     }
     Line {
-      SrcBlock		      "lcp_sfun"
+      SrcBlock		      "lcp_sfun_rtw2012a"
       SrcPort		      6
       DstBlock		      "time"
       DstPort		      1
@@ -1887,7 +1895,7 @@ Model {
     Line {
       SrcBlock		      "Add"
       SrcPort		      1
-      DstBlock		      "lcp_sfun"
+      DstBlock		      "lcp_sfun_rtw2012a"
       DstPort		      2
     }
     Line {
