@@ -8,6 +8,7 @@
 	</info>
 
     <syntax>result = problem.solve</syntax>
+    <syntax>result = problem.solve(th)</syntax>
     <syntax>result = solve(problem)</syntax>
 
     <descr>
@@ -17,7 +18,9 @@
         The <tt>Opt</tt> class serves as general wrapper for preprocessing the data 
         involved in optimization, including necessary error checks. Once the data are valid, 
         then are passed to <tt>mpt_solve</tt> or <tt>mpt_solvemp</tt> function that calls the appropriate solver without
-        any errorchecks. 
+        any errorchecks. <br />
+        For parametric problems it is possible to solve the problem for a particular value of the parameters <i>\theta</i>        
+        if provided as an argument <tt>th</tt>.
 
         
 	</descr>
@@ -121,6 +124,27 @@
         <cmd> result = problem.solve </cmd>
         <descr> We can plot the solution </descr>
         <cmd> result.xopt.plot </cmd>        
+    </example>
+    <example>
+        <descr> Formulate linear parametric problem <i>\min x_1-2x_2\theta+\theta \text{s.t.} x_1-x_2\ge\theta, x_1\ge 0, x_2\ge 0, -1\le\theta\le 1  </i>
+            with the help of YALMIP.
+        </descr>
+        <cmd> sdpvar x1 x2 th </cmd>
+        <descr> Objective function: </descr>
+        <cmd>  obj = x1-2*x2*th+th; </cmd>
+        <descr> Constraints: </descr>
+        <cmd>  F = [ x1-x2 &gt;= th; x1&gt;=0; x2&gt;=0; -1&lt;= th &lt;= 1]; </cmd>
+        <descr> Construct an instance of <tt>Opt</tt> class that represents parametric linear program </descr>
+        <cmd> problem=Opt(F,obj,th,[x1;x2]) </cmd>
+        <descr> Solve the above problem quickly for the point <tt>th=0.5</tt> without generating explicit solution
+        </descr>
+        <cmd> problem.solve(0.5) </cmd>        
+        <descr> Verify this result by solving the problem parametrically</descr>
+        <cmd> res=problem.solve; </cmd>
+        <descr>  Plot the optimal cost function </descr>
+        <cmd> res.xopt.fplot('obj','linewidth',3); </cmd>
+        <descr> Evaluate the explicit solution for the point <tt>th=0.5</tt> </descr>
+        <cmd> res.xopt.feval(0.5,'obj') </cmd>        
     </example>
 
 	<!-- multiple related function can be defined -->
