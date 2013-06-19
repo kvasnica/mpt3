@@ -8,6 +8,7 @@
   </info>
   <syntax>S = P.slice(dims, values)</syntax>
   <syntax>S = slice(P, dims, values)</syntax>
+  <syntax>S = P.slice(dims, values, 'keepDim', true/false)</syntax>
 
   <descr> 
       Compute the intersection of <i>P</i> with a subspace spanning the dimensions <tt>dims</tt> at
@@ -25,12 +26,18 @@
      <latex>
          $$ P = {x ~|~ Ax \le b,~ A_{\text{eq}}x = b_{\text{eq}} },  $$
      </latex>     
-     the <tt>slice</tt> operation over <tt>dims</tt> at given <tt>values</tt> returns
+     the <tt>slice</tt> operation over <tt>dims</tt> at given <tt>values</tt> returns a polyhedron
+     in a reduced dimension <tt>P.Dim-length(dims)</tt>
+     <latex>
+         $$ S = { x ~|~ A_{(:,\text{keep})}x &lt;= b - A_{(:, \text{dims})}\text{values} }. $$
+     </latex>
+     This corresponds to the default choice <tt>keepdim=false</tt>.<br />
+     Alternatively, by invoking <tt>keepdim=true</tt>, the polyhedron <tt>S</tt> will be returned in the same
+     dimension as <tt>P</tt>
      <latex>
          $$ S = { x ~|~ Ax \le b,~ A_{\text{eq}}x = b_{\text{eq}}, x(\text{dims}) == \text{values} }. $$
      </latex>
-
-     Note that dimension of <tt>S</tt> is equal to dimension of <tt>P</tt>.
+      
       
   </descr>
   
@@ -91,8 +98,8 @@
   <example>
       <descr> Create random symmetric polytope in dimension 3.</descr>
           <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
-          <descr>Compute slices over the dimension 2 </descr>
-          <cmd>S = P.slice(2);</cmd>
+          <descr>Compute slices over the dimension 2 but preserve the dimension </descr>
+          <cmd>S = P.slice(2,0,'keepDim',true);</cmd>
           <descr>Plot the result</descr>
           <cmd>P.plot('alpha',0.2,'color','lightblue'); hold on;
               S.plot('color','blue','alpha',0.2,'linestyle','--','linewidth',3);
@@ -105,11 +112,8 @@
       <cmd>P = Polyhedron(v);</cmd>
       <descr>Slice it over dimensions 2 and 4 at values [1;-5] </descr>
       <cmd>S = P.slice([2,4], [1;-5])</cmd>
-      <descr>The resulting polyhedron cannot be plotted, so we create a new polyhedron by removing the inequalities.</descr>
-      <cmd> problem = Opt(S); problem.eliminateEquations; </cmd>
-      <descr> Plot the polyhedron in reduced dimension </descr>
-      <cmd> Sn = Polyhedron(problem.A,problem.b); </cmd>
-      <cmd> Sn.plot('color','green','alpha',0.5); </cmd>      
+      <descr> The resulting polyhedron <tt>S</tt> is in reduced dimension and can be plotted.</descr>
+      <cmd> S.plot('color','green','alpha',0.5); </cmd>      
   </example>
 
   
