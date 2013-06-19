@@ -49,6 +49,7 @@
                 <option>Contour</option><descr>Add contour graph. Default is false.</descr>
                 <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
                 <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>showgrid</option><descr>Show the grid inside the set. Default is false.</descr>
                 <option>colormap</option><descr>Color map to use given as a string or a function handle. Default is 'mpt'.</descr>
                 <option>colororder</option><descr>Either 'fixed' or 'random'. Default is 'fixed'.</descr>
 		</class>

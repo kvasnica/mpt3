@@ -49,6 +49,7 @@
                 <option>Contour</option><descr>Add contour graph. Default is false.</descr>
                 <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
                 <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>showgrid</option><descr>Show the grid inside the set. Default is false.</descr>
                 <option>colormap</option><descr>Color map to use given as a string or a function handle. Default is 'mpt'.</descr>
                 <option>colororder</option><descr>Either 'fixed' or 'random'. Default is 'fixed'.</descr>
 		</class>
@@ -83,6 +84,18 @@
         <cmd> U = PolyUnion('Set',P,'convex',true,'overlaps',false,'bounded',true,'fulldim',true) </cmd>
         <descr> Plot the functions over the union with the line width equal 3 and by showing the polyhedra as well. </descr>
         <cmd> U.fplot('a','LineWidth',3,'show_set',true); </cmd>
+    </example>
+    <example>
+        <descr> Plot piecewise-quadratic function </descr>
+        <descr> Generate a polygon.  </descr>
+        <cmd> v = [-1, 1.7; 1.1, 0.5; 0, 2.3; 1, -1.7; 0, -2.3; -1.1 -0.5]; </cmd>
+        <cmd> Q = Polyhedron(v);  </cmd>
+        <descr> Triangulate the polygon and create an union of polyhedra.</descr>
+        <cmd> T = PolyUnion('Set',Q.triangulate,'Convex',true,'overlaps',false) </cmd>
+        <descr> Attach a quadratic function over this union and name it "power". </descr>
+        <cmd> T.addFunction(QuadFunction(diag([1,2.3]),[-3,0.5],5),'power') </cmd>
+        <descr> Plot the function over the union with random color, transparency equal 0.4, and show grid.</descr>
+        <cmd> T.fplot('colororder','random','show_set',true,'alpha',0.4,'showgrid',true) </cmd>
     </example>
 
 	<!-- multiple related function can be defined -->
