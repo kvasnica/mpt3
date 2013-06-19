@@ -50,6 +50,7 @@
                 <option>Contour</option><descr>Add contour graph. Default is false.</descr>
                 <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
                 <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>showgrid</option><descr>Show the grid inside the set. Default is false.</descr>
                 <option>ColorMap</option><descr>Color map given either as a M-by-3 matrix, or as a string. Default is 'mpt'.
                                             Other available options are 'hsv', 'hot', 'gray', 'lightgray', 'bone', 'copper', 
                                             'pink', 'white', 'flag', 'lines', 'colorcube','vga', 'jet', 'prism', 'cool',
@@ -115,7 +116,6 @@
         <cmd> S.fplot('fri','position',2,'Color','gray') </cmd>
         <descr> Plot the second element of the function "mon" and the underlying domain with some transparency.</descr>
         <cmd> S.fplot('mon','position',2,'show_set',true,'alpha',0.6,'colororder','random') </cmd>
-
     </example>
 
 	<!-- multiple related function can be defined -->
