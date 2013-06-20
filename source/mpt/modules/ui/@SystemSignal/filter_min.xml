@@ -10,7 +10,7 @@
   <syntax></syntax>
 
   <descr> 
-      This filter introduces the lower bound <tt>\text{lb}</tt> on the 
+      This filter introduces the lower bound <i>\text{lb}</i> on the 
       signal <i>s</i>, i.e. <i>\text{lb} \le s_{k} </i>. 
   </descr>
 

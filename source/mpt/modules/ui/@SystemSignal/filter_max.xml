@@ -10,7 +10,7 @@
   <syntax></syntax>
 
   <descr> 
-      This filter introduces the upper bound <tt>\text{ub}</tt> on the
+      This filter introduces the upper bound <i>\text{ub}</i> on the
       signal <i>s</i>, i.e. <i> s_{k} \le \text{ub} </i>.    
   </descr>
 

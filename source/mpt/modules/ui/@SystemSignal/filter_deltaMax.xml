@@ -10,7 +10,7 @@
   <syntax></syntax>
 
   <descr> 
-      This filter introduces the upper bound <tt>\text{ub}</tt> on the difference 
+      This filter introduces the upper bound <i>\text{ub}</i> on the difference 
       of a signal <i> \Delta s_{k} \le \text{ub} </i>. The signal difference is      
       defined as <i>\Delta s_{k} = s_{k} - s_{k-1} </i> where <i>s</i> is the 
       system signal and <i>k</i> is the time instant.        

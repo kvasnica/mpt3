@@ -16,8 +16,7 @@
        This demo shows how to design an explicit controller for usage in 
        real-time control in Real-Time Workshop. 
        The code generation and compilation for real-time has been tested 
-       under Real-Time Windows target on Windows 32-bit and 64-bit platforms.
-        <br />
+       under Real-Time Windows target on Windows 32-bit and 64-bit platforms.<br />
         
         Deployment steps:
         <ol>

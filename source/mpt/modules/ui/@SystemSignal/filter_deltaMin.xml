@@ -10,7 +10,7 @@
   <syntax></syntax>
 
   <descr> 
-      This filter introduces the lower bound <tt>\text{lb}</tt> on the difference 
+      This filter introduces the lower bound <i>\text{lb}</i> on the difference 
       of a signal <i>\text{lb} \le \Delta s_{k} </i>. The signal difference is      
       defined as <i>\Delta s_{k} = s_{k} - s_{k-1} </i> where <i>s</i> is the 
       system signal and <i>k</i> is the time instant.        

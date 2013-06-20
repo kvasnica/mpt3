@@ -18,11 +18,9 @@
        The LCP solver must be present in the installation path including the 
        extended version <bf>lcprtw</bf> that contains pre-compiled libraries
        for linking with OpenWatcom compiler. The demo has been tested under
-       Real-Time Windows target and XPC target on Windows 32-bit platform.
-       <br />       
+       Real-Time Windows target and XPC target on Windows 32-bit platform.<br />       
        <bf>Note that this demo can be compiled and run on Windows 32-bit platform
-       for Matlab r2012a!</bf> 
-       <br />
+       for Matlab r2012a!</bf><br />
         
         Deployment steps:
         <ol>
