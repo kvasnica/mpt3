@@ -8,9 +8,9 @@
 		Plot the polyhedron.
 	</info>
 	
-	<syntax>y = plot(P, 'Prop1', value1, 'Prop2', value2)</syntax>
-    <syntax>y = plot(P1, 'Prop1', value1, P2, 'Prop2', value2)</syntax>
-	<syntax>y = P.plot('Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = plot(P, 'Prop1', value1, 'Prop2', value2)</syntax>
+    <syntax>h = plot(P1, 'Prop1', value1, P2, 'Prop2', value2)</syntax>
+	<syntax>h = P.plot('Prop1', value1, 'Prop2', value2)</syntax>
 
 	<!-- long description of the function -->
 	<descr>

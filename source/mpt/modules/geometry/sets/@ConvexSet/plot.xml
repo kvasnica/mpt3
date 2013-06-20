@@ -8,8 +8,8 @@
 		Plot the convex set.
 	</info>
 	
-	<syntax>y = plot(Set, 'Prop1', value1, 'Prop2', value2)</syntax>
-	<syntax>y = Set.plot('Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = plot(Set, 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = Set.plot('Prop1', value1, 'Prop2', value2)</syntax>
 
 	<!-- long description of the function -->
 	<descr>
