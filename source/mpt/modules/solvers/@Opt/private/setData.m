@@ -53,9 +53,13 @@ if ~builtin('isempty',p.P)
 end
 
 % assign solver in uppercase
-opt.solver = upper(strtrim(p.solver));
+if ~isempty(p.solver)
+    opt.solver = upper(strtrim(p.solver));
+end
 
 % assign vartype in uppercase
-opt.vartype = upper(p.vartype);
+if ~isempty(p.vartype)
+    opt.vartype = upper(p.vartype);
+end
 
 end
