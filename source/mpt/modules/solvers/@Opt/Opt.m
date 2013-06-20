@@ -1,4 +1,4 @@
-classdef Opt < handle
+classdef Opt < handle & matlab.mixin.Copyable
     % Encapsulates data and solutions for LP/QP/pLP/pQP/LCP/pLCP problems
     %
     % opt = Opt(param, value,...)
@@ -133,4 +133,49 @@ classdef Opt < handle
 %         
 %     end
     
+    methods (Access=protected)
+        function U = copyElement(obj)
+            % Creates a copy of the union
+            %
+            %   copy = U.copy()
+            
+            % Note: matlab.mixin.Copyable.copy() automatically properly
+            % copies arrays and empty arrays, no need to do it here.
+            % Moreover, it automatically creates the copy of proper class.
+            U = copyElement@matlab.mixin.Copyable(obj);
+
+            % we don't know what type of arguments can be put in the future
+            % to Internal properties, so we check if a field contains a
+            % "copy" method
+            if isstruct(obj.Internal)
+                nf = fieldnames(obj.Internal);
+                for i=1:numel(nf)
+                    if ismethod(obj.Internal.(nf{i}),'copy');
+                        U.Internal.(nf{i}) = obj.Internal.(nf{i}).copy;
+                    end
+                end
+            else
+                if ismethod(obj.Internal,'copy');
+                    U.Internal = obj.Internal.copy;
+                end
+            end
+            % we don't know what type of arguments can be stored inside
+            % Data, so we check if it contains a "copy" method - then use
+            % it to create new object.
+            if isstruct(obj.Data)
+                nd = fieldnames(obj.Data);
+                for i=1:numel(nd)
+                    if ismethod(obj.Data.(nd{i}),'copy');
+                        U.Data.(nd{i}) = obj.Data.(nd{i}).copy;
+                    end
+                end
+            else
+                if ismethod(obj.Data,'copy');
+                    U.Data = obj.Data.copy;
+                end                
+            end
+            
+        end
+ 
+    end
 end
