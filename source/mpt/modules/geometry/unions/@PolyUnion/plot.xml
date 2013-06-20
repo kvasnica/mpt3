@@ -8,9 +8,10 @@
 		Plot the union of polyhedra.
 	</info>
 	
-	<syntax>y = plot(U, 'Prop1', value1, 'Prop2', value2)</syntax>
-	<syntax>y = U.plot('Prop1', value1, 'Prop2', value2)</syntax>
-
+	<syntax>h = plot(U, 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = U.plot('Prop1', value1, 'Prop2', value2)</syntax>
+    <syntax>h = plot(U1, 'Prop1', value1, ..., U2, 'Prop2', value2, ...)</syntax>
+    
 	<!-- long description of the function -->
 	<descr>
         Plot the union of polyhedra up to dimension three.
