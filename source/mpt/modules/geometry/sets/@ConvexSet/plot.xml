@@ -36,7 +36,13 @@
                 <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
                 <option>Marker</option><descr>Type of markings to use. Allowed values are ".", "o", "x", "+", "*", "s", "d", "v", "\^", "&lt;", "&gt;", "p", "h" or "none". Default is "none".</descr>
                 <option>MarkerSize</option><descr>The size of the marker. Default is 6.</descr>
-		</class>
+                <option>ColorMap</option><descr>Color map given either as a M-by-3 matrix, or as a string. Default is 'mpt'. Other available options
+                                                are 'hsv', 'hot', 'gray', 'lightgray', 'bone', 'copper', 'pink', 'white', 'flag', 'lines', 'colorcube',
+                                                'vga', 'jet', 'prism', 'cool', 'autumn', 'spring', 'winter', 'summer'.
+                                            </descr>
+                <option>ColorOrder</option><descr>Either 'fixed' for fixed ordering of colors, or 'random' for a random order. Default is 'fixed'.</descr>
+                <option>ShowIndex</option><descr>This option is valid only for bounded polyhedra in 2D. If true, display an index of the plotted element. The default choice is false.</descr>                
+        </class>
 	</input>
     <input>
         <name>value1</name>
