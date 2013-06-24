@@ -16,9 +16,6 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	[sysStruct, probStruct] = mpt_verifySysProb(sysStruct, probStruct);
 	out = importSysStruct(sysStruct);
 	
-	if isfield(probStruct, 'tracking') && probStruct.tracking > 0
-		error('Tracking problems not yet supported.');
-	end
 	if iscell(probStruct.Q) || iscell(probStruct.R)
 		error('Time varying penalty matrices not yet supported.');
 	end
@@ -45,7 +42,8 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	
 	% custom settings
 	if ~iscell(sysStruct.A) && isfield(probStruct, 'Tconstraint') && ...
-			probStruct.Tconstraint==1 && probStruct.norm==2
+			probStruct.Tconstraint==1 && probStruct.norm==2 && ...
+			(~isfield(probStruct, 'tracking') || probStruct.tracking==0)
 		% add LQR terminal set/penalty for LTI systems with 2-norm cost
 		fprintf('Computing LQR terminal set and penalty:\n');
 		S = out.LQRSet();
@@ -147,6 +145,36 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 		out.y.softMax.maximalViolation = probStruct.symax;
 		out.y.softMin.maximalViolation = probStruct.symax;
 	end
+	
+	% tracking
+	if isfield(probStruct, 'tracking') && probStruct.tracking>0
+
+		if probStruct.tracking==1
+			% deltau formulation
+			out.u.with('deltaPenalty');
+			if isfield(probStruct, 'Rdu')
+				out.u.deltaPenalty = create_penalty(probStruct.Rdu, probStruct.norm);
+			else
+				out.u.deltaPenalty = create_penalty(probStruct.R, probStruct.norm);
+			end
+			out.u.penalty = [];
+		end
+		
+		if isfield(probStruct, 'Qy')
+			% output reference
+			if ~out.y.hasFilter('reference')
+				out.y.with('reference');
+			end
+			out.y.reference = 'free';
+		else
+			% state reference
+			if ~out.x.hasFilter('reference')
+				out.x.with('reference');
+			end
+			out.x.reference = 'free';
+		end
+	end
+
 	
 	if probStruct.subopt_lev==1
 		obj.N = 1;

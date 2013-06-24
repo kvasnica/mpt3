@@ -62,9 +62,7 @@ classdef IterableBehavior < handle
 			if nargout==0
 				% no outputs, just execute the method
 				for i = 1:numel(obj)
-					if nargout==0
-						fun(obj(i));
-					end
+					fun(obj(i));
 				end
 				
 			else
