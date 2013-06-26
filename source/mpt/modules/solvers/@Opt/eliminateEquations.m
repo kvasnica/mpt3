@@ -100,9 +100,16 @@ if rank(full(Ue(:,1:re)))~=re
     % if invertibility is not achieved, we need to factorize differently
     % try full factorization but we with different combination of
     % variables
-    [Le,Ue,pe] = lu(Ae(:,2:re+1),'vector');
-    qe = 1:S.n;
-    if rank(Ue(:,1:re))~=re
+    for i=1:S.n-re
+        [Le,Ue,pe] = lu(sparse(Ae(:,i:re+i-1)),'vector');
+        qe = 1:S.n;
+        if rank(full(Ue(:,1:re)))~=re
+            continue
+        else
+            break;
+        end
+    end
+    if rank(full(Ue(:,1:re)))~=re
         error('EliminateEquations: Could not find invertible submatrix for removing equalities.');
     end
 end
