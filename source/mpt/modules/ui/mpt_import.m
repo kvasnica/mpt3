@@ -59,9 +59,9 @@ elseif nargin==2 && isstruct(varargin{1}) && isstruct(varargin{2})
 	end
 
 	if isfield(probStruct, 'Nc')
-		out.u.with('controlHorizon');
+		out.u.with('block');
 		out.u.block.from = probStruct.Nc;
-		out.u.block.to = obj.N;
+		out.u.block.to = probStruct.N;
 	end
 	if isfield(probStruct, 'P_N')
 		if ~out.x.hasFilter('terminalPenalty')
