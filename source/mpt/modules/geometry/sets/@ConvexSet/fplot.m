@@ -20,6 +20,8 @@ function h = fplot(obj, varargin)
 %     logical, default=false
 %  'alpha': transparency (1=opaque, 0=complete transparency)
 %     numeric, default=1
+%  'edgealpha': transparency of edges (1=opaque, 0=complete transparency)
+%     double, default=1
 %  'wire': if true, only plots the wire frame
 %     logical, default=false
 %  'linestyle': style of lines, same as in matlab's plot
@@ -108,6 +110,7 @@ ip.addParamValue('wire',       false,  @(x) islogical(x) || x==1 || x==0);
 ip.addParamValue('linestyle',  '-', @validate_linestyle);
 ip.addParamValue('linewidth',  1,   @isnumeric);
 ip.addParamValue('edgecolor', 'k', @validate_color);
+ip.addParamValue('edgealpha', 1, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('alpha',      1, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('contour',    false, @(x) islogical(x) || x==1 || x==0);
 ip.addParamValue('grid',  20,   @isnumeric);
