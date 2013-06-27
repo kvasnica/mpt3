@@ -22,6 +22,10 @@ global MPTOPTIONS
 %     string, default='-'
 %  'linewidth': width of the set's border
 %     double, default = 1
+%  'edgecolor': color of edges
+%     string, default='k'
+%  'edgealpha': transparency of edges (1=opaque, 0=complete transparency)
+%     double, default=1
 %  'alpha': transparency (1=opaque, 0=complete transparency)
 %     double, default=1
 %  'marker': marker of the plot
@@ -97,6 +101,8 @@ ip.addParamValue('color', [], @validate_color);
 ip.addParamValue('wire', false,  @(x) islogical(x) || x==1 || x==0);
 ip.addParamValue('linestyle', '-', @validate_linestyle);
 ip.addParamValue('linewidth', 1,   @isnumeric);
+ip.addParamValue('edgecolor', 'k', @validate_color);
+ip.addParamValue('edgealpha', 1, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('alpha', 0.8, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('marker', 'none', @validate_marker);
 ip.addParamValue('markerSize', 6, @isnumeric);

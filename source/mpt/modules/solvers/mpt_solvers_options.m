@@ -433,6 +433,11 @@ options.gurobi.OutputFlag = 0;
 options.gurobi.DisplayInterval=5;
 % (default = 5). Controls the frequency at which log lines are printed (in seconds).
 
+options.gurobi.Aggregate = 0;
+% Enables or disables aggregation in presolve. In rare instances,
+% aggregation can lead to an accumulation of numerical errors. Turning it
+% off can sometimes improve solution accuracy.
+
 
 %% NAG options
 options.nag.qp.ftol = 1e-9;
