@@ -103,7 +103,7 @@ ip.addParamValue('linestyle', '-', @validate_linestyle);
 ip.addParamValue('linewidth', 1,   @isnumeric);
 ip.addParamValue('edgecolor', 'k', @validate_color);
 ip.addParamValue('edgealpha', 1, @(x) isnumeric(x) && x>=0 && x<=1);
-ip.addParamValue('alpha', 0.8, @(x) isnumeric(x) && x>=0 && x<=1);
+ip.addParamValue('alpha', 1, @(x) isnumeric(x) && x>=0 && x<=1);
 ip.addParamValue('marker', 'none', @validate_marker);
 ip.addParamValue('markerSize', 6, @isnumeric);
 ip.addParamValue('colormap', 'mpt', @(x) (isnumeric(x) && size(x, 2)==3) || ischar(x)); 
