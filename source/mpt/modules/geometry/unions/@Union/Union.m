@@ -248,7 +248,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  end
 
 		  for i = 1:U.Num
-			  f = U.Set(i).getFunction(FuncName);
+			  f = U.index_Set(i).getFunction(FuncName);
 			  if ~isa(f, 'AffFunction')
 				  error('Only affine functions can be trimmed.');
 			  end
