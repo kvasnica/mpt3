@@ -98,6 +98,7 @@ else
 	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
 endif
 	@echo "Version ID: $(FULLVERSION)"
+	@hg tag $(VERSION)
 
 #create a temporary copy of source files directory if not yet created, preserve timestamps
 tmpdir:
