@@ -359,6 +359,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 				otherCtrl = model;
 				obj.model = otherCtrl.model;
 				obj.N = otherCtrl.N;
+				obj.xinitFormat = otherCtrl.xinitFormat;
 				
 			elseif isa(model, 'AbstractSystem')
 				% import model and possibly the prediction horizon
