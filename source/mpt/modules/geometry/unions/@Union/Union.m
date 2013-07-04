@@ -257,6 +257,99 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  end
 		  
 	  end
+	  
+	  function out = findSaturatedRegions(obj, function_name, varargin)
+		  % Determines saturation properties of unions
+		  %
+		  % Syntax:
+		  %   out = obj.findSaturatedRegions(myfun, 'min', min_value, ...
+		  %                             'max', max_value, 'range', range)
+		  %
+		  % Inputs:
+		  %         obj: Union object
+		  %       myfun: string name of the function to check
+		  %              (the function must be affine)
+		  %   min_value: lower saturation limit (mandatory)
+		  %   max_value: upper saturation limit (mandatory)
+		  %       range: range of function's outputs (optional)
+		  %
+		  % Output:
+		  %     out.min: lower saturation limits
+		  %     out.max: upper saturation limits
+		  %    out.Imin: indices of regions where all RANGE elements of
+		  %              MYFUN are saturated at the lower limit
+		  %    out.Imax: indices of regions where all RANGE elements of
+		  %              MYFUN are saturated at the upper limit
+		  %  out.Iunsat: indices of unsaturated regions
+		  %       out.S: saturation indicators:
+		  %              out.S(i, j) = 1  if in the i-th region the j-th
+		  %                     element of MYFUN attains the upper limit
+		  %              out.S(i, j) = -1 if in the i-th region the j-th
+		  %                     element of MYFUN attains the upper limit
+		  %              out.S(i, j) = 0  if in the i-th region the j-th
+		  %                     element of MYFUN is not saturated
+		  
+		  global MPTOPTIONS
+		  
+		  %% validation
+		  error(obj.rejectArray());
+		  error(nargchk(2, Inf, nargin));
+		  if ~ischar(function_name)
+			  error('The function name must be a string.');
+		  elseif ~obj.hasFunction(function_name)
+			  error('No such function "%s" in the object.', function_name);
+		  elseif ~isa(obj.index_Set(1).Functions(function_name), 'AffFunction')
+			  error('Function "%s" must be affine.', function_name);
+		  end
+		  
+		  %% parsing
+		  ip = inputParser;
+		  ip.addParamValue('range', 1:obj.index_Set(1).Functions(function_name).R, ...
+			  @validate_indexset);
+		  ip.addParamValue('min', [], @validate_realvector);
+		  ip.addParamValue('max', [], @validate_realvector);
+		  ip.parse(varargin{:});
+		  options = ip.Results;
+		  R = numel(options.range);
+		  error(validate_vector(options.min, R, 'min value'));
+		  error(validate_vector(options.max, R, 'max value'));
+		  % TODO: determine lower/upper saturations automatically
+		  
+		  %% processing
+		  S = zeros(numel(options.range), obj.Num);
+		  for i = 1:obj.Num
+			  fun = obj.index_Set(i).Functions(function_name);
+			  for j = 1:numel(options.range)
+				  jr = options.range(j);
+				  % saturated function must have a zero affine term
+				  if norm(fun.F(jr, :)) <= MPTOPTIONS.zero_tol
+					  if abs(fun.g(jr) - options.min(j)) <= MPTOPTIONS.abs_tol
+						  % region saturated at minimum
+						  S(j, i) = -1;
+					  elseif abs(fun.g(jr) - options.max(j)) <= MPTOPTIONS.abs_tol
+						  % region saturated at maximum
+						  S(j, i) = 1;
+					  end
+				  end
+			  end
+		  end
+		  
+		  %% create the output structure
+		  out.S = S;
+		  out.min = options.min;
+		  out.max = options.max;
+		  satmax = false(1, obj.Num);
+		  satmin = false(1, obj.Num);
+		  for i = 1:obj.Num
+			  % which regions are saturated?
+			  satmax(i) = all(S(:, i)==1);
+			  satmin(i) = all(S(:, i)==-1);
+		  end
+		  out.Imin = find(satmin);
+		  out.Imax = find(satmax);
+		  out.Iunsat = setdiff(1:obj.Num, [out.Imin, out.Imax]);
+	  end
+
 
   end
   methods (Hidden)
