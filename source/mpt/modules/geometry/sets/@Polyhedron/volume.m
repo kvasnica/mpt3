@@ -31,7 +31,11 @@ end
 
 % Use built-in convhulln to compute volume
 P.minVRep();
-[K,vol] = convhulln(P.V);
-
+if P.Dim==1
+	% issue #71: we need to handle 1D cases manually
+	vol = max(P.V) - min(P.V);
+else
+	[~, vol] = convhulln(P.V);
+end
 
 end
