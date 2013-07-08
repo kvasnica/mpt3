@@ -27,7 +27,7 @@ error(msg); % the error is only thrown if msg is not empty
 
 % deal with arrays
 if numel(P) > 1
-	I = sum(P.forEach(@(x) x.integrate(function_name)));
+	I = P.forEach(@(x) x.integrate(function_name));
 	return
 end
 

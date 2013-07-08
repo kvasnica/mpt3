@@ -10,7 +10,7 @@ P2.addFunction(AffFunction(0, c2), 'const');
 P = [P1, P2];
 
 I = P.integrate();
-Igood = P1.volume*c1 + P2.volume*c2;
-assert(abs(I - Igood) <= 1e-6);
+Igood = [P1.volume*c1, P2.volume*c2];
+assert(norm(I - Igood) <= 1e-6);
 
 end
