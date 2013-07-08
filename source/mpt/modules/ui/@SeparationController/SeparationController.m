@@ -144,9 +144,7 @@ classdef SeparationController < EMPCController
 					tic
 				end
 				V = Pmin(i).V;
-				for j = 1:size(V, 1)
-					CON = CON + [ sep_fun(V(j, :)') <= -1 ];
-				end
+				CON = CON + [ sep_fun(V') <= -1 ];
 			end
 			for i = 1:numel(Pmax)
 				% display progress
@@ -155,9 +153,7 @@ classdef SeparationController < EMPCController
 					tic
 				end
 				V = Pmax(i).V;
-				for j = 1:size(V, 1)
-					CON = CON + [ sep_fun(V(j, :)') >= 1 ];
-				end
+				CON = CON + [ sep_fun(V') >= 1 ];
 			end
 			fprintf('Solving the separation problem...\n');
 			info = solvesdp(CON, []);
