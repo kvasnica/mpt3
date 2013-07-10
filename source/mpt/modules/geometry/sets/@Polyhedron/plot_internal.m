@@ -24,8 +24,6 @@ end
 
 if options.wire,
 	options.alpha = 0;
-	% plot edges in specified color
-	options.edgecolor = clr;
 end
 
 % If we're trying to plot an affine hull, then create a bounding polytope and re-plot
