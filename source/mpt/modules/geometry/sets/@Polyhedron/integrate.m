@@ -31,6 +31,10 @@ if numel(P) > 1
 	return
 end
 
+% we need the V-representation (doing the computation here significantly
+% speeds up Polyhedron/isBounded)
+P.minVRep();
+
 % validation
 if ~P.isBounded()
 	error('The polyhedron must be bounded.');
