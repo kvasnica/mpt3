@@ -366,8 +366,11 @@ classdef EMPCController < AbstractController
 			else
 				out = obj;
 			end
-			out.optimizer = BinTreePolyUnion(obj.optimizer);
-						
+			newopt = [];
+			for i = 1:numel(obj.optimizer)
+				newopt = [newopt, BinTreePolyUnion(obj.optimizer(i))];
+			end
+			out.optimizer = newopt;
 		end
 		
 	end
