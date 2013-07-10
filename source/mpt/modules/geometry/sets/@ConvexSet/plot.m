@@ -171,4 +171,9 @@ if nargout==0
 	clear h
 end
 
+axis tight
+% enlarge the axis by 10%
+a = axis;
+axis(1.1*a);
+
 end
