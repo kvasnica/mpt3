@@ -17,25 +17,35 @@ if no>1
     return;
 end
 
-% check boundedness
-if ~P.isBounded
-    vol = inf;
-    return
-end
-
 % check emptyness and full-dimensionality
 if P.isEmptySet || ~P.isFullDim
     vol = 0;
     return;
 end
 
-% Use built-in convhulln to compute volume
+% computing volume requires vertices
 P.minVRep();
-if P.Dim==1
+
+if ~P.isBounded
+	% unbounded polyhedra have infinite volume
+	vol = Inf;
+	
+elseif P.Dim==1
 	% issue #71: we need to handle 1D cases manually
 	vol = max(P.V) - min(P.V);
+
+elseif size(P.V, 1) == P.Dim+1
+	% cheaper volume computation if the set is a fully-dimensional simplex
+	% https://en.wikipedia.org/wiki/Simplex#Volume
+	S = P.V';
+	D = zeros(size(S, 1), size(S, 2)-1);
+	for j = 2:size(S, 2)
+		D(:, j-1) = S(:, j)-S(:, 1);
+	end
+	vol = 1/factorial(size(S, 2)-1)*abs(det(D));
+
 else
+	% general computation
 	[~, vol] = convhulln(P.V);
-end
 
 end
