@@ -224,7 +224,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			new.saveAllComponents();
 		end
 
-		function varargout = update(obj, u)
+		function [xn, y, varargout] = update(obj, u)
             % Evaluates the state-update and output equations and updates
             % the internal state of the system
             %
@@ -242,17 +242,10 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 				error('Internal state not set, use "sys.initialize(x0)".');
 			end
 
-			varargout = cell(1, nargout);
-			if nargout>2
-				% MLD systems return [xn, y, z, d]
-				[varargout{:}] = obj.update_equation(x, u);
-			else
-				varargout{1} = obj.update_equation(x, u);
-				if nargout>1
-					varargout{2} = obj.output_equation(x, u);
-				end
-			end
-			xn = varargout{1};
+			% update_equation() always returns at least "x" and "y", but
+			% can return more for MLD systems
+			varargout = cell(1, nargout-2);
+			[xn, y, varargout{:}] = obj.update_equation(x, u);
 			
 			% update the internal state
             obj.initialize(xn);

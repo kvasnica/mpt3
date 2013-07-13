@@ -25,11 +25,12 @@ classdef PWASystem < AbstractSystem
 		% no validation in these functions! it was already performed in
 		% AbstractSystem/update() and output()
 		
-		function xn = update_equation(obj, x, u)
-			% returns the state update
+		function [xn, y] = update_equation(obj, x, u)
+			% returns the state update and the output
 			
 			% use the first-region tiebreak
 			xn = obj.polyunion.feval([x; u], 'update', 'tiebreak', @(q) 0);
+			y = obj.polyunion.feval([x; u], 'output', 'tiebreak', @(q) 0);
 		end
 		
 		function y = output_equation(obj, x, u)

@@ -22,10 +22,11 @@ classdef LTISystem < AbstractSystem
 		% no validation in these functions! it was already performed in
 		% AbstractSystem/update() and output()
 
-		function xn = update_equation(obj, x, u)
-			% returns the state update
+		function [xn, y] = update_equation(obj, x, u)
+			% returns the state update and the output
 			
 			xn = obj.A*x + obj.B*u + obj.f;
+			y = obj.C*x + obj.D*u + obj.g;
 		end
 
 		function y = output_equation(obj, x, u)
