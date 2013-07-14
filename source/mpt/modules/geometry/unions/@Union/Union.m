@@ -258,12 +258,12 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  
 	  end
 	  
-	  function out = findSaturatedRegions(obj, function_name, varargin)
+	  function out = findSaturated(obj, function_name, varargin)
 		  % Determines saturation properties of unions
 		  %
 		  % Syntax:
-		  %   out = obj.findSaturatedRegions(myfun, 'min', min_value, ...
-		  %                             'max', max_value, 'range', range)
+		  %   out = obj.findSaturated(myfun, 'min', min_value, ...
+		  %                          'max', max_value, 'range', range)
 		  %
 		  % Inputs:
 		  %         obj: Union object

@@ -92,7 +92,7 @@ classdef ClippingController < EMPCController
 			% TODO: check that the feedback law is continuous
 
 			% determine saturation properties
-			sat = optimizer.findSaturatedRegions('primal', ...
+			sat = optimizer.findSaturated('primal', ...
 				'min', min_value, 'max', max_value);
 
 			% compute adjacency list
