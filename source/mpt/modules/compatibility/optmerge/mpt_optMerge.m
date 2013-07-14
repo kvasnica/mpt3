@@ -125,8 +125,6 @@
 
 function [PAmer, colorMer] = mpt_optMerge(PA, Opt)
 
-global mptOptions
-
 % options
 % --------------------------------------------------------------------
 
@@ -147,7 +145,7 @@ if ~isfield(Opt, 'algo'),
     Opt.algo = 0;
 end;
 if ~isfield(Opt, 'verbose'), 
-    Opt.verbose = mptOptions.verbose; 
+    Opt.verbose = 1; 
 end;
 if isfield(Opt, 'PAdom');
     PAdom = Opt.PAdom;
@@ -166,7 +164,7 @@ end
 
 Opt.plot = 0; 
 Opt.safeMode = 0;   
-Opt.lpsolver = mptOptions.lpsolver;
+Opt.lpsolver = 3;
 if ismac
     Opt.espressoCmd = which('espresso.mac');
 elseif ispc
