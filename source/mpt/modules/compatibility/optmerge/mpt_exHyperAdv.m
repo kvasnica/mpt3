@@ -174,8 +174,8 @@ for i = 1:length(PA)
 %     if dointersect(PA(i), PAhull)
 %         keep(end+1) = i;
 %     end
-    PP = PA(i) & PAhull;
-    [xc, rc] = chebyball(PP);
+    PP = PA(i).intersect(PAhull);
+	rc = PP.chebyCenter.r;
     if rc >= Opt.tol_minR, 
         PA(i) = PP;
         keep(end+1) = i; 
@@ -185,13 +185,14 @@ if Opt.verbose>1,
     fprintf('  ... removed %i flat polyhedra\n', length(PA)-length(keep));
 end;
 PA = PA(keep);
-[Hi, Ki] = double(PA);
-color.Reg = color.Reg(keep);
-
-if ~iscell(Hi)
-    Hi = { Hi };
-    Ki = { Ki };
+Hi = {};
+Ki = {};
+for i = 1:length(PA)
+	PA(i).minHRep();
+	Hi{i} = PA(i).A;
+	Ki{i} = PA(i).b;
 end
+color.Reg = color.Reg(keep);
 
 
 
@@ -609,8 +610,12 @@ end
 %       * restrict search for markings to domain (speed-up)
 %       * for the domain, we use a first guess of domain
 %         (we know that the domain is a subset of the convex hull)
-[dom.H dom.K] = double(PAhull); dom.constr = 1;
-[dom.A dom.B] = double(PAhull); 
+dom.H = PAhull.A;
+dom.K = PAhull.b;
+dom.A = PAhull.A;
+dom.B = PAhull.b;
+dom.constr = 1;
+
 Opt.verbose = Opt.verbose + 1; 
 M = (-1)*mpt_hyparr2(Hyp, dom, dom, Opt);
 Opt.verbose = Opt.verbose - 1;
@@ -644,7 +649,7 @@ for i = 1:size(M,2)
         if ~clustPerf
             % we can use simple approach:
             % in which original polyhedra does the 'center' of the marking lie?
-            [isin, inwhich, closest] = isinside(PA,x);
+            [isin, inwhich, closest] = PA.isInside(x);
             if isin
                 colStat = unique(color.Reg(inwhich));
                 if length(colStat) > 1

@@ -202,13 +202,8 @@ end;
 % if the user has not specified the domain,
 % we quickly compute here the hull or the envelope
 if isempty(PAdom)
-    try
-        disp('computing convex hull')
-        PAdom = hull(PA);
-    catch
-        disp('error when computing convex hull, trying to compute envelope instead');
-        PAdom = envelope(PA);
-    end;
+	disp('Computing convex hull...')
+	PAdom = PolyUnion(PA).convexHull();
     disp('Warning: you have not specified the set of polyhedra (the so called');
     disp('domain) the problem is defined in. We assume the domain is given by');
     disp('the hull (or envelope if the hull computation fails).');
@@ -223,32 +218,20 @@ if isempty(PAcompl)
     disp('polyhedra to be merged and the domain. We thus assume it is empty.');
     disp('Note that a non-empty not specified complement is filled up by the');
     disp('merging algorithm optimally!');
-elseif isfulldim(PAcompl)
+elseif any(PAcompl.isFullDim())
     % add the complement to the polyhedra array PA and associate an
     % auxiliary color to the complement
     colorSorted = sort(unique(color.Reg));
     maxCol = colorSorted(end);
-    PA = horzcat(PA, PAcompl);
+    PA = [PA; PAcompl];
     color.Reg = [color.Reg, ones(1,length(PAcompl))*(maxCol+1)];
-end;
-
-% is there more than one color? 
-% If not, there is nothing to be merged...
-if length(unique(color.Reg)) == 1
-    disp('only one color: nothing to merge - giving back the domain')
-    PAmer = PAdom;
-    colorMer.Reg = color.Reg;
-    c = color.Reg(1);
-    colorMer.Table{c} = [1:length(PAdom)];
-    return;
 end;
 
 % turn polyhedral array in halfspace representation
 P.Hi = []; P.Ki = [];
 for i = 1:length(PA)
-    [H, K] = double(PA(i));
-    P.Hi{i} = H;
-    P.Ki{i} = K;
+    P.Hi{i} = PA(i).A;
+    P.Ki{i} = PA(i).b;
 end;
 
 % start to measure the time
@@ -292,7 +275,7 @@ end;
 % PA, we will not merge them here and they will not show up in the final
 % set of polyhedra. However, their markings are in M and will serve as
 % counterexamples.
-if ~isempty(PAcompl) & isfulldim(PAcompl)
+if ~isempty(PAcompl) && any(PAcompl.isFullDim())
     maxCol = length(color.Table)-1;
 else
     maxCol = length(color.Table);
@@ -330,12 +313,12 @@ for c = Col
         Ki( find(M_mer{i}==0), : ) = [];
         
         % get minimal polyhedral description
-        Pmer = polytope([Hi; Dom.A], [Ki; Dom.B]) & PAdom;
+        Pmer = Polyhedron([Hi; Dom.A], [Ki; Dom.B]).intersect(PAdom);
         
         % store the corresponding polyhedron 
-        if isfulldim(Pmer), 
+        if Pmer.isFullDim() 
             % add the polyhedron
-            PAmer = horzcat(PAmer, Pmer);
+            PAmer = [PAmer; Pmer];
             
             % add the color
             colorMer.Reg(end+1) = c;
