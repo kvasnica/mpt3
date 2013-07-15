@@ -1,9 +1,13 @@
 function test_mpccontroller_fromYALMIP_04_pass
 % must allow to introduce new variables
 
-Double_Integrator
-probStruct.Tconstraint = 0;
-model = mpt_import(sysStruct, probStruct);
+model = LTISystem('A', [1 1; 0 1], 'B', [1; 0.5]);
+model.u.min = -1;
+model.u.max = 1;
+model.x.max = [5; 5];
+model.x.min = [-5; -5];
+model.u.penalty = QuadFunction(1);
+model.x.penalty = QuadFunction(eye(2));
 mpc = MPCController(model, 5);
 Y = mpc.toYALMIP();
 
