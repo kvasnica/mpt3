@@ -257,24 +257,60 @@ classdef EMPCController < AbstractController
 			end
 		end
 		
-		function out = simplify(obj)
-			% Simplifies the explicit controller by merging together
-			% regions which share the same feedback law
+		function new = simplify(obj, method)
+			% Simplifies a given explicit controller
+			%
+			%   simple = controller.simplify(method)
+			%
+			% Supported methods:
+			%    'clipping': Clipping approach
+			%                (see ClippingController)
+			%     'fitting': PWA fitting controller
+			%                (see FittingController)
+			%      'greedy': Greedy region merging
+			%         'orm': Optimal Region Merging
+			%  'separation': Saturation-based separation
+			%                (see SeparationController)
 			
-			if nargout==0
-				% in-place merging
-				out = obj;
-			else
-				% copy-and-merge
-				out = obj.copy;
+			error(nargchk(1, Inf, nargin));
+			if nargin < 2
+				method = 'greedy';
 			end
-			out.optimizer.trimFunction('primal', obj.nu);
-			out.optimizer.merge('primal');
-			% TODO: figure out why out.optPostSetEvent() is not triggered
-			% automatically
-			out.optPostSetEvent();
-			out.N = 1; % to get correct size of the open-loop optimizer
+			
+			% trim the feedback law to just the receding horion part.
+			% operate on a copy as not to destroy the original object
+			old = obj.copy();
+			old.optimizer.trimFunction('primal', obj.nu);
+			old.N = 1; % to get correct size of the open-loop optimizer
 			% TODO: implement a better way
+			
+			switch lower(method)
+				case {'greedy', 'orm'},
+					optimal = isequal(lower(method), 'orm');
+					if nargout==0
+						new = obj;
+					else
+						new = old;
+					end
+					new.optimizer = old.optimizer.merge('primal', 'optimal', optimal);
+					
+					% TODO: figure out why the event is not triggered
+					% automatically
+					new.optPostSetEvent();
+					
+				case 'fitting',
+					new = FittingController(old);
+					
+				case 'separation',
+					new = SeparationController(old);
+					
+				case 'clipping',
+					new = ClippingController(old);
+					
+				otherwise,
+					help EMPCController/simplify
+					error('Unrecognized simplification method "%s".', method);
+			end
 		end
 		
 		function data = clicksim(obj, varargin)
