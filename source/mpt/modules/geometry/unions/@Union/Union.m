@@ -258,6 +258,12 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  
 	  end
 	  
+	  function map = findUnique(obj, FuncName)
+		  % Classifies regions
+		  
+		  [~, map] = obj.Set.uniqueFunctions(FuncName);
+	  end
+	  
   end
   methods (Hidden)
 
