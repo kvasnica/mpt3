@@ -1,132 +1,81 @@
-function U = merge(obj, FuncName)
+function U = merge(obj, function_name, optimal, optimal_merging)
 %MERGE merges polyhedra together 
 %
-%  merge(U)
-%  U.merge
+% To merge the underlying set of a polyunion:
+%   U.merge()
 %
-% ---------------------------------------------------------------------------
-% DESCRIPTION
-% ---------------------------------------------------------------------------
-% Uses greedy merging to join regions.
+% To merge regions where the FUNCNAME function has the same expression:
+%   U.merge('funcname')
 %
-% ---------------------------------------------------------------------------
-% INPUT
-% ---------------------------------------------------------------------------
-% U  - PolyUnion object
-%
-% ---------------------------------------------------------------------------
-% OUTPUT                                                                                                    
-% ---------------------------------------------------------------------------
-% U               - merged PolyUnion
-%
-% see also MPT_GREEDYMERGING, MPT_OPTMERGE
-%
-% GREEDY MERGING
-% Comments:     The algorithm tries to merge as many of the given polyhedra as 
-%               possible using a greedy approach. The algorithm cycles through 
-%               the regions and checks if any two regions form a convex union.
-%               If so, the algorithm combines them in one region, and continues
-%               checking the remaining regions.
-%               To improve the solution, multiple merging loops are enabled
-%               by default.
-%               To reduce the problem of getting stuck in local minima, several 
-%               trials can be used until the solution is not improved.
-%
-% Author:       Tobias Geyer
-%                                                                       
-% History:      date        subject                                       
-%               2004.01.16  initial version based on mb_reducePWA by Mato Baotic
-%               2004.05.06  debugged, comments added
-%
-% Copyright is with the following author(s):
-% 
-% 2012 Revised by Martin Herceg, Automatic Control Laboratory, ETH Zurich
-%
-% (C) 2007 Michal Kvasnica, Slovak University of Technology in Bratislava
-%          michal.kvasnica@stuba.sk
-% (C) 2005 Frank J. Christophersen, Automatic Control Laboratory, ETH Zurich,
-%          fjc@control.ee.ethz.ch
-% (C) 2005 Tobias Geyer, Automatic Control Laboratory, ETH Zurich,
-%          geyer@control.ee.ethz.ch
-% (C) 2004 Michal Kvasnica, Automatic Control Laboratory, ETH Zurich,
-%          kvasnica@control.ee.ethz.ch
-%
-% ---------------------------------------------------------------------------
-% Legal note:
-%          This program is free software; you can redistribute it and/or
-%          modify it under the terms of the GNU General Public
-%          License as published by the Free Software Foundation; either
-%          version 2.1 of the License, or (at your option) any later version.
-%
-%          This program is distributed in the hope that it will be useful,
-%          but WITHOUT ANY WARRANTY; without even the implied warranty of
-%          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-%          General Public License for more details.
-% 
-%          You should have received a copy of the GNU General Public
-%          License along with this library; if not, write to the 
-%          Free Software Foundation, Inc., 
-%          59 Temple Place, Suite 330, 
-%          Boston, MA  02111-1307  USA
-%
-% ---------------------------------------------------------------------------
+% To merge regions optimally:
+%   U.merge('optimal', true)
+%   U.merge('funcname', 'optimal', true)
 
 global MPTOPTIONS
-if isempty(MPTOPTIONS)
-    MPTOPTIONS = mptopt;
+
+%% parsing of inputs
+error(nargchk(1, Inf, nargin));
+if nargin==1
+	function_name = '';
+	optimal_merging = false;
+elseif nargin==2
+	optimal_merging = false;
+elseif nargin==3
+	function_name = '';
+	optimal_merging = optimal;
+	optimal = 'optimal';
+elseif nargin==4
+	if ~isequal(lower(optimal), 'optimal')
+		error('Unrecognized option "%s".', num2str(optimal));
+	end
+else
+	error('Wrong number of input arguments.');
 end
 
-if nargin<2
-	FuncName = [];
-end
-
-Options.trials = MPTOPTIONS.modules.geometry.unions.polyunion.merge.trials;
-
-% deal with arrays
+%% deal with arrays
 if numel(obj)>1
-    parfor i=1:numel(obj)
-		if nargout==0
-			obj(i).merge;
-		else
-			U(i) = obj(i).merge;
-		end
-    end
-    return;
+	for i = 1:numel(obj)
+		U(i) = U(i).merge(function_name, 'optimal', optimal_merging);
+	end
+	return
 end
 
+%% validation
+if ~ischar(function_name)
+	error('The function name must be a string.');
+elseif ~isempty(function_name) && ~obj.hasFunction(function_name)
+	error('No such function "%s" in the object.', function_name);
+elseif isempty(function_name) && ~isempty(obj.listFunctions)
+	error('Function name must be specified.');
+end
+
+
+%% merging
 if nargout==0
 	% no outputs = in-place merging
 	U = obj;
 else
 	% output requested = do not modify the source object
-	U = obj.copy;
+	U = obj.copy();
 end
-
 % if there is 0 or 1 set contained, return
 if U.Num<=1
     return
 end
 
-funs = U.listFunctions;
-if isempty(FuncName) && ~isempty(funs)
-	% If functions are attached, the only sane behavior is to expect that
-	% we want to merge regions in which certain function has indentical
-	% expressions.
-	%
-	% If you want to merge regions while disregarding functions, you can
-	% achieve this as follows:
-	%
-	% N = merge(removeAllFunctions(copy(U)));
-	
-	error('Function name must be specified.');
-
-elseif ~isempty(FuncName)
+if isempty(function_name)
+	% merging of regions (not considering functions)
+	if optimal_merging
+		U.Set = sub_optimalMerging(U);
+	else
+		U.Set = sub_greedyMerging(U);
+	end
+else
 	% We are going to merge against a specified function.
-	
 	Rmerged = [];
 	
 	% Get list of regions in which the function has the same expression
-	[uF, uMap] = U.Set.uniqueFunctions(FuncName);
+	[uF, uMap] = U.Set.uniqueFunctions(function_name);
 	if MPTOPTIONS.verbose >= 0
 		fprintf('%d regions with %d unique functions.\n', U.Num, length(uF));
 	end
@@ -151,8 +100,8 @@ elseif ~isempty(FuncName)
 			% Remove all functions, since the pure merge() code introduces
 			% new regions, but does not automatically attach functions to
 			% them.
-			Ui.removeAllFunctions;
-			Ui.merge;
+			Ui.removeAllFunctions();
+			Ui.merge('optimal', optimal_merging);
 			R = Ui.Set;
 			% Reattach functions
 			for j = 1:numel(R)
@@ -160,10 +109,10 @@ elseif ~isempty(FuncName)
 				% after merging.
 				R(j).copyFunctionsFrom(U.Set(regions(1)));
 				% Replace the main function
-				R(j).addFunction(uF(i), FuncName);
+				R(j).addFunction(uF(i), function_name);
 			end
 		end
-		Rmerged = [Rmerged R];
+		Rmerged = [Rmerged; R];
 		if MPTOPTIONS.verbose >= 0
 			nafter = length(R);
 			if nafter < nbefore
@@ -178,16 +127,38 @@ elseif ~isempty(FuncName)
 			(U.Num-length(Rmerged))/U.Num*100, U.Num, length(Rmerged));
 	end
 	U.Set = Rmerged;
-	return
 end
+
+end
+
+%% optimal merging subroutine
+%------------------------------------------------------------------
+function N = sub_optimalMerging(U)
+% merges regions optimally
+
+Hull = U.convexHull();
+Complement = Hull \ U.Set;
+% 0 = overlapping regions
+% Inf = non-overlapping regions
+Algorithm = 0;
+N = mpt_optMerge(U.Set, struct('PAdom', Hull, 'PAcompl', Complement, ...
+	'algo', Algorithm));
+
+end
+
+%% greedy merging subroutine
+%------------------------------------------------------------------
+function N = sub_greedyMerging(U)
+% greedy merging
+
+global MPTOPTIONS
+if isempty(MPTOPTIONS)
+    MPTOPTIONS = mptopt;
+end
+Options.trials = MPTOPTIONS.modules.geometry.unions.polyunion.merge.trials;
 
 % try to reduce the union first
 U.reduce;
-
-% regions must be in H-rep (because of set-difference involved in testing of convexity)
-% parfor i=1:U.Num
-%     U.Set(i).minHRep();
-% end
 
 % compute list of neighbours
 Ri.BC = sub_buildBClist(U.Set);
@@ -233,13 +204,11 @@ while trial <= Options.trials
     end
 end;
 
-U.Set = Ri_best.Pn;
+N = Ri_best.Pn;
 
 if MPTOPTIONS.verbose>=1,
     fprintf('  ==> min: %i  max: %i\n', Ri_min, Ri_max');
 end
-
-
 
 end
 
