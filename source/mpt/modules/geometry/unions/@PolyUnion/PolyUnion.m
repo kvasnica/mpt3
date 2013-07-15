@@ -97,8 +97,12 @@ classdef PolyUnion < Union
 		  %         obj: Union object
 		  %       myfun: string name of the function to check
 		  %              (the function must be affine)
-		  %   min_value: lower saturation limit (mandatory)
-		  %   max_value: upper saturation limit (mandatory)
+		  %   min_value: lower saturation limit
+		  %              (if not provided, the limit is comptued
+		  %              automatically by solving an LP)
+		  %   max_value: upper saturation limit
+		  %              (if not provided, the limit is comptued
+		  %              automatically by solving an LP)
 		  %       range: range of function's outputs (optional)
 		  %
 		  % Output:
@@ -139,9 +143,46 @@ classdef PolyUnion < Union
 		  ip.parse(varargin{:});
 		  options = ip.Results;
 		  R = numel(options.range);
+		  
+		  %% find saturation limits
+		  if isempty(options.min)
+			  minvalue = Inf(R, 1);
+			  for i = 1:obj.Num
+				  fun = obj.Set(i).Functions(function_name);
+				  lp = obj.Set(i).optMat;
+				  lp.quicklp = true;
+				  for j = 1:R
+					  lp.f = fun.F(j, :);
+					  sol = mpt_solve(lp);
+					  if sol.exitflag ~= MPTOPTIONS.OK
+						  error('Problems with solving an LP.');
+					  end
+					  minvalue(j) = min(minvalue(j), sol.obj+fun.g(j));
+				  end
+			  end
+			  options.min = minvalue;
+		  end
+		  if isempty(options.max)
+			  maxvalue = -Inf(R, 1);
+			  for i = 1:obj.Num
+				  fun = obj.Set(i).Functions(function_name);
+				  lp = obj.Set(i).optMat;
+				  lp.quicklp = true;
+				  for j = 1:R
+					  lp.f = -fun.F(j, :);
+					  sol = mpt_solve(lp);
+					  if sol.exitflag ~= MPTOPTIONS.OK
+						  error('Problems with solving an LP.');
+					  end
+					  maxvalue(j) = max(maxvalue(j), -sol.obj+fun.g(j));
+				  end
+			  end
+			  options.max = maxvalue;
+		  end
+		  
+		  %% additional validation
 		  error(validate_vector(options.min, R, 'min value'));
 		  error(validate_vector(options.max, R, 'max value'));
-		  % TODO: determine lower/upper saturations automatically
 		  
 		  %% processing
 		  S = zeros(numel(options.range), obj.Num);

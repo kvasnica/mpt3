@@ -1,5 +1,5 @@
 function test_polyunion_saturation_01_pass
-% tests Union/findSaturatedRegions
+% tests Union/findSaturated
 
 Punsat = Polyhedron('lb', -1, 'ub', 1);
 Punsat.addFunction(AffFunction(1, 0), 'f');
@@ -12,7 +12,15 @@ Pmin2.addFunction(AffFunction(0, -1), 'f');
 
 U = PolyUnion([Pmin1, Punsat, Pmax, Pmin2]);
 
-out = U.findSaturatedRegions('f', 'min', -1, 'max', 1);
+% automatic saturation limits
+out = U.findSaturated('f');
+assert(isequal(out.S, [-1, 0, 1, -1]));
+assert(isequal(out.Imin, [1 4]));
+assert(isequal(out.Imax, 3));
+assert(isequal(out.Iunsat, 2));
+
+% manual saturation limits
+out = U.findSaturated('f', 'min', -1, 'max', 1);
 assert(isequal(out.S, [-1, 0, 1, -1]));
 assert(isequal(out.Imin, [1 4]));
 assert(isequal(out.Imax, 3));

@@ -50,8 +50,7 @@ classdef SeparationController < EMPCController
 			obj.Domain = obj.optimizer.convexHull();
 			
 			% determine saturation properties
-			sat = obj.optimizer.findSaturated('primal', ...
-				'min', obj.LowerSaturation, 'max', obj.UpperSaturation);
+			sat = obj.optimizer.findSaturated('primal');
 			
 			separator = obj.separate(obj.optimizer.Set(sat.Imin), ...
 				obj.optimizer.Set(sat.Imax), obj.optimizer.Dim);
@@ -158,7 +157,7 @@ classdef SeparationController < EMPCController
 			fprintf('Solving the separation problem...\n');
 			info = solvesdp(CON, []);
 			if info.problem~=0
-				error(info.info);
+				warning(info.info);
 			end
 			
 			% optimal separator
