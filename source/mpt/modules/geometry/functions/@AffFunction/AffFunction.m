@@ -38,7 +38,9 @@ classdef AffFunction < Function
 			error(nargchk(1,3,nargin));
 			
 			% check F
-			validate_realmatrix(F);
+			if ~isa(F, 'sdpvar')
+				validate_realmatrix(F);
+			end
 			
 			% assign F
 			obj.F = F;
@@ -50,7 +52,9 @@ classdef AffFunction < Function
 			if nargin==1
 				obj.g = zeros(obj.R, 1);
 			else
-				validate_realvector(g);
+				if ~isa(g, 'sdpvar')
+					validate_realvector(g);
+				end
 				if length(g) ~= obj.R
 					error('The vector "g" must be of the size %d.',obj.R);
 				end

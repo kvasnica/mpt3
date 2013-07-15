@@ -48,10 +48,9 @@ classdef QuadFunction < Function
 			
 			% check H
 			Hm = varargin{1};
-			validate_realmatrix(Hm);
-			%             if all(abs(Hm(:))<MPTOPTIONS.zero_tol);
-			%                 error('The matrix "H" must be different from zero.');
-			%             end
+			if ~isa(Hm, 'sdpvar')
+				validate_realmatrix(Hm);
+			end
 			if size(Hm,1)~=size(Hm,2)
 				error('The matrix "H" must be square.');
 			end
@@ -63,7 +62,7 @@ classdef QuadFunction < Function
 			obj.D = size(Hm,1);
 			
 			% get the dimension of the range
-			obj.R = size(Hm,3);
+			obj.R = 1;
 			
 			% only H provided
 			if nargin==1
@@ -75,7 +74,9 @@ classdef QuadFunction < Function
 			if nargin>1
 				% F is provided, check
 				Fm = varargin{2};
-				validate_realmatrix(Fm);
+				if ~isa(Fm, 'sdpvar')
+					validate_realmatrix(Fm);
+				end
 				if size(Fm,1)~=obj.R
 					error('The number of rows for matrix "F" must be %d.',obj.R);
 				end
@@ -90,7 +91,9 @@ classdef QuadFunction < Function
 			if nargin>2
 				% g is provided, check
 				gm = varargin{3};
-				validate_realvector(gm);
+				if ~isa(gm, 'sdpvar')
+					validate_realvector(gm);
+				end
 				% make column vector
 				gm = gm(:);
 				if length(gm)~=obj.R
