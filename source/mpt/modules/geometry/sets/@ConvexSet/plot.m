@@ -172,8 +172,13 @@ if nargout==0
 end
 
 axis tight
-% enlarge the axis by 10%
+% enlarge the axis
 a = axis;
-axis(1.1*a);
+for i = 1:2:length(a)
+	da = a(i+1)-a(i);
+	a(i) = a(i)-da*0.05;
+	a(i+1) = a(i+1)+da*0.05;
+end
+axis(a);
 
 end
