@@ -43,7 +43,7 @@ classdef AffFunction < Function
 			end
 			
 			% assign F
-			obj.F = F;
+			obj.F = full(F);
 			
 			% get the dimension of the domain and the range
 			[obj.R, obj.D] = size(F);
@@ -58,7 +58,7 @@ classdef AffFunction < Function
 				if length(g) ~= obj.R
 					error('The vector "g" must be of the size %d.',obj.R);
 				end
-				obj.g = g;
+				obj.g = full(g);
 			end
 			
 			% Data provided
