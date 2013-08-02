@@ -60,7 +60,10 @@ N_sim = 30;
 
 % Create the closed-loop system:
 loop = ClosedLoop(ctrl, model);
-data = loop.simulate(x0, N_sim);
+
+% provide initial conditions including the values for inputs because the
+% delta penalty is activated
+data = loop.simulate(x0, N_sim, 'u.previous', zeros(4,1));
 
 % plot the output trajectories
 figure
