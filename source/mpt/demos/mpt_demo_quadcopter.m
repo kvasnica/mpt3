@@ -42,17 +42,16 @@ ctrl.model.u.max = [13; 13; 13; 13]-u0;
 ctrl.model.y.min = [-pi/6; -pi/6; -Inf; -Inf; -Inf; -1; -Inf(6,1)];
 ctrl.model.y.max = [pi/6; pi/6; Inf; Inf; Inf; Inf; Inf(6,1)];
 
-% add reference signals
+% add symbolic reference signal
 ctrl.model.y.with('reference');
-ctrl.model.y.reference = [0;0;1;0;0;0;zeros(6,1)];
-
-% active slew rate constraints
-ctrl.model.u.with('deltaPenalty');
-% add quadratic penalty on the input rates
-ctrl.model.u.deltaPenalty = QuadFunction(0.1*eye(4));
+ctrl.model.y.reference = 'free';
 
 % add quadratic penalty on the outputs
 ctrl.model.y.penalty = QuadFunction(diag([0 0 10 10 10 10 0 0 0 5 5 5]));
+
+% add an integrator on inputs that extends the state space
+ctrl.model.with('integrator');
+ctrl.model.u.penalty = QuadFunction(0.1*eye(4));
 
 
 %% Simulate the closed loop
@@ -61,9 +60,10 @@ N_sim = 30;
 % Create the closed-loop system:
 loop = ClosedLoop(ctrl, model);
 
-% provide initial conditions including the values for inputs because the
-% delta penalty is activated
-data = loop.simulate(x0, N_sim, 'u.previous', zeros(4,1));
+% provide initial conditions and the reference signal for closed loop
+% simulation
+yref = [0;0;1;0;0;0;zeros(6,1)];
+data = loop.simulate(x0, N_sim, 'y.reference', yref);
 
 % plot the output trajectories
 figure
