@@ -171,6 +171,36 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
 		  end
 	  end
 
+	  function out = trimFunction(obj, FuncName, n)
+		  % Extracts the first "n" rows of a given affine function
+		  %
+		  % This method creates a copy of the input array where the
+		  % specified affine function is replaced by a new affine function
+		  % which only contains the first "n" rows of the original
+		  % function.
+		  
+		  error(nargchk(3, 3, nargin));
+		  [~, errmsg] = obj.validateFunctionName(FuncName);
+		  error(errmsg);
+		  
+		  if nargout==0
+			  % in-place trimming
+			  out = obj;
+		  else
+			  % create a copy if explicitly requested
+			  out = obj.copy();
+		  end
+
+		  for i = 1:numel(out)
+			  f = out(i).getFunction(FuncName);
+			  if ~isa(f, 'AffFunction')
+				  error('Only affine functions can be trimmed.');
+			  end
+			  ft = AffFunction(f.F(1:n, :), f.g(1:n), f.Data);
+			  out(i).addFunction(ft, FuncName);
+		  end
+	  end
+	  
   end
   
   methods (Hidden)
