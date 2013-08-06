@@ -70,7 +70,10 @@ classdef NormFunction < Function
 			else
 				% domain is equal to number of columns of Q
 				validate_realmatrix(Q);
-				obj.weight = full(Q);
+				if issparse(Q)
+					Q = full(Q);
+				end
+				obj.weight = Q;
 				obj.D = size(Q, 2);
 			end
 		end

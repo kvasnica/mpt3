@@ -56,7 +56,10 @@ classdef QuadFunction < Function
 			end
 			
 			% assign H
-			obj.H = full(Hm);
+			if issparse(Hm)
+				Hm = full(Hm);
+			end
+			obj.H = Hm;
 			
 			% get the dimension of the domain
 			obj.D = size(Hm,1);
@@ -83,7 +86,10 @@ classdef QuadFunction < Function
 				if size(Fm,2)~=obj.D
 					error('The number of columns for matrix "F" must be %d.',obj.D);
 				end
-				obj.F = full(Fm);
+				if issparse(Fm)
+					Fm = full(Fm);
+				end
+				obj.F = Fm;
 				obj.g = zeros(obj.R,1);
 			end
 			
@@ -95,7 +101,10 @@ classdef QuadFunction < Function
 					validate_realvector(gm);
 				end
 				% make column vector
-				gm = full(gm(:));
+				if issparse(gm)
+					gm = full(gm);
+				end
+				gm = gm(:);
 				if length(gm)~=obj.R
 					error('The vector "g" must be of the size %d.',obj.R);
 				end

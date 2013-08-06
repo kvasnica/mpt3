@@ -43,7 +43,10 @@ classdef AffFunction < Function
 			end
 			
 			% assign F
-			obj.F = full(F);
+			if issparse(F)
+				F = full(F);
+			end
+			obj.F = F;
 			
 			% get the dimension of the domain and the range
 			[obj.R, obj.D] = size(F);
@@ -58,7 +61,10 @@ classdef AffFunction < Function
 				if length(g) ~= obj.R
 					error('The vector "g" must be of the size %d.',obj.R);
 				end
-				obj.g = full(g);
+				if issparse(g)
+					g = full(g);
+				end
+				obj.g = g;
 			end
 			
 			% Data provided
