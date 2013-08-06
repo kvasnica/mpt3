@@ -258,10 +258,47 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  
 	  end
 	  
-	  function map = findUnique(obj, FuncName)
-		  % Classifies regions
+	  function map = findUnique(obj, function_name, varargin)
+		  % Finds regions of the underlying set which share the same
+		  % expression of a given function
+		  %
+		  % Syntax:
+		  %   map = obj.findUnique(fun)
+		  %   map = obj.findUnique(fun, 'range', R)
+		  %
+		  % Inputs:
+		  %   obj: Union object
+		  %   fun: String representation of the function to use
+		  %     R: When specified, only the R components of a given
+		  %        function are employed to recognize unique regions
+		  %
+		  % Output:
+		  %   map: 1xN array (N=number of regions in the union's underlying
+		  %        set) with map(i)=j if the i-th region contains the j-th
+		  %        unique expression of function FUN
 		  
-		  [~, map] = obj.Set.uniqueFunctions(FuncName);
+		  %% validation
+		  error(obj.rejectArray());
+		  error(nargchk(2, Inf, nargin));
+		  if ~ischar(function_name)
+			  error('The function name must be a string.');
+		  elseif ~obj.hasFunction(function_name)
+			  error('No such function "%s" in the object.', function_name);
+		  elseif ~isa(obj.index_Set(1).Functions(function_name), 'AffFunction')
+			  error('Function "%s" must be affine.', function_name);
+		  end
+		  
+		  %% parsing
+		  ip = inputParser;
+		  ip.addParamValue('range', 1:obj.index_Set(1).Functions(function_name).R, ...
+			  @validate_indexset);
+		  ip.parse(varargin{:});
+		  options = ip.Results;
+
+		  % clone the union since trimming changes the original
+		  new = obj.copy();
+		  new.trimFunction(function_name, options.range);
+		  [~, map] = new.Set.uniqueFunctions(function_name);
 	  end
 	  
   end
