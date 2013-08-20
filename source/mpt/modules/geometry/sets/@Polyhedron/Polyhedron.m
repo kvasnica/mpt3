@@ -511,17 +511,19 @@ classdef Polyhedron < ConvexSet
 			if size(obj.R_int,1)>0 && size(obj.V_int,1)==0
 				% fprintf('Adding the origin to this cone');
 				obj.V_int = zeros(1,d);
-			end
-			
-			% if both V and H representations have been provided at the input and
-			% check if it is valid polyhedron (only for redundant representations)
-			if obj.hasHRep && obj.hasVRep
-				% recompute both reps
-				obj.hasVRep = false;
-				obj.minVRep();
-				obj.hasHRep = false;
-				obj.minHRep();
-			end
+            end
+
+% MH: commenting out - the user will be responsible for possible wrong results
+% when providing incompatible H- and V- representations
+% 			% if both V and H representations have been provided at the input and
+% 			% check if it is valid polyhedron (only for redundant representations)
+% 			if obj.hasHRep && obj.hasVRep
+% 				% recompute both reps
+% 				obj.hasVRep = false;
+% 				obj.minVRep();
+% 				obj.hasHRep = false;
+% 				obj.minHRep();
+% 			end
 			
 			% Compute a minimum representation for the affine set
 			obj.minAffineRep;
