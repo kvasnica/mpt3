@@ -4,7 +4,7 @@ function test_function_onenorm_01_pass
 
 % weight must be provided
 [~, msg] = run_in_caller('f = OneNormFunction()');
-asserterrmsg(msg, 'Input argument "Q" is undefined.');
+asserterrmsg(msg, 'Not enough input arguments');
 
 % weight must be a matrix
 [~, msg] = run_in_caller('f = OneNormFunction(''a'')');

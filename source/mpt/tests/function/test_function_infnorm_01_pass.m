@@ -4,7 +4,7 @@ function test_function_infnorm_01_pass
 
 % weight must be provided
 [~, msg] = run_in_caller('f = InfNormFunction()');
-asserterrmsg(msg, 'Input argument "Q" is undefined.');
+asserterrmsg(msg, 'Not enough input arguments.');
 
 % weight must be a matrix
 [~, msg] = run_in_caller('f = InfNormFunction(''a'')');
