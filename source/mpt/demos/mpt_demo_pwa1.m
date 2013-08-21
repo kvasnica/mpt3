@@ -19,7 +19,7 @@ A1 = 0.8*[cos(alpha) -sin(alpha); sin(alpha) cos(alpha)];
 
 dyn1 = LTISystem('A', A1, 'B', B, 'C', C, 'D', D);
 % We need to tell that dynamics #1 should be active if x_1<=0:
-dyn1.setDomain('x', Polyhedron([1 0], 1));
+dyn1.setDomain('x', Polyhedron([1 0], 0));
 
 % Second dynamics:
 alpha = pi/3;
