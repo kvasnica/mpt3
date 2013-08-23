@@ -549,6 +549,14 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			if isfield(sysStruct, 'umax')
 				obj.u.max = sysStruct.umax;
 			end
+			if isfield(sysStruct, 'dumin') && any(~isinf(sysStruct.dumin))
+				obj.u.with('deltaMin');
+				obj.u.deltaMin = sysStruct.dumin;
+			end
+			if isfield(sysStruct, 'dumax') && any(~isinf(sysStruct.dumax))
+				obj.u.with('deltaMax');
+				obj.u.deltaMax = sysStruct.dumax;
+			end
 		end
 		
 	end

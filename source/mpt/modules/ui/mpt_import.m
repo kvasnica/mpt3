@@ -248,12 +248,6 @@ end
 if isfield(sysStruct, 'Aunc')
 	error('Systems with parametric uncertainties not yet supported.');
 end
-if isfield(sysStruct, 'dumax') && any(~isinf(sysStruct.dumax))
-	error('Delta u constraints not yet supported.');
-end
-if isfield(sysStruct, 'dumin') && any(~isinf(sysStruct.dumin))
-	error('Delta u constraints not yet supported.');
-end
 
 % import dynamics
 if isfield(sysStruct, 'data') && isfield(sysStruct.data, 'MLD')
