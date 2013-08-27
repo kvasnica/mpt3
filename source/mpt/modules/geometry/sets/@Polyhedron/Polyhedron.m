@@ -529,6 +529,30 @@ classdef Polyhedron < ConvexSet
 			obj.minAffineRep;
 			
 		end
+		
+		function R = and(P, Q)
+			% P&Q computes intersection of two polytopes
+			
+			R = intersect(P, Q);
+		end
+		
+		function [H, isConvex] = or(P, Q)
+			% P|Q computes union of two polytopes
+			%
+			% U = P | Q returns a single polyhedron (the convex hull) if
+			% the union of P and Q is convex. Otherwise U=[P; Q].
+			%
+			% [U, isConvex] = P | Q also returns a binary flag indicating
+			% convexity.
+			
+			U = PolyUnion([P(:); Q(:)]);
+			isConvex = U.isConvex();
+			if isConvex
+				H = U.convexHull();
+			else
+				H = [P(:); Q(:)];
+			end
+		end
 	end
 	
 	methods(Hidden)
