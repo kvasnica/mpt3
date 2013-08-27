@@ -288,9 +288,12 @@ classdef Polyhedron < ConvexSet
 					% Remove obviously redundant inequalities
 					if n > 0
 						H(b==Inf, :) = [];%zeros(nnz(inf_rows),d+1);
-						% remove zero rows
+						% remove zero rows, but only those whose
+						% right-hand-side is non-negative. Removing zero
+						% rows with negative RHS would silently remove
+						% trivial infeasibility.
 						nA = matNorm(H(:,1:end-1));
-						H(nA < MPTOPTIONS.zero_tol,:) = [];
+						H((nA < MPTOPTIONS.zero_tol) & (H(:, end)>=0),:) = [];
 					end
 					obj.Dim = d;
 					obj.H_int = H;
@@ -436,9 +439,12 @@ classdef Polyhedron < ConvexSet
 			if size(p.H,1) > 0
 				inf_rows = (p.H(:,end)==Inf);
 				p.H(inf_rows,:) = [];%zeros(nnz(inf_rows),d+1);
-				% remove zero rows
+				% remove zero rows, but only those whose
+				% right-hand-side is non-negative. Removing zero
+				% rows with negative RHS would silently remove
+				% trivial infeasibility.
 				nA = matNorm(p.H(:,1:end-1));
-				p.H(nA < MPTOPTIONS.zero_tol,:) = [];
+				p.H((nA < MPTOPTIONS.zero_tol) & (p.H(:, end)>=0),:) = [];
 			end
 			if size(p.He,1) > 0
 				p.He(isinf(p.He(:,end)),:) = [];
