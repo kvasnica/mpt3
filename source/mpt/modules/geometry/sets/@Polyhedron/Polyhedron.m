@@ -448,9 +448,6 @@ classdef Polyhedron < ConvexSet
 			end
 			if size(p.He,1) > 0
 				p.He(isinf(p.He(:,end)),:) = [];
-				% remove zero rows
-				nAe = matNorm(p.He(:,1:end-1));
-				p.He(nAe < MPTOPTIONS.zero_tol,:) = [];
 			end
 			
 			% don't check for double-sided inequalities, that's why we provide
