@@ -293,7 +293,8 @@ classdef Polyhedron < ConvexSet
 						% rows with negative RHS would silently remove
 						% trivial infeasibility.
 						nA = matNorm(H(:,1:end-1));
-						H((nA < MPTOPTIONS.zero_tol) & (H(:, end)>=0),:) = [];
+						H((nA < MPTOPTIONS.zero_tol) & ...
+							(H(:, end)>=-MPTOPTIONS.zero_tol),:) = [];
 					end
 					obj.Dim = d;
 					obj.H_int = H;
@@ -444,7 +445,8 @@ classdef Polyhedron < ConvexSet
 				% rows with negative RHS would silently remove
 				% trivial infeasibility.
 				nA = matNorm(p.H(:,1:end-1));
-				p.H((nA < MPTOPTIONS.zero_tol) & (p.H(:, end)>=0),:) = [];
+				p.H((nA < MPTOPTIONS.zero_tol) & ...
+					(p.H(:, end)>=-MPTOPTIONS.zero_tol),:) = [];
 			end
 			if size(p.He,1) > 0
 				p.He(isinf(p.He(:,end)),:) = [];
