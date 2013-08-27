@@ -112,6 +112,36 @@ classdef AffFunction < Function
 			status = ~eq(f, g);
 		end
 		
+		function new = slice(obj, dims, values)
+			% Slice an affine function through given coordinates
+			%
+			% When f=F*x+g, then f.slice(dims, values) produces a new
+			% function fn=Fn*z+gn where:
+			%      z = x(keep)
+			%     Fn = F(:, keep)
+			%     gn = g + F(:, dims)*values
+			% with
+			%   keep = setdiff(1:nx, dims)
+
+			error(nargchk(3, 3, nargin));
+			
+			% validation
+			for i=1:numel(dims)
+				validate_dimension(dims(i));
+			end
+			if any(dims>obj.D)
+				error('Dimension must not exceed %d.', obj.D);
+			end
+			if numel(values)~=numel(dims)
+				error('"values" must be a vector with %d element(s).', numel(dims));
+			end
+
+			keep = setdiff(1:obj.D, dims);
+			Fn = obj.F(:, keep);
+			gn = obj.g + obj.F(:, dims)*values(:);
+			new = AffFunction(Fn, gn);
+		end
+		
 	end
 	methods (Hidden)
 		function y=af(obj, x)
