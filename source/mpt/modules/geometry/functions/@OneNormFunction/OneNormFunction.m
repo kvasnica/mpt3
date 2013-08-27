@@ -18,6 +18,7 @@ classdef OneNormFunction < NormFunction
 			%
 			% "Q" need not to be square. Function value is always scalar.
 			
+			error(nargchk(1,1,nargin));
 			obj = obj@NormFunction(1, Q);
 		end
 		
