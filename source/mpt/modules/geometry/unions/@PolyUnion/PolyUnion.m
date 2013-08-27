@@ -219,6 +219,24 @@ classdef PolyUnion < Union
 		  out.Iunsat = setdiff(1:obj.Num, [out.Imin, out.Imax]);
 	  end
 	  
+	  function [new, sliced_set] = slice(obj, dims, values)
+		  % Slices the polyunion at given dimensions
+		  %
+		  % U.slice(dims, values) fixes dimensions given in "dims" to
+		  % values in "values". Slices corresponding functions as well.
+		  %
+		  % For more information see Polyhedron/slice
+		  
+		  error(nargchk(3, 3, nargin));
+		  sliced_set = obj.Set.slice(dims, values);
+		  new = PolyUnion(sliced_set);
+		  % TODO: propagate properties preserved under slicing:
+		  % * Convex (if original was convex, so is the slice)
+		  % * Overlaps (if original didn't have them, neither will the
+		  % slice)
+		  % * Connected (if the original was, so will be the slice)
+	  end
+	  
   end  
 end
 
