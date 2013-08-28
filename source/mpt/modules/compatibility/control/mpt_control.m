@@ -29,6 +29,12 @@ ctrl = MPCController(model, probStruct.N);
 if nargin==2 || ( nargin==3 && isequal(type, 'explicit') )
 	% return an explicit representation
 	ctrl = ctrl.toExplicit();
+	
+	% remove overlaps if possible
+	if numel(ctrl.optimizer)>1 && probStruct.norm~=2
+		fprintf('Removing overlaps:\n');
+		ctrl.optimizer = ctrl.optimizer.min('obj');
+	end
 end
 
 end
