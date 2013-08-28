@@ -59,6 +59,22 @@ classdef Function < handle & IterableBehavior
 			% correctly without any overhead due to method call.
 			out = obj.Handle(x);
 		end
+		
+		function new = slice(obj, dims, values)
+			% Slice a function through given coordinates
+
+			error(nargchk(3, 3, nargin));
+			
+			% A very general implementation is to restore the vector "x" by
+			% x(dims)=values, x(keep)=z, where "keep" are the indices which
+			% are _not_ sliced.
+			%
+			% This implementation supports arbitrary nonlinear functions
+			% specified as function handles, but also provides slicing of
+			% OneNormFunction and InfNormFunction objects.
+			new = Function(@(z) obj.Handle(obj.restore_sliced_x(z, dims, values)));
+		end
+
 	end
 	
 	methods (Hidden)
@@ -88,6 +104,19 @@ classdef Function < handle & IterableBehavior
 			
 			obj.Internal.(name) = value;
 			
+		end
+	end
+	
+	methods (Static, Hidden)
+		function x = restore_sliced_x(z, dims, values)
+			% Restores "x" by fixing x(dims)=values and x(other)=z with
+			% "other = setdiff(1:nx, dims)
+			
+			nx = numel(z)+numel(dims);
+			keep = setdiff(1:nx, dims);
+			x = zeros(nx, 1);
+			x(keep) = z(:);
+			x(dims) = values;
 		end
 	end
 	
