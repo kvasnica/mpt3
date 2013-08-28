@@ -110,14 +110,8 @@ else
 	% slice functions
 	for n = P.Functions.keys
 		name = n{1};
-		fun = P.Functions(name);
-		if ismethod(fun, 'slice')
-			new = fun.slice(dims, values);
-			S.addFunction(new, name);
-		else
-			warning('Function "%s" of class "%s" cannot be sliced', ...
-				name, class(fun));
-		end
+		new = P.Functions(name).slice(dims, values);
+		S.addFunction(new, name);
 	end
 end
 
