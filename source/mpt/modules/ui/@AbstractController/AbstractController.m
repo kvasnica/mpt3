@@ -372,6 +372,9 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 					error('Cannot control autonomous systems.');
 				end
 				if nargin==3
+					if isinf(predictionHorizon)
+						error('The prediction horizon must be finite.');
+					end
 					obj.N = predictionHorizon;
 				end
 			end
