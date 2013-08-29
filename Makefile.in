@@ -18,6 +18,7 @@ GZIP = @GZIP@
 SCP = @SCP@
 MAXDOC = @MAXDOC@
 RSYNC = @RSYNC@
+CURL = @CURL@
 
 # variables from MATLAB
 @MATLAB_INFO@
@@ -51,6 +52,23 @@ POLYHEDRON_DIR = $(MPT_DIR)/modules/geometry/sets/@Polyhedron
 
 # documentation directory
 DOC_DIR = $(strip $(shell $(SED) -n 's/.*DESTDIR.*>\(.*\)<\/def>/\1/gp' conf.xml))
+
+##
+# tbxmanger configuration
+# no trailing slashes in the TBX_HOST URL please!
+TBX_HOST = http://www.tbxmanager.com/api/v1
+TBX_PLATFORM = all
+ifeq ($(UNSTABLE),1)
+	TBX_CODE_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/unstable/$(MPTNAME).tgz
+	TBX_DOC_URL =  http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/unstable/$(MPTDOCNAME).tgz
+	TBX_REPOSITORY = unstable
+else
+	TBX_CODE_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz
+	TBX_DOC_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/$(MODVERSION)/$(MPTDOCNAME).tgz
+	TBX_REPOSITORY = stable
+endif
+TBX_CODE_PACKAGE=mpt
+TBX_DOC_PACKAGE=mptdoc
 
 # run Makefile in the "@Polyhedron" subdirectory
 polyhedron:  tmpdir
@@ -99,6 +117,29 @@ else
 endif
 	@echo "Version ID: $(FULLVERSION)"
 	@hg tag $(VERSION)
+
+# register code distribution at tbxmanager
+tbxcode:
+# check that the download URL exists by checking the HTTP return code
+ifneq ($(shell $(CURL) -o /dev/null -sL -w "%{http_code}" "$(TBX_CODE_URL)"),200)
+	$(error The URL does not exist: $(TBX_CODE_URL))
+endif
+# read login and password from stdin if they are not provided from the
+# command line
+ifndef TBX_LOGIN
+	$(eval TBX_LOGIN:=$(shell read -p "Login: "; echo $$REPLY))
+endif
+ifndef TBX_PASSWORD
+	$(eval TBX_PASSWORD:=$(shell read -p "Password: "; echo $$REPLY))
+endif
+# create new version
+	@echo "Registering version \"$(FULLVERSION)\" for package \"$(TBX_CODE_PACKAGE)\" in repository \"$(TBX_REPOSITORY)\""
+	@$(CURL) --user $(TBX_LOGIN):$(TBX_PASSWORD) "$(TBX_HOST)/versions/create?package=$(TBX_CODE_PACKAGE)&version=$(FULLVERSION)&repository=$(TBX_REPOSITORY)"
+	@echo
+# create new download link for all platforms
+	@echo "Registering link for platform \"$(TBX_PLATFORM)\": $(TBX_CODE_URL)"
+	@$(CURL) --user $(TBX_LOGIN):$(TBX_PASSWORD) "$(TBX_HOST)/links/create?package=$(TBX_CODE_PACKAGE)&version=$(FULLVERSION)&platform=$(TBX_PLATFORM)&url=$(TBX_CODE_URL)"
+	@echo
 
 #create a temporary copy of source files directory if not yet created, preserve timestamps
 tmpdir:

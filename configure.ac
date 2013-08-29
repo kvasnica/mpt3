@@ -60,6 +60,11 @@ if test "$MATLAB" = no ; then
 	AC_MSG_ERROR(Cannot find matlab on the path.)
 fi
 
+AC_CHECK_PROG(CURL, curl, curl, no)
+if test "$CURL" = no ; then
+	AC_MSG_ERROR(Cannot find "curl".)
+fi
+
 AC_CHECK_PROG(WGET, wget, wget, no)
 if test "$WGET" = no ; then
 	AC_MSG_ERROR(Cannot find wget. Please, install "wget" program.)
