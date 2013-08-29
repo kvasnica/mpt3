@@ -116,7 +116,6 @@ else
 	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
 endif
 	@echo "Version ID: $(FULLVERSION)"
-	@hg tag $(VERSION)
 
 # register code distribution at tbxmanager
 tbxcode:
@@ -140,6 +139,7 @@ endif
 	@echo "Registering link for platform \"$(TBX_PLATFORM)\": $(TBX_CODE_URL)"
 	@$(CURL) --user $(TBX_LOGIN):$(TBX_PASSWORD) "$(TBX_HOST)/links/create?package=$(TBX_CODE_PACKAGE)&version=$(FULLVERSION)&platform=$(TBX_PLATFORM)&url=$(TBX_CODE_URL)"
 	@echo
+	@hg tag $(VERSION)
 
 #create a temporary copy of source files directory if not yet created, preserve timestamps
 tmpdir:
