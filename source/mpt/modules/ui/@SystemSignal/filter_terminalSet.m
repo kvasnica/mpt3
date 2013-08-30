@@ -56,7 +56,7 @@ end
 
 % we require the H-representation, which we also normalize to avoid
 % numerical problems
-Q = Polyhedron(P); % make a coppy
+Q = P.copy(); % make a copy
 for i = 1:numel(Q)
 	Q(i).minHRep().normalize();
 end
