@@ -10,7 +10,7 @@ function supp = support(obj, x)
 %   support(x) := max x'*y s.t. y in Set
 %
 % Paramaters:
-%  x  - Vector of length dim
+%  x  - Vector of length "dim" or a matrix with "dim" rows
 %
 % Returns
 %  supp - support of x or [] if empty
@@ -23,31 +23,24 @@ error(nargchk(2,2,nargin));
 validate_realmatrix(x);
 
 % deal with arrays
-no = numel(obj);
-if no>1
-    supp = Inf*ones(size(obj));
-    for i=1:no
-        supp(i) = obj(i).support(x);        
-    end
-    return
-end
-    
-if size(x,1) == 1 || size(x,2) == 1
-    x = x(:)';
-    if numel(x)~=obj.Dim,
-        error('Input argument "x" must be a vector of length %i.', obj.Dim);
-    end
-else
-    if size(x,2) ~= obj.Dim,
-        error('Input argument "x" must be a matrix of size n x %i.', obj.Dim);
-    end
+if numel(obj)>1
+	supp = obj.forEach(@(e) e.support(x));
+	return
 end
 
-supp = Inf*ones(size(x,1),1);
-for i=1:size(x,1)
-    sol  = obj.extreme(x(i,:)');
+if ~isequal(size(x, 1), obj.Dim)
+	error('Input argument "x" must have %d rows.', obj.Dim);
+end
+
+% compute the support for each point (points are assumed to be stored
+% column-wise)
+n_points = size(x, 2);
+supp = Inf*ones(n_points, 1);
+for i=1:n_points
+    sol = obj.extreme(x(:,i));
     if ~isempty(sol.supp)
         supp(i) = sol.supp;
     end
 end
+
 end

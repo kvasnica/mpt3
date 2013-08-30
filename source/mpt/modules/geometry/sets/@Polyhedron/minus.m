@@ -95,7 +95,7 @@ switch type
         end
         
         % Subtract the support of S for each inequality of P
-        Hn = [P.A P.b-S.support(P.A)];
+        Hn = [P.A P.b-S.support(P.A')];
         if any(Hn(:,end)==-Inf)
             % empty polyhedron in the same dimension
             Pdiff = Polyhedron('H',zeros(0,P.Dim+1));
