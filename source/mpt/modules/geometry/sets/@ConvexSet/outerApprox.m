@@ -67,8 +67,8 @@ if nargin < 2
     pos = zeros(obj.Dim,1);
     neg = zeros(obj.Dim,1);
     for i=1:obj.Dim
-        pos(i) =  obj.support( I(i,:));
-        neg(i) = -obj.support(-I(i,:));
+        pos(i) =  obj.support( I(i,:)');
+        neg(i) = -obj.support(-I(i,:)');
     end
     
     % replace inf with infbound

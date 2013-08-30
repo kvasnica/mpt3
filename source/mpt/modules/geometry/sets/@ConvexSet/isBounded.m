@@ -32,11 +32,11 @@ end
 ts = true;
 I = eye(obj.Dim);
 for i=1:obj.Dim
-    if isinf(obj.support( I(i,:)))
+    if isinf(obj.support( I(i,:)'))
         ts = false;
         return;
     end
-    if isinf(obj.support(-I(i,:))),
+    if isinf(obj.support(-I(i,:)')),
         ts = false;
         return;
     end
