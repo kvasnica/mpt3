@@ -24,7 +24,7 @@ S = [Y; YSet(x,G)];
 % the origin does not lie in S(1), but in S(2) 
 z = [0;0];
 
-s = S.project(z);
+s = S.forEach(@(e) e.project(z));
 
 if norm(s(1).dist-1.3577,Inf)>1e-4
     error('Wrong distance.');

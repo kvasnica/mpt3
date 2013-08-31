@@ -9,11 +9,11 @@ z = sdpvar(1);
 F = [max(1,x)+max(y^2,z) <= 3, max(1,-min(x,y)) <= 5, norm([x;y],2) <= z];
 
 
-Y = YSet([x,y,z],F);
+Y = YSet([x;y;z],F);
 
 %x=0;y=1;z=2
 % the point is inside
-z = [0,1,2];
+z = [0;1;2];
 
 s = Y.project(z);
 

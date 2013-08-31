@@ -14,7 +14,7 @@ S2 = YSet(P(:),P>=0);
 
 S = [S1,S2];
 
-[worked, msg] = run_in_caller('s = S.project(randn(4,1)); ');
+[worked, msg] = run_in_caller('s = S(1).project(randn(4,1)); ');
 assert(~worked);
 asserterrmsg(msg,'Inconsistent assignment');
 

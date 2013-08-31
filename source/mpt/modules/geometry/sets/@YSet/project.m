@@ -25,20 +25,13 @@ error(nargchk(2,2,nargin));
 % check vector x
 validate_realvector(x);
 
-% deal with arrays
-if numel(obj)>1
-	% return an array of structures
-	sol = obj.forEach(@(elem) elem.project(x));
-    return
-end
+% reject arrays
+error(obj.rejectArray());
 
 % check dimension
-if numel(x)~=obj.Dim
-    error('The argument must have %i number of elements.', obj.Dim);
-end
-
-if any(size(x)~=size(obj.vars))
-    x = transpose(x);
+if ~isequal(size(obj.vars), size(x))
+	error('Input argument "x" must be a %dx%d matrix.', ...
+		size(obj.vars, 1), size(obj.vars, 2));
 end
 
 % if x was created out of the matrix, there might be symmetric terms, 

@@ -54,7 +54,7 @@ P = [P1;P2;P3];
 % none from P contains this point
 z = [ -1.9107       1.3343        1.031];
 
-s = P.project(z);
+s = P.forEach(@(e) e.project(z(:)));
 
 for i=1:3
     if ~P(i).contains(s(i).x)

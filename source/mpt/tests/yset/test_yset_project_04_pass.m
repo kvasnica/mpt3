@@ -3,14 +3,14 @@ function test_yset_project_04_pass
 % 2D set, circle, the point is inside
 %
 
-x = sdpvar(1,2);
+x = sdpvar(2, 1);
 
-F = ( x*x' <= 1 );
+F = ( x'*x <= 1 );
 
 S = YSet(x,F);
 
 % the point is outside
-z = [-0.5,-0.5];
+z = [-0.5; -0.5];
 
 s = S.project(z);
 
