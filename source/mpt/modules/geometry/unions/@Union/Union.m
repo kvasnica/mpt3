@@ -12,6 +12,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
   end
   properties (SetAccess=protected)
       Set % container for sets
+	  Domain % domain of the union
   end
   properties (SetAccess=protected, Hidden)
       Internal % internal data
@@ -38,6 +39,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
           ip = inputParser;
           ip.KeepUnmatched = false;
           ip.addParamValue('Set', [], @(x) isa(x, 'ConvexSet'));
+		  ip.addParamValue('Domain', [], @(x) isa(x, 'ConvexSet'));
           ip.addParamValue('Data', [], @(x) true);
           ip.parse(arg{:});
           p = ip.Results;
@@ -60,10 +62,24 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 				  end
 			  end
 		  end
-          
+
           % assign data
           obj.Set = num2cell(C(:));
           obj.Data = p.Data;
+		  if ~isempty(p.Domain) && ~isempty(C)
+			  % set the domain if the set is not empty
+			  obj.Domain = num2cell(p.Domain(:));
+		  end
+	  end
+	  
+	  function D = get.Domain(obj)
+		  % getter for Union.Domain
+		  
+		  if isempty(obj.Domain)
+			  D = obj.Set;
+		  else
+			  D = obj.Domain;
+		  end
 	  end
 	 
 	  function obj = addFunction(obj, fun, FuncName)

@@ -26,7 +26,8 @@ classdef PolyUnion < Union
           ip = inputParser;
           ip.KeepUnmatched = false;
           ip.addParamValue('Set', [], @(x) isa(x, 'Polyhedron'));
-          ip.addParamValue('Convex',[], @(x) islogical(x) || x==1 || x==0);
+          ip.addParamValue('Domain', [], @(x) isa(x, 'Polyhedron'));
+		  ip.addParamValue('Convex',[], @(x) islogical(x) || x==1 || x==0);
           ip.addParamValue('Overlaps',[], @(x) islogical(x) || x==1 || x==0);
           ip.addParamValue('Connected',[], @(x) islogical(x) || x==1 || x==0);
           ip.addParamValue('Bounded',[], @(x) islogical(x) || x==1 || x==0);
@@ -69,8 +70,24 @@ classdef PolyUnion < Union
 					  end
 				  end
 			  end
-          end
-          
+		  end
+
+		  if ~isempty(p.Domain) && ~isempty(C)
+			  % set the domain if the set is not empty
+			  
+			  % first kick out empty sets
+			  p.Domain = p.Domain(~p.Domain.isEmptySet);
+			  
+			  if ~isempty(p.Domain)
+				  obj.Domain = p.Domain(:);
+				  if any(diff([obj.Domain.Dim]~=0))
+					  error('All domains must be in the same dimension.');
+				  elseif obj.Domain(1).Dim~=obj.Set(1).Dim
+					  error('The domain must be a %dD polyhedron.', obj.Set(1).Dim);
+				  end
+			  end
+		  end
+		  
           obj.Internal.Convex = p.Convex;
           obj.Internal.Overlaps = p.Overlaps;
           % convex union implies connected

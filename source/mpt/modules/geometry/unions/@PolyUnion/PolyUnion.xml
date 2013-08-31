@@ -9,8 +9,7 @@
 	</info>
 	
 	<syntax>PU = PolyUnion(P)</syntax>
-    <syntax>PU = PolyUnion('Set',P,'Convex',true)</syntax>
-    <syntax>PU = PolyUnion('Set',P,'Convex',true,'Overlaps',false,...)</syntax>
+    <syntax>PU = PolyUnion('Set',P,'Domain',D,'Convex',true,'Overlaps',false,...)</syntax>
 
 	<!-- long description of the function -->
 	<descr>
@@ -22,7 +21,9 @@
         
         You can associate various properties with the <tt>PolyUnion</tt> object:
         <ul>
-            <li>To mark the union as <bf>convex</bf>, you can set the <tt>Convex</tt> property <tt>true</tt> or <tt>false</tt>.
+			<li>Domain of the union can be set via the <tt>Domain</tt> property. If not provided,
+			the domain will be equal to the underlying set of the union.</li>
+			<li>To mark the union as <bf>convex</bf>, you can set the <tt>Convex</tt> property <tt>true</tt> or <tt>false</tt>.
             If you specify that the union is convex, the remaining algorithms will rely on this information which will can 
             speed up the computations significantly.
             </li>
@@ -51,6 +52,11 @@
 	<input required="true">
         <name>P</name>
         <descr>Non-empty polyhedra in the same dimension. </descr>
+        <class name="Polyhedron"/>
+    </input>
+	<input>
+        <name>Domain</name>
+        <descr>Specifies domains of the union.</descr>
         <class name="Polyhedron"/>
     </input>
 	<input>
