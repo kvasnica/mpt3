@@ -54,6 +54,9 @@ elseif fun.R~=1
 	error('Only scalar-valued functions can be handled.');
 end
 
+% domains of input unions will be preserved
+domains = cat(1, PUs.Domain);
+
 % deal with overlaps within of individual polyunions
 newPUs = [];
 for i = 1:numel(PUs)
@@ -200,5 +203,5 @@ end % ipart
 if isa(Pfinal, 'double') && isempty(Pfinal)
 	out = PolyUnion;
 else
-	out = PolyUnion('Set', Pfinal', 'overlaps', false);
+	out = PolyUnion('Set', Pfinal', 'overlaps', false, 'Domain', domains);
 end
