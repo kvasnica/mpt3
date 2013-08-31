@@ -129,6 +129,12 @@ else
 	U.Set = Rmerged;
 end
 
+if numel(U.Set) < numel(U.Domain)
+	% if the merged set is simpler than the original domain, use the
+	% former as the new domain
+	U.Domain = U.Set;
+end
+
 end
 
 %% optimal merging subroutine
