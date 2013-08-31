@@ -43,6 +43,16 @@ end
 if H.isEmptySet,
     Pnew = Polyhedron('V', zeros(0,size(T,1)));
     return;
+
+elseif norm(T) <= MPTOPTIONS.abs_tol
+	% Special case: zero map. Return a singleton (the origin) of
+	% appropriate dimension: T*P = { z | z=0 } where the dimension of "z"
+	% is equal to the number of rows of "T"
+	new_dim = size(T, 1);
+	V = zeros(new_dim, 1);
+	He = [eye(new_dim), zeros(new_dim, 1)];
+	Pnew = Polyhedron('V', V', 'He', He);
+	return
 end
 
 if H.hasVRep
