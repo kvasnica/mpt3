@@ -25,9 +25,6 @@ classdef EMinTimeController < EMPCController
 			end
 
 			obj.importUserData(varargin{:});
-			if ~isa(obj.model, 'LTISystem')
-				error('Only LTI systems are supported in this version.');
-			end
 
 			obj.N = 1;
 			if ~isobject(obj.optimizer)
@@ -58,6 +55,8 @@ classdef EMinTimeController < EMPCController
 				ctrl = EMPCController(PU);
 				ctrl.nu = sys.nu;
 				startIdx = 2; % do not add the terminal set into the solution
+			elseif ~ismethod(obj.model, 'stabilizingController')
+				error('You must specify the terminal state set.');
 			else
 				% no terminal set given, determine our own
 				fprintf('Computing stabilizing terminal controller...\n');
@@ -73,17 +72,45 @@ classdef EMinTimeController < EMPCController
 
 			fprintf('Iterating...\n');
 			converged = false;
+			previous_targets = ctrl(1).partition.Domain;
 			
 			for k = 2:options.maxIterations
 				fprintf('New horizon: %d\n', k-1);
+
+				opt = [];
 				
-				% TODO: deal with non-convex terminal sets
-				sys.x.terminalSet = ctrl(k-1).optimizer.convexHull;
+				% target sets = domain of the controller from previous
+				% iteration
+				targets = PolyUnion(previous_targets);
 				
-				ctrl(k) = EMPCController(sys, 1);
-				if ctrl(k).optimizer.convexHull == ctrl(k-1).optimizer.convexHull
+				% simplify the targets by kicking out sets which are
+				% completely covered by other sets
+				if targets.Num>1
+					n_before = targets.Num;
+					targets.reduce();
+					fprintf('Target sets: %d (%d discarded)\n', ...
+						targets.Num, n_before-targets.Num);
+				end
+				
+				% solve horizon 1 problem for each target set
+				new_targets = [];
+				for it = 1:targets.Num
+					sys.x.terminalSet = targets.Set(it);
+					ctrl_k_it = EMPCController(sys, 1);
+					new_targets = [new_targets, ctrl_k_it.partition.Domain];
+					opt = [opt, ctrl_k_it.optimizer];
+				end
+				
+				% store the new optimizer
+				ctrl(k) = ctrl(k-1).copy();
+				ctrl(k).optimizer = opt;
+
+				% check convergence
+				if new_targets==previous_targets
 					converged = true;
 					break
+				else
+					previous_targets = new_targets;
 				end
 			end
 			if ~converged
@@ -94,18 +121,20 @@ classdef EMinTimeController < EMPCController
 			% put all controllers into one optimizer
 			optimizer = [];
 			for i = startIdx:length(ctrl)
-				opt = ctrl(i).optimizer;
-				% step distance to the target is the new cost
-				sd = AffFunction(zeros(1, sys.nx), i-1);
+				for k = 1:length(ctrl(i).optimizer)
+					opt = ctrl(i).optimizer(k);
+					% step distance to the target is the new cost
+					sd = AffFunction(zeros(1, sys.nx), i-1);
 
-				% TODO: copy original cost to 'obj_original' or something
-				% like that?
-				for j = 1:length(opt.Set)
-					opt.Set(j).addFunction(sd, 'obj');
+					% TODO: copy original cost to 'obj_original' or something
+					% like that?
+					for j = 1:length(opt.Set)
+						opt.Set(j).addFunction(sd, 'obj');
+					end
+					optimizer = [optimizer; opt];
 				end
-				
-				optimizer = [optimizer; opt];
 			end
+			
 			obj.optimizer = optimizer;
 		end
 
