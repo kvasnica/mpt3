@@ -5,7 +5,7 @@ function  test_polyhedron_project_04_pass
 
 P(1) = ExamplePoly.randVrep;
 P(2) = ExamplePoly.randHrep;
-x = randn(5, 2);
+x = randn(2, 5);
 
 % arrays must be rejected
 [~, msg] = run_in_caller('d = P.project(x);');

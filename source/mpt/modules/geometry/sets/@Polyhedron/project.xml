@@ -27,8 +27,8 @@
   </input>
   <input required="true">
     <name>y</name>
-    <descr>Vector of size <tt>P.Dim</tt> that represent single point <i>y</i>, or matrix of size <i>n\times\text{P.Dim}</i>
-    that corresponds to multiple points merged rowwise.
+    <descr>Vector of size <tt>P.Dim</tt> that represent single point <i>y</i>, or matrix of size <i>\text{P.Dim}\times n</i>
+    that corresponds to multiple points merged column-wise.
     </descr>
     <class name="double"/>
   </input>

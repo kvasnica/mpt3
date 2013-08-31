@@ -5,9 +5,9 @@ function test_polyhedron_project_08_pass
 
 P(1) = ExamplePoly.randHrep;
 P(2) = ExamplePoly.randHrep('d',4);
-[worked, msg] = run_in_caller('d = P.project(randn(2,4)); ');
+[worked, msg] = run_in_caller('d = P.project(randn(4,2)); ');
 assert(~worked);
-asserterrmsg(msg,'The polyhedron array must be in the same dimension.');
+asserterrmsg(msg,'This method does not support arrays. Use the forEach() method.');
 
 
 end
