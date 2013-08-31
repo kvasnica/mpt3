@@ -31,7 +31,9 @@ else
 			end
 			P = [P, Pk];
 		end
-		pu = [pu, PolyUnion('Set', P, 'Bounded', true, 'FullDim', true, ...
-			'Convex', sol{i}.convex)];
+		new = PolyUnion('Set', P, 'Bounded', true, 'FullDim', true, ...
+			'Convex', sol{i}.convex, 'Domain', toPolyhedron(sol{i}.Pfinal));
+		pu = [pu, new];
+		
 	end
 end
