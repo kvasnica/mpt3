@@ -53,6 +53,7 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 		
 			obj.checkOptimizer(value);
 			obj.optimizer = value;
+			obj.optPostSetEvent();
 		end
 		
 		function display(obj)
@@ -401,7 +402,16 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			end
 		end
 	end
-		
+
+	methods(Access=protected, Hidden)
+	
+		function optPostSetEvent(obj, source, event)
+			% triggered after the optimizer was changed
+			
+			obj.markAsModified();
+		end
+	end
+
 	methods(Hidden)
 		% internal APIs
 		

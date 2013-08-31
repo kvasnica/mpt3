@@ -542,6 +542,16 @@ classdef EMPCController < AbstractController
 			%
 			% store the partition, feedback and cost objects for fast
 			% access
+
+			
+			obj.markAsModified();
+
+			if isempty(obj.optimizer)
+				obj.feedback = [];
+				obj.cost = [];
+				obj.feedback = [];
+				return
+			end
 			
 			obj.feedback = obj.optimizer.getFunction('primal');
 			obj.cost = obj.optimizer.getFunction('obj');
@@ -555,7 +565,8 @@ classdef EMPCController < AbstractController
 				for i = 1:length(obj.optimizer)
 					P = [P; Polyhedron(obj.optimizer(i).Set)];
 				end
-				out = PolyUnion('Set', P.removeAllFunctions);
+				out = PolyUnion('Set', P.removeAllFunctions, ...
+					'Domain', cat(1, obj.optimizer.Domain));
 			end
 			obj.partition = out;
 			
@@ -567,8 +578,6 @@ classdef EMPCController < AbstractController
 			else
 				obj.nr = 0;
 			end
-
-			obj.markAsModified();
 		end
 
 	end
