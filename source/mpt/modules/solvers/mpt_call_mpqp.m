@@ -128,7 +128,8 @@ for i=1:length(reg)
     end
 end
 
-ret.xopt = PolyUnion('Set',reg,'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
+ret.xopt = PolyUnion('Set',reg,'Domain', toPolyhedron(r.Phard),...
+	'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
 ret.xopt.setInternal('convexHull', toPolyhedron(r.Phard));
 ret.mpqpsol = r;
 if numel(reg)>0

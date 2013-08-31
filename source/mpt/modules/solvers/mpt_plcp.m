@@ -569,11 +569,11 @@ end
 if flag==1
     % solution terminated correctly
     sol.xopt = PolyUnion('Set',regions,'Convex',true,'Overlaps',false,...
-    'Bounded',true,'Connected',true,'FullDim',true);
+    'Bounded',true,'Connected',true,'FullDim',true,'Domain', hull);
 else
     % preterminated, can be nonconvex
     sol.xopt = PolyUnion('Set',regions,'Overlaps',false,...
-    'Bounded',true,'Connected',true,'FullDim',true);
+    'Bounded',true,'Connected',true,'FullDim',true, 'Domain', hull);
 end
 
 % store feasible set 

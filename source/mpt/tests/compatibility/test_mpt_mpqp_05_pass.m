@@ -22,4 +22,9 @@ H = sortrows(double(sol.mpqpsol.Phard));
 Hgood = [-1 0 5;-0.203610055929218 -0.979052064562708 1.86032121572301;0.203610055929218 0.979052064562708 1.86032121572301;1 0 5];
 assert(norm(H-Hgood)<1e-8);
 
+% make sure the domain was returned
+assert(isa(sol.xopt.Domain, 'Polyhedron'));
+assert(length(sol.xopt.Domain)==1);
+assert(sol.xopt.Internal.convexHull == sol.xopt.Domain);
+
 end
