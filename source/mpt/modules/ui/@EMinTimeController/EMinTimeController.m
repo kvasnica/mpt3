@@ -104,6 +104,8 @@ classdef EMinTimeController < EMPCController
 					if feasible
 						new_targets = [new_targets(:); ctrl_k_it.partition.Domain(:)];
 						opt = [opt, ctrl_k_it.optimizer];
+					else
+						fprintf('Target set #%d: infeasible\n', it);
 					end
 				end
 				
