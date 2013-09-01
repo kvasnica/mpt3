@@ -1,20 +1,9 @@
 function y=horzcat(varargin)
+% Horizontal concatenation of ConvexSet objects
 %
-% avoids concatenation into matrices
-%
+% Note: all ConvexSet arrays will be converted to column arrays, regardless
+% of their original dimension.
 
-% check for empty arguments
-e = cellfun(@(x)builtin('isempty',x),varargin,'UniformOutput',false);
-
-% delete empty entries
-varargin(cell2mat(e))=[];
-
-% check if the sets are the same
-s = cellfun(@class,varargin,'UniformOutput',false);
-if length(unique(s))~=1
-   error('Only the same sets can be concatenated.');
-end
-
-y = builtin('horzcat',varargin{:});
+y = vertcat(varargin{:});
 
 end
