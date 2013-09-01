@@ -60,4 +60,9 @@ assert(isequal(size(Q), [4 1]));
 Q = [H H];
 assert(isequal(size(Q), [4 1]));
 
+% concatenation of incompatible objects must fail
+[~, msg] = run_in_caller('[P; 1]');
+asserterrmsg(msg, 'Only the same sets can be concatenated.');
+
+
 end
