@@ -96,9 +96,19 @@ classdef EMinTimeController < EMPCController
 				new_targets = [];
 				for it = 1:targets.Num
 					sys.x.terminalSet = targets.Set(it);
-					ctrl_k_it = EMPCController(sys, 1);
-					new_targets = [new_targets, ctrl_k_it.partition.Domain];
-					opt = [opt, ctrl_k_it.optimizer];
+					feasible = false;
+					try
+						ctrl_k_it = EMPCController(sys, 1);
+						feasible = true;
+					end
+					if feasible
+						new_targets = [new_targets(:); ctrl_k_it.partition.Domain(:)];
+						opt = [opt, ctrl_k_it.optimizer];
+					end
+				end
+				
+				if isempty(new_targets)
+					error('Problem is infeasible.');
 				end
 				
 				% store the new optimizer
