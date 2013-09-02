@@ -572,6 +572,15 @@ classdef Polyhedron < ConvexSet
 	end
 	
 	methods(Static)
+	
+		function B = unitBox(dim)
+			% Polyhedron.unitBox(n) constructs a unit box in "n" dimensions
+			
+			error(nargchk(1, 1, nargin));
+			B = Polyhedron('lb', -ones(dim, 1), 'ub', ones(dim, 1), ...
+				'irredundantHRep', true);
+		end
+
 		function new = loadobj(obj)
 			% load Polyhedron objects
 			
