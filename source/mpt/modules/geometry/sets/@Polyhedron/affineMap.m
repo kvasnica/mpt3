@@ -41,7 +41,7 @@ if size(T,2)~=H.Dim
 end
 
 if H.isEmptySet,
-    Pnew = Polyhedron('V', zeros(0,size(T,1)));
+	Pnew = Polyhedron.emptySet(size(T, 1));
     return;
 
 elseif norm(T) <= MPTOPTIONS.abs_tol

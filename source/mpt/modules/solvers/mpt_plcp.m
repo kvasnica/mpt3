@@ -230,7 +230,7 @@ hdat.redundant_rows = R.Internal.redundant_rows;
 HASH = map_put(HASH, Io, hdat);
 
 % initialize counters
-regions = Polyhedron('H',zeros(0,lc.d+1));
+regions = Polyhedron.emptySet(lc.d);
 stats.pivs = 0;
 stats.facetsTraversed = 0;
 flag = 1;
@@ -317,7 +317,7 @@ while ~builtin('isempty',UNEX)
   actual_region = map_getIndex(HASH, R.Internal.I);
   regions(actual_region) = R; % store regions in array as they were explored
   er = ([regions.Dim]==0); % empty regions
-  regions(er) = Polyhedron('H',zeros(0,lc.d+1)); % set the dimensio of empty regions to lc.d
+  regions(er) = Polyhedron.emptySet(lc.d); % set the dimensio of empty regions to lc.d
   adj_list{actual_region} = cell(size(R.H,1),1); % adjacency list
   layer_list{layer+1} = []; % layers list 
   regions_found = 0;

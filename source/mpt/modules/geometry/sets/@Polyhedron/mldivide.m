@@ -90,7 +90,7 @@ if numel(res)>0
 	res = res(find(~res.isEmptySet()));
 end
 if numel(res)==0 && numel(P)>0
-	res = Polyhedron('H', zeros(0, P(1).Dim+1));
+	res = Polyhedron.emptySet(P(1).Dim);
 end
 
 % TODO: either return a copy of P without functions, or make sure that
@@ -156,7 +156,7 @@ for j = 1:size(QkH, 1)
 	PH = [PH; QkH(j, :)]; 
 end
 if numel(R)==0
-	R = Polyhedron('H', zeros(0, P.Dim+1));
+	R = Polyhedron.emptySet(P.Dim);
 end
 
 end
@@ -175,7 +175,7 @@ global MPTOPTIONS
 % quickly check several trivial special cases:
 if Y.isEmptySet()
 	% special case: if Y is empty set, then Y\R = empty set
-	res = Polyhedron('H', zeros(0, Y.Dim+1));
+	res = Polyhedron.emptySet(Y.Dim);
 	return
 
 elseif Y.Dim ~= R.Dim
@@ -290,7 +290,7 @@ end
 
 if numel(res)==0
 	% make sure the output is always a polyhedron in the dimension of Y
-	res = Polyhedron('H',zeros(0, Y.Dim+1));
+	res = Polyhedron.emptySet(Y.Dim);
 end
 
 end

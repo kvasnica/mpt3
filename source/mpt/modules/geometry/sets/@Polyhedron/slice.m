@@ -103,7 +103,7 @@ else
 		else
 			% equality constraints inconsistent => empty polyhedron of
 			% correct dimension
-			S = Polyhedron('H', zeros(0, length(keep_dims)+1));
+			S = Polyhedron.emptySet(length(keep_dims));
 		end
 	end
 	

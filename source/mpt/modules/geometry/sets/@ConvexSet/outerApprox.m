@@ -44,7 +44,7 @@ if isempty(MPTOPTIONS)
 end
 
 if obj.isEmptySet
-    approx = Polyhedron('H',zeros(0,obj.Dim+1));
+    approx = Polyhedron.emptySet(obj.Dim);
     approx.Internal.lb =  inf*ones(obj.Dim,1);
     approx.Internal.ub = -inf*ones(obj.Dim,1);
     return

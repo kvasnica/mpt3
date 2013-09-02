@@ -83,14 +83,14 @@ switch type
         % difference is empty.
         if rank([P.He;S.He], MPTOPTIONS.abs_tol) > rank(S.He, MPTOPTIONS.abs_tol)
             % empty polyhedron in the same dimension
-            Pdiff = Polyhedron('H',zeros(0,P.Dim+1));
+			Pdiff = Polyhedron.emptySet(P.Dim);
             return
         end
         
         % special case P==S
         if P==S
             % empty polyhedron in the same dimension
-            Pdiff = Polyhedron('H',zeros(0,P.Dim+1));
+            Pdiff = Polyhedron.emptySet(P.Dim);
             return;
         end
         
@@ -98,7 +98,7 @@ switch type
         Hn = [P.A P.b-S.support(P.A')];
         if any(Hn(:,end)==-Inf)
             % empty polyhedron in the same dimension
-            Pdiff = Polyhedron('H',zeros(0,P.Dim+1));
+            Pdiff = Polyhedron.emptySet(P.Dim);
             return;
         end
         % remove remaining Inf rows

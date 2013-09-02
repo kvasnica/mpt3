@@ -66,11 +66,7 @@ if any(dims>P.Dim)
 end
 
 if P.isEmptySet,
-    if P.hasHRep
-        q = Polyhedron('H',zeros(0,length(dims)+1));
-    else
-        q = Polyhedron('V',zeros(0,length(dims)));
-    end
+	q = Polyhedron.emptySet(length(dims));
     return;
 end
 
