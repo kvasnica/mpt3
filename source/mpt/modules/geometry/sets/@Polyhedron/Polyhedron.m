@@ -577,7 +577,7 @@ classdef Polyhedron < ConvexSet
 			% Polyhedron.emptySet(n) constructs an empty set in R^n
 
 			error(nargchk(1, 1, nargin));
-			S = Polyhedron('H', zeros(0, dim+1));
+			S = Polyhedron(zeros(0, dim), zeros(0, 1));
 			S.Internal.Empty = true;
 			S.Internal.FullDim = false;
 		end
