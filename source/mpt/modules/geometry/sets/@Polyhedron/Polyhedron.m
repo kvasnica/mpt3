@@ -573,6 +573,15 @@ classdef Polyhedron < ConvexSet
 	
 	methods(Static)
 	
+		function S = emptySet(dim)
+			% Polyhedron.emptySet(n) constructs an empty set in R^n
+
+			error(nargchk(1, 1, nargin));
+			S = Polyhedron('H', zeros(0, dim+1));
+			S.Internal.Empty = true;
+			S.Internal.FullDim = false;
+		end
+
 		function B = unitBox(dim)
 			% Polyhedron.unitBox(n) constructs a unit box in "n" dimensions
 			
