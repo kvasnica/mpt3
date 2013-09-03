@@ -88,7 +88,7 @@ switch sol.exitflag
         sol.x = [];
         sol.supp = NaN;
     case MPTOPTIONS.UNBOUNDED;
-        sol.x = [];
+        sol.x = s.Primal(obj.extr.local(:));
         sol.supp = Inf;
     otherwise
         error('Solver returned "%s" error when called from YALMIP.',sol.how);
