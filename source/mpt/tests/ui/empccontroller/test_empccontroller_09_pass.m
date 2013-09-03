@@ -22,10 +22,13 @@ model.u.penalty = InfNormFunction(0.01);
 N = 6;
 mpc = MPCController(model, N);
 expmpc = mpc.toExplicit();
+expmpc.partition.plot();
+axis([-1 1 -1 1]);
 
 if expmpc.partition.Num~=58
     error('The number of regions does not hold');
 end
+close all
 
 
 end
