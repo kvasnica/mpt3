@@ -71,10 +71,7 @@ if nargin < 2
         neg(i) = -obj.support(-I(i,:)');
     end
     
-    % replace inf with infbound
     H = [eye(obj.Dim), pos; -eye(obj.Dim), -neg];
-    H(H==Inf) = MPTOPTIONS.infbound;
-    H(H==-Inf) = -MPTOPTIONS.infbound;
     
     approx = Polyhedron(H(:, 1:end-1), H(:, end));
     approx.Internal.lb = neg;
