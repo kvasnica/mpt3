@@ -11,7 +11,7 @@ elseif numel(P) > 1
     return
 end
 
-if size(P.H_int,1) == 0 && size(P.V_int,1) == 0
+if isempty(P.H_int) && isempty(P.V_int) && isempty(P.R_int)
     if size(P.He_int,1) == 0
         fprintf('Empty polyhedron in R^%i\n', P.Dim);
     else
