@@ -56,18 +56,30 @@ end
 if isempty(facetI)
     if P.hasVRep
         % Average vertices and rays
-        sol.x = mean(P.V,1)';
-        if size(P.R,1) > 0
-            sol.x = sol.x + norm(sol.x)*mean(normalize(P.R))';
-        end
+		if isempty(P.V) && ~isempty(P.R)
+			% only rays
+			sol.x = mean(normalize(P.R), 1)';
+		else
+			% vertices and maybe rays
+			sol.x = mean(P.V,1)';
+			if size(P.R,1) > 0
+				sol.x = sol.x + norm(sol.x)*mean(normalize(P.R), 1)';
+			end
+		end
         
         V = P.V;
-        V = V(2:end,:) - repmat(V(1,:),size(V,1)-1,1);
+		if ~isempty(V)
+			V = V(2:end,:) - repmat(V(1,:),size(V,1)-1,1);
+		end
         R = P.R;
         
         sol.isStrict = false;
         if rank([V;R], MPTOPTIONS.abs_tol) == P.Dim
             sol.isStrict = true;
+		end
+		if isempty(V)
+			% the set is unbounded
+			sol.r = Inf;
 		end
 		P.Internal.InternalPoint = sol;
         return
