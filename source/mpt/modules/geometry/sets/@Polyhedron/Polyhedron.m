@@ -580,6 +580,8 @@ classdef Polyhedron < ConvexSet
 			S = Polyhedron(zeros(0, dim), zeros(0, 1));
 			S.Internal.Empty = true;
 			S.Internal.FullDim = false;
+			S.Internal.lb = Inf(dim, 1);
+			S.Internal.ub = -Inf(dim, 1);
 		end
 
 		function B = unitBox(dim)
