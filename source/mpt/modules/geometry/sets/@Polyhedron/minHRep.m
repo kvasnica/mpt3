@@ -74,6 +74,15 @@ if obj.irredundantHRep == false
 		return
 	end
 
+	% remove trivially redundant rows with 0*x <= b (note that at this
+	% stage we know that the set is not emapy, hence b>=0)
+	nA = matNorm(obj.H_int(:,1:end-1));
+	zero_rows = nA < MPTOPTIONS.zero_tol;
+	if any(zero_rows)
+		iredundant_rows(zero_rows) = [];
+		obj.H_int(zero_rows, :) = [];
+	end
+	
 	% available heuristics
 	% TODO: put these into MPTOPTIONS.modules.geometry.polyhedron.reduce
 	bounding_box = true;
@@ -407,6 +416,12 @@ if obj.irredundantHRep == false
 	
 end
 
+if isempty(obj.H_int) && isempty(obj.He_int)
+	% all rows were removed as redundant to produce R^n
+	obj.H_int = [zeros(1, obj.Dim), 1];
+	% keep at least one of the original constraints for consistency
+	iredundant_rows = 1;
+end
 sol.H  = obj.H_int;
 sol.He = obj.He_int;
 sol.I = true(nold,1);
