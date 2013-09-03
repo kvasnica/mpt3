@@ -534,6 +534,23 @@ classdef Polyhedron < ConvexSet
 			obj.minAffineRep;
 			
 		end
+
+		function answer = isPointed(P)
+			% returns true if the polyhedron is pointed
+			%
+			% A polyhedron { x | A*x<=b, C*x=d } is pointed if and only if
+			% its lineality space null([A; C]) is empty.
+			%
+			% Literature:
+			% http://www.ee.ucla.edu/ee236a/lectures/polyhedra.pdf
+			
+			answer = false(size(P));
+			for i = 1:numel(P)
+				% we need the H-representation, hence use the "A" and "Ae"
+				% getters to compute it if it's not available
+				answer(i) = isempty(null([P.A; P.Ae]));
+			end
+		end
 		
 		function R = and(P, Q)
 			% P&Q computes intersection of two polytopes
