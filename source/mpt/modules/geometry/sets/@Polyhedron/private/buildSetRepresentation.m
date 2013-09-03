@@ -4,28 +4,11 @@ function optMat = buildSetRepresentation(obj)
 % optimization
 %
 
-% Choose H-rep or V-rep
-hRep = obj.hasHRep; vRep = obj.hasVRep;
-
-% % we have a problem here with empty polyhedra, e.g. 
-% % Polyhedron(zeros(0, 2), [])
-%
-% if size(obj.H_int,1) > 0 || size(obj.He_int,1) > 0
-%     hRep = true;
-% end
-% if size(obj.V_int,1) > 0 || size(obj.R_int,1) > 0
-%     vRep = true;
-% end
-if hRep && vRep
-    if size(obj.H_int,1) > size(obj.V_int,1)+size(obj.R_int,1)
-        hRep = false; % vRep is simpler
-    else
-        vRep = false; % hRep is simpler
-    end
-end
-
-
-if hRep
+% Prefer H-representation. The primary purpose of the toolbox is parametric
+% optimization where polyhedra are generated in H-rep. If both reps are
+% available, this is usually a consequence of an inadvert H-to-V
+% conversion, e.g. in plotting. Such a conversion can be unreliable.
+if obj.hasHRep
     % Set containment:
     %   H(:,1:end-1)  * x <= H(:,end)
     %   He(:,1:end-1) * x == He(:,end)
@@ -48,31 +31,46 @@ if hRep
     optMat.lb = -inf*ones(obj.Dim,1);
     optMat.ub =  inf*ones(obj.Dim,1);
 
-elseif vRep
+elseif obj.hasVRep
     % Set containment:
-    %  [-I  V' R']   [  x]   [ 0]
-    %  [ 0' 1' 0'] * [lam] = [ 1]
-    %  [Ae  0  0 ]   [gam]   [be]
-    %
-    %  lam >= 0, gam >= 0
-    %
-    optMat.type = 'V';
-    nV = size(obj.V_int,1); nR = size(obj.R_int,1);
-    optMat.A  = zeros(0,obj.Dim+nV+nR);
-    optMat.b  = zeros(0,1);
-    if ~isempty(obj.He_int)
-        optMat.Ae = [-eye(obj.Dim) obj.V_int' obj.R_int';...
-            zeros(1,obj.Dim) ones(1,nV) zeros(1,nR);...
-            obj.He_int(:,1:end-1) zeros(size(obj.He_int,1),nV+nR)];
-        optMat.be = [zeros(obj.Dim,1);1;obj.He_int(:,end)];
-    else
-        optMat.Ae = [-eye(obj.Dim) obj.V_int' obj.R_int';...
-            zeros(1,obj.Dim) ones(1,nV) zeros(1,nR)];
-        optMat.be = [zeros(obj.Dim,1);1];
-    end
+	%   x = lam'*V + gam'*R
+	%   lam>=0, gam>=0, 1'*lam=1
+
+	optMat.type = 'V';
+    nV = size(obj.V_int,1); 
+	nR = size(obj.R_int,1);
+
+	% lam>=0, gam>=0
     optMat.lb = [-inf*ones(obj.Dim,1);zeros(nV+nR,1)];
     optMat.ub = [ inf*ones(obj.Dim,1);ones(nV,1);inf*ones(nR,1)];
 
+	% no inequality constraints
+	optMat.A = zeros(0, obj.Dim+nV+nR);
+	optMat.b = zeros(0, 1);
+
+	% equality constraints:
+	%   x = lam'*V + gam'*R
+	%   1'*lam=1	
+    %                [  x]   
+    %  [-I  V' R']   [lam]   [0]
+    %  [ 0' 1' 0'] * [gam] = [1]
+	optMat.Ae = [-eye(obj.Dim) obj.V_int' obj.R_int'];
+	optMat.be = zeros(obj.Dim, 1);
+	if nV>0
+		% only include 1'*lam==1 if we actually do have vertices
+		optMat.Ae = [optMat.Ae; zeros(1,obj.Dim) ones(1,nV) zeros(1,nR)];
+		optMat.be = [optMat.be; 1];
+	end
+
+else
+	% no representation is available => empty set
+	optMat.type = 'H';
+	optMat.A = zeros(0, obj.Dim);
+	optMat.b = zeros(0, 1);
+	optMat.Ae = zeros(0, obj.Dim);
+	optMat.be = zeros(0, 1);
+	optMat.lb = ones(obj.Dim, 1); % empty set
+	optMat.ub = zeros(obj.Dim, 1);
 end
 
 end
