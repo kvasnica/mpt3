@@ -37,6 +37,8 @@ function Pnew = mtimes(P, S)
 % Computes the cartesian product P x S
 %
 
+global MPTOPTIONS
+
 % Determine the type of the arguments
 if isa(S, 'Polyhedron')
     if numel(S)>1
@@ -102,9 +104,23 @@ switch [P_class S_class]
         else
             alpha = S;
             poly = P;
-        end
-        
-        if poly.hasHRep
+		end
+		
+		if abs(alpha) < MPTOPTIONS.abs_tol
+			% scaling with zero produces a singleton
+			%
+			% we deal with this explicitly as to correctly support R^n
+			% (depends on resolution of issue #93)
+
+			% obey representation of the input
+			if poly.hasHRep
+				Pnew = Polyhedron([eye(poly.Dim); -eye(poly.Dim)], ...
+					zeros(2*poly.Dim, 1));
+			else
+				Pnew = Polyhedron(zeros(1, poly.Dim));
+			end
+			
+		elseif poly.hasHRep
 			if isempty(poly.He_int)
 				Pnew = Polyhedron(poly.A, alpha*poly.b);
 			else
