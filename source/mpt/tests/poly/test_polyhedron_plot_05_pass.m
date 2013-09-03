@@ -5,7 +5,7 @@ function test_polyhedron_plot_05_pass
 
 
 P(1) = Polyhedron('He',randn(2,3));
-P(2) = Polyhedron('R',[0;0;1]);
+P(2) = Polyhedron('R',[0;0;1], 'V', 0);
 
 h=plot(P,'color','blue','polyhedron',true,'linewidth',2);
 
