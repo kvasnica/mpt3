@@ -704,9 +704,22 @@ if any(any(isnan(A),2))
 end
 % intersect current representation and bounds for theta
 Hn = [A; lc.Ht];
+
+% we need to remove zero rows here since we do not necessarily call
+% Polyhedron/minHRep (which would remove them automatically) every time.
+n_rows = size(Hn, 1);
 nA = matNorm(Hn(:,1:end-1));
-kept_rows = find(nA > MPTOPTIONS.zero_tol); % store the non-redundant rows
+zero_rows = (nA < MPTOPTIONS.zero_tol);
+Hn = Hn(~zero_rows, :);
+
+% create polyhedron {x | A*x<=b} with only non-zero rows of "A"
 R = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
+
+% exit quickly if the polyhedron is empty
+if R.isEmptySet()
+    R = [];
+    return;
+end
 
 % store additional data inside Internal properties
 R.setInternal('I',I);
@@ -773,37 +786,16 @@ if computeHull
     % do not normalize it before red. eliminination, because the detection
     % of empty regions will fail (test_plcp_12_pass)
     R.normalize;
-    
-    % kick out the redundant rows from the original system [A, lc.Ht]
-    kept_rows(hull.I) = [];
-    
-    % store indices of rows that are reduntant in the original H
-    % representation
-    redr = true(size(Hn,1),1);
-    redr(kept_rows) = false;
-    R.setInternal('redundant_rows', redr);        
-    
-%     if isempty(hull.H) || R.isEmptySet
-%         if MPTOPTIONS.modules.solvers.plcp.debug >= 2
-%             fprintf('minHRep: Empty region found - skipping.\n');
-%         end
-%         R = [];
-%         return
-%     end
-%     
-%     if ~isempty(hull.He)
-%         if MPTOPTIONS.modules.solvers.plcp.debug >= 2
-%             fprintf('minHRep: Lower-dimensional region found - skipping.\n');
-%         end
-%         R = [];
-%         return
-%     end
-end
 
-% check for empty set
-if R.isEmptySet
-    R = [];
-    return;
+	% store indices of rows that are reduntant in the original
+	% H-representation (i.e., the one before removing zero rows)
+	redundant_rows = true(n_rows, 1);
+	nonzero_rows = find(~zero_rows);
+	% nonzero_rows(~hull.I) denotes indices of non-redundant non-zero rows
+	% (feasible zero rows are redundant by definition)
+	redundant_rows(nonzero_rows(~hull.I)) = false;
+    
+	R.setInternal('redundant_rows', redundant_rows);
 end
 
 end
