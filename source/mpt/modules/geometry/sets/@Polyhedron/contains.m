@@ -150,7 +150,10 @@ elseif S.Dim ~= P.Dim
 end
 
 tf = true;
-if S.hasVRep
+if S.hasVRep && (P.hasHRep || (~isempty(S.V_int) && isempty(S.R_int)))
+	% to check P.contains(S) with S in V-rep we reuquire either
+	% 1) P to be in H-rep, or
+	% 2) S to have vertices and no rays
 	if P.hasHRep
 		% Easiest case => test each ray and vertex
 		P.minHRep();
@@ -187,8 +190,9 @@ if S.hasVRep
 		
 	end
 else
-	% S is an H-rep => Need an H-rep of P
+	% S is an H-rep or in incompatible V-rep => Need an H-rep of P and S
 	P.minHRep();
+	S.minHRep();
 	
 	% check outer approximations first
 	P.outerApprox();
