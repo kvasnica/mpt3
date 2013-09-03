@@ -546,9 +546,14 @@ classdef Polyhedron < ConvexSet
 			
 			answer = false(size(P));
 			for i = 1:numel(P)
-				% we need the H-representation, hence use the "A" and "Ae"
-				% getters to compute it if it's not available
-				answer(i) = isempty(null([P.A; P.Ae]));
+				if P(i).hasHRep
+					% check the lineality space
+					answer(i) = isempty(null([P.A; P.Ae]));
+				else
+					% polyhedron is pointed if it contains no line (i.e.,
+					% if it contains at least one vertex)
+					answer(i) = ~isempty(P.V_int);
+				end
 			end
 		end
 		
