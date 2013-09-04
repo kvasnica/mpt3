@@ -600,6 +600,19 @@ classdef Polyhedron < ConvexSet
 			S.Internal.ub = -Inf(dim, 1);
 		end
 
+		function S = fullSpace(dim)
+			% Polyhedron.fullSpace(n) constructs the H-representation of R^n
+
+			% R^n is represented by 0'*x<=1
+			S = Polyhedron(zeros(1, dim), 1);
+			S.irredundantHRep = true;
+			S.Internal.Empty = false;
+			S.Internal.FullDim = true;
+			S.Internal.Bounded = false;
+			S.Internal.lb = -Inf(dim, 1);
+			S.Internal.ub = Inf(dim, 1);
+		end
+		
 		function B = unitBox(dim)
 			% Polyhedron.unitBox(n) constructs a unit box in "n" dimensions
 			
