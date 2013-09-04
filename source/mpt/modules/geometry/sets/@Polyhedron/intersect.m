@@ -48,7 +48,7 @@ if isfield(P.Internal, 'lb') && isfield(P.Internal, 'ub') && ...
 			any(Sub+MPTOPTIONS.rel_tol < Plb)
 		% outer box approximations do not intersect, hence polyhedra do not
 		% intersect
-		PnS = Polyhedron;
+		PnS = Polyhedron.emptySet(P.Dim);
 		return
 	end
 end
@@ -64,7 +64,7 @@ end
 if isempty(P.He_int) && isempty(S.He_int)
 	if isempty(P.H_int) || isempty(S.H_int)
 		% intersection with an empty set gives an empty set
-		PnS = Polyhedron;
+		PnS = Polyhedron.emptySet(P.Dim);
 	else
 		% faster call using just Ax<=b
 		PnS = Polyhedron([P.A; S.A], [P.b; S.b]);
