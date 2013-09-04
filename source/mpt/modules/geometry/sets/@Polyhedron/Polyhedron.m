@@ -574,6 +574,66 @@ classdef Polyhedron < ConvexSet
 				H = [P(:); Q(:)];
 			end
 		end
+		
+		function answer = isFullSpace(P)
+			% returns true if the polyhedron represents R^n
+			
+			global MPTOPTIONS
+			
+			answer = false(size(P));
+			for i = 1:numel(P)
+				if P(i).hasHRep
+					
+					if ~isempty(P(i).He_int)
+						% affine set is not R^n
+					
+					elseif isempty(P(i).He_int) && ...
+						all(matNorm(P(i).H_int(:, 1:end-1)) < MPTOPTIONS.zero_tol) && ...
+							all(P(i).H_int(:, end) > -MPTOPTIONS.zero_tol)
+						% 0*x<=b with "b" non-negative => R^n
+						%
+						% Note that the polyhedron constructor already
+						% removed rows like a'*x<=Inf, which are the only
+						% other description of R^n
+						answer(i) = true;
+					end
+					
+				elseif P(i).hasVRep && ~isempty(P(i).R_int)
+					% check whether rays span R^n
+					
+					% the rays span R^n if there exists lambda>=0 such
+					% that R*lambda gives each basis vector of R^n
+					
+					answer(i) = true; % will be unset later if necessary
+					
+					% set of basis vectors
+					E = [eye(P(i).Dim), -eye(P(i).Dim)];
+					R = P(i).R_int';
+					nR = size(R, 2);
+					lp.f = zeros(nR, 1);
+					lp.A = -eye(nR);
+					lp.b = zeros(nR, 1);
+					lp.Ae = R;
+					lp.be = [];
+					lp.lb = zeros(nR, 1);
+					lp.ub = Inf(nR, 1);
+					lp.quicklp = true;
+					for j = 1:size(E, 2)
+						% solve the feasibility LP:
+						%   find lambda>=0, s.t. R*lambda=E(:, j)
+						lp.be = E(:, j);
+						res = mpt_solve(lp);
+						if res.exitflag ~= MPTOPTIONS.OK
+							% infeasible, the conic combinations of
+							% rays failed to provide a basis vector
+							answer(i) = false;
+							break
+						end
+					end
+					
+				end
+			end
+		end
 	end
 	
 	methods(Hidden)
