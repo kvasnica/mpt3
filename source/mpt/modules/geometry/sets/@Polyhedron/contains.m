@@ -161,8 +161,17 @@ if S.hasVRep && (P.hasHRep || (~isempty(S.V_int) && isempty(S.R_int)))
 		% check also equalities
 		A = [P.A;P.Ae;-P.Ae]; b = [P.b;P.be;-P.be];
 		
-		I = A*S.R' - repmat(b,1,size(S.R,1));
+		% Let:
+		%   P = { x | a'*x <= b }
+		%   S = { x | x=r*y, y >= 0 }
+		% Then P.contains(S) iff \forall x \in S we have x \in P, i.e.
+		%   a'*r*y <= b, \forall y>=0
+		% which holds iff
+		%   a'*r <= min(0, b)
+		
+		I = A*S.R' - repmat(min(0, b), 1, size(S.R,1));
 		if any(I(:) > MPTOPTIONS.rel_tol),
+			% rays are not contained
 			tf = false;
 			return
 		end
