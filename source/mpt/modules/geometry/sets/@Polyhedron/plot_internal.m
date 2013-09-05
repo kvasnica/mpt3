@@ -10,8 +10,8 @@ global MPTOPTIONS
 
 h = [];
 
-if P.isEmptySet()
-	% do not plot empty sets
+if P.isEmptySet() || P.isFullSpace()
+	% do not plot empty sets and R^n
 	return
 end
 
