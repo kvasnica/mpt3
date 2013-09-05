@@ -20,6 +20,13 @@ elseif ~obj.hasVRep
 	% empty set
 	obj.hasHRep = true;
 	return
+elseif obj.isFullSpace()
+	% R^n
+	Rn = Polyhedron.fullSpace(obj.Dim);
+	obj.H_int = Rn.H;
+	obj.He_int = Rn.He;
+	obj.hasHRep = true;
+	return
 end
 
 % compute Hrep
