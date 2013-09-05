@@ -534,16 +534,6 @@ classdef Polyhedron < ConvexSet
 			end
 		end
 		
-		function F = fliplr(P)
-			% Flip the polyhedron array
-			%
-			% If P=[P1, P2, P3], then fliplr(P)=[P3, P2, P1]
-			
-			% since we store polyhedron arrays as column vectors (see
-			% Polyhedron/horzcat), it suffices to invoke flipud()
-			F = flipud(P);
-		end
-		
 		function answer = isFullSpace(P)
 			% returns true if the polyhedron represents R^n
 			

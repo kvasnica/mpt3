@@ -24,6 +24,14 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
   
   methods
 	  
+	  function F = fliplr(P)
+		  % Flips an array of ConvexSet objects
+
+		  % since we store arrays as column vectors by default (see
+		  % ConvexSet/horzcat), it suffices to invoke flipud()
+		  F = flipud(P);
+	  end
+
 	  function F = get.Func(obj)
 		  F = obj.Functions.values();
 	  end
