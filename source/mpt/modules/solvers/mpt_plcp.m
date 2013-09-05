@@ -668,8 +668,6 @@ function R = lcp_getRegion(lc, I, HASH, regions, UNEX, piv, computeHull)
 % if the region was discovered and stored earlier
 %
 
-global MPTOPTIONS
-
 if nargin < 7
     computeHull = true;
 end
@@ -705,14 +703,9 @@ end
 % intersect current representation and bounds for theta
 Hn = [A; lc.Ht];
 
-% we need to remove zero rows here since we do not necessarily call
-% Polyhedron/minHRep (which would remove them automatically) every time.
-n_rows = size(Hn, 1);
-nA = matNorm(Hn(:,1:end-1));
-zero_rows = (nA < MPTOPTIONS.zero_tol);
-Hn = Hn(~zero_rows, :);
-
-% create polyhedron {x | A*x<=b} with only non-zero rows of "A"
+% create polyhedron {x | A*x<=b}
+% 
+% Note that the polyhedron constructor retains zero rows
 R = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
 
 % exit quickly if the polyhedron is empty
@@ -787,15 +780,8 @@ if computeHull
     % of empty regions will fail (test_plcp_12_pass)
     R.normalize;
 
-	% store indices of rows that are reduntant in the original
-	% H-representation (i.e., the one before removing zero rows)
-	redundant_rows = true(n_rows, 1);
-	nonzero_rows = find(~zero_rows);
-	% nonzero_rows(~hull.I) denotes indices of non-redundant non-zero rows
-	% (feasible zero rows are redundant by definition)
-	redundant_rows(nonzero_rows(~hull.I)) = false;
-    
-	R.setInternal('redundant_rows', redundant_rows);
+	% store indices of redundant rows
+	R.setInternal('redundant_rows', hull.I);
 end
 
 end
