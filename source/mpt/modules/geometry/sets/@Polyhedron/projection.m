@@ -68,6 +68,9 @@ end
 if P.isEmptySet,
 	q = Polyhedron.emptySet(length(dims));
     return;
+elseif P.isFullSpace()
+	q = Polyhedron.fullSpace(length(dims));
+	return
 end
 
 % Compute projection of the polyhedron
