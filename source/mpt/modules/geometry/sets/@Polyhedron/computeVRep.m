@@ -26,6 +26,12 @@ elseif obj.isEmptySet()
 	obj.R_int = zeros(0, obj.Dim);
 	obj.hasVRep = true;
 	return
+elseif obj.isFullSpace()
+	% R^n = zero vertex and all basis vectors as rays
+	obj.V_int = zeros(1, obj.Dim);
+	obj.R_int = [eye(obj.Dim); -eye(obj.Dim)];
+	obj.hasVRep = true;
+	return
 end
 
 done = false;
