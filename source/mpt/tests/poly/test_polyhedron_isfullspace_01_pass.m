@@ -7,6 +7,14 @@ function test_polyhedron_isfullspace_01_pass
 R = Polyhedron.fullSpace(2);
 assert(R.isFullSpace());
 
+% H-rep of R^n
+R = Polyhedron([0 0], 0);
+assert(R.isFullSpace());
+R = Polyhedron([0 0; 0 0], [0; 3]);
+assert(R.isFullSpace());
+R = Polyhedron([0 0], 2);
+assert(R.isFullSpace());
+
 % vertex + rays spanning R^n = R^n
 R = Polyhedron('V', [1 0], 'R', [eye(2); -eye(2)]);
 assert(R.isFullSpace());
@@ -40,6 +48,12 @@ R = Polyhedron('R', [eye(2); -eye(2); randn(5, 2)]);
 assert(R.isFullSpace());
 
 %% not R^n
+
+% H-rep of an empty set is not R^n
+R = Polyhedron([0 0; 0 0], [0; -1]);
+
+% H-rep of a half-space is not R^n
+R = Polyhedron([0 0; 0 1], [0; 0]);
 
 % no vertices and rays spanning only a portion of R^n != R^n
 R = Polyhedron('R', [1 1; 1 -1]);

@@ -5,13 +5,17 @@ function test_polyhedron_41_pass
 A = [0; -1; 0; 1]; 
 b = [-9; 1; 1; 1];
 
-% the zero row 0*x<=-9 must stay!
-expected = [-1 1;0 -9;1 1];
+P = Polyhedron(A, b);
+
+assert(P.isEmptySet());
+
+% the H-representation should be left intact
+assert(isequal(P.H, [A, b]));
 
 P = Polyhedron(A, b);
-assert(isequal(sortrows(P.H), expected));
+assert(isequal(P.H, [A, b]));
 
 P = Polyhedron('A', A, 'b', b);
-assert(isequal(sortrows(P.H), expected));
+assert(isequal(P.H, [A, b]));
 
 end

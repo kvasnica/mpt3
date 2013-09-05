@@ -284,18 +284,19 @@ classdef Polyhedron < ConvexSet
 					if n~=length(b)
 						error('Number of rows does not hold between arguments "A", "b".')
 					end
-					
-					% Remove obviously redundant inequalities
-					if n > 0
-						H(b==Inf, :) = [];%zeros(nnz(inf_rows),d+1);
-						% remove zero rows, but only those whose
-						% right-hand-side is non-negative. Removing zero
-						% rows with negative RHS would silently remove
-						% trivial infeasibility.
-						nA = matNorm(H(:,1:end-1));
-						H((nA < MPTOPTIONS.zero_tol) & ...
-							(H(:, end)>=-MPTOPTIONS.zero_tol),:) = [];
+
+					% replace a'*x<=+/-Inf by 0'*x<=+/-1
+					InfRows = isinf(b);
+					if any(InfRows)
+						% normalize a'*x <= +/-Inf to 0'*x <= +/- 1
+						A(InfRows, :) = 0*A(InfRows, :);
+						b(InfRows) = sign(b(InfRows));
+						H = full([A, b]);
 					end
+
+					% replace nearly-zero entries by zero
+					H(abs(H)<MPTOPTIONS.zero_tol) = 0;
+
 					obj.Dim = d;
 					obj.H_int = H;
 					obj.He_int = zeros(0, d+1);
@@ -424,61 +425,38 @@ classdef Polyhedron < ConvexSet
 				end
 			end
 			
-			% Test for obvious infeasibility
-			if (~isempty(p.H) && any(p.H(:,end) == -Inf)) || ...
-					(~isempty(p.lb) && any(p.lb == Inf)) || ...
-					(~isempty(p.ub) && any(p.ub == -Inf))
-				obj = Polyhedron('H',zeros(0,d+1));
-				return
-			end
-			
 			% Add upper/lower bounds
 			if ~isempty(p.lb), p.H = [p.H;-eye(d) -p.lb(:)]; end
 			if ~isempty(p.ub), p.H = [p.H; eye(d)  p.ub(:)]; end
-			
-			% Remove obviously redundant inequalities
-			if size(p.H,1) > 0
-				inf_rows = (p.H(:,end)==Inf);
-				p.H(inf_rows,:) = [];%zeros(nnz(inf_rows),d+1);
-				% remove zero rows, but only those whose
-				% right-hand-side is non-negative. Removing zero
-				% rows with negative RHS would silently remove
-				% trivial infeasibility.
-				nA = matNorm(p.H(:,1:end-1));
-				p.H((nA < MPTOPTIONS.zero_tol) & ...
-					(p.H(:, end)>=-MPTOPTIONS.zero_tol),:) = [];
+
+			if ~isempty(p.H)
+				% replace a'*x<=+/-Inf by 0'*x<=+/-1
+				InfRows = isinf(p.H(:, end));
+				if any(InfRows)
+					% normalize a'*x <= +/-Inf to 0'*x <= +/- 1
+					A = p.H(:, 1:end-1);
+					b = p.H(:, end);
+					A(InfRows, :) = 0*A(InfRows, :);
+					b(InfRows) = sign(b(InfRows));
+					p.H = [A, b];
+				end
+				
+				% replace nearly-zero entries by zero
+				p.H(abs(p.H)<MPTOPTIONS.zero_tol) = 0;
 			end
-			if size(p.He,1) > 0
-				p.He(isinf(p.He(:,end)),:) = [];
+			if ~isempty(p.He)
+				% replace nearly-zero entries by zero
+				p.He(abs(p.He)<MPTOPTIONS.zero_tol) = 0;
 			end
-			
-			% don't check for double-sided inequalities, that's why we provide
-			% equality constraints separately and we don't want in PLCP solver
-			% conversio to low-dimensional polyhedra - besides it's time
-			% consuming when solving parametric problems
-			%       if ~isempty(p.H)
-			%           [An, bn, Aen, ben] = mpt_ineq2eq(p.H(:,1:end-1), p.H(:,end));
-			%           if ~isempty(ben)
-			%               %        disp('Inequality constraints contain equalities written as double-sided inequalities.');
-			%               %        disp('Extracting double-sided inequalities.');
-			%               p.H = [An, bn];
-			%               p.m = size(p.H,1);
-			%               p.He = [p.He; Aen, ben];
-			%               p.me = size(p.He,1);
-			%           end
-			%       end
-			
-			% replace INF with MPTOPTIONS.infbound
-			p.V(p.V==Inf) = MPTOPTIONS.infbound;
-			p.V(p.V==-Inf) = -MPTOPTIONS.infbound;
-			p.H(p.H==Inf) = MPTOPTIONS.infbound;
-			p.H(p.H==-Inf) = -MPTOPTIONS.infbound;
-			p.He(p.He==Inf) = MPTOPTIONS.infbound;
-			p.He(p.He==-Inf) = -MPTOPTIONS.infbound;
-			p.R(p.R==Inf) = MPTOPTIONS.infbound;
-			p.R(p.R==-Inf) = -MPTOPTIONS.infbound;
-			
-			
+			if ~isempty(p.V)
+				% replace nearly-zero entries by zero
+				p.V(abs(p.V)<MPTOPTIONS.zero_tol) = 0;
+			end
+			if ~isempty(p.R)
+				% replace nearly-zero entries by zero
+				p.R(abs(p.R)<MPTOPTIONS.zero_tol) = 0;
+			end
+
 			% Assign data
 			obj.H_int  = full(p.H);
 			obj.He_int = full(p.He);
@@ -489,16 +467,9 @@ classdef Polyhedron < ConvexSet
 			obj.hasHRep = ~isempty(p.H) || ~isempty(p.He);
 			obj.hasVRep = ~isempty(p.V) || ~isempty(p.R);
 			
-			%       Empty = []; % flag for empty polyhedron / isempty function
-			%       Bounded = []; % flag for boundedness / isBounded function
-			%       FullDim = []; % flag for full-dimensionality / isFullDim function
-			%       InternalPoint = []; % flag for an interior point / interiorPoint function
-			% FuncName - names for functions if provided
-			
 			obj.Internal=struct('Empty',[],'Bounded',[],'FullDim',[],'InternalPoint',[],'ChebyData',[]);
 			obj.Data = p.Data;
-			
-			
+						
 			if size(obj.R_int,1) > 0 || size(obj.V_int,1) > 0
 				obj.irredundantVRep = p.irredundantVRep;
 			end
@@ -518,18 +489,6 @@ classdef Polyhedron < ConvexSet
 				obj.V_int = zeros(1,d);
             end
 
-% MH: commenting out - the user will be responsible for possible wrong results
-% when providing incompatible H- and V- representations
-% 			% if both V and H representations have been provided at the input and
-% 			% check if it is valid polyhedron (only for redundant representations)
-% 			if obj.hasHRep && obj.hasVRep
-% 				% recompute both reps
-% 				obj.hasVRep = false;
-% 				obj.minVRep();
-% 				obj.hasHRep = false;
-% 				obj.minHRep();
-% 			end
-			
 			% Compute a minimum representation for the affine set
 			obj.minAffineRep;
 			

@@ -3,15 +3,12 @@ function test_polyhedron_15_pass
 % allow inf terms in "ub" field
 %
 
+% this set is R^n
 P=Polyhedron('ub', Inf);
 
-if numel(P.b)~=0
-    error('Inf rows must be removed.');
-end
-% b = P.b;
-% if b(1)~=0
-%     error('Inf rows must be converted to zero rows.')
-% end
-
+assert(~P.isBounded);
+assert(~P.isEmptySet);
+assert(P.isFullDim);
+assert(P.isFullSpace);
 
 end
