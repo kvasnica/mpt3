@@ -22,20 +22,20 @@ if obj.hasHRep
     
     A = obj.A;
     b = obj.b;
-    
+
     % 2-norm of each facet
     n = matNorm(A);
 
-    % if polyhedron was properly constructed, n should not contain zero
-    % values
-    if any(abs(n)<MPTOPTIONS.zero_tol)
-        nA=A;
-        nb=b;
-    else
-        nA = A ./ repmat(n,1,size(A,2));
-        nb = b ./ repmat(n,1,size(b,2));
-    end
-    obj.H_int=[nA, nb];
+	% normalize 0'*x<=+/-b to 0'*x<= +/- sign(b)
+	% (correct sign is important as not to mess with trivial infeasibility)
+	ZeroRows = (n<MPTOPTIONS.zero_tol);
+	n(ZeroRows) = 1;
+	b(ZeroRows) = sign(b(ZeroRows));
+
+	% normalize each half-space (0*x<=b will be left intact)
+	nA = A ./ repmat(n,1,size(A,2));
+	nb = b ./ n;
+	obj.H_int=[nA, nb];
 
     % normalize also equalities if present
     if ~isempty(obj.He_int)
