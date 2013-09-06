@@ -47,9 +47,6 @@ MPTDOCNAME = mpt3doc-$(MODVERSION)
 RELEASEDIR = release
 DATE = $(shell date  +"%d.%m.%G")
 
-# @Polyhedron subdirectory
-POLYHEDRON_DIR = $(MPT_DIR)/modules/geometry/sets/@Polyhedron
-
 # documentation directory
 DOC_DIR = $(strip $(shell $(SED) -n 's/.*DESTDIR.*>\(.*\)<\/def>/\1/gp' conf.xml))
 
@@ -70,13 +67,9 @@ endif
 TBX_CODE_PACKAGE=mpt
 TBX_DOC_PACKAGE=mptdoc
 
-# run Makefile in the "@Polyhedron" subdirectory
-polyhedron:  tmpdir
-	@$(MAKE) -C $(POLYHEDRON_DIR)
-
 # quick distribution: code with help description
 # package tagged with id of the tip
-distcode: distclean txt
+distcode: txt
 	@echo "Creating $(RELEASEDIR)/$(MPTNAME).tgz..."
 	@mkdir -p "$(RELEASEDIR)/$(MPTNAME)"
 	@cp -Rf "$(XML_DIR)/$(FUNC_DIR)" "$(RELEASEDIR)/$(MPTNAME)"
@@ -162,7 +155,7 @@ doc: tmpdir
 	$(MAXDOC) -a conf.xml
 
 # generate documentation separately from the code and pack it as "$(MPTDOCNAME)"
-distdoc: distclean doc
+distdoc: doc
 	@mkdir -p "$(RELEASEDIR)/$(MPTDOCNAME)"
 	@cp -Rf "$(DOC_DIR)" "$(RELEASEDIR)/$(MPTDOCNAME)"
 	@# remove unnecessary doc files
@@ -195,14 +188,9 @@ endif
 	@echo "Version ID: $(FULLVERSION)"
 
 
-uninstall: distclean
-
 clean:
 	@-rm config.status config.log matlab_info.tmp 
 
-distclean: 
-	@-$(MAKE) distclean -C $(POLYHEDRON_DIR)
-
 # phony targets
-.PHONY: clean distclean doc polyhedron uninstall dist
+.PHONY: clean doc
 

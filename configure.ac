@@ -147,5 +147,5 @@ AC_CONFIG_COMMANDS_PRE( \
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile source/mpt/modules/geometry/sets/@Polyhedron/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
