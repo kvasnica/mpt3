@@ -118,7 +118,6 @@ Options = mptopt;
 % prints the copyright notice
 fprintf('\nMPT toolbox %s initialized...\n', Options.version);
 fprintf('Copyright (C) 2003-%s by M. Kvasnica, C.N. Jones, and M. Herceg\n',datestr(now,'yyyy'));
-fprintf('\nSend bug reports, questions or comments to mpt@control.ee.ethz.ch\n');
 fprintf('For news, visit the MPT web page at http://control.ee.ethz.ch/~mpt/\n');
 
 disp(['            LP solver: ' Options.lpsolver]);
