@@ -5,7 +5,7 @@
   
   <info>Add a Polyhedron and a vector or Polyhedron.</info>
   <syntax>Q = P + S</syntax>
-  <syntax>Q = plus(P,S)</syntax>
+  <syntax>Q = plus(P,S,method)</syntax>
   <syntax>Q = P + x</syntax>
   <syntax>Q = plus(P, x)</syntax>
   
@@ -29,6 +29,11 @@
     <name>S</name>
     <descr>Polyhedron in any format or a point given as column real vector of the length <tt>P.Dim</tt></descr>
     <class name="Polyhedron or double"/>
+  </input>
+  <input>
+    <name>method</name>
+    <descr>String selecting the projection method to be used. Can be 'vrep', 'fourier', or 'mplp'.</descr>
+    <class name="string"/>
   </input>
   
   <output>

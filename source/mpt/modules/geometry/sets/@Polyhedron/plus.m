@@ -1,19 +1,18 @@
-function PpS = plus(P,S)
+function PpS = plus(P,S, method)
 % PLUS Compute the minkowski sum of S with this polyhedron.
 %
 % -------------------------------------------------------------------------
 % Case 1: x is a vector of length P.Dim
 %
-% Px = plus(P,x)
-% Px = P.plus(x)
 % Px = P + x
 %
 % Computes the Minkowski sum:
 %
 %   P+x = {x+y | y in P}
 %
-% Parameters:
-%   x  - Vector of length P.Dim
+% Inputs:
+%   P: polyhedron in the n-dimensional space
+%   x: point in the n-dimensional space as a column vector
 %
 % Returns:
 %   Px - Minkowski sum of this polyhedron P and x
@@ -21,20 +20,25 @@ function PpS = plus(P,S)
 % -------------------------------------------------------------------------
 % Case 2: S is a polyhedron
 %
-% PpS = plus(P,S)
-% PpS = P.plus(S)
 % PpS = P + S
+% PpS = plus(P,S, method)
 %
 % Computes the Minkowski sum:
 %
 %   P+S = {x+y | x in P and y in S}
 %
-% Parameters:
-%   S - Polyhedron of dimension P.Dim
+% Inputs:
+%     P, S: polyhedra in the same dimension
+%   method: optional name of the projection method. Can be either 'vrep',
+%           'fourier', or 'mplp' (see Polyhedron/projection)
 %
 % Returns:
 %   PpS - Minkowski sum of P and S
-%
+
+if nargin < 3
+	% Default projection method. Empty=let Polyhedron/projection() decide.
+	method = [];
+end
 
 if ~isa(P, 'Polyhedron')
 	% v+P (issue #59)
@@ -130,7 +134,7 @@ switch type
             Z  = zeros(size(P.A,1), size(S.A,2));
             Ze = zeros(size(P.Ae,1),size(S.Ae,2));
             tmp = Polyhedron('H', [S.A -S.A S.b;Z P.A P.b], 'He', [S.Ae -S.Ae S.be;Ze P.Ae P.be]);
-            PpS = projection(tmp, 1:S.Dim);
+            PpS = projection(tmp, 1:S.Dim, method);
             
         elseif P.hasHRep && S.hasVRep
             % P is H-rep and S is V-rep
@@ -138,7 +142,7 @@ switch type
             
             % Do this the silly way now, by converting and adding
             P.minVRep();
-            PpS = P + S;
+            PpS = plus(P, S, method);
             
         elseif P.hasVRep && S.hasHRep
             % P is V-rep and S is H-rep
@@ -147,7 +151,7 @@ switch type
             
             % Do this the silly way now, but converting and adding
             S.minVRep();
-            PpS = P + S;
+            PpS = plus(P, S, method);
         end
         
         % add function handle
