@@ -16,14 +16,6 @@ end
 if nargin < 3,
     method = [];
 end
-if ~isempty(method)
-   if ~ischar(method)
-      error('Method must be specified as a string.');      
-   end
-   if isempty(strmatch(method,{'vrep','fourier','mplp'},'exact'))
-       error('Method must be one of these "vrep", "fourier", "mplp".');
-   end
-end
 
 % deal with arrays
 if numel(H)>1

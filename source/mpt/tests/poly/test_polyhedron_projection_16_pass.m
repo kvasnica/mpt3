@@ -1,12 +1,12 @@
 function test_polyhedron_projection_16_pass
-%
-% wrong method
-%
+% if method is given, it must be a correct string
 
-P = ExamplePoly.randHrep('d',7);
+P = Polyhedron.unitBox(2);
 
-[worked, msg] = run_in_caller('R=P.projection([4;1],''banana''); ');
-assert(~worked);
-asserterrmsg(msg,'Supported methods are "vrep", "fourier", and "mplp".');
+[~, msg] = run_in_caller('P.projection(1, 0)');
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
+
+[~, msg] = run_in_caller('P.projection(1, ''unknown'')');
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
 
 end
