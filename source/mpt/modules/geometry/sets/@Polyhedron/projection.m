@@ -127,7 +127,7 @@ else
 				Hn = fourier(Pn.H,dims);
 				if isempty(Hn)
 					% polyhedron is full R^P.dim
-					q = Polyhedron('H',zeros(1,numel(dims)+1));
+					q = Polyhedron.fullSpace(numel(dims));
 				else
 					q = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
 				end
