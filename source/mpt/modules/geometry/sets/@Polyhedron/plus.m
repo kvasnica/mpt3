@@ -98,35 +98,28 @@ switch type
             %% P is V-rep and S is V-rep
             Vp = P.V; Vs = S.V;
             Rp = P.R; Rs = S.R;
-%             Vp(end+1,:) = 0;
-%             Rp(end+1,:) = 0;
-%             Vs(end+1,:) = 0;
-%             Rs(end+1,:) = 0;
             
-            V = zeros(size(Vp,1)*size(Vs,1),P.Dim);
-            R = zeros(size(Rp,1)*size(Rs,1),P.Dim);
-            
-            k = 1;
-            for i=1:size(Vp,1)
-                for j=1:size(Vs,1)
-                    V(k,:) = Vp(i,:) + Vs(j,:);
-                    k = k + 1;
-                end
-            end
-            
-            k = 1;
-            for i=1:size(Rp,1)
-                for j=1:size(Rs,1)
-                    R(k,:) = Rp(i,:) + Rs(j,:);
-                    k = k + 1;
-                end
-            end
-            if size(Rp,1) == 0,
-                R = Rs;
-            end
-            if size(Rs,1) == 0,
-                R = Rp;
-            end
+			if size(Vp, 1)==0
+				V = Vs;
+			elseif size(Vs, 1)==0
+				V = Vp;
+			else
+				V = zeros(size(Vp,1)*size(Vs,1), P.Dim);
+				for i = 1:size(Vs, 1)
+					V((i-1)*size(Vp, 1)+1:i*size(Vp, 1), :) = bsxfun(@plus, Vp, Vs(i, :));
+				end
+			end
+			
+			if size(Rp, 1)==0
+				R = Rs;
+			elseif size(Rs, 1)==0
+				R = Rp;
+			else
+				R = zeros(size(Rp,1)*size(Rs,1), P.Dim);
+				for i = 1:size(Rs, 1)
+					R((i-1)*size(Rp, 1)+1:i*size(Rp, 1), :) = bsxfun(@plus, Rp, Rs(i, :));
+				end
+			end
             
             PpS = Polyhedron('V',V,'R',R);
             
