@@ -41,6 +41,12 @@ DELTA_DIMS_CHOOSE_FOURIER = 3;
 if nargin < 3, method = ''; solver = ''; end
 if nargin < 4, solver = ''; end
 
+if isempty(method)
+	% read default settings from global options. Note that the default can
+	% still be empty, in which case we perform an automatic selection.
+	method = MPTOPTIONS.modules.geometry.sets.Polyhedron.projection.method;
+end
+
 % deal with arrays
 no = numel(P);
 if no>1
@@ -81,7 +87,7 @@ if P.hasVRep
 else
 	
 	% Hard way - inequality rep
-	if nargin < 3 || isempty(method) % No method specified
+	if isempty(method) % No method specified
 		% choose based on properties of P
 		if P.Dim <= 4
 			% this call can be problematic due to computations of vertices in CDD,
