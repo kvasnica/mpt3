@@ -124,7 +124,13 @@ else
 				
 			case 'fourier'
 				Pn.minHRep(); % Redundancy elimination
-				Hn = fourier(Pn.H,dims);
+				
+				% we need to respect ordering of dimensions (issue #101)
+				dims_eliminate = setdiff(1:Pn.Dim, dims);
+				% reorder columns such that dimensions to keep are first
+				H = Pn.H(:, [dims(:); dims_eliminate(:); Pn.Dim+1]');
+				Hn = fourier(H, 1:length(dims));
+
 				if isempty(Hn)
 					% polyhedron is full R^P.dim
 					q = Polyhedron.fullSpace(numel(dims));
