@@ -4,9 +4,9 @@ function test_polyhedron_projection_16_pass
 P = Polyhedron.unitBox(2);
 
 [~, msg] = run_in_caller('P.projection(1, 0)');
-asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 
 [~, msg] = run_in_caller('P.projection(1, ''unknown'')');
-asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 
 end

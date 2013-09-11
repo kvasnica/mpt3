@@ -11,12 +11,11 @@ P = Polyhedron.unitBox(2);
 
 % projection should hence fail
 [~, msg] = run_in_caller('P.projection(2)');
-asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 
 % also Polyhedron/plus must fail, since it calls projection()
 [~, msg] = run_in_caller('P+P');
-asserterrmsg(msg, 'Supported methods are "vrep", "fourier", and "mplp".');
-
+asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 
 end
 

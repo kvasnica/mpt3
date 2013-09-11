@@ -43,7 +43,12 @@
       <option>fourier</option><descr>: Use fourier elimination. Good if projecting off a small number of
            dimensions. Projection will be highly redundant (use <tt>q.minHRep()</tt> to get
            irredundant form).</descr>
-      <option>mplp</option><descr>: Use mplp algorithm to compute projection. Good if the projection is
+      <option>ifourier</option><descr>: Fourier elimination with intermediate redundancy elimination. 
+		  Dimensions are projected off one by one, followed by removal of redundant constraints. 
+			   The result is still redundant, though.
+		   </descr>
+
+		   <option>mplp</option><descr>: Use mplp algorithm to compute projection. Good if the projection is
            not very degenerate (dimensions of projected facets are equal to the faces that
            they were projected from)</descr>
       <option>vrep</option><descr>: Compute vertex representation and then project</descr>

@@ -1,33 +1,28 @@
 function q = projection(P, dims, method, solver)
-% <matDoc>
-% <funcName>Projection</funcName>
-% <shortDesc>
-% Compute the projection of this polyhedron.</shortDesc>
-% <longDesc/>
+% PROJECTION Orthogonal projection of a polyhedron
 %
-% <syntax>
-% <desc>Compute the projection of this polyhedron.
+% Q=P.projection(dims) computes the orthogonal projection of the polyhedron
+% on dimensions given by DIMS.
 %
-% Q = proj(P) = {x | exists y, (x,y) in P}
+% P.projection(dims, method) allows to choose a projection method. Allowed
+% values of METHOD are:
+%   'fourier': Fourier elimination. Good if projecting off a small number
+%              of dimensions. The result will be highly redundant, hence
+%              use Q.minHRep() afterwards.
+%  'ifourier': Fourier elimination with intermediate redundancy
+%              elimination. Dimensions are projected off one by one,
+%              followed by removal of redundant constraints. The result is
+%              still redundant, though.
+%      'mplp': Good if the projection is not very degenerate (dimensions of
+%              projected facets are equal to the faces that they were
+%              projected from).
+%      'vrep': Projection via vertex enumeration. Good for low dimensions.
 %
-% </desc>
-% <input name='dims'>Dimensions to project the polyhedron onto</input>
-% <input name='method'>Method used to compute projection of Hrep
-% . fourier : Use fourier elimination. Good if projecting off a
-% .           small number of dimensions. Projection will be
-% .           highly redundant (use q.minHRep() to get
-% .           irredundant form).
-% . mplp    : Use mplp algorithm to compute projection. Good if
-% .           the projection is not very degenerate (dimensions
-% .           of projected facets are equal to the faces that
-% .           they were projected from)
-% . vrep    : Compute vertex representation and then project
-% </input>
-% <output name='q'>Projection of this polyhedron onto dims</output>
-% </syntax>
+% If METHOD is empty, we select the projection method best suited for a
+% particular case.
 %
-% </matDoc>
-
+% The default projection method can also be changed by modifying the
+% S.sets.Polyhedron.projection.method parameter in mpt_geometry_options.m
 
 global MPTOPTIONS
 if isempty(MPTOPTIONS)
@@ -144,6 +139,33 @@ else
 					q = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
 				end
 				
+			case 'ifourier'
+				% fourier with intermediate redundancy elimination
+				
+				Pn.minHRep(); % Redundancy elimination
+				
+				% we need to respect ordering of dimensions (issue #101)
+				dims_eliminate = setdiff(1:Pn.Dim, dims);
+				% reorder columns such that dimensions to keep are first
+				H = Pn.H(:, [dims(:); dims_eliminate(:); Pn.Dim+1]');
+				
+				% eliminate one dimension at a time
+				for i = 1:length(dims_eliminate)
+					Hn = fourier(H, 1:Pn.Dim-i);
+					if isempty(Hn)
+						% polyhedron is full R^P.dim
+						q = Polyhedron.fullSpace(numel(dims));
+						break
+					else
+						% remove redundant constraints...
+						q = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
+						if i < length(dims_eliminate)
+							% ... but only if we are not finished yet
+							q.minHRep();
+						end
+						H = q.H;
+					end
+				end
 				
 			case 'mplp'
 				% On Polyhedral Projection and Parametric Programming
@@ -191,7 +213,7 @@ else
 				q = Polyhedron(A,ones(size(A,1),1));
 				
 			otherwise
-				error('Supported methods are "vrep", "fourier", and "mplp".');
+				error('Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 		end
 		
 		% shift back to original coordinates

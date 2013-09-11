@@ -14,11 +14,13 @@ A = randn(4,DIM);
 Q1 = P.affineMap(A,'vrep');
 Q2 = P.affineMap(A,'fourier');
 Q3 = P.affineMap(A,'mplp');
+Q4 = P.affineMap(A,'ifourier');
 
 % make irrendundant
 Q1.minHRep();
 Q2.minHRep();
 Q3.minHRep();
+Q4.minHRep();
 
 for i=1:2
     if ~(Q1(i)==Q2(i))
@@ -29,6 +31,9 @@ for i=1:2
     end
     if ~(Q1(i)==Q3(i))
         error('Polyhedra Q1 and Q3 are not equal.');
+    end
+    if ~(Q1(i)==Q4(i))
+        error('Polyhedra Q1 and Q4 are not equal.');
     end
         
 end

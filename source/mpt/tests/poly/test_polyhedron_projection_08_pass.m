@@ -14,7 +14,7 @@ if any(R.isEmptySet)
     error('R is not empty');
 end
 xc = R.interiorPoint;
-for i=1:3
+for i=1:length(R)
    if norm(xc(i).x)>1e-4
        error('The point is the origin only.');
    end

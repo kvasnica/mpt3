@@ -8,7 +8,7 @@ P = Polyhedron('lb', lb, 'ub', ub);
 dims_to_test = { 1, [1 3 5], [3 1], [4 3 2], [4 2 3] };
 
 % test each method
-methods = {'mplp', 'vrep', 'fourier'};
+methods = {'mplp', 'vrep', 'fourier', 'ifourier'};
 for j = 1:length(dims_to_test)
 	dims = dims_to_test{j};
 	Expected = Polyhedron('lb', lb(dims), 'ub', ub(dims));
