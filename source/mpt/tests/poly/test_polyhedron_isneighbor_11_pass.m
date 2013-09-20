@@ -1,20 +1,21 @@
-function test_polyhedron_isadjacent_13_pass
+function test_polyhedron_isneighbor_11_pass
 %
-%  full-dim and full-dim that share a common facet, but are not adjacent
+%  full-dim and full-dim that share a common hyperplane, but are not
+%  neighbors
 %
  
 P = Polyhedron('H',[  2.396196989874281   1.000000000000000   2.982430072506135
   -1.000000000000000  -1.582411278288845                   0
   -1.000000000000000   2.049356315589773   3.879795333447698]);
 
-% firt facet is common
+% first hyperplane is common
 Q = Polyhedron('H',[2.396196989874281   1.000000000000000  -2.982430072506135
   -1.455299923984253  -1.000000000000000   2.627083536318854
   -1.000000000000000   1.670098447906721   3.474636449467853]);
 
 
-if P.isAdjacent(Q) || Q.isAdjacent(P)
-    error('Regions are not adjacent see the plot.')
+if P.isNeighbor(Q) || Q.isNeighbor(P)
+    error('Regions are not neighbors, see the plot.')
 end
 
 Q.computeVRep();
@@ -23,8 +24,8 @@ x =[P.H(3,1:end-1);null(P.H(3,1:end-1))']\[P.H(3,end);null(P.H(3,1:end-1))'*[-1.
 
 Qn = Polyhedron('V',[Q.V;x']);
 
-if P.isAdjacent(Qn) || Qn.isAdjacent(P)
-    error('Regions are not adjacent. See the plot.');
+if P.isNeighbor(Qn) || Qn.isNeighbor(P)
+    error('Regions are not neighbors. See the plot.');
 end
 
 

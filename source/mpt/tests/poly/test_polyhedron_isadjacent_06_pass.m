@@ -1,25 +1,14 @@
 function test_polyhedron_isadjacent_06_pass
 %
-%  empty polyhedron
+%  test does not apply for polyhedra in different dimension
 %
-%
 
-H =[ -0.039385    -0.011962            0
-      0.25807     0.078687            0
-            0           -1           10
-    -0.053731    -0.010858            0
-      -0.3562    -0.094458            0];
-      
-P = Polyhedron('H',H);
+P = ExamplePoly.randHrep;  % 2D
+Q = Polyhedron(randn(5,3)); % 3D
 
-% Q should be infeasible
-Q = Polyhedron('H',randn(40,3));
-
-ts1 = P.isAdjacent(Q);
-ts2 = Q.isAdjacent(P);
- 
-  if ts1 || ts2
-      error('Empty regions are not adjacent.');
-  end
+% must be adjacent because He is a facet of P
+[worked, msg] = run_in_caller('P.isAdjacent(Q); ');
+assert(~worked);
+asserterrmsg(msg,'Polyhedra must be in the same dimension.');
 
 end

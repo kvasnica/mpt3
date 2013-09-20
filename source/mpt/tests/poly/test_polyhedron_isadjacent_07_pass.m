@@ -1,23 +1,13 @@
 function test_polyhedron_isadjacent_07_pass
-%
-%  full-dim and low-dim polyhedron
-%
+% test for issue #77
 
-V = [ 0.39347      0.71001       -0.447
-       2.3374     -0.12299     -0.51271
-     -0.11254      0.89459      -1.0449
-       2.1187      0.37883         1.09
-      -1.3253     -0.86585      -1.5705];    
-P = Polyhedron(V);
+% these two polytopes are NOT adjacent since their intersection is NOT a
+% facet of both
+R1 = Polyhedron([0 0; 2 0; 0 1; 2 1]); 
+R2 = Polyhedron([1 0; 2 0; 1 -1; 2 -1]); 
+assert(~R1.isAdjacent(R2));
 
-% must be adjacent because He is a facet of P
-Q = Polyhedron('He',[1.88497280188774, 4.01529144269429, -1, 4.42480473259544],'lb',[-10;-5;-1],'ub',[2; 2;1]);
-
-ts1 = P.isAdjacent(Q);
-ts2 = Q.isAdjacent(P);
- 
-if ~ts1 || ~ts2
-      error('Regions must be adjacent.');
-end
+% polyhedra are neighbors
+assert(R1.isNeighbor(R2));
 
 end

@@ -1,4 +1,4 @@
-function test_polyhedron_isadjacent_10_pass
+function test_polyhedron_isneighbor_09_pass
 %
 %  unbounded and low-dim
 %
@@ -11,8 +11,8 @@ P = Polyhedron('H',[0.76591      0.95021      0.17105;
 Q = Polyhedron('H',-P.H(1,:),'He',[1 -0.5 0]);
 
 
-if ~P.isAdjacent(Q)
-    error('Regions must be adjacent.')
+if ~P.isNeighbor(Q)
+    error('Regions must be neighbors.')
 end
 
 end

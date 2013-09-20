@@ -1,26 +1,23 @@
-function test_polyhedron_isadjacent_03_pass
+function test_polyhedron_isadjacent_08_pass
 %
-% simple adjacency test- P and Q in 2D and are adjacent
-%
-% facet index provided
-%
+%  there is an empty region between P and Q -> not adjacent
 %
 
-H =[ -0.039385    -0.011962            0
-      0.25807     0.078687            0
+H1 = [0.039385     0.011962            0
+           -1            0            0
             0           -1           10
-    -0.053731    -0.010858            0
-      -0.3562    -0.094458            0];
-      
-P = Polyhedron('H',H);
+            1            0            2];
 
-Q = Polyhedron('lb',[0;-10],'ub',[2, 0],'H',-P(1).H(1,:));
-
-[ts, iP, iQ] = P.isAdjacent(Q,[],3);
-
-if ts
-   error('Regions are not adjacent along facet 3.');
+H2 = [ -0.25807    -0.078687            0
+            0           -1            8
+            1            0          2.5
+            0            1           -2];        
+        
+P = Polyhedron('H',H1);
+Q = Polyhedron('H',H2);
+        
+if P.isAdjacent(Q) || Q.isAdjacent(P)
+    error('Regions are not adjacent, there is empty but feasible region between.');
 end
-   
-  
+
 end
