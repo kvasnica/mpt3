@@ -1,4 +1,4 @@
-function test_polyhedron_isadjacent_02_pass
+function test_polyhedron_isneighbor_06_pass
 %
 %  empty polyhedron
 %
@@ -15,8 +15,8 @@ P = Polyhedron('H',H);
 % Q should be infeasible
 Q = Polyhedron('H',randn(40,3));
 
-ts1 = P.isAdjacent(Q);
-ts2 = Q.isAdjacent(P);
+ts1 = P.isNeighbor(Q);
+ts2 = Q.isNeighbor(P);
  
   if ts1 || ts2
       error('Empty regions are not adjacent.');

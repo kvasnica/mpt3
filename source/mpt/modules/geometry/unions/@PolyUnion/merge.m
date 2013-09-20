@@ -316,12 +316,12 @@ if MPTOPTIONS.verbose>=1
     fprintf('Computing list of neighbors...\n');
 end
 
-% M(i, j)=1 means that Pn(i) and Pn(j) are adjacent
+% M(i, j)=1 means that Pn(i) and Pn(j) are neighbors
 M = zeros(nR);
 for i = 1:nR-1
 	for j = i+1:nR
 		if ~M(i,j) && ~M(j,i)
-			if Pn(i).isAdjacent(Pn(j));
+			if Pn(i).isNeighbor(Pn(j));
 				M(i,j)=1;
 				M(j,i)=1;
 			end

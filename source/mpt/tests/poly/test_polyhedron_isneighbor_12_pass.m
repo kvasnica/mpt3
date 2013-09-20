@@ -1,4 +1,4 @@
-function test_polyhedron_isadjacent_14_pass
+function test_polyhedron_isneighbor_12_pass
 %
 %  full-dim and low-dim that are adjacent
 %
@@ -13,7 +13,7 @@ Q = Polyhedron('H',[1.000000000000000   -2.049356315589801   -3.879795333447730
   -1.455299923984409  -1.000000000000000   2.627083536318815]);
 
 
-if ~P.isAdjacent(Q) || ~Q.isAdjacent(P)
+if ~P.isNeighbor(Q) || ~Q.isNeighbor(P)
     error('Regions are adjacent. See the plot.');
 end
 

@@ -1,8 +1,8 @@
-function test_polyhedron_isadjacent_16_pass
+function test_polyhedron_isneighbor_05_pass
 %
 % simple adjacency test- P and Q in 2D and are adjacent
 %
-% wrong index set (contains -1)
+% facet indices provided
 %
 %
 
@@ -16,10 +16,11 @@ P = Polyhedron('H',H);
 
 Q = Polyhedron('lb',[2;-10],'ub',[3, 0],'H',-P(1).H(1,:));
 
-[worked, msg] = run_in_caller('P.isAdjacent(Q,[3,-1]); ');
-assert(~worked);
-asserterrmsg(msg,'Input argument is a not valid index set.');
+[ts, iP, iQ] = P.isNeighbor(Q,[3,1]);
 
- 
+if ~ts
+   error('Regions are adjacent.');
+end
+   
   
 end

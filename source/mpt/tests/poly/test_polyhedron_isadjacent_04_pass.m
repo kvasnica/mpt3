@@ -1,26 +1,37 @@
 function test_polyhedron_isadjacent_04_pass
 %
-% simple adjacency test- P and Q in 2D and are adjacent
-%
-% facet indices provided
-%
+%  full-dim and low-dim (which is a face)
 %
 
-H =[ -0.039385    -0.011962            0
-      0.25807     0.078687            0
-            0           -1           10
-    -0.053731    -0.010858            0
-      -0.3562    -0.094458            0];
-      
-P = Polyhedron('H',H);
+P = Polyhedron('H',[11.662            1       8.8301;
+                    -2.3259           -1      -2.0099;
+                    1       3.3546       4.3638]);
 
-Q = Polyhedron('lb',[2;-10],'ub',[3, 0],'H',-P(1).H(1,:));
+% last face of P                
+Q1 = Polyhedron('H',[11.662            1       8.8301;
+                    -2.3259           -1      -2.0099],...
+               'He',[1       3.3546       4.3638]);
 
-[ts, iP, iQ] = P.isAdjacent(Q,[3,1]);
 
-if ~ts
-   error('Regions are adjacent.');
+if ~P.isAdjacent(Q1)
+    error('Regions must be adjacent.')
 end
-   
-  
+if ~Q1.isAdjacent(P)
+    error('Regions must be adjacent.')
+end
+
+% revert last face of P                
+Q2 = Polyhedron('H',[11.662            1       8.8301;
+                    -2.3259           -1      -2.0099],...
+               'He',-[1       3.3546       4.3638]);
+
+
+if ~P.isAdjacent(Q2)
+    error('Regions must be adjacent.')
+end
+if ~Q2.isAdjacent(P)
+    error('Regions must be adjacent.')
+end
+           
+
 end

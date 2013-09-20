@@ -2136,14 +2136,24 @@ for i=1:length(regions)
             if ~ismember(i,bt)
                 P = regions(i);
                 Q = regions(lt(k));    
-                % must try if P and Q are adjacent first, because
-                % isNeighbor cannot verify the case when two regions are
-                % adjacent to one facet
-                [ts,iP,iQ] = P.isAdjacent(Q,j);
-                % if the adjacency failed, try with neighborhood with region tol
-                if ~ts
-                    [ts,iP,iQ] = P.isNeighbor(Q,j);
-                end
+                % must try if P and Q are neighbors first
+                [ts,iP,iQ] = P.isNeighbor(Q,j);
+                 % if the neighborhood fails try distance with region tol
+                 if ~ts
+                     dt = P.distance(Q);
+                     ts = dt.dist<MPTOPTIONS.region_tol;
+                     % find the facet of Q that is the closest to P
+                     facetP = P.getFacet(j);
+                     xP = facetP.chebyCenter.x;
+                     xQ = Q.project(xP).x;
+                     for jj=1:size(Q.H)
+                        facetQ = Q.getFacet(jj);
+                         if  facetQ.contains(xQ)
+                           iQ = jj;
+                           break;
+                         end
+                     end
+                 end
                 if ts
                     % regions are neighbors, correct
                     adj_list{lt(k)}{iQ} = [adj_list{lt(k)}{iQ}, i];

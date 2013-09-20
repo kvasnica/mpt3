@@ -1,6 +1,6 @@
-function test_polyhedron_isadjacent_15_pass
+function test_polyhedron_isneighbor_13_pass
 %
-% simple adjacency test- P and Q in 2D and are adjacent
+% simple adjacency test- P and Q in 2D and are neighbors
 %
 % facet indices provided, but out of range
 %
@@ -16,7 +16,7 @@ P = Polyhedron('H',H);
 
 Q = Polyhedron('lb',[0;-10],'ub',[2, 0],'H',-P(1).H(1,:));
 
-[worked, msg] = run_in_caller('[ts, iP, iQ] = P.isAdjacent(Q,[1,4],2); ');
+[worked, msg] = run_in_caller('[ts, iP, iQ] = P.isNeighbor(Q,[1,4],2); ');
 assert(~worked);
 asserterrmsg(msg,'Facet index set for region P contains indices out of range.');
 
