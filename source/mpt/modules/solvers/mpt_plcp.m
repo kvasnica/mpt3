@@ -2138,22 +2138,34 @@ for i=1:length(regions)
                 Q = regions(lt(k));    
                 % must try if P and Q are neighbors first
                 [ts,iP,iQ] = P.isNeighbor(Q,j);
-                 % if the neighborhood fails try distance with region tol
-                 if ~ts
-                     dt = P.distance(Q);
-                     ts = dt.dist<MPTOPTIONS.region_tol;
-                     % find the facet of Q that is the closest to P
-                     facetP = P.getFacet(j);
-                     xP = facetP.chebyCenter.x;
-                     xQ = Q.project(xP).x;
-                     for jj=1:size(Q.H)
-                        facetQ = Q.getFacet(jj);
-                         if  facetQ.contains(xQ)
-                           iQ = jj;
-                           break;
-                         end
-                     end
-                 end
+                % if the neighborhood fails try distance with region tol
+                if ~ts
+                    dt = P.distance(Q);
+                    ts = dt.dist<MPTOPTIONS.region_tol;
+                    if ts
+                        % find the facet of Q that is the closest to P
+                        facetP = P.getFacet(j);
+                        xP = facetP.chebyCenter.x;
+                        xQ = Q.project(xP).x;
+                        if isempty(xQ)
+                            ts = false;
+                        else
+                            for jj=1:size(Q.H,1)
+                                facetQ = Q.getFacet(jj);
+                                if  facetQ.contains(xQ)
+                                    iQ = jj;
+                                    break
+                                end
+                            end
+                            if isempty(iQ)
+                                % the regions are close, but the point on the
+                                % facet was not detected to lie in Q, hence no
+                                % neighbors
+                                ts = false;
+                            end
+                        end
+                    end
+                end
                 if ts
                     % regions are neighbors, correct
                     adj_list{lt(k)}{iQ} = [adj_list{lt(k)}{iQ}, i];
