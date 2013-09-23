@@ -75,6 +75,21 @@ PUs = newPUs;
 nR = 0;
 Pfinal = []; % list of regions
 
+% list of intersecting partitions
+PartitionsIntersect = true(numel(PUs));
+for i = 1:numel(PUs)
+	for j = setdiff(1:numel(PUs), i)
+		if numel(PUs(i).Domain)==1 && ...
+				numel(PUs(j).Domain)==1 && ...
+				~PUs(i).Domain.intersect(PUs(j).Domain).isFullDim()
+			% partitions do not intersect, no reason to check regions
+			%
+			% TODO: support domains composed of multiple polyhedra
+			PartitionsIntersect(i, j) = false;
+		end
+	end
+end
+
 for ipart = 1:numel(PUs)
 
 	% list of regions in which the function is better than in the
@@ -90,6 +105,11 @@ for ipart = 1:numel(PUs)
 		
 		for jpart = setdiff(1:numel(PUs), ipart)
 		
+			if ~PartitionsIntersect(ipart, jpart)
+				% partitions do not intersect, no reason to check regions
+				continue
+			end
+			
 			for jreg = 1:numel(PUs(jpart).Set)
 				
 				% do the regions intersect?
