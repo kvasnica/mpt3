@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>fliplr</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Revert the order of convex sets in the array.
+	</info>
+	
+	<syntax>T = fliplr(S)</syntax>
+	<syntax>T = S.fliplr</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Overloaded method for reverting the order of sets in the array of convex sets.         
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+        <descr>An array of <tt>ConvexSet</tt> objects <tt>Polyhedron</tt>, <tt>YSet</tt>, ... in the order of <tt>S = [S1, S2, S3, ...] </tt>. </descr>
+		<class name="ConvexSet"/>
+	</input>
+	<!-- now describe output arguments -->
+	<output>
+		<name>T</name>
+        <descr>The array of the convex sets in the reverted order <tt>T = [..., S3, S2, S1]</tt>. </descr>
+		<class name="ConvexSet"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> We have three polyhedra stored in the array.</descr>
+        <cmd> P1 = Polyhedron('lb', -1); </cmd>
+        <cmd> P2 = Polyhedron('lb', -2); </cmd>
+        <cmd> P3 = Polyhedron('lb', -3); </cmd>
+        <cmd> P = [P1, P2, P3] </cmd>
+        <descr> To reverse the order of the polyhedra, call the <tt>fliplr</tt> method </descr>
+        <cmd> R = P.fliplr </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>horzcat</related>
+    <related>vertcat</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>
