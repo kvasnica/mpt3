@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <help>
-	<function>mpt_call_mppl</function>
+	<function>mpt_call_mpqp</function>
 	
 	<info>
 		A gateway function to MPQP solver (without errorchecks)

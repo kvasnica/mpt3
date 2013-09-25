@@ -78,11 +78,14 @@
         <descr> Define a set <tt>S</tt> using <tt>YSet</tt> class  </descr>
         <cmd> options = sdpsettings('solver','sedumi','verbose',0); </cmd>
         <cmd> S = YSet(z, [norm(z)&lt;=1; randn(2)*z&lt;=0.5*ones(2,1)], options); </cmd>
-        <descr> Compute the distance to a point [-5,8] </descr>
-        <cmd> x = [-2, 2];</cmd>
+        <descr> Compute the distance to a point [-5;8] </descr>
+        <cmd> x = [-5; 8];</cmd>
         <cmd> d = S.distance(x)</cmd>
         <descr> We can plot the set and the points <tt>x</tt>, <tt>y</tt> </descr>
-        <cmd> S.plot; hold on;  text(x(1),x(2),'x'); axis([-3 2 -2 3]); text(d.y(1),d.y(2),'x'); </cmd>
+        <cmd> S.plot('alpha',0.5,'color','green'); 
+              hold on;  text(x(1),x(2),'x');
+              axis([-3 2 -2 3]); text(d.y(1),d.y(2),'x');
+        </cmd>
     </example>
 
 	<!-- multiple related function can be defined -->
