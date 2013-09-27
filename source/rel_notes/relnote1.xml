@@ -29,9 +29,9 @@
   <descr title="Interfaces to standalone solvers">
   <ol>
     <li>Linear programming: CDD, GLPK, SeDuMi, CLP, QPOASES, CPLEX,
-    GUROBI.</li>
+    GUROBI, NAG.</li>
     <li>Quadratic programming: SeDuMi, CLP, QPOASES, QPSPLINE, CPLEX,
-    GUROBI.</li>
+    GUROBI, NAG.</li>
     <li>Mixed-integer optimization: GLPK, CPLEX, GUROBI.</li>
   </ol>
   </descr>
