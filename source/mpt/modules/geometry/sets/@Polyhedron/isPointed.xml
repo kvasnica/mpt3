@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isPointed</function>
+	
+    <info>Test if a polyhedron is pointed or not</info>
+	<syntax>ts = P.isPointed</syntax>
+	<syntax>ts = isPointed(P)</syntax>
+
+	<descr>
+        A polyhedron P in H-representation <i>P=\{ ~x~ | Ax \le b,~ A_{e}x=b_{e} \}</i> is
+        pointed if and only if its lineality space <tt>null([A; A_e])</tt> is empty.
+        If the polyhedron is in V-representation, automatic conversion to H-representation will be performed.                 
+  </descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if the polyhedron <i>P</i> is pointed and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+ 
+    <example>
+        <descr>The unpointed polyhedron does not contain any vertex. For instance the following low-dimensional polyhedron is un-pointed: </descr>
+        <cmd> A = [-1.2 1.63; 0.7 0.5]; b = [1; 0.7]; Ae = [0.4 -1.4]; be = 0.8;</cmd>
+        <cmd> P = Polyhedron('A',A,'b',b,'Ae',Ae,'be',be); </cmd>
+        <descr>The polyhedron <tt>P</tt> is pointed</descr>
+        <cmd>P.isPointed</cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>isEmptySet</related>
+	<related>isBounded</related>
+    <related>isFullDim</related>
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+	<license macro="GPL2"/>
+</help>

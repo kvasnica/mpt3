@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isFullSpace</function>
+	
+    <info>Test if a polyhedron represents the whole space <i>\mathbb{R}^n</i>.</info>
+	<syntax>ts = P.isFullSpace</syntax>
+	<syntax>ts = isFullSpace(P)</syntax>
+
+	<descr>
+	  Return true if the polyhedron <i>P</i> is the whole space or false otherwise.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if the polyhedron <i>P</i> is the full space and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+ 
+    <example>
+        <descr>An example of a polyhedron in the full space is when it contains a zero row in
+        its H-representation and its right hand side is nonnegative.</descr>
+        <cmd>A = [0 0]; b = 1;</cmd>
+        <cmd>P = Polyhedron(A,b); </cmd>
+        <descr>The polyhedron <tt>P</tt> is the whole space.</descr>
+        <cmd>P.isFullSpace</cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>isEmptySet</related>
+	<related>isBounded</related>
+    <related>isFullDim</related>
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+	<license macro="GPL2"/>
+</help>
