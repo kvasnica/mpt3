@@ -444,6 +444,9 @@ classdef polytope
 			else
 				arg = Q;
 			end
+			if isempty(obj)
+				obj = polytope;
+			end
 			out = polytope(subsasgn(obj.P, X, arg));
 		end
 		
