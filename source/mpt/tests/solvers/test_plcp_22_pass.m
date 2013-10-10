@@ -35,7 +35,7 @@ sol = solvemp(con, obj, sdpsettings('debug', 1), [x(:, 1); dref], u(1));
 
 etime(clock, t)
 
-if ~any(length(sol{1}.Pn)~=[826,827])
+if length(sol{1}.Pn)<826
     error('The number of regions does not match.');
 end
 

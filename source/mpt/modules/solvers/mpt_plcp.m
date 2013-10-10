@@ -668,6 +668,8 @@ function R = lcp_getRegion(lc, I, HASH, regions, UNEX, piv, computeHull)
 % if the region was discovered and stored earlier
 %
 
+global MPTOPTIONS
+
 if nargin < 7
     computeHull = true;
 end
@@ -707,6 +709,20 @@ Hn = [A; lc.Ht];
 % 
 % Note that the polyhedron constructor retains zero rows
 R = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
+
+% detect zero rows
+zero_rows = sum(abs(R.A),2)<MPTOPTIONS.zero_tol;
+% scaling matrix
+Hscaled = Hn;
+[An,D1,D2] = mpt_scale_matrix(Hn(~zero_rows,:));
+% D1 must be nonnegative
+if (all(diag(D1)>MPTOPTIONS.zero_tol))
+    % respect zero rows in the original system
+    Hscaled(~zero_rows,:) = D1*Hn(~zero_rows,:);
+    % create a scaled polyhedron to avoid numerical problems in redudancy
+    % elimination and detection of empty polyhedra
+    R = Polyhedron(Hscaled(:, 1:end-1), Hscaled(:, end));
+end
 
 % exit quickly if the polyhedron is empty
 if R.isEmptySet()
@@ -2099,7 +2115,7 @@ for i=1:length(regions)
     for j=1:length(adj_list{i})
         adj_list{i}{j}(adj_list{i}{j}>length(regions)) = [];
     end
-
+    
     % check each facet
     n = length(adj_list{i});
     for j=1:n % loops thru facets of region i
@@ -2138,10 +2154,14 @@ for i=1:length(regions)
                 Q = regions(lt(k));    
                 % must try if P and Q are neighbors first
                 [ts,iP,iQ] = P.isNeighbor(Q,j);
-                % if the neighborhood fails try distance with region tol
+                % if the neighborhood fails try distance with some
+                % tolerance
                 if ~ts
                     dt = P.distance(Q);
-                    ts = dt.dist<MPTOPTIONS.region_tol;
+                    ts = dt.dist<1e-4;
+                    if isempty(ts)
+                        ts = 0;
+                    end
                     if ts
                         % find the facet of Q that is the closest to P
                         facetP = P.getFacet(j);
