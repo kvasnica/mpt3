@@ -13,7 +13,7 @@
     Compute the Pontryagin difference of <i>P</i> and <i>S</i>, or <i>P</i> and <i>x</i>.
     <latex>
       <!-- put spaces between \in and variables to properly parse it to TXT output -->
-      $$Q=P-S=\{ x \in P ~|~ x+w \in P\ \forall w \in Q \}$$
+      $$Q=P-S=\{ x \in P ~|~ x+w \in P\ \forall w \in S \}$$
     </latex>
     or
     <latex>
