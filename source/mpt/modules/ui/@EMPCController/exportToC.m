@@ -82,6 +82,12 @@ else
         error('The file name must contain only alphanumerical characters including underscore "_".');
     end
 end
+
+% check if there are multiple controllers
+if numel(obj.feedback)>1
+    error('The code generation can be applied only for explicit controllers with a single feedback law. This controller has %d possible feedback laws.',numel(obj.feedback));
+end
+
 % append the dirname to a current directory
 dirname = [pwd, filesep, dirname];
 
