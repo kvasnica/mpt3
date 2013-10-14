@@ -566,6 +566,9 @@ if hull.isEmptySet && any(~regions.isEmptySet)
 	% fact that some regions are missing from the solution)
 end
 
+% normalize regions to return normalized solution
+regions.normalize;
+
 if flag==1
     % solution terminated correctly
     sol.xopt = PolyUnion('Set',regions,'Convex',true,'Overlaps',false,...
@@ -790,12 +793,6 @@ end
 if computeHull
     [R, hull] = R.minHRep();
     
-    % normalize after redundancy elimination to prevent problems in
-    % visualisation 
-    % do not normalize it before red. eliminination, because the detection
-    % of empty regions will fail (test_plcp_12_pass)
-    R.normalize;
-
 	% store indices of redundant rows
 	R.setInternal('redundant_rows', hull.I);
 end
@@ -2134,10 +2131,11 @@ for i=1:length(regions)
                 ng = norm(g);
                 if ng>MPTOPTIONS.abs_tol
 					th = xc.x + 1.3/ng*g'*MPTOPTIONS.region_tol;
-					% find the neighbor via sequential search
-					[isin, inwhich]=regions.isInside(th,struct('fastbreak',1));
+					[isin, inwhich]=regions.isInside(th);
 					if isin
-						lt = inwhich;
+                        % the point could be located in the current region,
+                        % we must remove this region from the list
+						lt = setdiff(inwhich,i);
 						adj_list{i}{j} = lt;
 					end
                 end
@@ -2158,7 +2156,7 @@ for i=1:length(regions)
                 % tolerance
                 if ~ts
                     dt = P.distance(Q);
-                    ts = dt.dist<1e-4;
+                    ts = dt.dist<MPTOPTIONS.rel_tol;
                     if isempty(ts)
                         ts = 0;
                     end
@@ -2166,24 +2164,13 @@ for i=1:length(regions)
                         % find the facet of Q that is the closest to P
                         facetP = P.getFacet(j);
                         xP = facetP.chebyCenter.x;
-                        xQ = Q.project(xP).x;
-                        if isempty(xQ)
-                            ts = false;
-                        else
-                            for jj=1:size(Q.H,1)
-                                facetQ = Q.getFacet(jj);
-                                if  facetQ.contains(xQ)
-                                    iQ = jj;
-                                    break
-                                end
-                            end
-                            if isempty(iQ)
-                                % the regions are close, but the point on the
-                                % facet was not detected to lie in Q, hence no
-                                % neighbors
-                                ts = false;
-                            end
+                        % distance of the point xP to the polytope Q
+                        dtQ = zeros(size(Q.H,1),1);
+                        for jj=1:size(Q.H,1)
+                            % compute the distance to each facet
+                            dtQ(jj) = -Q.H(jj,:)*[xP;-1]/norm(Q.H(jj,:),2);                            
                         end
+                        [mindtQ,iQ] = min(dtQ);
                     end
                 end
                 if ts
