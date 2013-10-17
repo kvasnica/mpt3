@@ -47,16 +47,19 @@ ectrl = ctrl.toExplicit;
 
 % export explicit controller to C
 dir_name = 'rtw_explicitMPC';
-ectrl.exportToC('EMPCcontroller',dir_name);
+file_name = 'EMPCcontroller';
+ectrl.exportToC(file_name,dir_name);
 
 % compile the S-function
 p = [pwd,filesep,dir_name,filesep];
-mex(['-LargeArrayDims -I',dir_name],[p,'mpt_getInput_sfunc.c'],[p,'mpt_getInput.c']);
+mex(['-LargeArrayDims -I',dir_name],[p,file_name,'_sfunc.c'],[p,file_name,'.c']);
 
 % open the simulink scheme
 mpt_demo_rtw_explicitmpc
 
 % set the source files in the Simulink scheme
-set_param('mpt_demo_rtw_explicitmpc','CustomSource',['"',p,'mpt_getInput_sfunc.c" "',p,'mpt_getInput.c"']);
+str = sprintf('"%s%s_sfunc.c" "%s%s.c"',p,file_name,p,file_name);
+set_param('mpt_demo_rtw_explicitmpc','CustomSource',str);
+set_param('mpt_demo_rtw_explicitmpc/Controller','FunctionName',[file_name,'_sfunc']);
 
 end

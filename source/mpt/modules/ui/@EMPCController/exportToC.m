@@ -1,22 +1,22 @@
 function exportToC(obj, fname, dirname)
 %MPT_EXPORTC Exports an explicit controller to C code
 %
-% mpt_exportc(obj, fname, dirname)
+% ctrl.exportToC(obj, fname, dirname)
 %
 % ---------------------------------------------------------------------------
 % DESCRIPTION
 % ---------------------------------------------------------------------------
-% Creates a header file which contains information about a given explicit
-% controller. The header file must then be compiled with mpt_getInput.c, which
-% contains the region identification procedure. Note that if you want to compile
-% multiple controllers, you should use different names of the header files and
-% you should also modify mpt_getInput.c to take the appropriate header.
+% The routine creates two C-files for evaluation of the piecewise affine 
+% control law. The first file constains a pure C script for evaluation of the
+% explicit solution which can be ported to various platforms.
+% The second file is an S-function implementation for verification of the
+% controller under Simulink. 
 %
 % ---------------------------------------------------------------------------
 % INPUT
 % ---------------------------------------------------------------------------
 % ctrl   - MPT explicit controller
-% fname  - Name of the header file to be generated ("mpt_getInput.h" by default)
+% fname  - Name of the file to be generated ("mpt_getInput" by default)
 % dirname - Name of the directory that is generated ("mpt_explicit_controller"
 %           by default)
 %
@@ -29,7 +29,7 @@ function exportToC(obj, fname, dirname)
 %
 % (C) 2005 Michal Kvasnica, Automatic Control Laboratory, ETH Zurich,
 %          kvasnica@control.ee.ethz.ch
-%     2012 Revised by Martin Herceg, Automatic Control Laboratory, ETH
+%     2012-2013 Revised by Martin Herceg, Automatic Control Laboratory, ETH
 %          Zurich, herceg@control.ee.ethz.ch
 
 % ---------------------------------------------------------------------------
@@ -95,8 +95,9 @@ dirname = [pwd, filesep, dirname];
 if ~mkdir(dirname)
     error('Could not create directory "%s".',dirname);
 end
-% add extension
-fullfilename = [dirname, filesep, fname,'.h'];
+% create the file name with the path but without extension
+fullfilename = [dirname, filesep, fname];
+
 
 % extract polyhedra with control law
 Pn = obj.feedback.Set;
@@ -120,11 +121,11 @@ end
 
 
 % extract dimensions
-nx = obj.nx;
+nx = obj.feedback.Dim;
 nu = obj.nu;
 ny = nx;
 nref = 0;
-nxt = nx;
+nxt = obj.model.nx;
 
 % extract control law
 Fi = cell(nr,1);
@@ -134,18 +135,45 @@ for i=1:nr
     Gi{i}=Pn(i).getFunction('primal').g(1:nu);
 end
 
-% TO DO: TRACKING AND DELTA U FORMULATION 
+% check if the system has tracking of states/outputs
+track_x = 0;
+track_y = 0;
+Sx = fields(obj.model.x);
+if any(strcmp('reference',Sx))
+    if isequal(lower(obj.model.x.reference),'free')
+        track_x = 1;
+    end
+end
+Sy = fields(obj.model.y);
+if any(strcmp('reference',Sy))
+    if isequal(lower(obj.model.y.reference),'free')
+        track_y = 1;
+    end
+end
+
+% check if the system has delta u formulation
 deltau = 0;
-tracking = 0;
-if tracking==1,
-    nxt = obj.model.nx;
-    if isfield(obj.model.y, 'reference'),
+Su = fields(obj.model.u);
+if any(strcmp('deltaPenalty',Su))
+    deltau = 1;
+end
+
+if track_x || track_y
+    tracking = 2;
+    if deltau
+        tracking = 1;
+    end
+else
+    tracking = 0;
+end
+
+
+if tracking>0
+    if track_y
         nref = obj.model.ny;
-    else
+    elseif track_x
         nref = obj.model.nx;
     end
-elseif deltau,
-    nxt = nx - nu;
 end
 
 
@@ -154,13 +182,60 @@ if isempty(Ts)
     Ts = 1;
 end
 
-%% write the header file in the given directory
+%% write mpt_getInput.c
 
-fid = fopen(fullfilename, 'w');
+fid = fopen([fullfilename,'.c'], 'w');
 if fid<0,
     error('Cannot open file for writing!');
 end
-fprintf(fid, '#define mpt_getInput_h\n\n');
+
+header = {''
+'/* The function for evaluation of a piecewise affine control law associated'
+'   to a given state X using sequential search.'
+''  
+''
+'  Usage:'
+'    region = mpt_getInput(*X, *U)'
+''    
+'    if ''region'' is smaller 1 (region < 1), there is no control law associated to'
+'    a given state.'
+''
+'   Please note that all code in this file is provided under the terms of the'
+'   GNU General Public License, which implies that if you include it directly'
+'   into your commercial application, you will need to comply with the license.'
+'   If you feel this is not a good solution for you or your company, feel free '
+'   to contact the author:'
+'       michal.kvasnica@stuba.sk'
+'    to re-license this specific piece of code to you free of charge.'
+'*/'
+''
+'/* Copyright (C) 2005 by Michal Kvasnica (michal.kvasnica@stuba.sk) '
+'   Revised in 2012-2013 by Martin Herceg (herceg@control.ee.ethz.ch)    '
+'*/'
+''
+''
+'/*  This program is free software; you can redistribute it and/or modify'
+'    it under the terms of the GNU General Public License as published by'
+'    the Free Software Foundation; either version 2 of the License, or'
+'    (at your option) any later version.'
+''
+'    This program is distributed in the hope that it will be useful,'
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of'
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
+'    GNU General Public License for more details.'
+''
+'    You should have received a copy of the GNU General Public License'
+'    along with this program; if not, write to the Free Software'
+'    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
+'*/ '
+''};
+
+% write the header
+for i=1:numel(header)
+    fprintf(fid,[header{i},'\n']);
+end
+
+
 fprintf(fid, '#define MPT_NR %d\n', nr);
 fprintf(fid, '#define MPT_NX %d\n', nx);
 fprintf(fid, '#define MPT_NU %d\n', nu);
@@ -266,72 +341,6 @@ for ii = 1:nr,
 end
 fprintf(fid, '};\n');
 
-fclose(fid);
-
-
-
-
-%% write mpt_getInput.c
-
-f2 = fopen([dirname, filesep, 'mpt_getInput.c'], 'w');
-if f2<0,
-    error('Cannot open file for writing!');
-end
-
-header = {''
-'/*  mpt_getInput.c,'
-''
-'  Identifies a control law associated to a given state X'
-''  
-'  Requires the explicit controller to be described in a header file called'
-'  mpt_getInput.h (see ''help mpt_exportc'' for more details).'
-''
-'  Usage:'
-'    region = mpt_getInput(*X, *U)'
-''    
-'    if ''region'' is smaller 1 (region < 1), there is no control law associated to'
-'    a given state.'
-''
-'   Please note that all code in this file is provided under the terms of the'
-'   GNU General Public License, which implies that if you include it directly'
-'   into your commercial application, you will need to comply with the license.'
-'   If you feel this is not a good solution for you or your company, feel free '
-'   to contact the author:'
-'       michal.kvasnica@stuba.sk'
-'    to re-license this specific piece of code to you free of charge.'
-'*/'
-''
-'/* Copyright (C) 2005 by Michal Kvasnica (michal.kvasnica@stuba.sk) '
-'   Revised in 2012 by Martin Herceg (herceg@control.ee.ethz.ch)    '
-'*/'
-''
-''
-'/*  This program is free software; you can redistribute it and/or modify'
-'    it under the terms of the GNU General Public License as published by'
-'    the Free Software Foundation; either version 2 of the License, or'
-'    (at your option) any later version.'
-''
-'    This program is distributed in the hope that it will be useful,'
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of'
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
-'    GNU General Public License for more details.'
-''
-'    You should have received a copy of the GNU General Public License'
-'    along with this program; if not, write to the Free Software'
-'    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
-'*/ '
-''};
-
-% write the header
-for i=1:numel(header)
-    fprintf(f2,[header{i},'\n']);
-end
-
-% insert the name of the file
-fprintf(f2,'#ifndef mpt_getInput_h \n');
-fprintf(f2,'#include "%s.h" \n',fname);
-fprintf(f2,'#endif\n');
-
 core = {''
 'static float mpt_getInput(float *X, float *U)'
 '{'
@@ -414,29 +423,195 @@ core = {''
 'static void mpt_augmentInput(float *U, const float *Uprev)'
 '{'
 '    int i;'
-'    if ((MPT_TRACKING==1) || (MPT_DUMODE>0))'
-'    {'
-'        /* controllers with MPT_TRACKING=1 or MPT_DUMODE=1 generate'
-'         * deltaU instead of U, therefore to obtain the "true" control action,'
-'         * we need to add previous input at this point'
+'        /* This function augments the control input by adding the previous'
+'         * control action.'
 '         */'
 '        for (i=0; i<MPT_NU; i++)'
 '        {'
 '            U[i] = U[i] + Uprev[i];'
 '        }'
-'    } '
 '}'
 ''};
 
 % write the core
 for i=1:numel(core)
-    fprintf(f2,[core{i},'\n']);
+    fprintf(fid,[core{i},'\n']);
 end
 
+fclose(fid);
+
+%% write mpt_getInput_sfunc.c
+f2 = fopen([fullfilename,'_sfunc.c'], 'w');
+if f2<0,
+    error('Cannot open file for writing!');
+end
+
+part1={''
+'/*'
+'  Autogenerated C-code S-function for simulation of explicit controllers.'
+'    '
+'*/'
+''
+'/* Copyright (C) 2005 by Michal Kvasnica (michal.kvasnica@stuba.sk) '
+'   Revised in 2012-2013 by Martin Herceg, Automatic Control Laboratory,'
+'   ETH Zurich, herceg@control.ee.ethz.ch'
+'*/'
+''
+'/*  This program is free software; you can redistribute it and/or modify'
+'    it under the terms of the GNU General Public License as published by'
+'    the Free Software Foundation; either version 2 of the License, or'
+'    (at your option) any later version.'
+''
+'    This program is distributed in the hope that it will be useful,'
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of'
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
+'    GNU General Public License for more details.'
+''
+'    You should have received a copy of the GNU General Public License'
+'    along with this program; if not, write to the Free Software'
+'    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
+'*/ '
+''};
+
+% write part1
+for i=1:numel(part1)
+    fprintf(f2,[part1{i},'\n']);
+end
+
+% write the name of the file to include
+fprintf(f2,'#define S_FUNCTION_NAME  %s_sfunc   /*Name of the S-function file*/\n',fname);
+fprintf(f2,'#define S_FUNCTION_LEVEL 2		/*Level 2 S-functions allow multi-port status*/\n');
+fprintf(f2,'#include "simstruc.h"			/*Header where different routines are defined */\n\n');
+fprintf(f2, '#include "%s.c" /*inclusion of the evalution algorithm */\n\n',fname);
+
+
+part2 = {''
+'/* previous input */'
+'static float Uprev[MPT_NU];'
+''
+'static void mdlInitializeSizes(SimStruct *S)'
+'{'
+'    ssSetNumSFcnParams(S, 0);'
+''
+'    if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {'
+'        return; /* Parameter mismatch will be reported by Simulink */'
+'    }'
+''
+'    /* no states, all computation will be done in output section */'
+'    ssSetNumContStates(S, 0);'
+'    ssSetNumDiscStates(S, 0);'
+'    '
+'    /* one input port: state x(k) + vector of references */'
+'    ssSetNumInputPorts(S, 1); '
+'    '
+'    /* one output port: control action */'
+'    ssSetNumOutputPorts(S, 1);'
+''
+'    /* width of input vector - number of states of the original problem. '
+'     * note that tracking includes additional states, here we do not consider them'
+'     */'
+'    if (MPT_TRACKING>0) {'
+'        ssSetInputPortWidth(S, 0, MPT_NXT + MPT_NREF);'
+'    } else {'
+'        /* dimension extended by one to allow empty reference to be passed */'
+'        /*ssSetInputPortWidth(S, 0, MPT_NXT + 1); */'
+'        ssSetInputPortWidth(S, 0, MPT_NXT);'
+'    }'
+'    '
+'    ssSetInputPortDirectFeedThrough(S, 0, 1);'
+'    '
+'    /* width of output - number of control actions */'
+'    ssSetOutputPortWidth(S, 0, MPT_NU);'
+'    '
+'    ssSetNumSampleTimes(S, 1);'
+''
+'    /* Take care when specifying exception free code - see sfuntmpl.doc */'
+'    ssSetOptions(S, SS_OPTION_EXCEPTION_FREE_CODE);'
+'    '
+'}'
+''
+''
+'static void mdlInitializeSampleTimes(SimStruct *S)'
+'{'
+'    /* set sampling time */'
+'    ssSetSampleTime(S, 0, MPT_TS);'
+'    ssSetOffsetTime(S, 0, 0.0);'
+'}'
+''
+''
+'#define MDL_INITIALIZE_CONDITIONS'
+''
+'static void mdlInitializeConditions(SimStruct *S)'
+'{'
+'    /* reset previous input to zero */'
+'    int i;'
+'    for (i=0; i<MPT_NU; i++) {'
+'        Uprev[i] = 0;'
+'    }'
+'}'
+''
+'static void mdlOutputs(SimStruct *S, int_T tid)'
+'{'
+'    real_T            	*u   = ssGetOutputPortRealSignal(S,0);'
+'    InputRealPtrsType    Xin   = ssGetInputPortRealSignalPtrs(S,0);'
+'    static float region, U[MPT_NU], X[MPT_NXT], Xaug[MPT_NX], REF[MPT_NREF+1];'
+'    int i;'
+''
+'    /* prepare the input signal for passing to mpt_getInput function */'
+'    for (i=0; i<MPT_NXT; i++) {'
+'         X[i] = *Xin[i];'
+'    }'
+''
+'    if (MPT_TRACKING>0) {'
+'        /* extract references from input vector */'
+'        for (i=0; i<MPT_NREF; i++)'
+'        {'
+'            REF[i] = *Xin[MPT_NXT + i];'
+'        }'
+'    }'
+'    '
+'    /* augment state vector to deal with tracking and deltaU formulation */'
+'    mpt_augmentState(Xaug, X, Uprev, REF);'
+''
+'    /* get control law */'
+'    region = mpt_getInput(Xaug, U);'
+'        '
+'    /* check if control law was found, if not, stop the simulation */'
+'    if (region<1) {'
+'        ssSetErrorStatus(S, "No feasible control law found!");'
+'    }'
+'    '
+'    /* output control action */'
+'    for (i=0; i<MPT_NU; i++) {'
+'            u[i] = (real_T)U[i]; /* current output */'
+'        Uprev[i] = (float)u[i]; /* remember the previous computed value */'
+'    }'
+'}'
+''
+''
+'/* Function: mdlTerminate ====================================================='
+' * Abstract:'
+' *    No termination needed, but we are required to have this routine.'
+' */'
+'static void mdlTerminate(SimStruct *S)'
+'{'
+'}'
+''
+'/*End of file necessary includes*/'
+''
+'#ifdef  MATLAB_MEX_FILE    /* Is this file being compiled as a MEX-file? */'
+'#include "simulink.c"      /* MEX-file interface mechanism */'
+'#else'
+'#include "cg_sfun.h"       /* Code generation registration function */'
+'#endif'
+''};
+
+% write part2
+for i=1:numel(part2)
+    fprintf(f2,[part2{i},'\n']);
+end
+
+% close the second file
 fclose(f2);
 
-%% copy remaining files
-
-p = fileparts(which('EMPCController'));
-copyfile([p,filesep,'mpt_getInput_sfunc.c'],dirname);
-
+end

@@ -33,7 +33,7 @@ rmdir([d,filesep,'mpt_explicit_controller'],'s');
 
 % compare the results
 for i=1:size(x,1)
-    if norm(u(i)-c.evaluate(x(i,:)),Inf)>1e-4
+    if norm(u(i)-c.evaluate(x(i,:)'),Inf)>1e-4
         error('The results do not match! Problem with exported C-code.');
     end
 end
