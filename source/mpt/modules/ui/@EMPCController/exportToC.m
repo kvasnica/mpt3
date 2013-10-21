@@ -85,7 +85,10 @@ end
 
 % check if there are multiple controllers
 if numel(obj.feedback)>1
-    error('The code generation can be applied only for explicit controllers with a single feedback law. This controller has %d possible feedback laws.',numel(obj.feedback));
+    error(['The code generation can be applied only for explicit controllers with a single ',...
+        'feedback law. This controller has %d possible feedback laws. Use "PolyUnion/min" ',...
+        'method to find single optimizer, i.e. \n\n',...
+        '   ctrl.optimizer = ctrl.optimizer.min(''obj'')'],numel(obj.feedback));
 end
 
 % append the dirname to a current directory
