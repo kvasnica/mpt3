@@ -24,7 +24,7 @@ du = diff([uprev d.U]);
 assert(max(du) <= L.u.deltaMax);
 assert(min(du) >= L.u.deltaMin);
 Jgood = 524.894973036791;
-assert(abs(sum(d.cost) - Jgood) <= 1e-8);
+assert(abs(sum(d.cost) - Jgood) <= 1e-6);
 
 % must nicely complain if u.previous is not provided
 [~, msg] = run_in_caller('ctrl.simulate(x0, 30, ''x.reference'', xref)');

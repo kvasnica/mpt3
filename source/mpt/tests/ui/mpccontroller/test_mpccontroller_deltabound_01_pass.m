@@ -19,7 +19,7 @@ assert(feasible);
 du = diff([uprev, openloop.U]);
 assert(max(du) <= ctrl.model.u.deltaMax+1e-6);
 Jgood = 297.280032925402;
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% only deltaMin
 ctrl.model.u.without('deltaMax');
@@ -30,7 +30,7 @@ assert(feasible);
 du = diff([uprev, openloop.U]);
 assert(min(du) >= ctrl.model.u.deltaMin-1e-6);
 Jgood = 483.549843793654;
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% deltaMax and deltaMin
 ctrl.model.u.with('deltaMax');
@@ -42,7 +42,7 @@ du = diff([uprev, openloop.U]);
 assert(min(du) >= ctrl.model.u.deltaMin-1e-6);
 assert(max(du) <= ctrl.model.u.deltaMax+1e-6);
 Jgood = 266.904033535472;
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% previous value out of bounds
 [~, feasible, openloop] = ctrl.evaluate(x0, 'u.previous', L.u.max*2);

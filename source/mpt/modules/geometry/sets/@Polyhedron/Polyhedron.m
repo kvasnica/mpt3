@@ -419,7 +419,7 @@ classdef Polyhedron < ConvexSet
 			% check if every LB is actually lower than UB
 			if ~isempty(p.lb) && ~isempty(p.ub)
 				for i=1:d
-					if p.lb(i)>p.ub(i)
+					if p.lb(i)>p.ub(i) + MPTOPTIONS.zero_tol
 						error('Polyhedron: Lower bound at element %d must not be greater than its upper bound.',i);
 					end
 				end

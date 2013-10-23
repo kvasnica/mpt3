@@ -17,11 +17,11 @@ x0 = [-10; -1];
 [~, feasible, openloop] = ctrl.evaluate(x0);
 assert(feasible);
 % x0 must be in openloop.X(:, 1)
-assert(norm(openloop.X(:, 1)-x0)<=1e-8);
+assert(norm(openloop.X(:, 1)-x0)<=1e-6);
 dx = diff(openloop.X, 1, 2);
 assert(all(max(dx, [], 2) <= ctrl.model.x.deltaMax+1e-6));
 Jgood = 1234.46947430216;
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-6);
 
 %% only deltaMin
 ctrl.model.x.without('deltaMax');
@@ -33,7 +33,7 @@ assert(feasible);
 dx = diff(openloop.X, 1, 2);
 assert(all(min(dx, [], 2) >= ctrl.model.x.deltaMin-1e-6));
 Jgood = 1518.34690076945;
-assert(abs(openloop.cost-Jgood)<=1e-8);
+assert(abs(openloop.cost-Jgood)<=1e-5);
 
 %% deltaMax and deltaMin
 ctrl.model.x.with('deltaMax');

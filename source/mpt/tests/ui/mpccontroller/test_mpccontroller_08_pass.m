@@ -14,13 +14,13 @@ lti.u.penalty = QuadFunction(1);
 ctrl = MPCController(lti, 4);
 [~, ~, c] = ctrl.evaluate(x);
 Jgood = 10.995;
-assert(abs(c.cost-Jgood) < 1e-8);
+assert(abs(c.cost-Jgood) < 1e-7);
 
 % now change the penalty
 ctrl.model.u.penalty = QuadFunction(0.1);
 [~, ~, c] = ctrl.evaluate(x);
 Jgood = 8.7;
-assert(abs(c.cost-Jgood) < 1e-8);
+assert(abs(c.cost-Jgood) < 1e-7);
 
 % also updating the constraints must be propagated
 ctrl.model.u.min = -1.5;
