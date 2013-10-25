@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.24"
+    ComputedModelVersion    "1.26"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "mato"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Oct 17 15:43:34 2013"
-  RTWModifiedTimeStamp	  303925411
-  ModelVersionFormat	  "1.%<AutoIncrement:24>"
+  LastModifiedDate	  "Fri Oct 25 13:26:42 2013"
+  RTWModifiedTimeStamp	  304608395
+  ModelVersionFormat	  "1.%<AutoIncrement:26>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -151,8 +151,8 @@ Model {
 	  SolverMode		  "Auto"
 	  EnableConcurrentExecution off
 	  ConcurrentTasks	  off
-	  Solver		  "ode45"
-	  SolverName		  "ode45"
+	  Solver		  "VariableStepDiscrete"
+	  SolverName		  "VariableStepDiscrete"
 	  SolverJacobianMethodControl "auto"
 	  ShapePreserveControl	  "DisableAll"
 	  ZeroCrossControl	  "UseLocalSettings"
@@ -614,7 +614,7 @@ Model {
       }
       Name		      "Configuration"
       CurrentDlgPage	      "Solver"
-      ConfigPrmDlgPosition     [ 454, 203, 1366, 744 ] 
+      ConfigPrmDlgPosition     [ 0, 0, 912, 541 ] 
     }
     PropName		    "ConfigurationSets"
   }
@@ -717,7 +717,7 @@ Model {
   }
   System {
     Name		    "test_codegen_sim_05"
-    Location		    [404, 56, 1182, 408]
+    Location		    [403, 28, 1181, 380]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -731,7 +731,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "54"
+    SIDHighWatermark	    "55"
     Block {
       BlockType		      S-Function
       Name		      "Controller"
@@ -778,6 +778,19 @@ Model {
       InputPortWidth	      "model.nx+model.ny"
       IndexOptions	      "Index vector (dialog)"
       Indices		      "1:model.nx"
+      OutputSizes	      "1"
+    }
+    Block {
+      BlockType		      Selector
+      Name		      "Selector1"
+      SID		      "55"
+      Ports		      [1, 1]
+      Position		      [205, 231, 245, 269]
+      ZOrder		      -17
+      BlockMirror	      on
+      InputPortWidth	      "model.nu*N"
+      IndexOptions	      "Index vector (dialog)"
+      Indices		      "1"
       OutputSizes	      "1"
     }
     Block {
@@ -890,22 +903,8 @@ Model {
     Line {
       SrcBlock		      "Controller"
       SrcPort		      1
-      Points		      [-65, 0]
-      Branch {
-	Points			[0, -120]
-	Branch {
-	  DstBlock		  "input"
-	  DstPort		  1
-	}
-	Branch {
-	  DstBlock		  "hybrid model"
-	  DstPort		  1
-	}
-      }
-      Branch {
-	DstBlock		"To Workspace"
-	DstPort			1
-      }
+      DstBlock		      "Selector1"
+      DstPort		      1
     }
     Line {
       SrcBlock		      "Mux"
@@ -958,6 +957,26 @@ Model {
       }
       Branch {
 	DstBlock		"Mux1"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Selector1"
+      SrcPort		      1
+      Points		      [-5, 0]
+      Branch {
+	Points			[0, -120]
+	Branch {
+	  DstBlock		  "input"
+	  DstPort		  1
+	}
+	Branch {
+	  DstBlock		  "hybrid model"
+	  DstPort		  1
+	}
+      }
+      Branch {
+	DstBlock		"To Workspace"
 	DstPort			1
       }
     }

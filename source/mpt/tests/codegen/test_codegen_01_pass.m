@@ -29,7 +29,8 @@ sim('test_codegen_sim_01');
 cd(p);
 
 % delete the created directory
-rmdir([d,filesep,'mpt_explicit_controller'],'s');
+onCleanup(@()clear('functions'));
+onCleanup(@()rmdir([d,filesep,'mpt_explicit_controller'],'s'));
 
 % compare the results
 for i=1:size(x,1)

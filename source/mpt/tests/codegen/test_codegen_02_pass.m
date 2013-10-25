@@ -33,7 +33,8 @@ sim('test_codegen_sim_02');
 cd(p);
 
 % delete the created directory
-rmdir([d,filesep,name],'s');
+onCleanup(@()clear('functions'));
+onCleanup(@()rmdir([d,filesep,name],'s'));
 
 % compare the results
 u0 = 0;

@@ -1,5 +1,6 @@
-function test_codegen_05_pass
-% code generation for a hybrid model, using a free reference
+function test_codegen_st_05_pass
+% code generation of a binary search tree for a hybrid model, using a free
+% reference 
 
 % hybrid PWA model with 2 modes
 mode1 = LTISystem('A', [ 0.4 0.69; -0.69 0.4], 'B', [0;1], 'C', [1, 0]);
@@ -32,6 +33,9 @@ ectrl = ctrl.toExplicit();
 
 % remove overlaps
 ectrl.optimizer = ectrl.optimizer.min('obj');
+
+% construct the binary tree
+ectrl.binaryTree;
 
 % export explicit controller to C
 dir_name = 'rtw_explicitMPCtracking';

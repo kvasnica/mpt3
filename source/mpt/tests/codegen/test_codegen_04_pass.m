@@ -30,7 +30,7 @@ model.u.with('reference');
 model.x.reference = [ -0.24; 0.43; 0.19];
 model.u.reference = 0.5;
  
-ctrl=MPCController(model,6);
+ctrl=MPCController(model,3);
 
 c=ctrl.toExplicit;
 
@@ -46,13 +46,14 @@ cd(name);
 mex('mpt_getInput_sfunc.c');
 
 % run the simulation
-sim('test_codegen_sim_03');
+sim('test_codegen_sim_04');
 
 % go back to original directory
 cd(p);
 
 % delete the created directory
-rmdir([d,filesep,name],'s');
+onCleanup(@()clear('functions'));
+onCleanup(@()rmdir([d,filesep,name],'s'));
 
 % compare the results
 for i=1:size(x,1)

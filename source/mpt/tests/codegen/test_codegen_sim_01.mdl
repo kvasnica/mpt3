@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.6"
+    ComputedModelVersion    "1.7"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "mato"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Nov 30 14:53:58 2012"
-  RTWModifiedTimeStamp	  276188037
-  ModelVersionFormat	  "1.%<AutoIncrement:6>"
+  LastModifiedDate	  "Fri Oct 25 10:11:33 2013"
+  RTWModifiedTimeStamp	  304596691
+  ModelVersionFormat	  "1.%<AutoIncrement:7>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -67,7 +67,6 @@ Model {
     $ObjectID		    1
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
     model_		    "test_codegen_sim_01"
-    signals_		    []
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
@@ -674,6 +673,13 @@ Model {
       SampleTime	      "-1"
     }
     Block {
+      BlockType		      Selector
+      NumberOfDimensions      "1"
+      IndexMode		      "One-based"
+      InputPortWidth	      "-1"
+      SampleTime	      "-1"
+    }
+    Block {
       BlockType		      ToWorkspace
       VariableName	      "simulink_output"
       MaxDataPoints	      "1000"
@@ -708,7 +714,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "25"
+    SIDHighWatermark	    "26"
     Block {
       BlockType		      Reference
       Name		      "Explicit Controller"
@@ -717,7 +723,7 @@ Model {
       Position		      [210, 78, 305, 152]
       ForegroundColor	      "blue"
       DropShadow	      on
-      LibraryVersion	      "1.72"
+      LibraryVersion	      "1.75"
       SourceBlock	      "mpt_sim/Explicit Controller"
       SourceType	      "MPT Controller"
     }
@@ -726,7 +732,7 @@ Model {
       Name		      "Scope"
       SID		      "2"
       Ports		      [1]
-      Position		      [405, 99, 435, 131]
+      Position		      [455, 99, 485, 131]
       ZOrder		      -3
       Floating		      off
       Location		      [188, 390, 512, 629]
@@ -752,11 +758,23 @@ Model {
       SampleTime	      "0"
     }
     Block {
+      BlockType		      Selector
+      Name		      "Selector"
+      SID		      "26"
+      Ports		      [1, 1]
+      Position		      [340, 96, 380, 134]
+      ZOrder		      -17
+      InputPortWidth	      "3"
+      IndexOptions	      "Index vector (dialog)"
+      Indices		      "1"
+      OutputSizes	      "1"
+    }
+    Block {
       BlockType		      ToWorkspace
       Name		      "To Workspace"
       SID		      "24"
       Ports		      [1]
-      Position		      [375, 175, 435, 205]
+      Position		      [425, 175, 485, 205]
       ZOrder		      -7
       VariableName	      "u"
       MaxDataPoints	      "inf"
@@ -785,16 +803,8 @@ Model {
     Line {
       SrcBlock		      "Explicit Controller"
       SrcPort		      1
-      Points		      [40, 0]
-      Branch {
-	DstBlock		"Scope"
-	DstPort			1
-      }
-      Branch {
-	Points			[0, 75]
-	DstBlock		"To Workspace"
-	DstPort			1
-      }
+      DstBlock		      "Selector"
+      DstPort		      1
     }
     Line {
       SrcBlock		      "Uniform Random\nNumber"
@@ -807,6 +817,20 @@ Model {
       Branch {
 	Points			[0, 75]
 	DstBlock		"To Workspace1"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Selector"
+      SrcPort		      1
+      Points		      [15, 0]
+      Branch {
+	DstBlock		"Scope"
+	DstPort			1
+      }
+      Branch {
+	Points			[0, 75]
+	DstBlock		"To Workspace"
 	DstPort			1
       }
     }

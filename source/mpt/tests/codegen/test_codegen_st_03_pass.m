@@ -36,18 +36,18 @@ model.y.reference = dsys.C*expm(eye(3)-dsys.A)*dsys.B;
 ctrl=MPCController(model,4);
 
 c=ctrl.toExplicit;
-st = c.toSearchTree;
+c.binaryTree;
 
 % generate code using new name and new directory
 p=pwd;
 d = fileparts(which(mfilename));
 name = 'generated_code_test_03';
 cd(d);
-st.exportToC('codetest03',name)
+c.exportToC('codetest03',name)
 
 % compile the files in the directory
 cd(name);
-mex('mpt_getInput_sfunc.c');
+mex('codetest03_sfunc.c');
 
 % run the simulation
 sim('test_codegen_sim_03');
@@ -56,13 +56,16 @@ sim('test_codegen_sim_03');
 cd(p);
 
 % delete the created directory
-rmdir([d,filesep,name],'s');
+onCleanup(@()clear('functions'));
+onCleanup(@()rmdir([d,filesep,name],'s'));
 
 % compare the results
+u0 = 0;
 for i=1:size(x,1)
-    if norm(u(i)-c.evaluate(x(i,:)),Inf)>1e-4
+    if norm(u(i)-c.evaluate(x(i,:)','u.previous',u0,'y.reference',model.y.reference),Inf)>1e-4
         error('The results do not match! Problem with exported C-code.');
     end
+    u0 = u(i);
 end
     
 

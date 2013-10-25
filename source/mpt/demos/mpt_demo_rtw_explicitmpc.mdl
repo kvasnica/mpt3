@@ -6,11 +6,11 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.16"
+    ComputedModelVersion    "1.17"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
-  SavedCharacterEncoding  "windows-1252"
+  SavedCharacterEncoding  "UTF-8"
   SaveDefaultBlockParams  on
   ScopeRefreshTime	  0.035000
   OverrideScopeRefreshTime on
@@ -25,11 +25,11 @@ Model {
   Creator		  "mato"
   UpdateHistory		  "UpdateHistoryNever"
   ModifiedByFormat	  "%<Auto>"
-  LastModifiedBy	  "machine"
+  LastModifiedBy	  "mato"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Feb 14 17:37:41 2013"
-  RTWModifiedTimeStamp	  282764229
-  ModelVersionFormat	  "1.%<AutoIncrement:16>"
+  LastModifiedDate	  "Fri Oct 25 11:57:48 2013"
+  RTWModifiedTimeStamp	  304603062
+  ModelVersionFormat	  "1.%<AutoIncrement:17>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -67,7 +67,6 @@ Model {
     $ObjectID		    1
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
     model_		    "mpt_demo_sim1"
-    signals_		    []
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
@@ -444,7 +443,6 @@ Model {
 	  ConfigAtBuild		  off
 	  RTWUseLocalCustomCode	  off
 	  RTWUseSimCustomCode	  off
-	  CustomSource		  ""
 	  IncludeHyperlinkInReport off
 	  LaunchReport		  off
 	  TargetLang		  "C"
@@ -529,7 +527,7 @@ Model {
 	      ReqsInCode	      off
 	      UseSimReservedNames     off
 	    }
-	    RTWinTarget.RTWinTargetCC {
+	    Simulink.TargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
 	      $ObjectID		      12
 	      Version		      "1.12.0"
@@ -596,17 +594,61 @@ Model {
 	      CPPClassGenCompliant    off
 	      AutosarCompliant	      off
 	      GRTInterface	      on
-	      RTWinDir		      "C:/PROGRA~1/MATLAB/R2012a/toolbox/rtw/targets/rtwin"
-	      TargetArch	      "win32"
-	      CCListing		      off
-	      RebuildAll	      off
-	      ExtMode		      on
-	      ExtModeTransport	      0
-	      ExtModeStaticAlloc      off
-	      ExtModeStaticAllocSize  1000000
-	      ExtModeTesting	      off
-	      ExtModeMexFile	      "rtwinext"
-	      ExtModeIntrfLevel	      "Level1"
+	      CustomProperty {
+		DataType		"string"
+		Name			"RTWinDir"
+		Value			"C:/PROGRA~1/MATLAB/R2012a/toolbox/rtw/targets/rtwin"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"TargetArch"
+		Value			"win32"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CCListing"
+		Value			"off"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"RebuildAll"
+		Value			"off"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtMode"
+		Value			"on"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeTransport"
+		Value			"0"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeStaticAlloc"
+		Value			"off"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeStaticAllocSize"
+		Value			"1000000"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeTesting"
+		Value			"off"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeMexFile"
+		Value			"rtwinext"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExtModeIntrfLevel"
+		Value			"Level1"
+	      }
 	    }
 	    PropName		    "Components"
 	  }
@@ -1186,10 +1228,17 @@ Model {
       SampleInput	      off
       SampleTime	      "-1"
     }
+    Block {
+      BlockType		      Selector
+      NumberOfDimensions      "1"
+      IndexMode		      "One-based"
+      InputPortWidth	      "-1"
+      SampleTime	      "-1"
+    }
   }
   System {
     Name		    "mpt_demo_rtw_explicitmpc"
-    Location		    [475, 130, 1055, 390]
+    Location		    [474, 102, 1054, 362]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -1203,7 +1252,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "10"
+    SIDHighWatermark	    "11"
     Block {
       BlockType		      S-Function
       Name		      "Controller"
@@ -1228,6 +1277,19 @@ Model {
       C			      "eye(2)"
       D			      "[0;0]"
       X0		      "[-2;3]"
+    }
+    Block {
+      BlockType		      Selector
+      Name		      "Selector"
+      SID		      "11"
+      Ports		      [1, 1]
+      Position		      [160, 171, 200, 209]
+      ZOrder		      -17
+      BlockMirror	      on
+      InputPortWidth	      "5"
+      IndexOptions	      "Index vector (dialog)"
+      Indices		      "1"
+      OutputSizes	      "1"
     }
     Block {
       BlockType		      Scope
@@ -1292,15 +1354,8 @@ Model {
     Line {
       SrcBlock		      "Controller"
       SrcPort		      1
-      Points		      [-65, 0; 0, -110]
-      Branch {
-	DstBlock		"Plant"
-	DstPort			1
-      }
-      Branch {
-	DstBlock		"input"
-	DstPort			1
-      }
+      DstBlock		      "Selector"
+      DstPort		      1
     }
     Line {
       SrcBlock		      "Plant"
@@ -1313,6 +1368,19 @@ Model {
       }
       Branch {
 	DstBlock		"states"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Selector"
+      SrcPort		      1
+      Points		      [-25, 0; 0, -110]
+      Branch {
+	DstBlock		"Plant"
+	DstPort			1
+      }
+      Branch {
+	DstBlock		"input"
 	DstPort			1
       }
     }

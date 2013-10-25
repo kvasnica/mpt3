@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.6"
+    ComputedModelVersion    "1.8"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "mato"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Nov 30 14:51:23 2012"
-  RTWModifiedTimeStamp	  276187881
-  ModelVersionFormat	  "1.%<AutoIncrement:6>"
+  LastModifiedDate	  "Fri Oct 25 10:00:40 2013"
+  RTWModifiedTimeStamp	  304595901
+  ModelVersionFormat	  "1.%<AutoIncrement:8>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -67,7 +67,6 @@ Model {
     $ObjectID		    1
     $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
     model_		    "test_codegen_sim_02"
-    signals_		    []
     overrideMode_	    [0.0]
     Array {
       Type		      "Cell"
@@ -656,6 +655,14 @@ Model {
   }
   BlockParameterDefaults {
     Block {
+      BlockType		      Mux
+      Inputs		      "4"
+      DisplayOption	      "none"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      NonVirtualBus	      off
+    }
+    Block {
       BlockType		      Scope
       ModelBased	      off
       TickLabels	      "OneTimeTick"
@@ -671,6 +678,13 @@ Model {
       MaxDataPoints	      "5000"
       Decimation	      "1"
       SampleInput	      off
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Selector
+      NumberOfDimensions      "1"
+      IndexMode		      "One-based"
+      InputPortWidth	      "-1"
       SampleTime	      "-1"
     }
     Block {
@@ -691,10 +705,19 @@ Model {
       SampleTime	      "-1"
       VectorParams1D	      on
     }
+    Block {
+      BlockType		      UnitDelay
+      X0		      "0"
+      InputProcessing	      "Inherited"
+      SampleTime	      "1"
+      StateMustResolveToSignalObject off
+      RTWStateStorageClass    "Auto"
+      HasFrameUpgradeWarning  on
+    }
   }
   System {
     Name		    "test_codegen_sim_02"
-    Location		    [498, 75, 1078, 335]
+    Location		    [603, 56, 1183, 390]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -708,7 +731,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "25"
+    SIDHighWatermark	    "28"
     Block {
       BlockType		      Reference
       Name		      "Explicit Controller"
@@ -717,16 +740,27 @@ Model {
       Position		      [210, 78, 305, 152]
       ForegroundColor	      "blue"
       DropShadow	      on
-      LibraryVersion	      "1.72"
+      LibraryVersion	      "1.75"
       SourceBlock	      "mpt_sim/Explicit Controller"
       SourceType	      "MPT Controller"
+    }
+    Block {
+      BlockType		      Mux
+      Name		      "Mux"
+      SID		      "27"
+      Ports		      [2, 1]
+      Position		      [165, 96, 170, 134]
+      ZOrder		      -16
+      ShowName		      off
+      Inputs		      "2"
+      DisplayOption	      "bar"
     }
     Block {
       BlockType		      Scope
       Name		      "Scope"
       SID		      "2"
       Ports		      [1]
-      Position		      [405, 99, 435, 131]
+      Position		      [445, 99, 475, 131]
       ZOrder		      -3
       Floating		      off
       Location		      [188, 390, 512, 629]
@@ -752,11 +786,23 @@ Model {
       SampleTime	      "0"
     }
     Block {
+      BlockType		      Selector
+      Name		      "Selector"
+      SID		      "28"
+      Ports		      [1, 1]
+      Position		      [340, 96, 380, 134]
+      ZOrder		      -17
+      InputPortWidth	      "3"
+      IndexOptions	      "Index vector (dialog)"
+      Indices		      "1"
+      OutputSizes	      "1"
+    }
+    Block {
       BlockType		      ToWorkspace
       Name		      "To Workspace"
       SID		      "24"
       Ports		      [1]
-      Position		      [375, 175, 435, 205]
+      Position		      [415, 175, 475, 205]
       ZOrder		      -7
       VariableName	      "u"
       MaxDataPoints	      "inf"
@@ -767,7 +813,7 @@ Model {
       Name		      "To Workspace1"
       SID		      "25"
       Ports		      [1]
-      Position		      [170, 175, 230, 205]
+      Position		      [120, 250, 180, 280]
       ZOrder		      -7
       VariableName	      "x"
       MaxDataPoints	      "inf"
@@ -777,37 +823,74 @@ Model {
       BlockType		      UniformRandomNumber
       Name		      "Uniform Random\nNumber"
       SID		      "23"
-      Position		      [95, 99, 125, 131]
+      Position		      [35, 89, 65, 121]
       ZOrder		      -23
       Seed		      "[0;1]"
       SampleTime	      "1"
     }
+    Block {
+      BlockType		      UnitDelay
+      Name		      "Unit Delay"
+      SID		      "26"
+      Position		      [250, 193, 285, 227]
+      ZOrder		      -18
+      BlockMirror	      on
+      InputProcessing	      "Elements as channels (sample based)"
+      SampleTime	      "-1"
+    }
     Line {
       SrcBlock		      "Explicit Controller"
       SrcPort		      1
-      Points		      [40, 0]
+      DstBlock		      "Selector"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Uniform Random\nNumber"
+      SrcPort		      1
+      Points		      [30, 0]
+      Branch {
+	Points			[0, 160]
+	DstBlock		"To Workspace1"
+	DstPort			1
+      }
+      Branch {
+	Points			[0, 0]
+	DstBlock		"Mux"
+	DstPort			1
+      }
+    }
+    Line {
+      SrcBlock		      "Mux"
+      SrcPort		      1
+      DstBlock		      "Explicit Controller"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Unit Delay"
+      SrcPort		      1
+      Points		      [-95, 0]
+      DstBlock		      "Mux"
+      DstPort		      2
+    }
+    Line {
+      SrcBlock		      "Selector"
+      SrcPort		      1
+      Points		      [5, 0]
       Branch {
 	DstBlock		"Scope"
 	DstPort			1
       }
       Branch {
 	Points			[0, 75]
-	DstBlock		"To Workspace"
-	DstPort			1
-      }
-    }
-    Line {
-      SrcBlock		      "Uniform Random\nNumber"
-      SrcPort		      1
-      Points		      [20, 0]
-      Branch {
-	DstBlock		"Explicit Controller"
-	DstPort			1
-      }
-      Branch {
-	Points			[0, 75]
-	DstBlock		"To Workspace1"
-	DstPort			1
+	Branch {
+	  DstBlock		  "To Workspace"
+	  DstPort		  1
+	}
+	Branch {
+	  Points		  [0, 20]
+	  DstBlock		  "Unit Delay"
+	  DstPort		  1
+	}
       }
     }
   }

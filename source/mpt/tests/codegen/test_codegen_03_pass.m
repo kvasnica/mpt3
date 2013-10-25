@@ -41,11 +41,11 @@ p=pwd;
 d = fileparts(which(mfilename));
 name = 'generated_code_test_03';
 cd(d);
-c.exportToC('',name)
+c.exportToC('codetest03',name)
 
 % compile the files in the directory
 cd(name);
-mex('mpt_getInput_sfunc.c');
+mex('codetest03_sfunc.c');
 
 % run the simulation
 sim('test_codegen_sim_03');
@@ -54,7 +54,8 @@ sim('test_codegen_sim_03');
 cd(p);
 
 % delete the created directory
-rmdir([d,filesep,name],'s');
+onCleanup(@()clear('functions'));
+onCleanup(@()rmdir([d,filesep,name],'s'));
 
 % compare the results
 u0 = 0;

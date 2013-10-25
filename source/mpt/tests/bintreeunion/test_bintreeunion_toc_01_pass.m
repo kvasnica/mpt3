@@ -23,11 +23,11 @@ asserterrmsg(msg, 'Not enough input arguments.');
 asserterrmsg(msg, 'Not enough input arguments.');
 
 % the exported function must exist
-[~, msg] = run_in_caller('T.toC(''bogus'', ''out.c'')');
+[~, msg] = run_in_caller('T.toC(''bogus'', ''out'')');
 asserterrmsg(msg, 'No such function "bogus" in the object.');
 
 % correct settings
-T.toC('f', 'st_out.c');
+T.toC('f', 'st_out');
 assert(exist('st_out.c', 'file')==2);
 f = fileread('st_out.c');
 asserterrmsg(f, 'Generated on');

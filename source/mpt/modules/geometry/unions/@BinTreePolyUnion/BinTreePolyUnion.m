@@ -126,13 +126,28 @@ classdef BinTreePolyUnion < PolyUnion
 		function toC(obj, function_name, file_name)
 			% Exports the binary tree to a C-code
 			%
-			%   tree.toC('function', 'output.c')
+			%   tree.toC('function', 'output')
 			
 			global MPTOPTIONS
 			
 			error(nargchk(3, 3, nargin));
 			error(obj.rejectArray());
 
+            if nargin<2,
+                file_name = 'mpt_getInput';
+            else
+                if isempty(file_name)
+                    file_name = 'mpt_getInput';
+                end
+                file_name = strtrim(file_name);
+                strg = sprintf('[^a-zA-Z0-9_%s]',filesep);
+                if ~isempty(regexp(file_name,strg, 'once'))
+                    error('The file name must contain only alphanumerical characters including underscore "_" and directory separator "%s".',filesep);
+                end
+                % short name to point to a function
+                [~,short_name] = fileparts(file_name);
+            end
+            
 			% is the request function present?
 			if ~obj.hasFunction(function_name)
 				error('No such function "%s" in the object.', function_name);
@@ -143,19 +158,56 @@ classdef BinTreePolyUnion < PolyUnion
 			end
 			
 			fun = obj.Set(1).Functions(function_name);
-			out = sprintf('/* Generated on %s by MPT %s */', ...
-				datestr(now), MPTOPTIONS.version);
 
-			% read code from our template
-			template_file = which('BinTreePolyUnion/mpt_searchTree.c');
-			if isempty(template_file),
-				error('Cannot find file "BinTreePolyUnion/mpt_searchTree.c". Check your path setup.');
-			end
-			template = fileread(template_file);
-			
+            % write to a file
+            outfid = fopen([file_name,'.c'], 'w');
+            if outfid < 0,
+                error('Cannot open file "%s" for writing!', [file_name,'.c']);
+            end
+            
+			fprintf(outfid,'/*  Identifies a control law associated to a given state X using a binary search tree.\n\n');
+            fprintf(outfid,'  Usage:\n   region = %s(*X, *U)\n\n',short_name);
+                
+            % header    
+            header={''
+                '    if "region" is smaller 1 (region < 1), there is no control law associated to'
+                '    a given state.'
+                ''
+                '   Please note that all code in this file is provided under the terms of the'
+                '   GNU General Public License, which implies that if you include it directly'
+                '   into your commercial application, you will need to comply with the license.'
+                '   If you feel this is not a good solution for you or your company, feel free '
+                '   to contact me at michal.kvasnica@stuba.sk, I can re-license this specific '
+                '   piece of code to you free of charge.'
+                '*/'
+                ''
+                '/* Copyright (C) 2006-2013 by Michal Kvasnica (michal.kvasnica@stuba.sk) */'
+                ''
+                '/*  This program is free software; you can redistribute it and/or modify'
+                '    it under the terms of the GNU General Public License as published by'
+                '    the Free Software Foundation; either version 2 of the License, or'
+                '    (at your option) any later version.'
+                ''
+                '    This program is distributed in the hope that it will be useful,'
+                '    but WITHOUT ANY WARRANTY; without even the implied warranty of'
+                '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
+                '    GNU General Public License for more details.'
+                ''
+                '    You should have received a copy of the GNU General Public License'
+                '    along with this program; if not, write to the Free Software'
+                '    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
+                '*/ '
+                ''};
+
+            for i=1:numel(header)
+                fprintf(outfid,[header{i},'\n']);
+            end
+            
+            fprintf(outfid,'/* Generated on %s by MPT %s */ \n\n', datestr(now), MPTOPTIONS.version);
+		
 			% data of the search tree
 			ST = obj.Tree'; ST = ST(:);
-			out = char(out, sprintf('#define MPT_RANGE %d', fun.R));
+            out = char(sprintf('#define MPT_RANGE %d', fun.R));
 			out = char(out, sprintf('#define MPT_DOMAIN %d', fun.D));
 			out = char(out, 'static float MPT_ST[] = {');
 			temp = '';
@@ -202,21 +254,66 @@ classdef BinTreePolyUnion < PolyUnion
 
 			% convert into a single string, add line breaks
 			out_nl = [];
-			for i = 1:size(out, 1),
-				out_nl = [out_nl sprintf('%s\n', deblank(out(i, :)))];
-			end
-			
-			% inject data into the template
-			template = strrep(template, '/* placeholder, do not edit or remove!!! */', out_nl);
+            for i = 1:size(out, 1),
+                out_nl = [out_nl sprintf('%s\n', deblank(out(i, :)))];
+            end
 
-			% write to a file
-			outfid = fopen(file_name, 'w');
-			if outfid < 0,
-				error('Cannot open file "%s" for writing!', file_name);
-			end
-			fprintf(outfid, '%s', template);
+            % write the search tree
+            fprintf(outfid, out_nl);
+
+            % write the function for evaluation of the binary tree
+            fprintf(outfid,'static float %s(const float *X, float *U)\n',short_name);
+            
+            footer ={''
+                '{'
+                '    int ix, iu;'
+                '    long node = 1, row;'
+                '    float hx, k;'
+                ''
+                '    /* initialize U to zero*/'
+                '    for (iu=0; iu<MPT_RANGE; iu++) {'
+                '        U[iu] = 0;'
+                '    }'
+                ''
+                '    /* find region which contains the state x0 */'
+                '    while (node > 0) {'
+                '        hx = 0;'
+                '        row = (node-1)*(MPT_DOMAIN+3);'
+                '        for (ix=0; ix<MPT_DOMAIN; ix++) {'
+                '            hx = hx + MPT_ST[row+ix]*X[ix];'
+                '        }'
+                '        k = MPT_ST[row+MPT_DOMAIN];'
+                ''
+                '        if ((hx - k) <= 0) {'
+                '            /* x0 on the negative side of the hyperplane */'
+                '            node = (long)MPT_ST[row+MPT_DOMAIN+1];'
+                '        } else {'
+                '            /* x0 on positive side the hyperplane */'
+                '            node = (long)MPT_ST[row+MPT_DOMAIN+2];'
+                '        }'
+                '    }'
+                ''
+                '    node = -node;'
+                ''
+                '    /* compute control action associated to state x0 */'
+                '    for (iu=0; iu<MPT_RANGE; iu++) {'
+                '        for (ix=0; ix<MPT_DOMAIN; ix++) {'
+                '            U[iu] = U[iu] + MPT_F[(node-1)*MPT_DOMAIN*MPT_RANGE + iu*MPT_DOMAIN + ix]*X[ix];'
+                '        }'
+                '        U[iu] = U[iu] + MPT_G[(node-1)*MPT_RANGE + iu];'
+                '    }'
+                ''
+                '    return node;'
+                '}'
+                };
+            
+            % write the footer
+            for i=1:numel(footer)
+                fprintf(outfid,[footer{i},'\n']);
+            end
+
 			fclose(outfid);
-			fprintf('Output written to "%s".\n', file_name);
+			fprintf('Output written to "%s".\n', [file_name,'.c']);
 		end
 		
 		function display(obj)
