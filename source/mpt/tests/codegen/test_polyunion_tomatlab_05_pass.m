@@ -19,9 +19,9 @@ pause(0.1);
 X = grid(Polyhedron.unitBox(2)*8, 10);
 for i = 1:size(X, 1)
 	x = X(i, :)';
-	[~, ~, p1] = ctrl.evaluate(x);
+	p1 = ctrl.optimizer.feval(x, 'primal', 'tiebreak', 'obj');
 	p2 = pu_export(x);
-	assert(norm(p1.U(:)-p2)<1e-8); % optimizers must be identical
+	assert(norm(p1-p2)<1e-8); % optimizers must be identical
 end
 
 end

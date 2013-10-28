@@ -66,9 +66,4 @@ asserterrmsg(msg, 'The regions option must be a vector of integers.');
 [~, msg] = run_in_caller('Um.feval(x, ''fun2'', ''regions'', ''1'')');
 asserterrmsg(msg, 'The regions option must be a vector of integers.');
 
-% arrays of unions must be rejected
-UU = [Us Us];
-[~, msg] = run_in_caller('UU.feval(x)');
-asserterrmsg(msg, 'This method does not support arrays. Use the forEach() method.');
-
 end

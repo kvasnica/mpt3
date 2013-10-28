@@ -15,13 +15,11 @@ function [fval, feasible, idx, tie_value] = feval(obj, x, varargin)
 % Inputs:
 % ---
 % 
-%   U: union of convex sets (mandatory)
+%   U: union of convex sets or an array of unions (mandatory)
 %   x: point at which the function should be evaluated (mandatory)
 %   func: name of the function to evaluate (optional, see note below)
 % 
 % Notes:
-% * "U" must be a single union. Arrays of unions are not accepted. Use
-%   "array.forEach(@(e) e.feval(...))" to evaluate arrays of unions.
 % * "func" must refer to a single function. If omitted, "U.feval(x)"
 %   only works if the union has a single function.
 % 
@@ -61,6 +59,10 @@ function [fval, feasible, idx, tie_value] = feval(obj, x, varargin)
 %       the _smallest_ value of the tie-breaking function
 %   tb_value = scalar value of the tie-breaking function in set indexed
 %       by "idx"
+%
+% If U is an array of unions, then "idx" will be a matrix whose first row
+% denotes index of the union and the second row contains the index of
+% the corresponding region that contains "x".
 % 
 % Tie-breaking:
 % ---
@@ -119,14 +121,12 @@ function [fval, feasible, idx, tie_value] = feval(obj, x, varargin)
 % point location.
 
 error(nargchk(2, Inf, nargin));
-% use obj.forEach(@(z) z.feval(x, ...)) to evaluate arrays of unions
-error(obj.rejectArray());
 
 fval = [];
 feasible = false;
 idx = [];
 tie_value = [];
-if numel(obj)==0 || numel(obj.Set)==0
+if numel(obj)==0
 	return
 end
 
@@ -147,7 +147,59 @@ if nargin>2
 		options.(varargin{i}) = varargin{i+1};
 	end
 end
-	
+
+%% deal with arrays
+if numel(obj)>1
+	% evaluate the function in each partition and optionally apply
+	% tiebreaking
+	fval = {};
+	feasible = false;
+	regs = {};
+	tie_value = Inf(1, numel(obj));
+	for i = 1:numel(obj)
+		% evaluate the function in each partition
+		[fval{i}, fs, regs{i}] = obj(i).feval(x, varargin{:});
+		feasible = feasible | fs;
+		if fs && ~isempty(options.tiebreak)
+			% evaluate the tiebreaking function in the "active" region
+			if ischar(options.tiebreak)
+				tie_value(i) = obj(i).Set(regs{i}(1)).Functions(options.tiebreak).feval(x);
+			else
+				tie_value(i) = feval(options.tiebreak, x);
+			end
+		end
+	end
+	if ~feasible
+		fval = NaN(size(fval{1}, 1), 1);
+		idx = [];
+		tie_value = [];
+	elseif ~isempty(options.tiebreak)
+		% pick the partition with smallest value of the tiebreak
+		[~, ipart] = min(tie_value);
+		idx = [ipart*ones(1, length(regs{ipart})); regs{ipart}];
+		fval = fval{ipart};
+		tie_value = tie_value(ipart);
+	else
+		% no tiebreaking
+		fv = fval;
+		fval = [];
+		idx = [];
+		for i = 1:numel(obj)
+			if any(~isnan(fv{i}))
+				fval = [fval, fv{i}];
+			end
+			idx = [idx, [i*ones(1, length(regs{i})); regs{i}]];
+		end
+		tie_value = [];
+	end
+	return
+end
+
+if numel(obj.Set)==0
+	% no regions, nothing to do
+	return
+end
+
 %% validate arguments
 validate_realvector(x);
 if isempty(function_name)
