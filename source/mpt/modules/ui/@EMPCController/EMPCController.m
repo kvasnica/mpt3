@@ -176,69 +176,39 @@ classdef EMPCController < AbstractController
 			% proper initialization.
 			xinit = obj.parse_xinit(xinit, varargin{:});
 			
-			% index of the optimizer and index of the region from which the
-			% control action was extracted
-			opt_region = [];
-			opt_partition = [];
-			
 			% evaluate the primal optimizer, break ties based on the cost
 			% function. guarantees that the output is a single region where
 			% the cost is minimal.
-			if numel(obj.optimizer)==1
-				% simple case, just a single optimizer
-				[U, feasible, idx, J] = obj.optimizer.feval(xinit, ...
-					'primal', 'tiebreak', 'obj');
-				if ~feasible
-					J = Inf;
-					% U is already a vector of NaNs by Union/feval
-					
-				elseif isempty(J)
-					% no tie-breaking was performed, compute cost manually
+			[U, feasible, idx, J] = obj.optimizer.feval(xinit, ...
+				'primal', 'tiebreak', 'obj');
+			if ~feasible
+				J = Inf;
+				% index of the optimizer and index of the region from which the
+				% control action was extracted
+				opt_partition = [];
+				opt_region = [];
 
-					% Note: from a long-term sustainibility point of view
-					% we should use
-					%   J = obj.optimizer.Set(idx).feval(xinit, 'obj');
-					% here. but ConvexSet/feval() adds so much unnecessary
-					% overhead that we better evaluate the function
-					% directly
-					J = obj.optimizer.Set(idx).Functions('obj').feval(xinit);
-				end
-				if feasible
-					opt_partition = 1;
-					opt_region = idx;
-				end
-				
+			elseif numel(obj.optimizer)==1
+				opt_partition = 1;
+				opt_region = idx;
+
 			else
-				% multiple optimizers, pick the partition in which the cost
-				% is minimal
-
-				[U, feas, idx, J] = obj.optimizer.forEach(@(opt) opt.feval(xinit, ...
-					'primal', 'tiebreak', 'obj'), 'UniformOutput', false);
-				% only consider partitions that contain "xinit"
-				feasible_idx = find(cellfun(@(x) x, feas));
-				if isempty(feasible_idx)
-					feasible = false;
-					U = U{1}; % it's set to NaN by Union/feval
-					J = Inf;
-					
-				else
-					% compute cost in the best region of each feasible
-					% partition
-					feasible = true;
-					for i = feasible_idx
-						if isempty(J{i})
-							% no cost provided by tie-breaking, compute it
-							% manually
-							J{i} = obj.optimizer(i).Set(idx{i}).Functions('obj').feval(xinit);
-						end
-					end
-					Jmin = cat(2, J{feasible_idx});
-					[J, best_partition] = min(Jmin);
-					U = U{feasible_idx(best_partition)};
-					opt_region = idx{feasible_idx(best_partition)};
-					opt_partition = feasible_idx(best_partition);
-				end
+				% multiple optimizers
+				opt_partition = idx(1);
+				opt_region = idx(2);
 			end
+				
+			if isempty(J)
+				% no tie-breaking was performed, compute cost manually
+				%
+				% Note: from a long-term sustainibility point of view
+				% we should use
+				%   J = obj.optimizer.Set(idx).feval(xinit, 'obj');
+				% here. but ConvexSet/feval() adds so much unnecessary
+				% overhead that we better evaluate the function
+				% directly
+				J = obj.optimizer(opt_partition).Set(opt_region).Functions('obj').feval(xinit);
+			end				
 			
 			if numel(U)~=obj.nu*obj.N
 				% sanity checks for EMPCControllers imported from
