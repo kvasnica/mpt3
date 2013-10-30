@@ -44,7 +44,9 @@ function obj = on_set(obj, P)
 % called before the terminal set is changed
 
 % empty penalty means no penalization
-if ~isa(P, 'Polyhedron')
+if isempty(P)
+    return
+elseif ~isa(P, 'Polyhedron')
 	error('The input must be a polyhedron.');
 elseif numel(P)~=1
 	error('The input must be a single polyhedron.');

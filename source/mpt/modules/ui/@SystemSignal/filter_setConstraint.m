@@ -3,7 +3,7 @@ function filter = filter_setConstraint(obj)
 
 % set up the filter
 filter = FilterSetup;
-filter.addField('value', Polyhedron, @validate_polyhedron);
+filter.addField('value', [], @validate_polyhedron);
 
 % the filter impacts the following calls:
 filter.callback('constraints') = @on_constraints;
@@ -35,7 +35,9 @@ end
 function obj = on_set(obj, P)
 % called before the set is changed
 
-if ~isa(P, 'Polyhedron')
+if isempty(P)
+    return
+elseif ~isa(P, 'Polyhedron')
 	error('The input must be a polyhedron.');
 elseif numel(P)~=1
 	error('The input must be a single polyhedron.');
