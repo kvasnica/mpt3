@@ -68,6 +68,8 @@ end
 
 %% export headers
 [f_path, f_name, f_ext] = fileparts(filename);
+% replace invalid characters by an underscore
+f_name = regexprep(f_name, '[^a-zA-Z0-9_]', '_');
 if isempty(f_path)
 	full_path = [f_name '.m'];
 else
