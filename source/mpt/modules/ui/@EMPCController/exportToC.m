@@ -70,6 +70,8 @@ else
     if numel(fname)<=3
         error('The name of the file must have more than 3 characters.');
     end
+    % get the short name if the full path is provided
+    [~,fname] = fileparts(fname);   
     if ~isempty(regexp(fname,'\W', 'once'))
         error('The file name must contain only alphanumerical characters including underscore "_".');
     end    
@@ -81,8 +83,9 @@ else
     if isempty(dirname)
         dirname = 'mpt_explicit_controller';
     end
-    if ~isempty(regexp(dirname,'\W', 'once'))
-        error('The file name must contain only alphanumerical characters including underscore "_".');
+    dirname = strtrim(dirname);
+    if numel(dirname)<1
+        error('The name of the directory must have at least 1 character.');
     end
 end
 

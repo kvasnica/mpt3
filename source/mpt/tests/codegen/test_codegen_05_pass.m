@@ -54,7 +54,7 @@ cd(p);
 
 % delete the created directory
 onCleanup(@()clear('functions'));
-onCleanup(@()rmdir(dir_name,'s'));
+onCleanup(@()rmdir('rtw_explicitMPCtracking','s'));
 
 % compare the results
 for i=1:size(x,1)

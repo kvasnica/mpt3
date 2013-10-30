@@ -139,13 +139,11 @@ classdef BinTreePolyUnion < PolyUnion
                 if isempty(file_name)
                     file_name = 'mpt_getInput';
                 end
-                file_name = strtrim(file_name);
-                strg = sprintf('[^a-zA-Z0-9_%s]',filesep);
-                if ~isempty(regexp(file_name,strg, 'once'))
-                    error('The file name must contain only alphanumerical characters including underscore "_" and directory separator "%s".',filesep);
-                end
-                % short name to point to a function
+                % get the short name if the full path is provided
                 [~,short_name] = fileparts(file_name);
+                if ~isempty(regexp(short_name,'[^a-zA-Z0-9_]', 'once'))
+                    error('The file name must contain only alphanumerical characters including underscore "_".');
+                end
             end
             
 			% is the request function present?
