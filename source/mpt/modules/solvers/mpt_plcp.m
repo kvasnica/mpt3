@@ -2167,9 +2167,14 @@ for i=1:length(regions)
                         % distance of the point xP to the polytope Q
                         dtQ = zeros(size(Q.H,1),1);
                         for jj=1:size(Q.H,1)
-                            % compute the distance to each facet
-                            dtQ(jj) = -Q.H(jj,:)*[xP;-1]/norm(Q.H(jj,:),2);                            
-                        end
+                            % compute the distance to center of each facet of Q
+                            facetQ = Q.getFacet(jj);
+                            xQ = facetQ.chebyCenter.x;
+                            if isempty(xQ),
+                                xQ = NaN;
+                            end
+                            dtQ(jj) = norm(xP-xQ);
+                        end                        
                         [mindtQ,iQ] = min(dtQ);
                     end
                 end
