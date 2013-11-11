@@ -49,7 +49,13 @@ classdef MLDSystem < AbstractSystem
             if isstruct(source)
                 % import from MLD structure
                 S = source;
-			elseif ischar(source)
+                if isfield(S, 'MLDisvalid') && isfield(S, 'InputName')
+                    % this is a HYSDEL3 structure, convert to HYSDEL2
+                    % format
+                    S = obj.h3toh2(S);
+                end
+
+            elseif ischar(source)
                 % compile using HYSDEL
 				S = obj.compile_hysdel(source, parameters);
 			end
@@ -329,6 +335,77 @@ classdef MLDSystem < AbstractSystem
             
             % sort the symtable
             S = MLDSystem.sort_symtable(S);
+        end
+        
+        function MLDold = h3toh2(MLD)
+            % HYSDEL3-to-HYSDEL2 conversion of the MLD structure
+            
+            % reorder variables such that real components are in frton
+            % of binaries
+            xo = [MLD.j.xr(:); MLD.j.xb];
+            uo = [MLD.j.ur(:); MLD.j.ub];
+            yo = [MLD.j.yr(:); MLD.j.yb];
+            
+            % state-update equation
+            MLDold.A = MLD.A(xo, xo);
+            MLDold.B1 = MLD.Bu(xo, uo);
+            MLDold.B2 = MLD.Baux(xo, MLD.j.d);
+            MLDold.B3 = MLD.Baux(xo, MLD.j.z);
+            MLDold.B5 = MLD.Baff(xo);
+            
+            % output equation
+            MLDold.C = MLD.C(yo, xo);
+            MLDold.D1 = MLD.Du(yo, uo);
+            MLDold.D2 = MLD.Daux(yo, MLD.j.d);
+            MLDold.D3 = MLD.Daux(yo, MLD.j.z);
+            MLDold.D5 = MLD.Daff(yo);
+            
+            % inequalities
+            MLDold.E1 = -MLD.Eu(MLD.j.ineq, uo);
+            MLDold.E2 = MLD.Eaux(MLD.j.ineq, MLD.j.d);
+            MLDold.E3 = MLD.Eaux(MLD.j.ineq, MLD.j.z);
+            MLDold.E4 = -MLD.Ex(MLD.j.ineq, xo);
+            MLDold.E5 = MLD.Eaff(MLD.j.ineq);
+            
+            % add equalities as double-sided inequalities
+            MLDold.E1 = [MLDold.E1; ...
+                -MLD.Eu(MLD.j.eq, uo); MLD.Eu(MLD.j.eq, uo)];
+            MLDold.E2 = [MLDold.E2; ...
+                MLD.Eaux(MLD.j.eq, MLD.j.d); -MLD.Eaux(MLD.j.eq, MLD.j.d)];
+            MLDold.E3 = [MLDold.E3; ...
+                MLD.Eaux(MLD.j.eq, MLD.j.z); -MLD.Eaux(MLD.j.eq, MLD.j.z)];
+            MLDold.E4 = [MLDold.E4; ...
+                -MLD.Ex(MLD.j.eq, xo); MLD.Ex(MLD.j.eq, xo)];
+            MLDold.E5 = [MLDold.E5; ...
+                MLD.Eaff(MLD.j.eq); -MLD.Eaff(MLD.j.eq)];
+            
+            % dimensions
+            MLDold.nx = MLD.nx;
+            MLDold.nxr = length(MLD.j.xr);
+            MLDold.nxb = length(MLD.j.xb);
+            MLDold.nu = MLD.nu;
+            MLDold.nur = length(MLD.j.ur);
+            MLDold.nub = length(MLD.j.ub);
+            MLDold.ny = MLD.ny;
+            MLDold.nyr = length(MLD.j.yr);
+            MLDold.nyb = length(MLD.j.yb);
+            MLDold.nd = length(MLD.j.d);
+            MLDold.nz = length(MLD.j.z);
+            MLDold.ne = size(MLDold.E5, 1);
+            
+            % upper/lower bounds
+            MLDold.xl = MLD.xl(xo);
+            MLDold.xu = MLD.xu(xo);
+            MLDold.ul = MLD.ul(uo);
+            MLDold.uu = MLD.uu(uo);
+            MLDold.yl = MLD.yl(yo);
+            MLDold.yu = MLD.yu(yo);
+            MLDold.dl = MLD.wl(MLD.j.d);
+            MLDold.du = MLD.wu(MLD.j.d);
+            MLDold.zl = MLD.wl(MLD.j.z);
+            MLDold.zu = MLD.wu(MLD.j.z);
+            MLDold.symtable = [];
+            MLDold.MLDisvalid = 1;
         end
     end
 
