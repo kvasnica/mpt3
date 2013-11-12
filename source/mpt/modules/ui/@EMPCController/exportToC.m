@@ -6,7 +6,7 @@ function exportToC(obj, fname, dirname)
 % ---------------------------------------------------------------------------
 % DESCRIPTION
 % ---------------------------------------------------------------------------
-% The routine creates two C-files for evaluation of the piecewise affine 
+% The routine creates C-files for evaluation of the piecewise affine 
 % control law. The first file constains a pure C script for evaluation of the
 % explicit solution which can be ported to various platforms.
 % The second file is an S-function implementation for verification of the
@@ -107,8 +107,25 @@ end
 % create the file name with the path but without extension
 fullfilename = [dirname, filesep, fname];
 
-% call toC method of PolyUnion
-obj.optimizer.toC('primal',fullfilename);
+% call toC method of PolyUnion/BinTreePolyUnion
+if isa(obj.optimizer,'BinTreePolyUnion')
+    % no tie-breaking function for search tree
+    obj.optimizer.toC('primal',fullfilename);
+else
+    % for all other cases use objective function as tie-breaking function
+    obj.optimizer.toC('primal',fullfilename,'obj');
+end
+precision = MPTOPTIONS.modules.geometry.unions.(class(obj.optimizer)).toC.precision;
+precision = strtrim(lower(precision));
+if isempty(precision)
+    precision = 'double';
+elseif ~isequal(precision,'single') && ~isequal(precision,'double')
+    error('The specified precision in the option can be either "single" or "double".');
+end
+if isequal(precision,'single')
+    precision = 'float';
+end
+
 
 % sample time
 Ts = obj.model.Ts;
@@ -153,6 +170,8 @@ part1={''
 for i=1:numel(part1)
     fprintf(f2,[part1{i},'\n']);
 end
+
+fprintf(f2,'/* Generated on %s by MPT %s */ \n\n',datestr(now), MPTOPTIONS.version);
 
 % write the name of the file to include
 fprintf(f2,'#define S_FUNCTION_NAME  %s_sfunc   /*Name of the S-function file*/\n',fname);
@@ -219,7 +238,8 @@ part2 = {''
 '{'
 '    real_T            	*u   = ssGetOutputPortRealSignal(S,0);'
 '    InputRealPtrsType    Xin   = ssGetInputPortRealSignalPtrs(S,0);'
-'    static float region, U[MPT_RANGE], X[MPT_DOMAIN];'
+sprintf('    static %s U[MPT_RANGE], X[MPT_DOMAIN];',precision)
+'    unsigned long int region;'
 '    int i;'
 ''
 '    /* prepare the input signal for passing to mpt_getInput function */'

@@ -130,46 +130,78 @@ classdef BinTreePolyUnion < PolyUnion
 			
 			global MPTOPTIONS
 			
-			error(nargchk(3, 3, nargin));
-			error(obj.rejectArray());
-
-            if nargin<2,
+			error(nargchk(2, 3, nargin));
+            error(obj.rejectArray());
+            
+            if ~ischar(function_name)
+                error('The function name must be given as a string.');
+            end
+            if nargin<3,
                 file_name = 'mpt_getInput';
             else
                 if isempty(file_name)
                     file_name = 'mpt_getInput';
                 end
-                % get the short name if the full path is provided
-                [~,short_name] = fileparts(file_name);
-                if ~isempty(regexp(short_name,'[^a-zA-Z0-9_]', 'once'))
-                    error('The file name must contain only alphanumerical characters including underscore "_".');
+                if ~ischar(file_name)
+                    error('The file name must be given as a string.');
                 end
+            end
+            
+            % get the short name if the full path is provided
+            [path_to_file,short_name] = fileparts(file_name);
+            if ~isempty(regexp(short_name,'[^a-zA-Z0-9_]', 'once'))
+                error('The file name must contain only alphanumerical characters including underscore "_".');
+            end
+            % correct the file name with the proper extenstion ".c"
+            if isempty(path_to_file)
+                file_name = [short_name,'.c'];
+                mex_name = [short_name,'_mex.c'];
+            else
+                file_name = [path_to_file, filesep, short_name,'.c'];
+                mex_name = [path_to_file, filesep, short_name,'_mex.c'];
             end
             
 			% is the request function present?
 			if ~obj.hasFunction(function_name)
 				error('No such function "%s" in the object.', function_name);
 			end
-			% we only support affine functions for now
-			if ~isa(obj.Set(1).Functions(function_name), 'AffFunction')
-				error('Only affine functions are supported in this version.');
-			end
+			% support only for PWA/PWQ functions
+            if ~(isa(obj.Set(1).Functions(function_name), 'AffFunction') || ...
+                    isa(obj.Set(1).Functions(function_name), 'QuadFunction') )
+                error('Only quadratic and affine functions are supported.');
+            end
+            isquadratic = isa(obj.Set(1).Functions(function_name), 'QuadFunction');
 			
+            % single or double precision to export?
+            precision = MPTOPTIONS.modules.geometry.unions.BinTreePolyUnion.toC.precision;
+            precision = strtrim(lower(precision));
+            if isempty(precision)
+                precision = 'double';
+            elseif ~isequal(precision,'single') && ~isequal(precision,'double')
+                error('The specified precision in the option can be either "single" or "double".');
+            end
+            if isequal(precision,'single')
+                precision = 'float';
+            end
+            
 			fun = obj.Set(1).Functions(function_name);
 
-            % write to a file
-            outfid = fopen([file_name,'.c'], 'w');
+            %% write to a file
+            outfid = fopen(file_name, 'w');
             if outfid < 0,
-                error('Cannot open file "%s" for writing!', [file_name,'.c']);
+                error('Cannot open file "%s" for writing!', file_name);
             end
             
 			fprintf(outfid,'/*  Identifies a control law associated to a given state X using a binary search tree.\n\n');
-            fprintf(outfid,'  Usage:\n   region = %s(*X, *U)\n\n',short_name);
+            fprintf(outfid,'  Usage:\n  long region = %s( %s *X, %s *U)\n\n',short_name, precision, precision);
                 
             % header    
             header={''
-                '    if "region" is smaller 1 (region < 1), there is no control law associated to'
-                '    a given state.'
+                '   where X is a vector of dimension MPT_DOMAIN and U is a vector of dimension '
+                '   MPT_RANGE for PWA functions. The output variable "region" indicates index of'
+                '   a region where the point X is located. If "region" index is smaller than 1 '
+                '   (region < 1), there is no control law associated to a given state.'
+                ''
                 ''
                 '   Please note that all code in this file is provided under the terms of the'
                 '   GNU General Public License, which implies that if you include it directly'
@@ -177,23 +209,25 @@ classdef BinTreePolyUnion < PolyUnion
                 '   If you feel this is not a good solution for you or your company, feel free '
                 '   to contact me at michal.kvasnica@stuba.sk, I can re-license this specific '
                 '   piece of code to you free of charge.'
-                '*/'
                 ''
-                '/* Copyright (C) 2006-2013 by Michal Kvasnica (michal.kvasnica@stuba.sk) */'
                 ''
-                '/*  This program is free software; you can redistribute it and/or modify'
-                '    it under the terms of the GNU General Public License as published by'
-                '    the Free Software Foundation; either version 2 of the License, or'
-                '    (at your option) any later version.'
+                '   Copyright (C) 2006-2013 by Michal Kvasnica (michal.kvasnica@stuba.sk) '
+                '   Revised in 2013 by Martin Herceg, (herceg@control.ee.ethz.ch)'
                 ''
-                '    This program is distributed in the hope that it will be useful,'
-                '    but WITHOUT ANY WARRANTY; without even the implied warranty of'
-                '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
-                '    GNU General Public License for more details.'
                 ''
-                '    You should have received a copy of the GNU General Public License'
-                '    along with this program; if not, write to the Free Software'
-                '    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
+                '  This program is free software; you can redistribute it and/or modify'
+                '  it under the terms of the GNU General Public License as published by'
+                '  the Free Software Foundation; either version 2 of the License, or'
+                '  (at your option) any later version.'
+                ''
+                '  This program is distributed in the hope that it will be useful,'
+                '  but WITHOUT ANY WARRANTY; without even the implied warranty of'
+                '  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
+                '  GNU General Public License for more details.'
+                ''
+                '  You should have received a copy of the GNU General Public License'
+                '  along with this program; if not, write to the Free Software'
+                '  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
                 '*/ '
                 ''};
 
@@ -205,12 +239,20 @@ classdef BinTreePolyUnion < PolyUnion
 		
 			% data of the search tree
 			ST = obj.Tree'; ST = ST(:);
-            out = char(sprintf('#define MPT_RANGE %d', fun.R));
+            if isquadratic
+                out = ''; 
+            else
+                out = char(sprintf('#define MPT_RANGE %d', fun.R));
+            end
 			out = char(out, sprintf('#define MPT_DOMAIN %d', fun.D));
-			out = char(out, 'static float MPT_ST[] = {');
+			out = char(out, sprintf('static %s MPT_ST[] = {', precision));
 			temp = '';
 			for i = 1:length(ST),
-				temp = [temp sprintf('%e,\t', ST(i))];
+                if isequal(precision,'float')
+                    temp = [temp sprintf('%.7e,\t', ST(i))];
+                else
+                    temp = [temp sprintf('%.14e,\t', ST(i))];
+                end
 				if mod(i, 5)==0 || i==length(ST),
 					out = char(out, temp);
 					temp = '';
@@ -219,16 +261,41 @@ classdef BinTreePolyUnion < PolyUnion
 			out = char(out, '};');
 			
 			% data of the function
-			
+
+            % quadratic term
+            if isquadratic
+                out = char(out, sprintf('static %s MPT_H[] = {', precision));
+                for i = 1:obj.Num
+                    H = obj.Set(i).Functions(function_name).H;
+                    for j = 1:fun.D
+                        h = H(j, :);
+                        temp = '';
+                        for k = 1:length(h),
+                            if isequal(precision,'float')
+                                temp = [temp sprintf('%.7e,\t', h(k))];
+                            else
+                                temp = [temp sprintf('%.14e,\t', h(k))];
+                            end
+                        end
+                        out = char(out, temp);
+                    end
+                end
+                out = char(out, '};');
+            end
+            
 			% linear term
-			out = char(out, 'static float MPT_F[] = {');
+			out = char(out, sprintf('static %s MPT_F[] = {', precision));
 			for i = 1:obj.Num
 				F = obj.Set(i).Functions(function_name).F;
 				for j = 1:fun.R
 					f = F(j, :);
 					temp = '';
 					for k = 1:length(f),
-						temp = [temp sprintf('%e,\t', f(k))];
+                        if isequal(precision,'float')
+                            temp = [temp sprintf('%.7e,\t', f(k))];
+                        else
+                            temp = [temp sprintf('%.14e,\t', f(k))];
+                        end
 					end
 					out = char(out, temp);
 				end
@@ -236,15 +303,19 @@ classdef BinTreePolyUnion < PolyUnion
 			out = char(out, '};');
 			
 			% constant term
-			out = char(out, 'static float MPT_G[] = {');
+			out = char(out, sprintf('static %s MPT_G[] = {', precision));
 			for i = 1:obj.Num,
 				g = obj.Set(i).Functions(function_name).g;
 				for j = 1:fun.R,
 					f = g(j, :);
-					temp = '';
-					for k = 1:length(f),
-						temp = [temp sprintf('%e,\t', f(k))];
-					end
+                    temp = '';
+                    for k = 1:length(f),
+                        if isequal(precision,'float')
+                            temp = [temp sprintf('%.7e,\t', f(k))];
+                        else
+                            temp = [temp sprintf('%.14e,\t', f(k))];
+                        end
+                    end
 					out = char(out, temp);
 				end
 			end
@@ -260,25 +331,37 @@ classdef BinTreePolyUnion < PolyUnion
             fprintf(outfid, out_nl);
 
             % write the function for evaluation of the binary tree
-            fprintf(outfid,'static float %s(const float *X, float *U)\n',short_name);
+            fprintf(outfid,'static long %s(const %s *X, %s *U)\n', short_name, precision, precision);
             
-            footer ={''
+            footer = {''
                 '{'
-                '    int ix, iu;'
                 '    long node = 1, row;'
-                '    float hx, k;'
-                ''
-                '    /* initialize U to zero*/'
-                '    for (iu=0; iu<MPT_RANGE; iu++) {'
-                '        U[iu] = 0;'
-                '    }'
-                ''
+                };
+            if isquadratic
+                footer = [footer; {
+                    '    int ix, jx;'
+                    sprintf('    %s hx, sx, k;',precision)
+                    ''
+                    }];                
+            else
+                footer = [footer; {
+                    '    int ix, iu;'
+                    sprintf('    %s hx, k;',precision)
+                    ''
+                    '    /* initialize U to zero*/'
+                    '    for (iu=0; iu<MPT_RANGE; iu++) {'
+                    '        U[iu] = 0;'
+                    '    }'
+                    ''
+                    }];
+            end
+            footer = [footer; {
                 '    /* find region which contains the state x0 */'
                 '    while (node > 0) {'
                 '        hx = 0;'
                 '        row = (node-1)*(MPT_DOMAIN+3);'
                 '        for (ix=0; ix<MPT_DOMAIN; ix++) {'
-                '            hx = hx + MPT_ST[row+ix]*X[ix];'
+                '            hx += MPT_ST[row+ix]*X[ix];'
                 '        }'
                 '        k = MPT_ST[row+MPT_DOMAIN];'
                 ''
@@ -293,17 +376,39 @@ classdef BinTreePolyUnion < PolyUnion
                 ''
                 '    node = -node;'
                 ''
-                '    /* compute control action associated to state x0 */'
-                '    for (iu=0; iu<MPT_RANGE; iu++) {'
-                '        for (ix=0; ix<MPT_DOMAIN; ix++) {'
-                '            U[iu] = U[iu] + MPT_F[(node-1)*MPT_DOMAIN*MPT_RANGE + iu*MPT_DOMAIN + ix]*X[ix];'
-                '        }'
-                '        U[iu] = U[iu] + MPT_G[(node-1)*MPT_RANGE + iu];'
-                '    }'
+                }];
+            if isquadratic
+                footer = [footer; {
+                    '    /* compute control action associated to state x0 */'
+                    '    U[0] = 0;'
+                    '    for (ix=0; ix<MPT_DOMAIN; ix++) {'
+                    '        sx = 0;'
+                    '        for (jx=0; jx<MPT_DOMAIN; jx++) {'
+                    '             sx += MPT_H[(node-1)*MPT_DOMAIN*MPT_DOMAIN + ix*MPT_DOMAIN + jx]*X[jx];'
+                    '        }'
+                    '        U[0] += sx*X[ix];'
+                    '    }'
+                    '    for (ix=0; ix<MPT_DOMAIN; ix++) {'
+                    '        U[0] += MPT_F[(node-1)*MPT_DOMAIN + ix]*X[ix];'
+                    '    }'
+                    '    U[0] += MPT_G[node-1];'                    
+                }];
+            else
+                footer = [footer; {
+                    '    /* compute control action associated to state x0 */'
+                    '    for (iu=0; iu<MPT_RANGE; iu++) {'
+                    '        for (ix=0; ix<MPT_DOMAIN; ix++) {'
+                    '            U[iu] += MPT_F[(node-1)*MPT_DOMAIN*MPT_RANGE + iu*MPT_DOMAIN + ix]*X[ix];'
+                    '        }'
+                    '        U[iu] += MPT_G[(node-1)*MPT_RANGE + iu];'
+                    '    }'
+                    }];
+            end
+            footer = [footer; {
                 ''
                 '    return node;'
                 '}'
-                };
+                }];
             
             % write the footer
             for i=1:numel(footer)
@@ -311,7 +416,160 @@ classdef BinTreePolyUnion < PolyUnion
             end
 
 			fclose(outfid);
-			fprintf('Output written to "%s".\n', [file_name,'.c']);
+            fprintf('Output written to "%s".\n', file_name);
+            
+            %% write mpt_getInput_mex.c
+            
+            fdn = fopen(mex_name, 'w');
+            if fdn<0,
+                error('Cannot open file "%s" for writing!',mex_name);
+            end
+            
+            % write the mex-file for evaluation under Matlab
+            cmex={''
+                '/*'
+                '  Autogenerated C-mex file for evalution of explicit controllers.'
+                ''
+                '  This file is to be compiled under Matlab using the syntax'
+                ''
+                sprintf('   mex -largeArrayDims %s.c',[short_name,'_mex'])
+                ''
+                '  Usage in Matlab:'
+                ''
+                sprintf('   u = %s(x)', [short_name,'_mex'])
+                ''
+                '  where x is the vector of double for which to evaluate PWA/PWQ function.'
+                ''
+                ''
+                '  Copyright 2013 by Martin Herceg, Automatic Control Laboratory,'
+                '  ETH Zurich, herceg@control.ee.ethz.ch'
+                ''
+                ''
+                '  This program is free software; you can redistribute it and/or modify'
+                '  it under the terms of the GNU General Public License as published by'
+                '  the Free Software Foundation; either version 2 of the License, or'
+                '  (at your option) any later version.'
+                ''
+                '  This program is distributed in the hope that it will be useful,'
+                '  but WITHOUT ANY WARRANTY; without even the implied warranty of'
+                '  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the'
+                '  GNU General Public License for more details.'
+                ''
+                '  You should have received a copy of the GNU General Public License'
+                '  along with this program; if not, write to the Free Software'
+                '  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.'
+                '*/ '
+                ''
+                ''
+                sprintf('/* Generated on %s by MPT %s */ \n\n',datestr(now), MPTOPTIONS.version)
+                ''
+                ''
+                '#include <math.h>'
+                '#include "mex.h"'
+                sprintf('#include "%s.c"',short_name)
+                ''
+                '#ifndef MPT_RANGE'
+                '#define MPT_RANGE 1'
+                '#endif'
+                ''
+                ''
+                'void mexFunction( int nlhs, mxArray *plhs[], '
+                '		  int nrhs, const mxArray*prhs[] )'
+                ''
+                '{ '
+                '    int j;'
+                '    double *xin, *uout;'
+                '    char msg[70];'
+                '    long region;'
+                ''
+                '    mwSize M,N,D; '
+                };
+            if isequal(precision,'float')
+                cmex = [cmex; '    float x[MPT_DOMAIN], u[MPT_RANGE];'];
+            end
+            cmex = [cmex; {
+                ''
+                '    /* Check for proper number of arguments */'
+                ''
+                '    if (nrhs != 1) { '
+                '	    mexErrMsgTxt("One input arguments required."); '
+                '    } else if (nlhs > 1) {'
+                '	    mexErrMsgTxt("Too many output arguments."); '
+                '    } '
+                '    if (mxIsEmpty(prhs[0]))'
+                '        mexErrMsgTxt("The argument must not be empty.");'
+                '	if ( !mxIsDouble(prhs[0]) || mxIsComplex(prhs[0]) )'
+                '        mexErrMsgTxt("The argument must be real and of type DOUBLE.");'
+                '    if ( mxGetNumberOfDimensions(prhs[0])!=2 )'
+                '		mexErrMsgTxt("The argument must be a vector"); '
+                ''
+                '    M = mxGetM(prhs[0]);'
+                '    N = mxGetN(prhs[0]);'
+                '    if ( (M!=1) && (N!=1) )'
+                '		mexErrMsgTxt("The argument must be a vector.");'
+                ''
+                '    /* dimension */'
+                '    D = mxGetNumberOfElements(prhs[0]);'
+                '    if (D!=MPT_DOMAIN) {'
+                '        sprintf(msg, "The size of the input argument must be %%d x 1.",MPT_DOMAIN);'
+                '        mexErrMsgTxt(msg);'
+                '    }'
+                ''
+                '    /* get and verify input data */'
+                '    xin = mxGetPr(prhs[0]);   '
+                '    for (j=0; j<D; j++) {'
+                '        if ( mxIsNaN(xin[j]) || mxIsInf(xin[j]) )'
+                '            mexErrMsgTxt("No ''NaN'' or ''Inf'' terms are allowed.");'
+                '    }'
+                ''
+                '    /* create a matrix for the output */ '
+                '    plhs[0] = mxCreateDoubleMatrix( MPT_RANGE, 1, mxREAL);    '
+                '    uout = mxGetPr(plhs[0]);'
+                ''
+                }];
+            if isequal(precision,'float')
+                cmex = [cmex; {
+                    '    /* recast double as float */'
+                    '    for (j=0; j<MPT_DOMAIN; j++){'
+                    '        x[j] = (float)xin[j];'
+                    '    }'
+                    ''
+                    '    /* Do the evaluation in a subroutine */'
+                    sprintf('    region = %s(x, u);', short_name)
+                    ''
+                    }];
+            else
+                cmex = [cmex; {
+                    ''
+                    '    /* Do the evaluation in a subroutine */'
+                    sprintf('    region = %s(xin, uout);', short_name)
+                    ''
+                    }];
+            end
+            if isequal(precision,'float')
+                cmex = [cmex; {
+                    '    /* cast as double for output */'
+                    '    for (j=0; j<MPT_RANGE; j++){'
+                    '        uout[j] = (double)u[j];'
+                    '    }'
+                    ''}];
+            end
+            cmex = [cmex; {
+                ''
+                '    return;'
+                ''
+                '}'
+                }];
+            
+            % write the core
+            for i=1:numel(cmex)
+                fprintf(fdn,[cmex{i},'\n']);
+            end
+            
+            fclose(fdn);
+            fprintf('C-mex function written to "%s".\n', mex_name);
+            
+            
 		end
 		
 		function display(obj)

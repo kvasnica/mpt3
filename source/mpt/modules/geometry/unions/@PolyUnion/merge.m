@@ -161,7 +161,7 @@ global MPTOPTIONS
 if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
-Options.trials = MPTOPTIONS.modules.geometry.unions.polyunion.merge.trials;
+Options.trials = MPTOPTIONS.modules.geometry.unions.PolyUnion.merge.trials;
 
 % try to reduce the union first
 U.reduce;

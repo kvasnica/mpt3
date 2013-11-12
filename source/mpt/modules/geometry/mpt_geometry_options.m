@@ -10,7 +10,14 @@ S.sets.Polyhedron.projection.method = '';
 
 %% unions methods
 % how many trials to perform in greedy merging
-S.unions.polyunion.merge.trials = 1;
+S.unions.PolyUnion.merge.trials = 1;
+
+% double precision by default
+S.unions.PolyUnion.toC.precision = 'double';
+
+% rounding option
 S.unions.BinTreePolyUnion.round_places = 12;
+% double precision by default
+S.unions.BinTreePolyUnion.toC.precision = 'double';
 
 end
