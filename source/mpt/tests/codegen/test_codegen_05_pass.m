@@ -53,8 +53,7 @@ sim('test_codegen_sim_05')
 cd(p);
 
 % delete the created directory
-onCleanup(@()clear('functions'));
-onCleanup(@()rmdir('rtw_explicitMPCtracking','s'));
+onCleanup(@cleanfiles);
 
 % compare the results
 for i=1:size(x,1)
@@ -63,5 +62,12 @@ for i=1:size(x,1)
     end
 end
 
+
+end
+
+function cleanfiles
+
+clear('functions');
+rmdir('rtw_explicitMPCtracking','s');
 
 end

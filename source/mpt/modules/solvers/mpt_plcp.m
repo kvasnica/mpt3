@@ -552,7 +552,7 @@ layer_list(end) = [];
 adj_list = verify_graph(regions,adj_list);
 
 % compute set of feasible parameters
-hull = feasible_set(regions, adj_list, layer_list);
+hull = feasible_set(regions, adj_list, opt);
 if hull.isEmptySet && any(~regions.isEmptySet)
 	% sanity check: feasible set is empty, but regions are not
 	fprintf('Feasible set is wrong, please report to mpt@control.ee.ethz.ch\n');
@@ -2167,9 +2167,14 @@ for i=1:length(regions)
                         % distance of the point xP to the polytope Q
                         dtQ = zeros(size(Q.H,1),1);
                         for jj=1:size(Q.H,1)
-                            % compute the distance to each facet
-                            dtQ(jj) = -Q.H(jj,:)*[xP;-1]/norm(Q.H(jj,:),2);                            
-                        end
+                            % compute the distance to center of each facet of Q
+                            facetQ = Q.getFacet(jj);
+                            xQ = facetQ.chebyCenter.x;
+                            if isempty(xQ),
+                                xQ = NaN;
+                            end
+                            dtQ(jj) = norm(xP-xQ);
+                        end                        
                         [mindtQ,iQ] = min(dtQ);
                     end
                 end
@@ -2197,8 +2202,12 @@ end
 
 end
 
-function hull = feasible_set(regions, adj, layers)
+function F=feasible_set(regions, adj, problem)
+%
+% construct feasible set from the optimizer using the adjacency list
+%
 
+% global options
 global MPTOPTIONS
 
 H = [];
@@ -2211,37 +2220,54 @@ for i = 1:length(adj)
 		H = [H; regions(i).H(boundary_idx, :)];
 	end
 
-% % more numerical robustness, but does not help in test_plcp_13_pass	
-% 	boundary_idx = boundary_idx(:)'; % we need it as a row vector
-% 	for j = boundary_idx
-% 		g = regions(i).H(j, :);
-% 		ng = norm(g(1:end-1));
-% 		if ng >= MPTOPTIONS.abs_tol
-% 			% double-check that there are no other regions on the other
-% 			% side
-% 			xc = regions(i).chebyCenter(j);
-% 			if xc.exitflag == MPTOPTIONS.OK
-% 				% gradually increase size of the step over face
-% 				for e = 0:4
-% 					th = xc.x + (10^e)/ng*g(1:end-1)'*MPTOPTIONS.region_tol;
-% 					% find the neighbor via sequential search
-% 					isin = regions.isInside(th,struct('fastbreak',1));
-% 					if isin
-% 						break
-% 					end
-% 				end
-% 				if ~isin
-% 					% no other region on the other side, add the face to
-% 					% the feasible set
-% 					H = [H; g];
-% 				else
-% 					g;
-% 				end
-% 			end
-% 		end
-% 	end
 end
-hull = Polyhedron(H(:, 1:end-1), H(:, end));
+
+F = Polyhedron(H(:, 1:end-1), H(:, end));
+
+if isEmptySet(F)
+    warning('mpt_plcp:adjacencyList','Numerical problems in verifying the adjacency list. The adjacency list may be wrong. Trying a failback method. This could take a while.');
+    % The feasible set is wrong. Terminate this approach and try
+    % more robust way of detecting the feasible set.
+    
+    % fallback scenario
+    H = [];
+    for i = 1:length(adj)
+        % faces over which there is no neighbor => faces of the feasible set
+        boundary_idx = find(cellfun('isempty', adj{i}));
+        
+        if ~isempty(boundary_idx)
+            for j=1:numel(boundary_idx)
+                % boundary facet
+                bfacet = regions(i).getFacet(boundary_idx(j));
+                xF = bfacet.chebyCenter.x;
+                if ~isempty(xF)
+                    % check that a point beyond the boundary gives infeasible PLCP
+                    xplus = xF + bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
+                    [~,~,~,exitflag]=lcp(problem.M,problem.q+problem.Q*xplus);
+                    if exitflag~=MPTOPTIONS.OK
+                        % check that a point inside is contained in the
+                        % same region (to make sure that this is actually
+                        % the facet of this region)
+                        xminus = xF - bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
+                        if regions(i).contains(xminus)
+                            H = [H; regions(i).H(boundary_idx(j),:)];
+                            P = Polyhedron('H',H);
+                            if isEmptySet(P)
+                                % The feasible set is wrong. Show the
+                                % warning and quit
+                                warning('mpt_plcp:feasibleSet','Numerical problems in computing the feasible set. Failback approach failed.');
+                                break;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+    end
+    F = Polyhedron(H(:, 1:end-1), H(:, end));
+    
+end
 
 end
 
