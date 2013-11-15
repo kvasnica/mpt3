@@ -24,7 +24,7 @@ for k=1:length(QPsolvers)
         S.solver = QPsolvers{k};
 
         % solve one problem N times to get averaged computational time
-        N=50;
+        N=21;
         Rm=cell(1,N);
         tm = zeros(1,N);
         for j=1:N
@@ -61,6 +61,6 @@ res.infeasible = infeasible(ind);
 
 disp('Time spent on solving MPC problems.');
 for i=1:length(total_time)
-   disp([res.solvers_list{i},' ',num2str(res.total_time(i)),'s (infeasible ',num2str(res.infeasible(i)),'-times)']); 
+   fprintf('%s %.4f (infeasible %d-times)\n',res.solvers_list{i}, res.total_time(i),res.infeasible(i)); 
 end
 
