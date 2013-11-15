@@ -9,31 +9,35 @@ global MPTOPTIONS
 
 % speed-hack
 if isstruct(Sin) && isfield(Sin, 'quicklp')
-	S = Sin;
-	[S.m, S.n] = size(Sin.A);
-	S.me = size(Sin.Ae, 1);
-	S.f = S.f(:);
-	S.solver = MPTOPTIONS.lpsolver;
-	S.problem_type = 'LP';
-	S.x0 = zeros(S.n,1);
-	S.test = false;
-	S.d = [];
-	S.c = 0;
-	R = sub_callsolver(S, MPTOPTIONS);
-	return
+    if Sin.quicklp
+        S = Sin;
+        [S.m, S.n] = size(Sin.A);
+        S.me = size(Sin.Ae, 1);
+        S.f = S.f(:);
+        S.solver = MPTOPTIONS.lpsolver;
+        S.problem_type = 'LP';
+        S.x0 = zeros(S.n,1);
+        S.test = false;
+        S.d = [];
+        S.c = 0;
+        R = sub_callsolver(S, MPTOPTIONS);
+        return
+    end
 elseif isstruct(Sin) && isfield(Sin, 'quickqp')
-	S = Sin;
-	[S.m, S.n] = size(Sin.A);
-	S.me = size(Sin.Ae, 1);
-	S.f = S.f(:);
-	S.solver = MPTOPTIONS.qpsolver;
-	S.problem_type = 'QP';
-	S.x0 = zeros(S.n,1);
-	S.test = false;
-	S.d = [];
-	S.c = 0;
-	R = sub_callsolver(S, MPTOPTIONS);
-	return
+    if Sin.quickqp
+        S = Sin;
+        [S.m, S.n] = size(Sin.A);
+        S.me = size(Sin.Ae, 1);
+        S.f = S.f(:);
+        S.solver = MPTOPTIONS.qpsolver;
+        S.problem_type = 'QP';
+        S.x0 = zeros(S.n,1);
+        S.test = false;
+        S.d = [];
+        S.c = 0;
+        R = sub_callsolver(S, MPTOPTIONS);
+        return
+    end
 end
 
 error(nargchk(1,2,nargin));
