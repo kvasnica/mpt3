@@ -126,8 +126,10 @@ classdef MLDSystem < AbstractSystem
             obj.addComponent('d', d);
 			obj.d.min = S.dl;
 			obj.d.max = S.du;
-			obj.d.with('binary');
-			obj.d.binary = true;
+            if obj.nd>0
+                obj.d.with('binary');
+                obj.d.binary = true;
+            end
 			
 			z = SystemSignal(obj.nz);
             z.name = 'z';
@@ -200,7 +202,7 @@ classdef MLDSystem < AbstractSystem
 			if size(obj.E1, 1)==0
 				% no constraints, compute 'xn' and 'y' directly
 				xn = obj.A*x0 + obj.B1*u + obj.B5;
-				y = obj.C*x0 + obj.C1*u + obj.D5;
+				y = obj.C*x0 + obj.D1*u + obj.D5;
 				d = zeros(obj.nd, 1);
 				z = zeros(obj.nz, 1);
 				feasible = true;
@@ -216,7 +218,7 @@ classdef MLDSystem < AbstractSystem
 					warning('MLD constraints lead to infeasible or unbounded solution.');
 				else
 					xn = obj.A*x0 + obj.B1*u + obj.B5;
-					y = obj.C*x0 + obj.C1*u + obj.D5;
+					y = obj.C*x0 + obj.D1*u + obj.D5;
 					feasible = true;
 				end
 				
