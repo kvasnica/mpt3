@@ -2158,24 +2158,27 @@ for i=1:length(regions)
                     dt = P.distance(Q);
                     ts = dt.dist<MPTOPTIONS.rel_tol;
                     if isempty(ts)
-                        ts = 0;
+                        ts = false;
                     end
                     if ts
                         % find the facet of Q that is the closest to P
                         facetP = P.getFacet(j);
                         xP = facetP.chebyCenter.x;
-                        % distance of the point xP to the polytope Q
-                        dtQ = zeros(size(Q.H,1),1);
-                        for jj=1:size(Q.H,1)
-                            % compute the distance to center of each facet of Q
-                            facetQ = Q.getFacet(jj);
-                            xQ = facetQ.chebyCenter.x;
-                            if isempty(xQ),
-                                xQ = NaN;
+                        if isempty(xP)
+                            ts = false;
+                        else
+                            % distance of the point xP to the polytope Q
+                            dtQ = Inf(size(Q.H,1),1);
+                            for jj=1:size(Q.H,1)
+                                % compute the distance to center of each facet of Q
+                                facetQ = Q.getFacet(jj);
+                                xQ = facetQ.chebyCenter.x;
+                                if ~isempty(xQ),
+                                    dtQ(jj) = norm(xP - xQ);
+                                end
                             end
-                            dtQ(jj) = norm(xP-xQ);
-                        end                        
-                        [mindtQ,iQ] = min(dtQ);
+                            [mindtQ,iQ] = min(dtQ);
+                        end
                     end
                 end
                 if ts
