@@ -577,7 +577,14 @@ classdef polytope
 			
 			PU = PolyUnion('Set', toPolyhedron(obj));
 			H = polytope(PU.convexHull);
-		end
+        end
+        
+        function E = envelope(obj)
+            % Convex envelope
+            
+            PU = PolyUnion(toPolyhedron(obj));
+            E = polytope(PU.envelope());
+        end
 	end
 	
 	methods(Static)
