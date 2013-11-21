@@ -58,7 +58,7 @@ for i=1:numel(dims)
 end
 % no dimensions or no projection, copy the polyhedron
 if isempty(dims) || isequal(dims, 1:P.Dim)
-	q = Polyhedron(P);
+	q = P.copy();
 	return;
 end
 if any(dims>P.Dim)
