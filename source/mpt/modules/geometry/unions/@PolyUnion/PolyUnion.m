@@ -252,8 +252,84 @@ classdef PolyUnion < Union
 		  % * Overlaps (if original didn't have them, neither will the
 		  % slice)
 		  % * Connected (if the original was, so will be the slice)
-	  end
-	  
+      end
+      
+      function E = envelope(obj)
+          % Computes the convex envelope of a polyunion
+          %
+          % Given are two polyhedra P={x | A*x<=b} and Q={x | H*x<=k }. If
+          % a facet of Q (and P) is not redundant for P (or Q), then it is
+          % not part of the envelope.
+          %
+          % Technically, the envelope is the H-polyhedron E={x | At*x<=bt,
+          % Ht*x<=kt} where At*x<=bt is the subsystem of A*x<=b obtained by
+          % removing all the inequalities not valid for the polyhedron Q;
+          % and Ht*x<=kt is defined similarly. 
+          %
+          % Limitations: supports only polyhedra in inequality
+          % H-representation.
+          %
+          % Syntax:
+          %   E = obj.envelope()
+          %
+          % Input:
+          %   obj: a single PolyUnion object with an arbitrary number of
+          %        polyhedra
+          %
+          % Output:
+          %     E: convex envelope as a Polyhedron object (can contain
+          %        redundant constraints. Use E.minHRep() to remove them)
+          
+          global MPTOPTIONS
+          
+          error(obj.rejectArray());
+          
+          % equality constraints not yet supported
+          ne = obj.Set.forEach(@(x) size(x.He, 1));
+          if nnz(ne)>0
+              error('Equality constraints are not supported.');
+          end
+
+          % all sets must be in the minimal H-rep
+          obj.Set.minHRep();
+
+          % inequality representation of the envelope
+          Ae = [];
+          be = [];
+          tic
+          for i = 1:obj.Num
+              if toc > MPTOPTIONS.report_period
+                  fprintf('progress: %d/%d\n', i, obj.Num);
+                  tic;
+              end
+              ni = length(obj.Set(i).b);
+              keep = true(1, ni);
+              for j = 1:obj.Num
+                  if i==j, continue, end
+                  for k = 1:ni
+                      if ~keep(k)
+                          % this constraint was already discarded
+                      end
+                      % flip the k-th constraint of the i-th region and
+                      % look whether we got a fully dimensional polyhedron
+                      H = [obj.Set(j).H; -obj.Set(i).H(k, :)];
+                      if fast_isFullDim(H)
+                          keep(k) = false;
+                      end
+                  end
+              end
+              keep_idx = find(keep);
+              Ae = [Ae; obj.Set(i).A(keep_idx, :)];
+              be = [be; obj.Set(i).b(keep_idx)];
+          end
+          
+          if isempty(Ae)
+              % the envelope is R^n
+              E = Polyhedron.fullSpace(obj.Dim);
+          else
+              E = Polyhedron(Ae, be);
+          end
+      end
   end  
 end
 
