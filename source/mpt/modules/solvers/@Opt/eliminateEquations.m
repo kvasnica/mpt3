@@ -222,6 +222,11 @@ if isempty(S.Ae)
     S.pE = zeros(S.me,S.d);
 end
 
+% type of variables must reflect the change in number of optimization
+% variables
+
+% TODO: support binary variables
+S.vartype = repmat('C', 1, S.n);
 
 % put Inf terms in lb/ub back
 % S.lb = -Inf(S.n,1);
