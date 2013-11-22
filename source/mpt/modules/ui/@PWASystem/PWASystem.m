@@ -538,6 +538,178 @@ classdef PWASystem < AbstractSystem
             
         end
 
+        function L = lyapunov(obj, ltype)
+            % Constructs a Lyapunov function for an autonomous PWA system
+            %
+            % Syntax
+            %   L = pwa.lyapunov(type)
+            %
+            % Inputs:
+            %   pwa: autonomous PWA system as an PWASystem object
+            %           x^+ = A_i*x+f_i IF x \in R_i
+            %  type: type of the Lyapunov function ('pwa' or 'pwq')
+            %
+            % Outputs:
+            %     L: PolyUnion object with the Lyapunov function
+            
+            error(obj.rejectArray());
+            error(nargchk(2, 2, nargin));
+            if obj.nu>0
+                error('This method only supports autonomous systems.');
+            end
+            
+            switch lower(ltype)
+                case 'pwa',
+                    laypfun = @PWALyapFunction;
+                case 'pwq'
+                    lyapfun = @PWQLyapFunction;
+                otherwise
+                    error('Unsupported function type "%s".', ltype);
+            end
+            
+            % check invariance and compute the transition map
+            [isinv, map] = obj.isInvariant();
+            if ~isinv
+                error('The system is not invariant.');
+            end
+            
+            % call the corresponding subfunction
+            [L, feasible] = feval(lyapfun, obj, map);
+            if ~feasible
+                error('Infeasible problem.');
+            end
+        end
+
     end
     
+    methods(Access=private, Hidden)
+        % internal APIs
+        
+        function [L, feasible] = PWQLyapFunction(obj, map)
+            % PWQ Lyapunov function construction for an autonomous PWA system
+            %
+            % The PWQ Lyapunov function is given by
+            %   L(x) = x'*Q_i*x + L_i*x + c_i IF x \in R_i
+            
+            global MPTOPTIONS
+            
+            error(obj.rejectArray());
+            if obj.nu>0
+                error('This method only supports autonomous systems.');
+            end
+            
+            % which regions contain the origin?
+            containsOrigin = obj.domain.contains(zeros(obj.nx, 1));
+            
+            % prepare variables for each transition
+            epsilon = MPTOPTIONS.rel_tol;
+            rho = sdpvar(1,1);
+            Q = cell(1, obj.ndyn);
+            L = cell(1, obj.ndyn);
+            c = cell(1, obj.ndyn);
+            for i = 1:obj.ndyn
+                Q{i} = sdpvar(obj.nx, obj.nx, 'symmetric');
+                L{i} = sdpvar(obj.nx, 1, 'full');
+                c{i} = sdpvar(1, 1);
+            end
+            
+            % formulate constraints
+            fprintf('Formulating constraints...\n');
+            constraints = [ rho <= -epsilon ];
+            tic
+            % enforce decay of the Lyapunov function over each transition
+            for i = 1:obj.ndyn
+                if toc > MPTOPTIONS.report_period
+                    fprintf('progress: %d/%d\n', i, obj.ndyn);
+                    tic;
+                end
+                
+                % enforce decrease
+                targets = find(map.transitions(i, :));
+                for j = targets
+                    % is this a purely quadratic transition?
+                    if containsOrigin(i) && containsOrigin(j)
+                        % quadratic transition
+                        W = obj.A{i}'*Q{j}*obj.A{i}-Q{i}-rho*eye(obj.nx);
+                        constraints = constraints + [ W <= 0 ];
+                    else
+                        % PWQ transition
+                        H = map.regions{i, j}.A;
+                        K = map.regions{i, j}.b;
+                        m = length(K);
+                        N = sdpvar(m, m, 'symmetric');
+                        constraints = constraints + [ N(:) >= 0 ];
+                        RHS = [-H K]'*N*[-H K];
+                        dQ = obj.A{i}'*Q{j}*obj.A{i} - Q{i};
+                        dL = 2*obj.A{i}'*Q{j}*obj.f{i} + obj.A{i}'*L{j} - L{i};
+                        dc = obj.f{i}'*Q{j}*obj.f{i} + c{j} + obj.f{i}'*L{j} - c{i};
+                        W = [dQ-rho*eye(obj.nx), 0.5*dL; 0.5*dL', dc]+RHS;
+                        constraints = constraints + [ W <= 0 ];
+                    end
+                end
+                
+                % enforce positivity
+                P = Q{i}-epsilon*eye(obj.nx);
+                if containsOrigin(i)
+                    % the function is purely quadratic in a region that
+                    % contains the origin
+                    constraints = constraints + [ P >= 0 ];
+                    constraints = constraints + [ L{i}==0; c{i}==0 ];
+                else
+                    % the function is positive everywhere else
+                    H = obj.domain(i).A;
+                    K = obj.domain(i).b;
+                    m = length(K);
+                    M = sdpvar(m, m, 'symmetric');
+                    constraints = constraints + [ M(:) >= 0 ];
+                    RHS = [-H K]'*M*[-H K];
+                    W = [P, 0.5*L{i}; 0.5*L{i}', c{i}]-RHS;
+                    constraints = constraints + [ W >= 0 ];
+                end
+            end
+            fprintf('...done\n');
+            
+            % solve the problem
+            fprintf('Solving...\n');
+            options = sdpsettings;
+            solution = solvesdp(constraints, [], options);
+            fprintf('...done\n');
+            
+            % check the solution
+            fprintf('\n');
+            feasible = true;
+            if(solution.problem==4)
+                res = checkset(constraints);
+                if min(res)>0,
+                    fprintf('Numerical problems, but solution is feasible\n');
+                else
+                    fprintf('Numerical problems, residual: %e (should be positive).\n', min(res));
+                end
+                
+            elseif(solution.problem>0)
+                feasible = false;
+                res = checkset(constraints);
+                fprintf('Infeasible problem, residual: %e (should be positive).\n', min(res));
+                L = PolyUnion;
+                return
+                
+            elseif(solution.problem<0)
+                error(solution.info);
+                
+            else
+                fprintf('Feasible solution found\n');
+            end
+            
+            % extract the solution
+            regions = obj.domain;
+            for i = 1:obj.ndyn
+                fun = QuadFunction(double(Q{i}), double(L{i})', double(c{i}));
+                regions(i).addFunction(fun, 'lyapunov');
+            end
+            L = PolyUnion(regions);
+            
+        end
+        
+    end
+
 end
