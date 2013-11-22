@@ -428,6 +428,60 @@ classdef PWASystem < AbstractSystem
                 C = C + [ sum(d(:, k)) == 1 ];
             end
         end
-        
+
+        function map = transitionMap(obj)
+            % Transition map for an autonomous PWA system
+            %
+            % Given a PWA system x^+ = A_i*x+f_i IF x \in R_i, this method
+            % computes the transition map M as an n-by-n logical matrix
+            % with M(i, j)=true iff \exists x \in \R_i such that
+            % x^+ \in \R_j. Also returns the subset of \R_i which enters
+            % \R_j.
+            %
+            % Limitation: only full-dimensional transitions are considered
+            %
+            % Syntax:
+            %
+            %   map = pwa.transitionMap()
+            %
+            % Input:
+            %   pwa: autonomous PWASystem object with
+            %           x^+ = A_i*x+f_i IF x \in R_i
+            %
+            % Output:
+            %   map.transition: n-by-n logical matrix with the i-j entry
+            %                   set to true iff there exists a transition
+            %                   from the i-th region to the j-th region
+            %      map.regions: n-by-n cell array of polyhedra with the i-j
+            %                   entry representing the subset of R_i which
+            %                   enters R_j
+
+            global MPTOPTIONS
+
+            error(obj.rejectArray());
+            if obj.nu>0
+                error('This method only supports autonomous systems.');
+            end
+
+            map.transitions = false(obj.ndyn, obj.ndyn);
+            map.regions = cell(obj.ndyn, obj.ndyn);
+            tic;
+            for i = 1:obj.ndyn
+                if toc > MPTOPTIONS.report_period
+                    fprintf('progress: %d/%d\n', i, obj.ndyn);
+                    tic;
+                end
+                for j = 1:obj.ndyn
+                    % Qij = { x \in Pi | Ai*x + fi \in Pj }
+                    Qij = obj.domain(j).invAffineMap(obj.A{i}, obj.f{i}).intersect(obj.domain(i));
+                    if Qij.isFullDim()
+                        map.transitions(i, j) = true;
+                        map.regions{i, j} = Qij;
+                    end
+                end
+            end
+        end
+
     end
+    
 end
