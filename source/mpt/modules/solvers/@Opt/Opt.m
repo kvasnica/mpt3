@@ -105,6 +105,116 @@ classdef Opt < handle & matlab.mixin.Copyable
                 error('Empty problems not supported.');
             end
         end
+        
+        function K = feasibleSet(obj, regions)
+            % Computes the feasible set of a given parametric problem
+            %
+            % For a parametric problem
+            %    min  J(z, x)
+            %    s.t. A*z <= b + pB*x
+            %         Ae*z = be + pE*x
+            % the feasible set K is the polyhedron
+            %   K = { x | \exists z s.t. A*z<=b+pB*x, Ae*z=be+pE*x }
+            %
+            % This method implements two procedures to compute K:
+            %   1) if K=prob.feasibleSet() is called, the feasible set is
+            %      calculated by projection (can be expensive)
+            %   2) if K=prob.feasibleSet(regions) is called with "regions"
+            %      being the critical regions of the parametric solution,
+            %      then K is constructed as follows:
+            %         For each facet of each region do:
+            %          a) compute the center of the facet
+            %          b) take a small step accross the facet
+            %          c) solve the problem for the new point
+            %          d) if the problem is infeasible, add the facet to
+            %             the feasible set 
+            %
+            % Syntax:
+            %   K = prob.feasibleSet()
+            %   K = prob.feasibleSet(regions)
+            %
+            % Inputs:
+            %      prob: parametric problem as an Opt object
+            %   regions: (optional) critical regions of the parametric
+            %            solution
+            %
+            % Output:
+            %         K: feasible set as a redundant H-polyhedron
+            
+            global MPTOPTIONS
+            
+            if ~obj.isParametric
+                error('The problem is not parametric.');
+            end
+            if nargin==1
+                % compute the feasible set via projection
+                
+                if obj.me>0
+                    % eliminate equalities, but do it on a copy of the object
+                    obj = obj.copy();
+                    obj.eliminateEquations();
+                end
+                
+                % construct the polyhedron { (x, z) | A*x<=b+pB*x }
+                ZX = Polyhedron([-obj.pB, obj.A], obj.b);
+                if ZX.isEmptySet()
+                    % the feasible set is empty
+                    K = Polyhedron.emptySet(obj.d);
+                    return
+                end
+                
+                % the feasible set is given as the projection of ZX onto
+                % the parametric space
+                K = ZX.projection(1:obj.d, 'fourier');
+                
+            else
+                % construct the feasible set via critical regions
+                
+                if ~isa(regions, 'Polyhedron')
+                    error('The second input must be an array of Polyhedron objects.');
+                end
+
+                % length of step over the facet
+                step_size = MPTOPTIONS.rel_tol*10;
+                Hf = [];
+                t = tic;
+                n_fails = 0;
+                for i = 1:length(regions)
+                    % for each region
+                    if toc(t) > MPTOPTIONS.report_period
+                        fprintf('progress: %d/%d\n', i, length(regions));
+                        t = tic;
+                    end
+                    for j = 1:length(regions(i).b)
+                        % for each facet of the i-th region:
+                        % 1) compute a point on the facet
+                        lpsol = regions(i).chebyCenter(j);
+                        if lpsol.exitflag == MPTOPTIONS.OK
+                            % 2) compute the point accross the j-th facet
+                            x = lpsol.x + regions(i).A(j, :)'/norm(regions(i).A(j, :)')*step_size;
+                            % 3) and solve the problem for the new point
+                            qpsol = obj.solve(x);
+                            if qpsol.exitflag ~= MPTOPTIONS.OK
+                                % 4) infeasible => add this facet to the feasible set
+                                Hf = [Hf; regions(i).H(j, :)];
+                            end
+                        else
+                            % numerical problems
+                            n_fails = n_fails + 1;
+                        end
+                    end
+                end
+                if n_fails > 0
+                    fprintf('WARNING: failed to compute points on %d facet(s)\n', n_fails);
+                end
+                if isempty(Hf)
+                    % numerical problems, return R^n
+                    K = Polyhedron.fullSpace(regions(1).Dim);
+                else
+                    K = Polyhedron(Hf(:, 1:end-1), Hf(:, end));
+                end
+            end
+        end
     end
     
 %     methods
