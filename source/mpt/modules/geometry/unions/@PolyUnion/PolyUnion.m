@@ -309,6 +309,7 @@ classdef PolyUnion < Union
                   for k = 1:ni
                       if ~keep(k)
                           % this constraint was already discarded
+                          continue
                       end
                       % flip the k-th constraint of the i-th region and
                       % look whether we got a fully dimensional polyhedron
