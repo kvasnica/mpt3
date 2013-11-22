@@ -6,8 +6,9 @@ function Pnew = invAffineMap(P, T, t)
 validate_realmatrix(T);
 if nargin<3
 	t = zeros(P(1).Dim, 1);
+else
+    validate_realvector(t);
 end
-validate_realvector(t);
 
 % deal with arrays
 if numel(P)>1
