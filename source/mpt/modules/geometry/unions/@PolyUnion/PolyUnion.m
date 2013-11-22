@@ -294,8 +294,7 @@ classdef PolyUnion < Union
           obj.Set.minHRep();
 
           % inequality representation of the envelope
-          Ae = [];
-          be = [];
+          He = [];
           tic
           for i = 1:obj.Num
               if toc > MPTOPTIONS.report_period
@@ -320,15 +319,14 @@ classdef PolyUnion < Union
                   end
               end
               keep_idx = find(keep);
-              Ae = [Ae; obj.Set(i).A(keep_idx, :)];
-              be = [be; obj.Set(i).b(keep_idx)];
+              He = [He; obj.Set(i).H(keep_idx, :)];
           end
           
-          if isempty(Ae)
+          if isempty(He)
               % the envelope is R^n
               E = Polyhedron.fullSpace(obj.Dim);
           else
-              E = Polyhedron(Ae, be);
+              E = Polyhedron(He(:, 1:end-1), He(:, end));
           end
       end
   end  
