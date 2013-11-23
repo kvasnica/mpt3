@@ -106,7 +106,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             end
         end
         
-        function K = feasibleSet(obj, regions)
+        function K = feasibleSet(obj, arg)
             % Computes the feasible set of a given parametric problem
             %
             % For a parametric problem
@@ -131,22 +131,43 @@ classdef Opt < handle & matlab.mixin.Copyable
             %
             % Syntax:
             %   K = prob.feasibleSet()
+            %   K = prob.feasibleSet(method)
             %   K = prob.feasibleSet(regions)
             %
             % Inputs:
             %      prob: parametric problem as an Opt object
             %   regions: (optional) critical regions of the parametric
             %            solution
+            %    method: (optional) string identificator of the projection
+            %            method to use (see help Polyhedron/projection). By
+            %            default we use the 'fourier' method.
             %
             % Output:
             %         K: feasible set as a redundant H-polyhedron
             
             global MPTOPTIONS
             
+            error(nargchk(1, 2, nargin));
             if ~obj.isParametric
                 error('The problem is not parametric.');
             end
-            if nargin==1
+            if nargin==2
+                if isa(arg, 'Polyhedron')
+                    use_projection = false;
+                    regions = arg;
+                elseif isa(arg, 'char')
+                    use_projection = true;
+                    method = arg;
+                else
+                    error('The input must be either a string or an array of Polyhedron objects.');
+                end
+            else
+                % default projection method
+                use_projection = true;
+                method = 'fourier';
+            end
+            
+            if use_projection
                 % compute the feasible set via projection
                 
                 if obj.me>0
@@ -165,15 +186,11 @@ classdef Opt < handle & matlab.mixin.Copyable
                 
                 % the feasible set is given as the projection of ZX onto
                 % the parametric space
-                K = ZX.projection(1:obj.d, 'fourier');
+                K = ZX.projection(1:obj.d, method);
                 
             else
                 % construct the feasible set via critical regions
                 
-                if ~isa(regions, 'Polyhedron')
-                    error('The second input must be an array of Polyhedron objects.');
-                end
-
                 % length of step over the facet
                 step_size = MPTOPTIONS.rel_tol*10;
                 Hf = [];
