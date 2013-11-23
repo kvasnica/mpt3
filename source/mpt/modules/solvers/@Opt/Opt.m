@@ -202,6 +202,11 @@ classdef Opt < handle & matlab.mixin.Copyable
                         fprintf('progress: %d/%d\n', i, length(regions));
                         t = tic;
                     end
+                    % make sure we have the minimal H-representation
+                    % (we do redundancy elimination here since it can be
+                    % costly in high dimensions; hence we want to give the
+                    % uer an appropriate progress report)
+                    regions(i).minHRep();
                     for j = 1:length(regions(i).b)
                         % for each facet of the i-th region:
                         % 1) compute a point on the facet
