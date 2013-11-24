@@ -211,10 +211,10 @@ classdef MLDSystem < AbstractSystem
 				% we have constraints, but not 'd' and 'z' variables, just
 				% check constraints and compute 'xn' and 'y' directly
 				b = obj.E1*u + obj.E4*x0 + obj.E5;
-				A = zeros(size(B));
 				d = [];
 				z = [];
-				if any(b < A)
+				if any(b < -MPTOPTIONS.zero_tol)
+                    feasible = false;
 					warning('MLD constraints lead to infeasible or unbounded solution.');
 				else
 					xn = obj.A*x0 + obj.B1*u + obj.B5;
