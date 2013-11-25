@@ -557,10 +557,10 @@ classdef PWASystem < AbstractSystem
             if obj.nu>0
                 error('This method only supports autonomous systems.');
             end
-            
+
             switch lower(ltype)
                 case 'pwa',
-                    laypfun = @PWALyapFunction;
+                    lyapfun = @PWALyapFunction;
                 case 'pwq'
                     lyapfun = @PWQLyapFunction;
                 otherwise
@@ -585,6 +585,132 @@ classdef PWASystem < AbstractSystem
     methods(Access=private, Hidden)
         % internal APIs
         
+        function [L, feasible] = PWALyapFunction(obj, map)
+            % PWA Lyapunov function construction for an autonomous PWA system
+            %
+            % The PWA Lyapunov function is given by
+            %   L(x) = L_i'*x + c_i IF x \in R_i
+            
+            global MPTOPTIONS
+            
+            % all regions must be bounded
+            if ~all(obj.domain.isBounded)
+                error('All domains must be bounded.');
+            end
+            
+            % which regions contain the origin?
+            origin = zeros(obj.nx, 1);
+            containsOrigin = obj.domain.contains(origin);
+            % check if the origin is a vertex
+            idx = find(containsOrigin);
+            for i = 1:length(idx)
+                j = idx(i);
+                if max(obj.domain(j).A*origin-obj.domain(j).b)<-MPTOPTIONS.abs_tol
+                    error('The origin must be a vertex (violated in domain %d).', j);
+                end
+            end
+            
+            % prepare variables for each transition
+            epsilon = MPTOPTIONS.rel_tol;
+            rho = sdpvar(1, 1);
+            L = cell(1, obj.ndyn);
+            c = cell(1, obj.ndyn);
+            for i = 1:obj.ndyn
+                L{i} = sdpvar(obj.nx, 1, 'full');
+                c{i} = sdpvar(1, 1);
+            end
+            
+            % formulate constraints
+            fprintf('Formulating constraints...\n');
+            constraints = [ epsilon <= rho <= 1 ];
+            tic
+            % enforce decay of the Lyapunov function over each transition
+            for i = 1:obj.ndyn
+                if toc > MPTOPTIONS.report_period
+                    fprintf('progress: %d/%d\n', i, obj.ndyn);
+                    tic;
+                end
+                
+                % vertices of the i-th region
+                % (since we only consider bounded regions, we know the
+                % rays are empty)
+                Vi = obj.domain(i).V;
+                
+                % enforce positivity on each vertex
+                nx = zeros(size(Vi, 1), 1);
+                for j = 1:size(Vi, 1)
+                    nx(j) = norm(Vi(j, :)', 1);
+                end
+                constraints = constraints + ...
+                    [ epsilon*nx <= Vi*L{i} + ones(size(nx))*c{i} ];
+                
+                if containsOrigin(i)
+                    % the constant term is zero in all regions which
+                    % contain the origin
+                    constraints = constraints + [ c{i} == 0 ];
+                end
+                
+                % enforce decrease
+                targets = find(map.transitions(i, :));
+                for j = targets
+                    Vi = map.regions{i, j}.V;
+                    nx = zeros(size(Vi, 1), 1);
+                    PWAi = [];
+                    PWAj = [];
+                    for vi = 1:size(Vi, 1)
+                        x = Vi(vi, :)';
+                        xp = obj.A{i}*x + obj.f{i};
+                        PWAi = [PWAi; L{i}'*x + c{i}];
+                        PWAj = [PWAj; L{j}'*xp + c{j}];
+                        nx(vi) = norm(x, 1);
+                    end
+                    constraints = constraints + [ rho*nx <= PWAi - PWAj ];
+                end
+            end
+            
+            % solve the problem
+            fprintf('Solving...\n');
+            options = sdpsettings;
+            % maximize the decay
+            solution = solvesdp(constraints, -rho, options);
+            fprintf('...done\n');
+            
+            % check the solution
+            fprintf('\n');
+            feasible = true;
+            if(solution.problem==4)
+                res = checkset(constraints);
+                if min(res)>0,
+                    fprintf('Numerical problems, but solution is feasible\n');
+                else
+                    fprintf('Numerical problems, residual: %e (should be positive).\n', min(res));
+                end
+                
+            elseif(solution.problem>0)
+                feasible = false;
+                res = checkset(constraints);
+                fprintf('Infeasible problem, residual: %e (should be positive).\n', min(res));
+                L = PolyUnion;
+                return
+                
+            elseif(solution.problem<0)
+                error(solution.info);
+                
+            else
+                fprintf('Feasible solution found\n');
+            end
+            
+            % extract the solution
+            regions = obj.domain;
+            for i = 1:obj.ndyn
+                fun = AffFunction(double(L{i})', double(c{i}));
+                regions(i).addFunction(fun, 'lyapunov');
+            end
+            L = PolyUnion(regions);
+
+        end
+
+                
         function [L, feasible] = PWQLyapFunction(obj, map)
             % PWQ Lyapunov function construction for an autonomous PWA system
             %
