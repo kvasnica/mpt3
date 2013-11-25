@@ -723,7 +723,12 @@ classdef PWASystem < AbstractSystem
             if obj.nu>0
                 error('This method only supports autonomous systems.');
             end
-            
+
+            % all domains must be full-dimensional
+            if ~all(obj.domain.isFullDim)
+                error('All domains must be full-dimensional.');
+            end
+
             % which regions contain the origin?
             containsOrigin = obj.domain.contains(zeros(obj.nx, 1));
             
@@ -760,6 +765,7 @@ classdef PWASystem < AbstractSystem
                         constraints = constraints + [ W <= 0 ];
                     else
                         % PWQ transition
+                        map.regions{i, j}.minHRep();
                         H = map.regions{i, j}.A;
                         K = map.regions{i, j}.b;
                         m = length(K);
@@ -783,6 +789,7 @@ classdef PWASystem < AbstractSystem
                     constraints = constraints + [ L{i}==0; c{i}==0 ];
                 else
                     % the function is positive everywhere else
+                    obj.domain(i).minHRep();
                     H = obj.domain(i).A;
                     K = obj.domain(i).b;
                     m = length(K);
