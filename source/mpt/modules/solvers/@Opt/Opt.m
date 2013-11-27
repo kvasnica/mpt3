@@ -140,7 +140,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             %            solution
             %    method: (optional) string identificator of the projection
             %            method to use (see help Polyhedron/projection). By
-            %            default we use the 'fourier' method.
+            %            default we use the 'ifourier' method.
             %
             % Output:
             %         K: feasible set as a redundant H-polyhedron
@@ -164,7 +164,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             else
                 % default projection method
                 use_projection = true;
-                method = 'fourier';
+                method = 'ifourier';
             end
             
             if use_projection
