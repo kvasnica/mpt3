@@ -40,7 +40,7 @@ end
 if isempty(U.Internal.Convex) || isempty(U.Internal.Overlaps) || ...
     isempty(U.Internal.Connected) || isempty(U.Internal.Bounded) || ...
     isempty(U.Internal.FullDim)        
-    disp('No properties are attached to this union.')
+    disp('Some of the required properties have not been determined for this union.')
     disp('The following properties are checked: convexity, overlaps, connectivity, boundedness, and full-dimensionality.');
     disp('This may take some time...');
 end
