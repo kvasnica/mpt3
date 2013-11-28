@@ -87,6 +87,9 @@ options.plcp.maxsteps = 200; %[ 200 ], minimum number of steps are 2
 options.plcp.maxpivots = 100; %[ default 100, maximum 500 unless default recursion limit is not changed in Matlab settings ],
 % maximum number of pivots to perform for searching a neighbor
 
+options.plcp.adjcheck = 0; % [default 0, otherwise 1]
+% force checking of the adjacency list inside the PLCP solver
+
 
 %% LCP options
 options.lcp.zerotol = 1e-10;

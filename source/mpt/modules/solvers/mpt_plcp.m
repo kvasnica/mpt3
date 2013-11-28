@@ -547,16 +547,24 @@ end
 % delete last field which is empty
 layer_list(end) = [];
 
-% check graph, if neighbors are correct (if not, remove those neighbors
-% who do not link to each other)
-adj_list = verify_graph(regions,adj_list);
+if MPTOPTIONS.modules.solvers.plcp.adjcheck
+    % check graph, if neighbors are correct (if not, remove those neighbors
+    % who do not link to each other)
+    adj_list = verify_graph(regions,adj_list);
+end
 
 % compute set of feasible parameters
 hull = feasible_set(regions, adj_list, opt);
 if hull.isEmptySet && any(~regions.isEmptySet)
-	% sanity check: feasible set is empty, but regions are not
-	fprintf('Feasible set is wrong, please report to mpt@control.ee.ethz.ch\n');
+	% sanity check: feasible set is empty which means that the adjacency
+	% list is not correct and there could be holes in the solution
+    flag = -4;
+    how = 'wrong adjacency list';
 	
+    % TODO: remove this warning after the fail-back approach for computing
+    % the feasible set is implemented
+	fprintf('Feasible set is wrong, please report to mpt@control.ee.ethz.ch\n');
+    
 	% return bounding box of the regions, since YALMIP needs at least some
 	% feasible set
 	hull = PolyUnion(regions).outerApprox;
@@ -2106,7 +2114,16 @@ if ~isa(adj_list,'cell')
     error('Provided adjacency list must be in a CELL format.');
 end
 
+if (MPTOPTIONS.verbose >= 1) || (MPTOPTIONS.modules.solvers.plcp.debug >=1)
+    fprintf('Verifying adjacency:\n');
+end
+
+
 for i=1:length(regions)
+    
+    if (MPTOPTIONS.verbose >= 1) || (MPTOPTIONS.modules.solvers.plcp.debug >=1)
+        fprintf('%i/%i\n',i,length(regions));
+    end
     
     % clear regions outside of the range first
     for j=1:length(adj_list{i})
@@ -2155,15 +2172,28 @@ for i=1:length(regions)
                 % if the neighborhood fails try distance with some
                 % tolerance
                 if ~ts
-                    dt = P.distance(Q);
+                    facetP = P.getFacet(j);
+                    xP = facetP.chebyCenter.x;
+                    if isempty(xP)
+                        % if the solver fails, normalize and try again
+                        facetP.normalize;
+                        xP = facetP.chebyCenter.x;
+                        if isempty(xP)
+                            % if the solver fails second time, solve
+                            % feasibility problem
+                            xP = Opt(facetP).solve.xopt;
+                        end
+                        if isempty(xP)
+                            xP = NaN(facetP.Dim,1);
+                        end
+                    end
+                    dt = Q.project(xP);
                     ts = dt.dist<MPTOPTIONS.rel_tol;
                     if isempty(ts)
                         ts = 0;
                     end
                     if ts
                         % find the facet of Q that is the closest to P
-                        facetP = P.getFacet(j);
-                        xP = facetP.chebyCenter.x;
                         % distance of the point xP to the polytope Q
                         dtQ = zeros(size(Q.H,1),1);
                         for jj=1:size(Q.H,1)
@@ -2171,7 +2201,17 @@ for i=1:length(regions)
                             facetQ = Q.getFacet(jj);
                             xQ = facetQ.chebyCenter.x;
                             if isempty(xQ),
-                                xQ = NaN;
+                                facetQ.normalize;
+                                xQ = facetQ.chebyCenter.x;
+                                if isempty(xQ)
+                                    % if the solver fails second time, solve
+                                    % feasibility problem
+                                    xQ = Opt(facetQ).solve.xopt;
+                                end
+                                if isempty(xQ)
+                                    % all approaches failed, leave
+                                    xQ = NaN(facetQ.Dim,1);
+                                end
                             end
                             dtQ(jj) = norm(xP-xQ);
                         end                        
@@ -2224,49 +2264,51 @@ end
 
 F = Polyhedron(H(:, 1:end-1), H(:, end));
 
-if isEmptySet(F)
-    warning('mpt_plcp:adjacencyList','Numerical problems in verifying the adjacency list. The adjacency list may be wrong. Trying a failback method. This could take a while.');
-    % The feasible set is wrong. Terminate this approach and try
-    % more robust way of detecting the feasible set.
-    
-    % fallback scenario
-    H = [];
-    for i = 1:length(adj)
-        % faces over which there is no neighbor => faces of the feasible set
-        boundary_idx = find(cellfun('isempty', adj{i}));
+if MPTOPTIONS.modules.solvers.plcp.adjcheck
+    if isEmptySet(F)
+        warning('mpt_plcp:adjacencyList','Numerical problems in verifying the adjacency list. The adjacency list may be wrong. Trying a failback method. This could take a while.');
+        % The feasible set is wrong. Terminate this approach and try
+        % more robust way of detecting the feasible set.
         
-        if ~isempty(boundary_idx)
-            for j=1:numel(boundary_idx)
-                % boundary facet
-                bfacet = regions(i).getFacet(boundary_idx(j));
-                xF = bfacet.chebyCenter.x;
-                if ~isempty(xF)
-                    % check that a point beyond the boundary gives infeasible PLCP
-                    xplus = xF + bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
-                    [~,~,~,exitflag]=lcp(problem.M,problem.q+problem.Q*xplus);
-                    if exitflag~=MPTOPTIONS.OK
-                        % check that a point inside is contained in the
-                        % same region (to make sure that this is actually
-                        % the facet of this region)
-                        xminus = xF - bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
-                        if regions(i).contains(xminus)
-                            H = [H; regions(i).H(boundary_idx(j),:)];
-                            P = Polyhedron('H',H);
-                            if isEmptySet(P)
-                                % The feasible set is wrong. Show the
-                                % warning and quit
-                                warning('mpt_plcp:feasibleSet','Numerical problems in computing the feasible set. Failback approach failed.');
-                                break;
+        % fallback scenario
+        H = [];
+        for i = 1:length(adj)
+            % faces over which there is no neighbor => faces of the feasible set
+            boundary_idx = find(cellfun('isempty', adj{i}));
+            
+            if ~isempty(boundary_idx)
+                for j=1:numel(boundary_idx)
+                    % boundary facet
+                    bfacet = regions(i).getFacet(boundary_idx(j));
+                    xF = bfacet.chebyCenter.x;
+                    if ~isempty(xF)
+                        % check that a point beyond the boundary gives infeasible PLCP
+                        xplus = xF + bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
+                        [~,~,~,exitflag]=lcp(problem.M,problem.q+problem.Q*xplus);
+                        if exitflag~=MPTOPTIONS.OK
+                            % check that a point inside is contained in the
+                            % same region (to make sure that this is actually
+                            % the facet of this region)
+                            xminus = xF - bfacet.Ae'/norm(bfacet.Ae)*MPTOPTIONS.rel_tol;
+                            if regions(i).contains(xminus)
+                                H = [H; regions(i).H(boundary_idx(j),:)];
+                                P = Polyhedron('H',H);
+                                if isEmptySet(P)
+                                    % The feasible set is wrong. Show the
+                                    % warning and quit
+                                    warning('mpt_plcp:feasibleSet','Numerical problems in computing the feasible set. Failback approach failed.');
+                                    return;
+                                end
                             end
                         end
                     end
                 end
             end
+            
         end
+        F = Polyhedron(H(:, 1:end-1), H(:, end));
         
     end
-    F = Polyhedron(H(:, 1:end-1), H(:, end));
-    
 end
 
 end

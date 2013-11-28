@@ -271,6 +271,19 @@
                         <class name="double"/>
                         <default>100</default>
                     </field>                                        
+                    <field>
+                        <name>adjcheck</name>
+                        <descr>Force verification of the adjacency list in the postprocessing phase. This option activates 
+                        a subfunction in the PLCP solver where the adjacency list is checked for any missing links in the graph 
+                        and performs correction. The option is turned off by default because the verification can be time
+                        consuming for large partitions.
+                        </descr>
+                        <class name="logical">
+                            <option>0</option>
+                            <option>1</option>
+                        </class>
+                        <default>0</default>
+                    </field>                                                           
                 </class>
 			</field>            
 			<field>
