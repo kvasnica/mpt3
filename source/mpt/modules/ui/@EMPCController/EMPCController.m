@@ -120,7 +120,7 @@ classdef EMPCController < AbstractController
 					res.xopt = mpt_mpsol2pu(sol);
 				else
 					res = problem.solve;
-					if res.exitflag ~= MPTOPTIONS.OK
+					if res.exitflag == MPTOPTIONS.INFEASIBLE
 						error('Problem is infeasible.');
 					end
 				end
