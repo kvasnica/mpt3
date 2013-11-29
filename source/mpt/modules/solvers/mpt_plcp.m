@@ -562,7 +562,11 @@ if hull.isEmptySet && any(~regions.isEmptySet)
     how = 'wrong adjacency list';
 	
     fprintf('Adjacency list is wrong, computing the feasible set by projection (may take a while)...\n');
-    hull = opt.feasibleSet();
+    % it appears that computing the feasible set by exploring feasibility
+    % of each facet of each region is more robust and faster than using
+    % projections. To enable the projection-based computation, call:
+    %   hull = opt.feasibleSet()
+    hull = opt.feasibleSet(regions);
     fprintf('...done\n');
 	
 	% TODO: fix computation of feasible sets, see test_plcp_13_pass for a
