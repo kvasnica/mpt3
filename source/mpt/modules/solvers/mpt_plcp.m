@@ -561,13 +561,9 @@ if hull.isEmptySet && any(~regions.isEmptySet)
     flag = -4;
     how = 'wrong adjacency list';
 	
-    % TODO: remove this warning after the fail-back approach for computing
-    % the feasible set is implemented
-	fprintf('Feasible set is wrong, please report to mpt@control.ee.ethz.ch\n');
-    
-	% return bounding box of the regions, since YALMIP needs at least some
-	% feasible set
-	hull = PolyUnion(regions).outerApprox;
+    fprintf('Adjacency list is wrong, computing the feasible set by projection (may take a while)...\n');
+    hull = opt.feasibleSet();
+    fprintf('...done\n');
 	
 	% TODO: fix computation of feasible sets, see test_plcp_13_pass for a
 	% nice example where the current approach fails (probably due to the
