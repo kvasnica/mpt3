@@ -547,31 +547,35 @@ end
 % delete last field which is empty
 layer_list(end) = [];
 
+feasible_set_computed = false;
 if MPTOPTIONS.modules.solvers.plcp.adjcheck
     % check graph, if neighbors are correct (if not, remove those neighbors
     % who do not link to each other)
     adj_list = verify_graph(regions,adj_list);
+    
+    % compute set of feasible parameters
+    hull = feasible_set(regions, adj_list, opt);
+    
+    if hull.isEmptySet && any(~regions.isEmptySet)
+        % sanity check: feasible set is empty which means that the adjacency
+        % list is not correct and there could be holes in the solution
+        flag = -4;
+        how = 'wrong adjacency list';
+        fprintf('Adjacency list is wrong, computing the feasible set by projection (may take a while)...\n');
+        % the feasible set will be computed via Opt/feasibleSet()
+
+    else
+        % feasible set appears to be correct
+        feasible_set_computed = true;
+    end
 end
 
-% compute set of feasible parameters
-hull = feasible_set(regions, adj_list, opt);
-if hull.isEmptySet && any(~regions.isEmptySet)
-	% sanity check: feasible set is empty which means that the adjacency
-	% list is not correct and there could be holes in the solution
-    flag = -4;
-    how = 'wrong adjacency list';
-	
-    fprintf('Adjacency list is wrong, computing the feasible set by projection (may take a while)...\n');
+if ~feasible_set_computed
     % it appears that computing the feasible set by exploring feasibility
     % of each facet of each region is more robust and faster than using
     % projections. To enable the projection-based computation, call:
     %   hull = opt.feasibleSet()
     hull = opt.feasibleSet(regions);
-    fprintf('...done\n');
-	
-	% TODO: fix computation of feasible sets, see test_plcp_13_pass for a
-	% nice example where the current approach fails (probably due to the
-	% fact that some regions are missing from the solution)
 end
 
 % normalize regions to return normalized solution
