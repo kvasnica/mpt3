@@ -21,14 +21,22 @@ if isempty(obj.V_int) && isempty(obj.R_int)
 	return
 end
 
-try
+if isempty(obj.R_int) && obj.Dim>1 && obj.isFullDim() && ...
+		size(obj.V_int, 1)>=obj.Dim+1
+	% try convhulln first; requires following conditions to be met:
+	% * no rays
+	% * dimension at least 2
+    % * the set is full-dimensional
+	% * the set has at least d+1 vertices
+    K = convhulln(obj.V_int);
+	s.V = obj.V_int(unique(K), :);
+	s.R = obj.R_int;
+	
+else
     s = cddmex('reduce_v', struct('V', obj.V_int, 'R', obj.R_int));
-catch
-    % retry with stripping to 4 decimal numbers
-    V = unique(1e-4*floor(obj.V*1e4),'rows');
-    s = cddmex('reduce_v', struct('V', V, 'R', obj.R_int));
+    
 end
-
+	
 obj.V_int = s.V;
 obj.R_int = s.R;
 obj.irredundantVRep = true;

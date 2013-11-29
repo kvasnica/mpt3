@@ -52,7 +52,9 @@ assert(isempty(P.R));
 assert(~P.hasHRep);
 
 P = Polyhedron([1 1; 0 1; 1 0]);
-assert(norm(sortrows(P.H) - [-1 -1 -1;-0 1 1;1 -0 1]) < 1e-8);
+P.computeHRep;
+P.normalize();
+assert(norm(sortrows(P.H) - [-sqrt(2)/2 -sqrt(2)/2 -sqrt(2)/2; 0 1 1; 1 0 1]) < 1e-8);
 assert(P.hasHRep);
 
 P = Polyhedron([1 1; 0 1; 1 0]);
@@ -60,11 +62,15 @@ assert(isequal(P.He, zeros(0, 3)));
 assert(P.hasHRep);
 
 P = Polyhedron([1 1; 0 1; 1 0]);
-assert(norm(sortrows(P.A) - [-1 -1;-0 1;1 -0]) < 1e-8);
+P.computeHRep;
+P.normalize();
+assert(norm(sortrows(P.A) - [-sqrt(2)/2 -sqrt(2)/2; 0 1; 1 0]) < 1e-8);
 assert(P.hasHRep);
 
 P = Polyhedron([1 1; 0 1; 1 0]);
-assert(norm(sortrows(P.b) - [-1;1;1]) < 1e-8);
+P.computeHRep;
+P.normalize();
+assert(norm(sortrows(P.b) - [-sqrt(2)/2;1;1]) < 1e-8);
 assert(P.hasHRep);
 
 P = Polyhedron([1 1; 0 1; 1 0]);

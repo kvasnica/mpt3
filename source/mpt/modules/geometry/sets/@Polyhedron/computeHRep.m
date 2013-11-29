@@ -30,20 +30,50 @@ elseif obj.isFullSpace()
 end
 
 % compute Hrep
-try
-	% Do facet enumeration with CDD
-	s = cddmex('hull', ...
-		struct('V', obj.V_int, 'R', obj.R_int));
-catch
-	% if CDD fails, retry with matlab version
-	[s.V,s.R,s.A,s.B] = mpt_nlrs('hull', obj);
+
+obj.minVRep();
+if isempty(obj.R_int) && obj.Dim>1 && obj.isFullDim() && ...
+		size(obj.V_int, 1)>=obj.Dim+1
+	% try convhulln first; requires following conditions to be met:
+	% * no rays
+	% * dimension at least 2
+    % * the set is full-dimensional
+	% * the set has at least d+1 vertices
+
+	x0 = obj.interiorPoint().x;
+	V = obj.V_int;
+    K = convhulln(V); % {'QJ', 'Qx', 'Qs'}
+	d = size(V, 2);
+	s.A = zeros(size(K, 1), d);
+	s.B = ones(size(K, 1), 1);
 	s.lin = [];
+    for i = 1:size(K, 1)
+        % each row of K contains indices of vertices that lie on the i-th
+        % facet
+        P = V(K(i, :), :);
+        % compute the normal vector and the offset of the facet
+        W = [P, -ones(d, 1)];
+        [AB, ~] = qr(W'); % qr() is much faster than null()
+        a = AB(1:d, end);
+        b = AB(end, end);
+        
+        % determine the sign
+        if a'*x0>b
+            a = -a;
+            b = -b;
+        end
+        s.A(i, :) = a';
+        s.B(i) = b;
+    end
+
+else
+    % Do facet enumeration with CDD
+    s = cddmex('hull', struct('V', obj.V_int, 'R', obj.R_int));
 end
+
 Hall  = [s.A s.B];
 H = Hall; H(s.lin, :) = [];
 He = Hall(s.lin, :);
-H(matNorm(H(:, 1:end-1)) < MPTOPTIONS.zero_tol, :) = [];
-He(matNorm(He(:, 1:end-1)) < MPTOPTIONS.zero_tol, :) = [];
 obj.H_int = H;
 obj.He_int = He;
 obj.hasHRep = true;
