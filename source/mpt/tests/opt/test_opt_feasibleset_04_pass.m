@@ -7,6 +7,13 @@ prob = Opt(M);
 Kpqp = prob.feasibleSet(); % uses the pQP formulation
 
 plcp = prob.qp2lcp();
+% here Opt/feasibleSet() exploits the original pQP constraints
+Kplcp = plcp.feasibleSet();
+assert(Kpqp==Kplcp);
+% make sure the original problem stayed a pLCP
+assert(isempty(plcp.A));
+assert(~isempty(plcp.M));
+
 % define the plcp from scratch to make sure the pQP constraints are not
 % stored in the object
 opt.Ath = plcp.Ath;
