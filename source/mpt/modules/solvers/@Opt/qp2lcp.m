@@ -37,6 +37,14 @@ S.Internal.Y = S.Y;
 S.Internal.C = S.C;
 S.Internal.c = S.c;
 
+% store the original constraints (used in Opt/feasibleSet)
+S.Internal.constraints.A = S.A;
+S.Internal.constraints.b = S.b;
+S.Internal.constraints.pB = S.pB;
+S.Internal.constraints.Ae = S.Ae;
+S.Internal.constraints.be = S.be;
+S.Internal.constraints.pE = S.pE;
+
 if reduce_flag
 %     % Remove redundancies to reduce the problem size if possible
 %     Hp = [-S.pB S.A S.b;
