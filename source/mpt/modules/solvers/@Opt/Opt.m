@@ -170,14 +170,38 @@ classdef Opt < handle & matlab.mixin.Copyable
             if use_projection
                 % compute the feasible set via projection
                 
-                if obj.me>0
-                    % eliminate equalities, but do it on a copy of the object
-                    obj = obj.copy();
-                    obj.eliminateEquations();
+                if isequal(lower(obj.problem_type), 'lcp')
+                    % LCP constraints:
+                    %   I*w - M*z = q + Q*x
+                    %   w >= 0, z >= 0
+                    %   Ath*x <= bth
+                    
+                    [nw, nz] = size(obj.M);
+                    nb = length(obj.bth);
+                    % y = [x; w; z]
+                    Ae = [-obj.Q, eye(nw), -obj.M];
+                    be = obj.q;
+                    A = [obj.Ath, zeros(nb, nw+nz); ...
+                        zeros(nw, obj.d), -eye(nw), zeros(nw, nz); ...
+                        zeros(nz, obj.d+nw), -eye(nz)];
+                    b = [obj.bth; zeros(nw+nz, 1)];
+                    ZX = Polyhedron('Ae', Ae, 'be', be, 'A', A, 'b', b);
+
+                else
+                    % LP/QP constraints:
+                    %     A*z <= b + pB*x
+                    %    Ae*z == be + pE*x
+                    %   Ath*x <= bth
+                    if obj.me>0
+                        % eliminate equalities, but do it on a copy of the object
+                        obj = obj.copy();
+                        obj.eliminateEquations();
+                    end
+                    
+                    % construct the polyhedron { (x, z) | A*x<=b+pB*x }
+                    ZX = Polyhedron([-obj.pB, obj.A], obj.b);
                 end
                 
-                % construct the polyhedron { (x, z) | A*x<=b+pB*x }
-                ZX = Polyhedron([-obj.pB, obj.A], obj.b);
                 if ZX.isEmptySet()
                     % the feasible set is empty
                     K = Polyhedron.emptySet(obj.d);
