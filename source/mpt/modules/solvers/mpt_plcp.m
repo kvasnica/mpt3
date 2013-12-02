@@ -547,35 +547,57 @@ end
 % delete last field which is empty
 layer_list(end) = [];
 
-feasible_set_computed = false;
 if MPTOPTIONS.modules.solvers.plcp.adjcheck
     % check graph, if neighbors are correct (if not, remove those neighbors
     % who do not link to each other)
     adj_list = verify_graph(regions,adj_list);
-    
-    % compute set of feasible parameters
-    hull = feasible_set(regions, adj_list, opt);
-    
-    if hull.isEmptySet && any(~regions.isEmptySet)
-        % sanity check: feasible set is empty which means that the adjacency
-        % list is not correct and there could be holes in the solution
-        flag = -4;
-        how = 'wrong adjacency list';
-        fprintf('Adjacency list is wrong, computing the feasible set by projection (may take a while)...\n');
-        % the feasible set will be computed via Opt/feasibleSet()
-
-    else
-        % feasible set appears to be correct
-        feasible_set_computed = true;
-    end
 end
 
-if ~feasible_set_computed
+% compute the set of feasible parameters
+hull = feasible_set(regions, adj_list, opt);
+
+% quick sanity check: does the feasible set contain the chebycenters of all
+% regions?
+if ~sub_check_feasible_set(hull, regions)
+    % the feasible set does not contain the chebyceter of at least one
+    % region, thus declare it as an empty set such that it is recomputed
+    % later
+    hull = Polyhedron.emptySet(opt.d);
+end
+
+if hull.isEmptySet && any(~regions.isEmptySet)
+    % feasible set is empty which means that the adjacency
+    % list is not correct and there could be holes in the solution
+    flag = -4;
+    how = 'wrong adjacency list';
+    if MPTOPTIONS.verbose>=0
+        fprintf('Adjacency list is wrong, using an alternative approach to compute the feasible set (may take a while)...\n');
+    end
+
+    % recompute the feasible set via Opt/feasibleSet()
+    %
     % it appears that computing the feasible set by exploring feasibility
     % of each facet of each region is more robust and faster than using
     % projections. To enable the projection-based computation, call:
     %   hull = opt.feasibleSet()
+    if MPTOPTIONS.verbose>=0 && length(regions)>200
+        fprintf('Computing the feasible set...\n');
+    end
     hull = opt.feasibleSet(regions);
+    if MPTOPTIONS.verbose>=0 && length(regions)>200
+        fprintf('...done\n');
+    end
+end
+
+% quick sanity check: does the feasible set contain the chebycenters of all
+% regions?
+% quick sanity check: does the feasible set contain the chebycenters of all
+% regions?
+if ~sub_check_feasible_set(hull, regions)
+    % the feasible set does not contain the chebyceter of at least one
+    % region. return the outer box approximation of the regions instead
+    fprintf('Feasible set is still wrong, returning the box outer approximation...\n');
+    hull = PolyUnion(regions).outerApprox();
 end
 
 % normalize regions to return normalized solution
@@ -631,6 +653,23 @@ end
 
 
 %% subfunctions
+function answer = sub_check_feasible_set(K, regions)
+% checks whether the feasible set K contains the chebycenter of each region
+
+answer = true;
+ch = regions.chebyCenter;
+for i = 1:length(ch)
+    if ~isempty(ch(i).x) && ~K.contains(ch(i).x)
+        % the feasible set does not contain the chebyceter of the i-th
+        % region, thus it is wrong
+        answer = false;
+        return
+    end
+end
+
+end
+
+%---
 function fo = lcp_initialfeas(lc)
 %
 % Compute any feasible value of theta s.t. (M,q+Q th) is feasible
