@@ -547,10 +547,12 @@ end
 % delete last field which is empty
 layer_list(end) = [];
 
+adj_list_verified = false;
 if MPTOPTIONS.modules.solvers.plcp.adjcheck
     % check graph, if neighbors are correct (if not, remove those neighbors
     % who do not link to each other)
     adj_list = verify_graph(regions,adj_list);
+    adj_list_verified = true;
 end
 
 % compute the set of feasible parameters
@@ -559,10 +561,32 @@ hull = feasible_set(regions, adj_list, opt);
 % quick sanity check: does the feasible set contain the chebycenters of all
 % regions?
 if ~sub_check_feasible_set(hull, regions)
-    % the feasible set does not contain the chebyceter of at least one
-    % region, thus declare it as an empty set such that it is recomputed
-    % later
-    hull = Polyhedron.emptySet(opt.d);
+    
+    if adj_list_verified
+        % the adjacency list was verified previously, yet the feasible set
+        % is wrong. Declare it as an empty set such that it is recomputed
+        % by projection lated
+        hull = Polyhedron.emptySet(opt.d);
+    else
+        % verify the adjacency list
+        if MPTOPTIONS.verbose>=0
+            fprintf('Fixing the adjacency list...\n');
+        end
+        adj_list = verify_graph(regions,adj_list);
+        adj_list_verified = true;
+        if MPTOPTIONS.verbose>=0
+            fprintf('...done.\n');
+        end
+    
+        % and reconstruct the feasible set based on the fixed list
+        hull = feasible_set(regions, adj_list, opt);
+
+        % check correctness of the feasible set
+        if ~sub_check_feasible_set(hull, regions)
+            % the feasible set is still wrong
+            hull = Polyhedron.emptySet(opt.d);
+        end
+    end
 end
 
 if hull.isEmptySet && any(~regions.isEmptySet)
@@ -571,33 +595,11 @@ if hull.isEmptySet && any(~regions.isEmptySet)
     flag = -4;
     how = 'wrong adjacency list';
     if MPTOPTIONS.verbose>=0
-        fprintf('Adjacency list is wrong, using an alternative approach to compute the feasible set (may take a while)...\n');
+        fprintf('Adjacency list is wrong, computing the feasible set via projection (may take a while)...\n');
     end
 
     % recompute the feasible set via Opt/feasibleSet()
-    %
-    % it appears that computing the feasible set by exploring feasibility
-    % of each facet of each region is more robust and faster than using
-    % projections. To enable the projection-based computation, call:
-    %   hull = opt.feasibleSet()
-    if MPTOPTIONS.verbose>=0 && length(regions)>200
-        fprintf('Computing the feasible set...\n');
-    end
-    hull = opt.feasibleSet(regions);
-    if MPTOPTIONS.verbose>=0 && length(regions)>200
-        fprintf('...done\n');
-    end
-end
-
-% quick sanity check: does the feasible set contain the chebycenters of all
-% regions?
-% quick sanity check: does the feasible set contain the chebycenters of all
-% regions?
-if ~sub_check_feasible_set(hull, regions)
-    % the feasible set does not contain the chebyceter of at least one
-    % region. return the outer box approximation of the regions instead
-    fprintf('Feasible set is still wrong, returning the box outer approximation...\n');
-    hull = PolyUnion(regions).outerApprox();
+    hull = opt.feasibleSet();
 end
 
 % normalize regions to return normalized solution
@@ -619,6 +621,7 @@ sol.xopt.setInternal('convexHull', hull);
 % store other important properties under Internal
 sol.xopt.setInternal('hash_table_basis', HASH);
 sol.xopt.setInternal('adj_list', adj_list);
+sol.xopt.setInternal('adj_list_verified', adj_list_verified);
 if MPTOPTIONS.modules.solvers.plcp.bfs
     sol.xopt.setInternal('layer_list', layer_list);
 else
@@ -2157,15 +2160,12 @@ if ~isa(adj_list,'cell')
     error('Provided adjacency list must be in a CELL format.');
 end
 
-if (MPTOPTIONS.verbose >= 1) || (MPTOPTIONS.modules.solvers.plcp.debug >=1)
-    fprintf('Verifying adjacency:\n');
-end
-
-
+tic
 for i=1:length(regions)
     
-    if (MPTOPTIONS.verbose >= 1) || (MPTOPTIONS.modules.solvers.plcp.debug >=1)
-        fprintf('%i/%i\n',i,length(regions));
+    if toc > MPTOPTIONS.report_period && MPTOPTIONS.verbose>=0
+        fprintf('progress: %d/%d\n', i, length(regions));
+        tic;
     end
     
     % clear regions outside of the range first
