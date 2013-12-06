@@ -315,7 +315,7 @@
                         <name>maxpiv</name>
                         <descr>Maximum number of pivots to be performed. </descr>
                         <class name="double"/>
-                        <default>1e6</default>
+                        <default>1e4</default>
                     </field>                    
                     <field>
                         <name>clock</name>
@@ -720,7 +720,7 @@
                         <name>IterationLimit</name>
                         <descr>Limits the number of simplex iterations performed.</descr>
                         <class name="double"/>
-                        <default>1e12</default>
+                        <default>1e6</default>
                     </field>                    
                     <field>
                         <name>NodeLimit</name>

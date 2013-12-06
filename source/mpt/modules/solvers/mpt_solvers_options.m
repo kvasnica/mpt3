@@ -98,7 +98,7 @@ options.lcp.zerotol = 1e-10;
 options.lcp.lextol = 1e-9;
 % Lexicographic tolerance - a small treshold from which values are considered as equal.
 
-options.lcp.maxpiv = 1e6; 
+options.lcp.maxpiv = 1e4; 
 % Maximum number of pivots to be performed.          
 
 options.lcp.nstepf = 50;
@@ -326,7 +326,7 @@ options.gurobi.CutOff = 1e12;
 % it will terminate with a CUTOFF status (see the Status Code section for
 % further details). Infinity for minimization, -Infinity for maximization   
 
-options.gurobi.IterationLimit=1e12; 
+options.gurobi.IterationLimit=1e6; 
 % >0, Limits the number of simplex iterations performed.
 
 options.gurobi.NodeLimit=1e12;
