@@ -54,8 +54,7 @@ sim('test_codegen_sim_03');
 cd(p);
 
 % delete the created directory
-onCleanup(@()clear('functions'));
-onCleanup(@()rmdir([d,filesep,name],'s'));
+onCleanup(@()cleanfiles(d,name));
 
 % compare the results
 u0 = 0;
@@ -65,7 +64,12 @@ for i=1:size(x,1)
     end
     u0 = u(i);
 end
-    
+ 
+end
 
+function cleanfiles(d,name)
+
+clear('functions');
+rmdir([d,filesep,name],'s');
 
 end
