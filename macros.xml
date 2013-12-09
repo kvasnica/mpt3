@@ -21,7 +21,7 @@ Boston, MA  02111-1307  USA
 <macro name="email_cnj">colin.jones@epfl.ch</macro>
 
 <macro name="author_cnj">
-	<date>2010-2012</date>
+	<date>2010-2013</date>
 	<name>Colin Neil Jones</name>
 	<affiliation>EPF Lausanne</affiliation>
 	<email macro="email_cnj"/>
@@ -31,7 +31,7 @@ Boston, MA  02111-1307  USA
 <macro name="email_kvasnica">michal.kvasnica@stuba.sk</macro>
 
 <macro name="author_kvasnica">
-	<date>2003-2012</date>
+	<date>2003-2013</date>
 	<name>Michal Kvasnica</name>
 	<affiliation>STU Bratislava</affiliation>
 	<email macro="email_kvasnica"/>
@@ -81,7 +81,7 @@ Boston, MA  02111-1307  USA
 
 <macro name="email_herceg">herceg@control.ee.ethz.ch</macro>
 <macro name="author_herceg">
-	<date>2010-2012</date>
+	<date>2010-2013</date>
 	<name>Martin Herceg</name>
 	<affiliation>ETH Zurich</affiliation>
 	<email macro="email_herceg"/>
