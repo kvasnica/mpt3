@@ -209,8 +209,11 @@ classdef Opt < handle & matlab.mixin.Copyable
                         obj.eliminateEquations();
                     end
                     
-                    % construct the polyhedron { (x, z) | A*x<=b+pB*x }
-                    ZX = Polyhedron([-obj.pB, obj.A], obj.b);
+                    % construct the polyhedron 
+                    % { (x, z) | A*x<=b+pB*x, Ath*x<=bth }
+                    ZX = Polyhedron([-obj.pB, obj.A; ...
+                        obj.Ath, zeros(length(obj.bth), obj.n)], ...
+                        [obj.b; obj.bth]);
                 end
                 
                 if ZX.isEmptySet()
