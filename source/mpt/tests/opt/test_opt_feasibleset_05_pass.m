@@ -10,14 +10,12 @@ Ath = [eye(2); -eye(2)]; bth = [2;2;5;5];
 % MPLP with parametrized cost
 problem = Opt('f',f,'A',A,'b',b,'pB',B,'pF',pF,'Ath',Ath,'bth',bth);
 
-% solution
-res = problem.solve;
-
 % feasible set
 F = problem.feasibleSet;
 
-% the result must be the same
-assert(res.xopt.convexHull==F);
+% the correct feasible set is a box
+expected = Polyhedron([-5 -5; 2 -5; -5 2; 2 2]).minHRep();
 
+assert(F==expected);
 
 end
