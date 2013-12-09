@@ -184,7 +184,12 @@ if ret.exitflag == MPTOPTIONS.OK
 			% unbounded => polyhedron
 			sol.r = Inf;
 		end
-	end
+    end
+    % check if the point is contained inside the polyhedron
+    if ~P.contains(sol.x)
+        sol.exitflag = MPTOPTIONS.INFEASIBLE;
+    end
+    
 else
 	% infeasible
 	sol.x = [];

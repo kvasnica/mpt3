@@ -205,7 +205,7 @@ else
 				sol = dat.solve;
 				
 				% The normals of the facets is the cost function
-				A = zeros(sol.xopt.Num,sol.xopt.Set(1).Dim);
+				A = zeros(sol.xopt.Num,dat.d);
 				for i=1:sol.xopt.Num
 					objfun = sol.xopt.Set(i).getFunction('obj');
 					A(i,:) = objfun.F;

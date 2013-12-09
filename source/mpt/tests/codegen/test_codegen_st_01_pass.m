@@ -32,8 +32,7 @@ sim('test_codegen_sim_01');
 cd(p);
 
 % delete the created directory
-onCleanup(@()clear('functions'));
-onCleanup(@()rmdir([d,filesep,'mpt_explicit_controller'],'s'));
+onCleanup(@()cleanfiles(d,'mpt_explicit_controller'));
 
 % compare the results
 for i=1:size(x,1)
@@ -41,7 +40,12 @@ for i=1:size(x,1)
         error('The results do not match! Problem with exported C-code.');
     end
 end
-    
+   
+end
 
+function cleanfiles(d,name)
+
+clear('functions');
+rmdir([d,filesep,name],'s');
 
 end

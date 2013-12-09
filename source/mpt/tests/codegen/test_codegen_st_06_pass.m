@@ -21,6 +21,9 @@ cd(d);
 % generate code using default name
 c.exportToC('_a_b','my dir');
 
+% clean files on exit
+onCleanup(@()cleanfiles(p));
+
 % enter the directory and compile the files
 cd('my dir');
 mex('_a_b_sfunc.c');
@@ -45,14 +48,13 @@ cd('dir/my-dir');
 mex('my_function_sfunc.c');
 cd('../..');
 
+end
 
-onCleanup(@()clear('functions'));
-onCleanup(@()rmdir('my dir','s'));
-onCleanup(@()rmdir('dir','s'));
-onCleanup(@()cd(p));
+function cleanfiles(p)
 
-
-
-
+clear('functions');
+rmdir('my dir','s');
+rmdir('dir','s');
+cd(p);
 
 end

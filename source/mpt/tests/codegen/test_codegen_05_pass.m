@@ -44,9 +44,9 @@ cd(dir_name);
 % compile the S-function
 mex('EMPCcontroller_sfunc.c');
 
-assignin('caller','N',ctrl.N);
-assignin('caller','model',model);
-assignin('caller','x0',[0;0]);
+assignin('base','N',ctrl.N);
+assignin('base','model',model);
+assignin('base','x0',[0;0]);
 sim('test_codegen_sim_05')
 
 % go back to original directory
