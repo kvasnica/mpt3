@@ -272,22 +272,32 @@ if any(strcmpi(S.problem_type,{'LP','QP'}))
         Anew = [-A A];
         bnew = -b;
         
-        % create M,q for LCP
-        M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
-        q = [fnew; -bnew];
-        
-        % solve LCP
-        % dimension of LCP to solve is "2*size(H,1)+size(A,1)"
-        if S.test
-            [z,w,basis,exfl] = lcp(M, q);
-        else
-            if ~isempty(S.routine)
-                lcpopt = MPTOPTIONS.modules.solvers.lcp;
-                lcpopt.routine = S.routine;
-                [z,w,basis,exfl] = lcp(M, q, lcpopt );                
-            else                
-                [z,w,basis,exfl] = lcp(M, q, MPTOPTIONS.modules.solvers.lcp );
+        % catch error when allocating on extra large dimensions
+        try
+            % create M,q for LCP
+            M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
+            q = [fnew; -bnew];
+            
+            % solve LCP
+            % dimension of LCP to solve is "2*size(H,1)+size(A,1)"
+            if S.test
+                [z,w,basis,exfl] = lcp(M, q);
+            else
+                if ~isempty(S.routine)
+                    lcpopt = MPTOPTIONS.modules.solvers.lcp;
+                    lcpopt.routine = S.routine;
+                    [z,w,basis,exfl] = lcp(M, q, lcpopt );
+                else
+                    [z,w,basis,exfl] = lcp(M, q, MPTOPTIONS.modules.solvers.lcp );
+                end
             end
+        catch M1
+            % display what happened wrong
+            disp(M1.message);            
+            z = zeros(size(H,1)+size(Anew,1),1);
+            w = z;
+            % return error status 
+            exfl = -4;                      
         end
         
         % recover solution
@@ -343,22 +353,32 @@ if any(strcmpi(S.problem_type,{'LP','QP'}))
             bnew = Anew*bb - bn;
         end
         
-        % create M,q for LCP
-        M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
-        q = [fnew; -bnew];
-        
-        % solve LCP
-        % dimension of LCP to solve is "size(H,1)+size(Anew,1)"
-        if S.test
-            [z,w,basis,exfl] = lcp(M, q);
-        else
-            if ~isempty(S.routine)
-                lcpopt = MPTOPTIONS.modules.solvers.lcp;
-                lcpopt.routine = S.routine;
-                [z,w,basis,exfl] = lcp(M, q, lcpopt );
+        % catch error when allocating on extra large dimensions
+        try
+            % create M,q for LCP
+            M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
+            q = [fnew; -bnew];
+                    
+            % solve LCP
+            % dimension of LCP to solve is "size(H,1)+size(Anew,1)"
+            if S.test
+                [z,w,basis,exfl] = lcp(M, q);
             else
-                [z,w,basis,exfl] = lcp(M, q, MPTOPTIONS.modules.solvers.lcp );
+                if ~isempty(S.routine)
+                    lcpopt = MPTOPTIONS.modules.solvers.lcp;
+                    lcpopt.routine = S.routine;
+                    [z,w,basis,exfl] = lcp(M, q, lcpopt );
+                else
+                    [z,w,basis,exfl] = lcp(M, q, MPTOPTIONS.modules.solvers.lcp );
+                end
             end
+        catch M2
+            % display what happened wrong
+            disp(M2.message);
+            z = zeros(size(H,1)+size(Anew,1),1);
+            w = z;
+            % return error status 
+            exfl = -4;
         end
         
         % recover variables
