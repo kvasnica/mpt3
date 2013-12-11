@@ -378,8 +378,6 @@ else
 			opt.Internal.pB = -P.H(:,1:opt.d);
 			opt.Internal.A = P.H(:,opt.d+1:opt.n+opt.d);
 			opt.Internal.b  =  P.H(:,end);
-			opt.Ath = [eye(opt.d); -eye(opt.d)];
-			opt.bth = ones(2*opt.d, 1);
 			validate_solvernames(opt);
 			return
 		end

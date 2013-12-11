@@ -133,7 +133,7 @@ ret.xopt = PolyUnion('Set',reg,'Domain', toPolyhedron(r.Phard),...
 	'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
 ret.xopt.setInternal('convexHull', toPolyhedron(r.Phard));
 ret.mplpsol = r;
-if numel(reg)>0
+if ret.xopt.Num>0
 	ret.exitflag = MPTOPTIONS.OK;
 	ret.how = 'ok';
 else
