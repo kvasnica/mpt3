@@ -9,9 +9,22 @@ global MPTOPTIONS
 
 load data_plcp_varstepproblem_01
 
+onCleanup(@()setdefault);
+
+% force checking of adj. list
+MPTOPTIONS.modules.solvers.plcp.adjcheck=true;
+
 r=problem.solve;
 
 if r.xopt.Num~=293
     error('wrong number of regions.');
 end
 
+end
+
+function setdefault
+
+global MPTOPTIONS
+MPTOPTIONS.modules.solvers.plcp.adjcheck=false;
+
+end

@@ -12,6 +12,10 @@ global MPTOPTIONS
 % load test data
 load test_dualLP_01
 
+% force checking of adj. list
+MPTOPTIONS.modules.solvers.plcp.adjcheck=true;
+onCleanup(@()setdefault);
+
 d.pE = [0.12622      -1.6989
      0.014418       1.0117
      -0.96446      0.22981
@@ -87,5 +91,12 @@ end
 
 
 
+
+end
+
+function setdefault
+
+global MPTOPTIONS
+MPTOPTIONS.modules.solvers.plcp.adjcheck=false;
 
 end
