@@ -83,12 +83,22 @@
         <cmd> Ath = [eye(2); -eye(2)]; bth = [2;2;5;5]; </cmd>
         <descr> Create the parametric optimization problem </descr>
         <cmd> problem = Opt('f',f,'A',A,'b',b,'pB',B,'pF',pF,'Ath',Ath,'bth',bth) </cmd>
-        <descr> We want to compute the feasible set without solving the parametric optimization problem.</descr>
+        <descr> We want to compute the feasible set of the parametric optimization problem.</descr>
         <cmd> K = problem.feasibleSet() </cmd>
-        <descr> Now compute the solution by solving the parametric optimization problem: </descr>
+        <descr> The feasible set represents a region where there exist a feasible set of constraints.
+             Now compute the solution by solving the parametric optimization problem: </descr>
         <cmd> res = problem.solve </cmd>
-        <descr> The feasible sets from the two approaches are equal.</descr>        
-        <cmd> K == res.xopt.convexHull </cmd>
+        <descr> The parametric solver returns regions with the optimal solution to the 
+        parametric optimization problem. The union of these regions is a subset of the 
+            feasible set <tt>K</tt> because in some parts of the feasible space the cost 
+            function can be unbounded and therefore the optimality conditions do not hold.
+        </descr>        
+        <descr> On the figure below one can see that in this example the union of regions returned
+        from the parametric solver is a subset of the feasible set <tt>K</tt>.</descr>
+        <cmd> K.plot('wire',true,'linewidth',2,'linestyle','--');
+            hold on;
+            res.xopt.plot
+        </cmd>
     </example>
 
 	<!-- multiple related function can be defined -->
