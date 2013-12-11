@@ -150,8 +150,11 @@ Abc = A(:,Bc); Anc = A(:,Nc);
 % modify inequality constraints
 S.A = Abc*C + Anc;
 S.b = b - Abc*D1;
+S.Internal.A = S.A; % update merged constraints stored internally
+S.Internal.b = S.b; % update merged constraints stored internally
 if S.isParametric
     S.pB = pB - Abc*D2;
+    S.Internal.pB = S.pB; % update merged constraints stored internally
 end
 
 % modify cost
