@@ -150,7 +150,12 @@ else
 				H = Pn.H(:, [dims(:); dims_eliminate(:); Pn.Dim+1]');
 				
 				% eliminate one dimension at a time
+                t = tic;
 				for i = 1:length(dims_eliminate)
+                    if toc(t) > MPTOPTIONS.report_period
+                        fprintf('progress: %d/%d\n', i, length(dims_eliminate));
+                        t = tic;
+                    end
 					Hn = fourier(H, 1:Pn.Dim-i);
 					if isempty(Hn)
 						% polyhedron is full R^P.dim
