@@ -65,12 +65,23 @@ classdef MPCController < AbstractController
 			end
 		end
         		
-		function obj = construct(obj)
+		function obj = construct(obj, options)
 			% Converts the MPC problem into a YALMIP's optimizer object
+            %
+            % Syntax:
+            %   ctrl.construct()
+            %   ctrl.construct(sdpsettings(...))
 
 			% make sure we have the prediction horizon available
 			error(obj.assert_controllerparams_defined);
 			
+            % allow custom options for the optimizer object
+            if nargin<2
+                options = sdpsettings('verbose', 0);
+            else
+                sdpsettings(options, 'verbose', 0);
+            end
+            
 			if isempty(obj.yalmipData)
 				Y = obj.toYALMIP();
 			else
@@ -80,7 +91,7 @@ classdef MPCController < AbstractController
 			% construct YALMIP's optimizer object with the first state as
 			% the initial condition
 			obj.optimizer = optimizer(Y.constraints, Y.objective, ...
-				sdpsettings('verbose', 0), ...
+				options, ...
 				Y.internal.parameters, Y.internal.requested);
 			
 			obj.markAsUnmodified();
