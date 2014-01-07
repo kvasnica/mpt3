@@ -78,8 +78,6 @@ classdef MPCController < AbstractController
             % allow custom options for the optimizer object
             if nargin<2
                 options = sdpsettings('verbose', 0);
-            else
-                sdpsettings(options, 'verbose', 0);
             end
             
 			if isempty(obj.yalmipData)
