@@ -412,9 +412,13 @@ else
 
         % overwrited internally irredundant representation with parametric
         % data
-        opt.Internal.pB = -hull.H(:,1:opt.d);
+        opt.Internal.pB = -hull.H(:,1:opt.d); % merged inequality constraints on decision and parametric variables A*x <= b + pB*th
         opt.Internal.A = hull.H(:,opt.d+1:opt.n+opt.d);
         opt.Internal.b  =  hull.H(:,end);
+        opt.Internal.plb = plb; % extracted lower bound on parameters
+        opt.Internal.pub = pub; % extracted upper bound on parameters
+        opt.Internal.lb = lb(opt.d+1:opt.d+opt.n); % extracted lower bound on decision variables
+        opt.Internal.ub = ub(opt.d+1:opt.d+opt.n); % extracted upper bound on decision variables        
         opt.Internal.removed_rows.ineqlin = find(hull.I(1:opt.m));
         opt.Internal.removed_rows.lower = [opt.Internal.removed_rows.lower; find(hull.I(opt.m+1:opt.m+nnz(~ilb)))];
         opt.Internal.removed_rows.upper = [opt.Internal.removed_rows.upper; find(hull.I(opt.m+nnz(~ilb)+1:opt.m+nnz(~ilb)+nnz(~iub)))];
@@ -451,6 +455,67 @@ else
 %         opt.Ae =  hull.He(:,opt.d+1:end-1);
 %         opt.pE = -hull.He(:,1:opt.d);
 %         opt.be =  hull.He(:,end);
+
+        % find affine map between integer and binary variables
+        % x_I = T*y_B + t
+        % where x_I are integers and y_B are binary variables and T, t are
+        % matrices
+        ind_i = find(opt.vartype=='I');
+        ni = numel(ind_i);
+        if ni>0
+            % truncate zeros
+            lbi = opt.Internal.lb(ind_i);
+            ubi = opt.Internal.ub(ind_i);            
+            izlbi = abs(lbi) < MPTOPTIONS.zero_tol;
+            izubi = abs(ubi) < MPTOPTIONS.zero_tol;
+            lbi(izlbi) = zeros(nnz(izlbi),1);
+            ubi(izubi) = zeros(nnz(izubi),1);
+
+            % lower and upper bounds on integer variables
+            lbi = sign(lbi).*floor(abs(lbi));
+            ubi = sign(ubi).*floor(abs(ubi));
+            % correct inf values
+            % using infbound/2 value because intmax/2 or infbound gives
+            % large values in the transformation matrix which causes
+            % problems for mixed-integer solvers (see
+            % test_opt_integer_02_pass)
+            lbi(isinf(lbi)) = -MPTOPTIONS.infbound/2;
+            ubi(isinf(ubi)) = MPTOPTIONS.infbound/2;
+
+            % find negative lb that is the offset
+            t = zeros(ni,1);
+            indt = (lbi<0);
+            t(indt) = lbi(indt);
+            
+            % how many binary variables are needed to represent each
+            % integer?
+            imax = ubi-t;
+            nb = zeros(ni,1);
+            for i=1:ni
+                if imax(i)>intmax
+                    if MPTOPTIONS.verbose>1
+                        fprintf('The computed upper bound on the integer variable %i exceeds the limit %i. Using the upper limit instead.\n',i,intmax);
+                    end
+                    imax(i) = intmax;
+                end
+                nb(i) = numel(dec2bin(imax(i)));
+            end
+            % number of auxiliary binary variables to introduce
+            sb = sum(nb);
+            
+            % prepare the matrix T
+            T = zeros(ni,sb);
+            stmp = 0;
+            for i=1:ni
+               T(i,stmp+1:stmp+nb(i)) = power(2,nb(i)-1:-1:0);
+               stmp = stmp+nb(i);
+            end
+            
+            % store internally
+            opt.Internal.T = T;
+            opt.Internal.t = t;
+        end
+
     else
         % Remaining tests for non-parametric problems
         
@@ -478,6 +543,7 @@ else
         end
         
     end
+    
     
 end
 
