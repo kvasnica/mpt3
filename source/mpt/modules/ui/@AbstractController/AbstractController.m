@@ -211,6 +211,8 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			Y.internal.requested = vars;
 			% format of the initial condition
 			Y.internal.xinitFormat = obj.xinitFormat;
+            % default sdpsettings
+            Y.internal.sdpsettings = sdpsettings('verbose', 0);
 
 		end
 		
