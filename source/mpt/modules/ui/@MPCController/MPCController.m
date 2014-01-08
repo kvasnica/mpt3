@@ -130,9 +130,15 @@ classdef MPCController < AbstractController
 			
 			% use a pre-constructed optimizer object for faster
 			% evaluation
-			[U, infeasible] = obj.optimizer{xinit};
-			feasible = ~infeasible;
-			if infeasible
+			[U, status] = obj.optimizer{xinit};
+            % these statuses indicate a feasible solution 
+            % (from "help yalmiperror"):
+            %  0: Successfully solved
+            %  3: Maximum #iterations or time-limit exceeded
+            %  4: Numerical problems
+            %  5: Lack of progress
+            feasible = ismember(status, [0, 3, 4, 5]);
+			if ~feasible
 				J = Inf;
 				u = NaN(obj.nu, 1);
 				U = NaN(size(U));
