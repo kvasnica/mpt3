@@ -145,10 +145,82 @@ classdef polytope
 			end
 		end
 		
-		function h = plot(obj, varargin)
+		function h = plot(varargin)
 			% Polytope plotter
+            %
+            % Syntax:
+            %   plot(P)
+            %   plot(P, 'y') -- plot the polytope in yellow color
+            %   plot(P, [0.9 0.9 0.9]) -- use RGB color code
+            %   plot(P, options) -- use a structure of options (see below)
+            %   plot(P, 'y', options)
+            %
+            % Note: To plot a colored wireframe, use
+            %   plot(P, struct('wire', 1, 'edgecolor', 'b'))
+            %
+            % Supported options:
+            %       'alpha': transparency (1=opaque, 0=complete transparency)
+            %                double, default=1
+            %        'wire': if true, the set is plotted in wire frame
+            %                logical, default=false
+            %   'linestyle': style of the set's border
+            %                string, default='-'
+            %   'linewidth': width of the set's border
+            %                double, default = 1
+            %   'edgecolor': color of edges
+            %                string, default='k'
+            %   'edgealpha': transparency of edges (1=opaque, 0=complete transparency)
+            %                double, default=1
+            %      'marker': marker of the plot
+            %                string, default = 'none'
+            %  'markerSize': size of the marker
+            %                double, default=6
+            %    'colormap': color map to use
+            %                string or a function handle, default='mpt'
 			
-			h = obj.P.plot(varargin{:});
+            h = [];
+            
+            % split input arguments into objects and corresponding options
+            [objects, options] = parsePlotOptions('polytope', varargin{:});
+            if numel(objects)==0
+                % no objects to plot
+                return
+            end
+            
+            % plot each object separately, hence we need to hold on
+            prevHold = ishold;
+            if ~ishold,
+                clf;
+            end
+            hold('on');
+            
+            % plot each polytope
+            for i = 1:length(objects)
+                
+                % determine options for each object
+                args = {};
+                for j = 1:numel(options{i})
+                    if isstruct(options{i}{j})
+                        % convert structure into a set of {'param', value}
+                        % pairs
+                        f = fieldnames(options{i}{j});
+                        for k = 1:numel(f)
+                            args{end+1} = f{k};
+                            args{end+1} = options{i}{j}.(f{k});
+                        end
+                    else
+                        % color needs to be prefixed
+                        args{end+1} = 'color';
+                        args{end+1} = options{i}{j};
+                    end
+                end
+                
+                h = [h; objects{i}.P.plot(args{:})];
+            end
+            
+            if ~prevHold
+                hold('off');
+            end
 			if nargout==0
 				clear h
 			end
