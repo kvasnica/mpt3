@@ -29,8 +29,12 @@ classdef polytope
 					obj = polytope;
 				end
 				
-			elseif nargin==1 && isa(arg1, 'Polyhedron')
+			elseif nargin==1 && ...
+                    (isa(arg1, 'Polyhedron') || isa(arg1, 'PolyUnion'))
 				% import a polyhedral array
+                if isa(arg1, 'PolyUnion')
+                    arg1 = arg1.Set;
+                end
 				n = numel(arg1);
 				if n==0
 					obj.P = Polyhedron;
