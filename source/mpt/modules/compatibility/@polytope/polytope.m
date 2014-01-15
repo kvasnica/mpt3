@@ -661,6 +661,12 @@ classdef polytope
             PU = PolyUnion(toPolyhedron(obj));
             E = polytope(PU.envelope());
         end
+        
+        function Q = uminus(obj)
+            % Unary minus
+            
+            Q = polytope(-obj.P);
+        end
 	end
 	
 	methods(Static)
