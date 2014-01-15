@@ -19,6 +19,6 @@ problem = Opt(S);
 % full-dimensional
 [worked, msg] = run_in_caller('problem.solve; ');
 assert(~worked);
-asserterrmsg(msg,'EliminateEquations: Could not find invertible submatrix for removing equalities.');
+asserterrmsg(msg,'EliminateEquations: Matrix of equality constraints is row-dependent and there are equality constraints on the parameter.');
 
 end

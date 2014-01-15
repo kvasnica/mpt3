@@ -5,9 +5,6 @@ function test_opt_eliminateEquations_19_pass
 % The problem is not controllable and in MPT2.6 the stabilizing set cannot
 % be found which throws an error. 
 %
-% In MPT3 this is a nice failtest for elimination of equalities because
-% no matter how we try, the rank of the equality constraint remains still
-% less than the number of variables. 
 
 di=ss([0 0 -4.92 0 0;0 0 4.92 -4.92 0;384.6 -384.6 0 0 0;0 0 0 0 0;0 0 0 0 0],...
     [4.92;0;0;0;0],[1 0 0 0 -1;0 0 1 -1 0],[0;0]);
@@ -31,10 +28,11 @@ probStruct.subopt_lev=0;
 M=mpt_import(sysStruct,probStruct);
 
 C = MPCController(M,probStruct.N);
-[worked, msg] = run_in_caller('EC=C.toExplicit;');
+EC = C.toExplicit;
 
-% this should throw an error that equalities cannot be removed
-assert(~worked);
-asserterrmsg(msg,'Could not find invertible submatrix for removing equalities');
+if EC.optimizer.Num~=1
+    error('The problem should result in 1 region.');
+end
+
 
 end
