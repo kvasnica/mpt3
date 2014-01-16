@@ -35,8 +35,12 @@ function out = on_variables(obj, varargin)
 %  .var: sdpvar representation of the introduced variable
 %  .parametric: logical, if true, the variable will become part of the
 %              vector of initial conditions
-out.var = obj.Internal.soft_min;
-out.parametric = false;
+if isa(obj.Internal.soft_min, 'sdpvar')
+	out.var = obj.Internal.soft_min;
+	out.parametric = false;
+else
+	out = [];
+end
 
 end
 
