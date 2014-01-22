@@ -10,7 +10,10 @@ end
 
 if strcmpi(opt.problem_type,'LCP')
 % LCP 
-    
+    if any(eig(opt.M)<-MPTOPTIONS.abs_tol);
+        error('mpt_call_plcp: PLCP solver does not solve indefinite LCP problems. Use ENUMPLCP solver instead.');    
+    end
+
     % obtain solution
     ret = mpt_plcp(opt);
 

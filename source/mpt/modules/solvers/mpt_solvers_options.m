@@ -90,6 +90,12 @@ options.plcp.maxpivots = 100; %[ default 100, maximum 500 unless default recursi
 options.plcp.adjcheck = 0; % [default 0, otherwise 1]
 % force checking of the adjacency list inside the PLCP solver
 
+%% ENUM_PLCP options
+options.enum_plcp.maxLPs = Inf;
+% maximum number of LPs to solve
+
+options.enum_plcp.maxregions = Inf;
+% maximumum number of regions allowed to discover
 
 %% LCP options
 options.lcp.zerotol = 1e-10;

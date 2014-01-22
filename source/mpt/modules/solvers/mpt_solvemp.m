@@ -22,6 +22,11 @@ switch upper(S.solver)
         
         % call PLCP solver
         R = mpt_call_plcp(S);
+
+    case {'ENUMPLCP'}
+        
+        % call ENUMPLCP solver
+        R = mpt_call_enum_plcp(S);
         
     case {'MPQP'}
         

@@ -38,6 +38,7 @@ parametric_solvers_list = {...
     {'PLCP',{'mpt_plcp.m'},10},...
     {'MPQP',{'mpt_mpqp.m'},20},...
     {'MPLP',{'mpt_mplp.m'},30},...
+    {'ENUMPLCP',{'mpt_enum_plcp.m'},40},...
     };
 
 % found solvers as strings
@@ -181,9 +182,9 @@ if isempty(solvers.LCP)
 end
 
 % sort parametric solvers according to type of problem they solve
-solvers.parametric.LP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPLP','PLCP'}),1);
-solvers.parametric.QP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPQP','PLCP'}),1);
-solvers.parametric.LCP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'PLCP'}),1);
+solvers.parametric.LP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPLP','PLCP','ENUMPLCP'}),1);
+solvers.parametric.QP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPQP','PLCP','ENUMPLCP'}),1);
+solvers.parametric.LCP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'PLCP','ENUMPLCP'}),1);
 
 % exit if no LP solver is working
 if isempty(LPorder)

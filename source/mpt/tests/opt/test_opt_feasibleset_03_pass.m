@@ -17,8 +17,8 @@ asserterrmsg(msg, 'The input must be either a string or an array of Polyhedron o
 T = evalc('K = pqp.feasibleSet(''mplp'');');
 asserterrmsg(T, 'mpt_plcp: 22 regions');
 
-% default projection method (fourier) should not display anything
-T = evalc('K = pqp.feasibleSet();');
-assert(isempty(T));
+% default projection method (fourier)
+T = evalc('S = pqp.feasibleSet();');
+assert(~isEmptySet(S));
 
 end

@@ -6,23 +6,26 @@ function test_opt_eliminateEquations_45_pass
 
 global MPTOPTIONS
 
-m = 5; n = 12; me = 8; d = 2;
-S.A = randn(m,n);
-S.b = 5*rand(m,1);
-S.pB = randn(m,d);
-Q = randn(n);
-S.H = 0.5*(Q'*Q);
-S.f = randn(n,1);
-S.pF = randn(n,d);
-S.Ae = 8*randn(me,n);
-S.be = randn(me,1);
-S.pE = randn(me,d);
-S.ub = 4*ones(n,1);
-S.lb = -2*ones(n,1);
-S.Ath = [eye(d);-eye(d)];
-S.bth = [3*ones(d,1); 2*ones(d,1)];
-S.vartype = 'CCCCICBCCBCC';
+% m = 5; n = 12; me = 8; d = 2;
+% S.A = randn(m,n);
+% S.b = 5*rand(m,1);
+% S.pB = randn(m,d);
+% Q = randn(n);
+% S.H = 0.5*(Q'*Q);
+% S.f = randn(n,1);
+% S.pF = randn(n,d);
+% S.Ae = 8*randn(me,n);
+% S.be = randn(me,1);
+% S.pE = randn(me,d);
+% S.ub = 4*ones(n,1);
+% S.lb = -2*ones(n,1);
+% S.Ath = [eye(d);-eye(d)];
+% S.bth = [3*ones(d,1); 2*ones(d,1)];
+% S.vartype = 'CCCCICBCCBCC';
 
+load data_opt_eliminateEquations_45
+
+d = size(S.pB,2);
 % solve original problem for all values of integer and binaries
 problem = Opt(S);
 ind_i = find(problem.vartype=='I');

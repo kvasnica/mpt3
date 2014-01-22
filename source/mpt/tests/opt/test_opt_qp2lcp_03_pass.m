@@ -33,6 +33,25 @@ if norm(res.xopt-x,1)>MPTOPTIONS.rel_tol
     error('QP2LCP failed.');
 end
 
+% dual check
+lam_ineq = problem.recover.lambda.ineqlin.lambdaX*[rn.lambda;rn.xopt] + problem.recover.lambda.ineqlin.lambdaTh;
+lam_eq = problem.recover.lambda.eqlin.lambdaX*[rn.lambda;rn.xopt] + problem.recover.lambda.eqlin.lambdaTh;
+lam_l = problem.recover.lambda.lower.lambdaX*[rn.lambda;rn.xopt] + problem.recover.lambda.lower.lambdaTh;
+lam_u = problem.recover.lambda.upper.lambdaX*[rn.lambda;rn.xopt] + problem.recover.lambda.upper.lambdaTh;
+
+if norm(lam_ineq-res.lambda.ineqlin,Inf)>MPTOPTIONS.abs_tol
+    error('Lagrange multipliers for inequalities do not hold.');
+end
+if norm(lam_eq-res.lambda.eqlin,Inf)>MPTOPTIONS.abs_tol
+    error('Lagrange multipliers for equalities do not hold.');
+end
+if norm(lam_l-res.lambda.lower,Inf)>MPTOPTIONS.abs_tol
+    error('Lagrange multipliers for lower bound do not hold.');
+end
+if norm(lam_u-res.lambda.upper,Inf)>MPTOPTIONS.abs_tol
+    error('Lagrange multipliers for upper bound do not hold.');
+end
+
 
 
 

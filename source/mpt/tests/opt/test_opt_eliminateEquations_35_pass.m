@@ -6,22 +6,10 @@ function test_opt_eliminateEquations_35_pass
 
 global MPTOPTIONS
 
-m = 13; n = 8; me=1; d=2;
-S.A = randn(m,n);
-S.b = 13*rand(m,1);
-S.pB = randn(m,d);
-Q = randn(n);
-S.H = 0.5*(Q'*Q);
-S.f = randn(n,1);
-S.pF = randn(n,d);
-S.Ae = 5*randn(me,n);
-S.be = randn(me,1);
-S.pE = randn(me,d);
-S.Ath = [eye(d);-eye(d)];
-S.bth = [2*ones(d,1);1*ones(d,1)];
-S.vartype = 'CCBCCBCC';
+load data_opt_eliminateEquations_35
 
-
+[m,n] = size(S.A);
+d = size(S.pB,2);
 ind_b = find(S.vartype=='B');
 nb = nnz(ind_b);
 

@@ -6,21 +6,9 @@ function test_opt_eliminateEquations_41_pass
 
 global MPTOPTIONS
 
-m = 7; n = 10; me = 5; d = 2;
-S.A = randn(m,n);
-S.b = 2*rand(m,1);
-S.pB = randn(m,d);
-S.f = randn(n,1);
-S.pF = randn(n,d);
-S.Ae = 3*randn(me,n);
-S.be = randn(me,1);
-S.pE = randn(me,d);
-S.ub = 7*ones(n,1);
-S.lb = -4*ones(n,1);
-S.Ath = [eye(d);-eye(d)];
-S.bth = [2*ones(d,1); 4*ones(d,1)];
-S.vartype = 'CCCCICCCCC';
+load data_opt_eliminateEquations_41
 
+d = size(S.pB,2);
 % solve original problem for all values of integer and binaries
 problem = Opt(S);
 ind_i = find(problem.vartype=='I');

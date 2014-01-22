@@ -6,23 +6,9 @@ function test_opt_eliminateEquations_40_pass
 
 global MPTOPTIONS
 
-m = 65; n = 12; me=4; d = 1;
-S.A = randn(m,n);
-S.b = 18*rand(m,1);
-S.pB = randn(m,d);
-Q = randn(n);
-S.H = 0.5*(Q'*Q);
-S.f = randn(n,1);
-S.pF = randn(n,d);
-S.Ae = 8*randn(me,n);
-S.be = randn(me,1);
-S.pE = randn(me,d);
-S.ub = 11*ones(n,1);
-S.lb = -9*ones(n,1);
-S.Ath = [1;-1];
-S.bth = [3; 5];
-S.vartype = [repmat('C',1,6),'I',repmat('C',1,5)];
+load data_opt_eliminateEquations_40
 
+d = size(S.pB,2);
 % solve original problem for all values of integer
 problem = Opt(S);
 ind_i = find(problem.vartype=='I');

@@ -28,11 +28,16 @@ probStruct.subopt_lev=0;
 M=mpt_import(sysStruct,probStruct);
 
 C = MPCController(M,probStruct.N);
-EC = C.toExplicit;
+% EC = C.toExplicit;
+% 
+% if EC.optimizer.Num~=1
+%     error('The problem should result in 1 region.');
+% end
 
-if EC.optimizer.Num~=1
-    error('The problem should result in 1 region.');
-end
+[worked, msg] = run_in_caller('EC=C.toExplicit;');
 
+% this should throw an error that equalities cannot be removed
+assert(~worked);
+asserterrmsg(msg,'Could not find invertible submatrix for removing equalities');
 
 end

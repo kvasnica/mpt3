@@ -134,6 +134,28 @@ if S.me > 0
     end
 end
 
+% identify integer/binary variables
+if ~isempty(S.vartype)
+    if any(S.vartype=='S') || any(S.vartype=='N')
+        error('qp2lcp: Semicontinuous (S) or semiinteger (N) variables are not supported for transformation to LCP.');
+    end
+    
+    % find continuous variables
+    ind_b = find(S.vartype=='B');
+    if isempty(ind_b)
+        ind_b = zeros(0,1);
+    end
+    ind_i = find(S.vartype=='I');
+    ind_c = find(S.vartype=='C');
+else
+    % index sets in case no vartype is specified
+    ind_c = 1:S.n;
+    ind_i = zeros(0,1);
+    ind_b = zeros(0,1);
+end
+
+% number of continuous variables
+nc = numel(ind_c);
 
 % Convert the problem to the standard form:
 % min 0.5 u'*H*u + (F*th + f)'*u
@@ -145,72 +167,159 @@ else
     H = S.H;
 end
 
+% extract integer variables and map into inequality constraints
+% alpha1*xB + alpha2*yB + beta*xN <= gamma + delta*th
+if isempty(ind_i)
+    % no integers
+    % inequality constraints
+    alpha1 = S.A(:,ind_b);
+    alpha2 = zeros(S.m,0);
+    beta = S.A(:,ind_c);
+    gamma = S.b;
+    if S.isParametric
+        delta = S.pB;
+    end
+    % no change in the cost function
+    f = S.f;
+    if S.isParametric
+        pF = S.pF;
+    end
+    
+    % number of binary and continuous variables
+    nxb = numel(ind_b);
+    nyb = 0;
+
+else
+    % integer map xI = T*yB + t
+    T = S.Internal.T;
+    t = S.Internal.t;
+    % inequality constraints
+    alpha1 = S.A(:,ind_b);
+    alpha2 = S.A(:,ind_i)*T;
+    beta = S.A(:,ind_c);
+    gamma = S.b-S.A(:,ind_i)*t;
+    if S.isParametric
+        delta = S.pB;
+    end
+    
+    % number of binary and continuous variables
+    nxb = numel(ind_b);
+    nyb = size(T,2);    
+    
+    % cost function
+    if ~isempty(S.H)
+        % QP
+        H = [S.H(ind_b,ind_b) S.H(ind_b,ind_i)*T S.H(ind_b,ind_c);
+            T'*S.H(ind_i,ind_b) T'*S.H(ind_i,ind_i)*T T'*S.H(ind_i,ind_c);
+            S.H(ind_c,ind_b) S.H(ind_c,ind_i)*T S.H(ind_c,ind_c)];
+        f = [S.f(ind_b) + 0.5*(S.H(ind_i,ind_b)' + S.H(ind_b,ind_i))*t;
+            T'*S.f(ind_i) + T'*S.H(ind_i,ind_i)*t;
+            S.f(ind_c) + 0.5*(S.H(ind_i,ind_c)' + S.H(ind_c,ind_i))*t];
+    else
+        % LP
+        H = zeros(nxb+nyb+nc);
+        f = [S.f(ind_b);
+            T'*S.f(ind_i);
+            S.f(ind_c)];        
+    end
+    if S.isParametric
+        pF = [S.pF(ind_b,:);
+            T'*S.pF(ind_i,:);
+            S.pF(ind_c,:)];
+    end
+end
+
+% number of binary variables
+nb = nxb + nyb;
+
+% adjust the index sets if there are integers
+ind_bn = 1:nb;
+ind_cn = nb+1:nb+nc;
 
 % get the rank
-r = rank(S.A,MPTOPTIONS.abs_tol);
+r = rank(beta,MPTOPTIONS.abs_tol);
 
-if r<S.n    
-    % express x as a difference of two positive numbers, i.e. x = x+ - x-
-    
+if r<nc  
+    % express xR as a difference of two positive numbers, i.e. xR = x+ - x-
+       
     % new objective function
-    Hnew = [H -H; -H H];    
-    fnew = [S.f; -S.f];
-    pFnew = [S.pF; -S.pF];
+    Hnew = [ H(ind_bn,ind_bn)  H(ind_bn,ind_cn) -H(ind_bn,ind_cn);
+             H(ind_cn,ind_bn)  H(ind_cn,ind_cn) -H(ind_cn,ind_cn);
+            -H(ind_cn,ind_bn) -H(ind_cn,ind_cn)  H(ind_cn,ind_cn)];
+    fnew = [f(ind_bn); f(ind_cn); -f(ind_cn)];
+    if S.isParametric
+        pFnew = [pF(ind_bn,:); pF(ind_cn,:); -pF(ind_cn,:)];
+    end
+    ind_bnew = 1:nb;
+    ind_cnew = nb+1:nb+2*nc;
     
-    % new constraints Anew*y >= bnew
-    Anew = [-S.A S.A];
-    bnew = -S.b;
-    pBnew = -pB;
+    % new constraints AnewB*[xB;yB] + AnewR*xR <= bnew + Bnew*th
+    AnewB = [alpha1 alpha2];
+    AnewR = [beta -beta];
+    bnew = gamma;
+    if S.isParametric
+        Bnew = delta;
+    end
     
     % create M,q for LCP
-    M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
-    q = [fnew; -bnew];
+    M = [-eye(nb), zeros(nb,2*nc), zeros(nb,S.m);
+         0.5*(Hnew(ind_bnew,ind_cnew)'+Hnew(ind_cnew,ind_bnew)), Hnew(ind_cnew,ind_cnew), AnewR';
+         -AnewB, -AnewR, zeros(S.m)];
+    q = [ones(nb,1); fnew(ind_cnew); bnew];
     if S.isParametric
-        Q = [pFnew; -pBnew];
+        Q = [zeros(nb,S.d); pFnew(ind_cnew,:); Bnew];
     else
-        Q=[];
+        Q = [];
     end
 
-               
     % Build mapping from the lcp solution back to the original variables
-    % x = z(1:n) - z(n+1:2*n)
+    % xR = z(nb+1:nb+nc) - z(nb+nc+1:nb+2*nc)
     %     
+    % w  = [vB; vR+; vR-; s], z = [[xB;yB]; x+; x-; lam]
+    %
     % x = [0 I -I]*[w] + [0]*[th]
     %              [z]       [1 ]
     % u = uX * [w;z] + uTh * [th;1]
-    nd = size(M,1);
-    recover.uX = zeros(S.n,2*nd);
-    recover.uX(:,nd+1:nd+S.n) = eye(S.n);
-    recover.uX(:,nd+S.n+1:nd+2*S.n) = -eye(S.n);
-    recover.uTh = zeros(S.n,S.d+1);    
+    recover.uX = zeros(S.n,2*(nb+2*nc+S.m));
+    recover.uX(ind_b,nb+2*nc+S.m+1:nb+2*nc+S.m+nxb) = eye(nxb);
+    if ~isempty(ind_i)
+        recover.uX(ind_i,nb+2*nc+S.m+nxb+1:nb+2*nc+S.m+nxb+nyb) = T;
+    end
+    recover.uX(ind_c,nb+2*nc+S.m+nb+1:nb+2*nc+S.m+nb+nc) = eye(nc);
+    recover.uX(ind_c,nb+2*nc+S.m+nb+nc+1:nb+2*nc+S.m+nb+2*nc) = -eye(nc);
+    recover.uTh = zeros(S.n,S.d+1);
+    if ~isempty(ind_i)
+        recover.uTh(ind_i,S.d+1) = t;
+    end
 
     % Lagrange multipliers are:
-    % lambda_ineq = z(2*n+1:end);
-    % lambda_ineq = z(2*n+1:end) + [0]*[th;1]
+    % lambda_ineq = z(nb+2*nc+1:end);
+    % lambda_ineq = z(nb+2*nc+1:end) + [0]*[th;1]
     % lambda_ineq = lambdaX * [w;z] + lambdaTh *[th;1];
-    
-    lambdaX = zeros(size(S.A,1),2*nd);
-    lambdaX(:,nd+2*S.n+1:2*nd) = eye(size(S.A,1),nd-2*S.n);
-    lambdaTh = zeros(size(S.A,1),S.d+1);
+    nlam = S.m;
+    lambdaX = zeros(S.m,2*(nb+2*nc+S.m));
+    lambdaX(:,nb+2*nc+S.m+nb+2*nc+1:nb+2*nc+S.m+nb+2*nc+S.m) = eye(S.m);
+    lambdaTh = zeros(S.m,S.d+1);
 
     
     % multipliers for the original inequalities
-    kept_rows.ineq = setdiff(1:S.Internal.m,S.Internal.removed_rows.ineqlin);    
-    recover.lambda.ineqlin.lambdaX = zeros(S.Internal.m,2*nd);
-    recover.lambda.ineqlin.lambdaX(kept_rows.ineq,nd+2*S.n+1:nd+2*S.n+S.Internal.m) = eye(numel(kept_rows.ineq));
+    kept_rows.ineq = setdiff(1:S.Internal.m,S.Internal.removed_rows.ineqlin);
+    recover.lambda.ineqlin.lambdaX = zeros(S.Internal.m,2*(nb+2*nc+S.m));
+    recover.lambda.ineqlin.lambdaX(kept_rows.ineq,nb+2*nc+S.m+nb+2*nc+1:nb+2*nc+S.m+nb+2*nc+S.Internal.m) = eye(numel(kept_rows.ineq));
     recover.lambda.ineqlin.lambdaTh = zeros(S.Internal.m,S.d+1);
     
     % multipliers for the original lower bound
     kept_rows.lb = setdiff(1:S.Internal.n,S.Internal.removed_rows.lower);    
-    recover.lambda.lower.lambdaX = zeros(S.Internal.n,2*nd);        
-    recover.lambda.lower.lambdaX(kept_rows.lb,nd+2*S.n+S.Internal.m+1:nd+2*S.n+S.Internal.m+numel(kept_rows.lb)) = eye(numel(kept_rows.lb));
+    recover.lambda.lower.lambdaX = zeros(S.Internal.n,2*(nb+2*nc+S.m));        
+    recover.lambda.lower.lambdaX(kept_rows.lb,nb+2*nc+S.m+nb+2*nc+S.Internal.m+1:...
+        nb+2*nc+S.m+nb+2*nc+S.Internal.m+numel(kept_rows.lb)) = eye(numel(kept_rows.lb));
     recover.lambda.lower.lambdaTh = zeros(S.Internal.n,S.d+1);
 
     % multipliers for the original upper bound
-    kept_rows.ub = setdiff(1:S.n,S.Internal.removed_rows.upper);
-    recover.lambda.upper.lambdaX = zeros(S.Internal.n,2*nd);        
-    recover.lambda.upper.lambdaX(kept_rows.ub,nd+2*S.n+S.Internal.m+numel(kept_rows.lb)+1:...
-        nd+2*S.n+S.Internal.m+numel(kept_rows.lb)+numel(kept_rows.ub)) = eye(numel(kept_rows.ub));
+    kept_rows.ub = setdiff(1:S.Internal.n,S.Internal.removed_rows.upper);
+    recover.lambda.upper.lambdaX = zeros(S.Internal.n,2*(nb+2*nc+S.m));        
+    recover.lambda.upper.lambdaX(kept_rows.ub,nb+2*nc+S.m+nb+2*nc+S.Internal.m+numel(kept_rows.lb)+1:...
+        nb+2*nc+S.m+nb+2*nc+S.Internal.m+numel(kept_rows.lb)+numel(kept_rows.ub)) = eye(numel(kept_rows.ub));
     recover.lambda.upper.lambdaTh = zeros(S.Internal.n,S.d+1);
 
     
@@ -227,99 +336,181 @@ if r<S.n
 %     recover.lambdaTh = -S.A'\(H*recover.uTh+[S.pF S.f]);
 
 else
-           
-    % factorize A to get
-    %  -A(B,:)*x = -b(B) -pB*th + y  % must be invertible mapping
-    %  -A(N,:)*x >= -b(N) -pB*th
+
+    % factorize beta to get
+    %  alpha1(P,:)*xB + alpha2(P,:)*yB + beta(P,:)*xR = gamma(P) + delta(P,:)*th - y  % must be invertible mapping
+    %  alpha1(Q,:)*xB + alpha2(Q,:)*yB + beta(Q,:)*xR <= gamma(Q) + delta(Q,:)*th
     %          y >= 0
-    [L,U,p] = lu(sparse(-S.A),'vector');
-    B = p(1:S.n);
-    N = setdiff(1:size(S.A,1),B);
+    [L,U,p] = lu(sparse(beta),'vector');
+    Pv = p(1:nc); % basic variables
+    Qv = setdiff(1:S.m,Pv); % non-basic variables
+    nlam = numel(Qv);
     
     % substitute
-    % use factorized solution to compute inv(A(B,:))
-    iAbl = -linsolve(full(L(1:S.n,:)),eye(S.n),struct('LT',true));
-    iAb = linsolve(full(U),iAbl,struct('UT',true));
-    %iAb = inv(A(B,:));
-    bb = S.b(B);
-    An = S.A(N,:);
-    bn = S.b(N);
-    if S.isParametric
-        pBb = S.pB(B,:);
-        pBn = S.pB(N,:);
-    end
+    % use factorized solution to compute inv(beta(P,:))
+    ibetal = linsolve(full(L(1:nc,:)),eye(nc),struct('LT',true));
+    ibetaP = linsolve(full(U),ibetal,struct('UT',true));
+    %ibetaP = inv(beta(P,:));
     
     % form new objective function
-    Hnew = iAb'*H*iAb;
-    fnew = -Hnew*bb - iAb'*S.f;
+    % xR = C1*xB + C2*yB + C3*y + D1 + D2*th
+    C1 = -ibetaP*alpha1(Pv,:);
+    C2 = -ibetaP*alpha2(Pv,:);
+    C3 = -ibetaP;
+    D1 = ibetaP*gamma(Pv);
     if S.isParametric
-        pFnew = -iAb'*H*iAb*pBb - iAb'*S.pF;
+       D2 = ibetaP*delta(Pv,:); 
     end
     
-    % new constraints Anew* y>= bnew
-    Anew = An*iAb;
-    if isempty(bn)
-        bnew = [];
+    % new objective function
+    if isempty(ind_i)
+        % no integers
+        if ~isempty(S.H)
+            % QP
+            Hnew = [S.H(ind_b,ind_b) + S.H(ind_b,ind_c)*C1 + C1'*S.H(ind_c,ind_b) + C1'*S.H(ind_c,ind_c)*C1,   S.H(ind_b,ind_c)*C3 + C1'*S.H(ind_c,ind_c)*C3;
+                C3'*S.H(ind_c,ind_b) + C3'*S.H(ind_c,ind_c)*C1, C3'*S.H(ind_c,ind_c)*C3];
+            fnew = [0.5*(S.H(ind_b,ind_c)+S.H(ind_c,ind_b)')*D1 + C1'*S.H(ind_c,ind_c)*D1 + S.f(ind_b) + C1'*S.f(ind_c);
+                C3'*S.H(ind_c,ind_c)*D1 + C3'*S.f(ind_c)];
+        else
+            % LP
+            Hnew = zeros(nb+nc);
+            fnew = [S.f(ind_b) + C1'*S.f(ind_c);
+                C3'*S.f(ind_c)];
+        end
     else
-        bnew = Anew*bb - bn;
+        if ~isempty(S.H)
+            % QP
+            Hnew = [S.H(ind_b,ind_b) + S.H(ind_b,ind_c)*C1 + C1'*S.H(ind_c,ind_b) + C1'*S.H(ind_c,ind_c)*C1, ...
+                S.H(ind_b,ind_i)*T + S.H(ind_b,ind_c)*C2 + C1'*S.H(ind_c,ind_i)*T + C1'*S.H(ind_c,ind_c)*C2, ...
+                S.H(ind_b,ind_c)*C3 + C1'*S.H(ind_c,ind_c)*C3;
+                T'*S.H(ind_i,ind_b) + T'*S.H(ind_i,ind_c)*C1 + C2'*S.H(ind_c,ind_b) + C2'*S.H(ind_c,ind_c)*C1, ...
+                T'*S.H(ind_i,ind_i)*T + T'*S.H(ind_i,ind_c)*C2 + C2'*S.H(ind_c,ind_i)*T + C2'*S.H(ind_c,ind_c)*C2, ...
+                T'*S.H(ind_i,ind_c)*C3 + C2'*S.H(ind_c,ind_c)*C3;
+                C3'*S.H(ind_c,ind_b) + C3'*S.H(ind_c,ind_c)*C1, ...
+                C3'*S.H(ind_c,ind_i)*T + C3'*S.H(ind_c,ind_c)*C2, ...
+                C3'*S.H(ind_c,ind_c)*C3];
+            fnew = [0.5*(S.H(ind_b,ind_c)+S.H(ind_c,ind_b)')*D1 + C1'*S.H(ind_c,ind_c)*D1 + S.f(ind_b) + C1'*S.f(ind_c) + ...
+                0.5*(S.H(ind_i,ind_b)'+S.H(ind_b,ind_i))*t + 0.5*C1'*(S.H(ind_i,ind_c)'+S.H(ind_c,ind_i))*t;
+                0.5*T'*(S.H(ind_i,ind_c)+S.H(ind_c,ind_i)')*D1 + C2'*S.H(ind_c,ind_c)*D1 + T'*S.f(ind_i) + C2'*S.f(ind_c) + ...
+                T'*S.H(ind_i,ind_i)*t + 0.5*C2'*(S.H(ind_i,ind_c)'+S.H(ind_c,ind_i))*t;
+                C3'*S.H(ind_c,ind_c)*D1 + C3'*S.f(ind_c) + 0.5*C3'*(S.H(ind_i,ind_c)'+S.H(ind_c,ind_i))*t];
+        else
+           % LP 
+           Hnew = zeros(nb+nc);
+           fnew = [S.f(ind_b) + C1'*S.f(ind_c);
+               T'*S.f(ind_i) + C2'*S.f(ind_c);
+               C3'*S.f(ind_c)];
+        end
     end
     if S.isParametric
-        pBnew = Anew*pBb - pBn;
+        if isempty(ind_i)
+            % no integers
+            if ~isempty(S.H)
+                % QP
+                pFnew = [ 0.5*(S.H(ind_b,ind_c)+S.H(ind_c,ind_b)')*D2 + C1'*S.H(ind_c,ind_c)*D2 + S.pF(ind_b,:) + C1'*S.pF(ind_c,:);
+                    C3'*S.H(ind_c,ind_c)*D2 + C3'*S.pF(ind_c,:) ];
+            else
+                % LP
+                pFnew = [ S.pF(ind_b,:) + C1'*S.pF(ind_c,:);
+                    C3'*S.pF(ind_c,:) ];
+            end
+        else
+            if ~isempty(S.H)
+                % QP                
+                pFnew = [ 0.5*(S.H(ind_b,ind_c)+S.H(ind_c,ind_b)')*D2 + C1'*S.H(ind_c,ind_c)*D2 + S.pF(ind_b,:) + C1'*S.pF(ind_c,:);
+                    0.5*T'*(S.H(ind_i,ind_c)+S.H(ind_c,ind_i)')*D2 + C2'*S.H(ind_c,ind_c)*D2 + T'*S.pF(ind_i,:) + C2'*S.pF(ind_c,:);
+                    C3'*S.H(ind_c,ind_c)*D2 + C3'*S.pF(ind_c,:) ];
+            else
+                % LP
+                pFnew = [ S.pF(ind_b,:) + C1'*S.pF(ind_c,:);
+                    T'*S.pF(ind_i,:) + C2'*S.pF(ind_c,:);
+                    C3'*S.pF(ind_c,:) ];
+            end
+        end
+    end
+    
+    
+    % new constraints AnewB*[xB;yB] + AnewR*y <= bnew + Bnew*th
+    alpha = [alpha1, alpha2];
+    AnewB = alpha(Qv,:)-beta(Qv,:)*ibetaP*alpha(Pv,:);
+    AnewR = -beta(Qv,:)*ibetaP;
+    bnew  = gamma(Qv)-beta(Qv,:)*ibetaP*gamma(Pv);
+    if S.isParametric
+        pBnew = delta(Qv,:)-beta(Qv,:)*ibetaP*delta(Pv,:);
     end
     
     % create M,q for LCP
-    M = [Hnew -Anew'; Anew zeros(size(Anew,1))];
-    q = [fnew; -bnew];
+    M = [-eye(nb) zeros(nb,nc+nlam);
+        0.5*(Hnew(ind_bn,ind_cn)'+Hnew(ind_cn,ind_bn)) Hnew(ind_cn,ind_cn) AnewR';
+        -AnewB -AnewR zeros(nlam)];
+    q = [ones(nb,1); fnew(ind_cn); bnew];
     if S.isParametric
-        Q = [pFnew; -pBnew];
+        Q = [zeros(nb,S.d); pFnew(ind_cn,:); pBnew];
     else
-        Q=[];
+        Q = [];
     end
     
     
     % Build mapping from the lcp solution back to the original variables
-    % x = iAb*bb + iAb*pBb*th -iAb*y
-    %     
-    % x = [0 -iAb]*[w] + [iAb*pBb iAb*bb]*[th]
-    %              [z]                    [1 ]
+    % xR = C1*xB + C2*yB + C3*y + D1 + D2*th
+    % 
+    % w  = [vB; vR; s], z = [[xB;yB]; y; lam]
+    %
+    % xR = [0 C1 C2 C3]*[w] + [D2 D1]*[th]
+    %                   [z]           [1 ]
+    % xB = [0 I  0  0 ]*[w] + [0  0 ]*[th]
+    %                   [z]           [1 ]
+    % yB = [0 0  I  0 ]*[w] + [0  0 ]*[th]
+    %                   [z]           [1 ]
+    
     % u = uX * [w;z] + uTh * [th;1]
-    recover.uX = [zeros(r,size(M,1))  -iAb  zeros(r,size(M,1)-r)];
-   
-    if S.isParametric
-        recover.uTh    = [iAb*pBb iAb*bb];
-    else
-        recover.uTh    = iAb*bb;
+    recover.uX = zeros(S.n, 2*(nb+nc+nlam));
+    recover.uX(ind_b, nb+nc+nlam+1:nb+nc+nlam+nxb) = eye(nxb);
+    if ~isempty(ind_i)
+        recover.uX(ind_i, nb+nc+nlam+nxb+1:nb+nc+nlam+nxb+nyb) = T;
     end
-    %  lambda_B = w(1:n)
-    %  lambda_N = z(n+1:end);
+    recover.uX(ind_c, nb+nc+nlam+1:nb+nc+nlam+nb+nc) = [C1 C2 C3];
+   
+    recover.uTh = zeros(S.n, S.d+1);
+    if ~isempty(ind_i)
+        recover.uTh(ind_i,S.d+1) = t;
+    end
+    if S.isParametric
+        recover.uTh(ind_c,:) = [D2 D1];
+    else
+        recover.uTh(ind_c,:) = D1;
+    end
+
+    % Lagrange multipliers
+    %  lambda_P = w(nb+1:nb+nc)  - corresponds to vR of vector w
+    %  lambda_Q = z(nb+nc+1:nb+nc+nlam) - corresponds to lam in vector z
     %  lambda = lambdaX * [w;z] + lambdaTh * [th;1]
 
     % A'*lam = -H*x -[F f]*[th;1]
     % A'*lam = -H*(uX*[w;z]+uTh*[th;1])-[F f]*[th;1]
     % lam =  (-A'\H*uX)*[w;z] -A'\(H*uTh-[F f])*[th;1]
 
-    nd = size(M,1);       
-    lambdaX = zeros(size(S.A,1),2*nd);
-    lambdaX(B,1:S.n) = eye(length(B),S.n);
-    lambdaX(N,nd+S.n+1:2*nd) = eye(length(N),nd-S.n);
-    lambdaTh = zeros(size(S.A,1),S.d+1); 
+    lambdaX = zeros(S.m,2*(nb+nc+nlam));
+    lambdaX(Pv,nb+1:nb+nc) = eye(length(Pv),nc);
+    lambdaX(Qv,(nb+nc+nlam)+nb+nc+1:2*(nb+nc+nlam)) = eye(length(Qv),nlam);
+    lambdaTh = zeros(S.m, S.d+1);
 
     % multipliers for the original inequalities    
     kept_rows.ineq = setdiff(1:S.Internal.m,S.Internal.removed_rows.ineqlin);    
-    recover.lambda.ineqlin.lambdaX = zeros(S.Internal.m,2*nd);
+    recover.lambda.ineqlin.lambdaX = zeros(S.Internal.m,2*(nb+nc+nlam));
     recover.lambda.ineqlin.lambdaX(kept_rows.ineq,:) = lambdaX(1:numel(kept_rows.ineq),:);
     recover.lambda.ineqlin.lambdaTh = zeros(S.Internal.m,S.d+1);
     
     % multipliers for the original lower bound
     kept_rows.lb = setdiff(1:S.Internal.n,S.Internal.removed_rows.lower);    
-    recover.lambda.lower.lambdaX = zeros(S.Internal.n,2*nd);        
+    recover.lambda.lower.lambdaX = zeros(S.Internal.n,2*(nb+nc+nlam));        
     recover.lambda.lower.lambdaX(kept_rows.lb,:) = ...
         lambdaX(numel(kept_rows.ineq)+1:numel(kept_rows.ineq)+length(kept_rows.lb),:);
     recover.lambda.lower.lambdaTh = zeros(S.Internal.n,S.d+1);
 
     % multipliers for the original upper bound
     kept_rows.ub = setdiff(1:S.Internal.n,S.Internal.removed_rows.upper);
-    recover.lambda.upper.lambdaX = zeros(S.Internal.n,2*nd);        
+    recover.lambda.upper.lambdaX = zeros(S.Internal.n,2*(nb+nc+nlam));        
     recover.lambda.upper.lambdaX(kept_rows.ub,:) = ...
         lambdaX(numel(kept_rows.ineq)+length(kept_rows.lb)+1:numel(kept_rows.ineq)+length(kept_rows.lb)+length(kept_rows.ub),:);
     recover.lambda.upper.lambdaTh = zeros(S.Internal.n,S.d+1);
@@ -355,8 +546,13 @@ if equations
     
     % lagrange multipliers for the original system
     kept_rows.eq = setdiff(1:S.Internal.me,S.Internal.removed_rows.eqlin);
-    recover.lambda.eqlin.lambdaX = zeros(S.Internal.me,2*nd);
-    recover.lambda.eqlin.lambdaX(kept_rows.eq,:) = niX;
+    if r<nc
+        recover.lambda.eqlin.lambdaX = zeros(S.Internal.me,2*(nb+2*nc+nlam));
+        recover.lambda.eqlin.lambdaX(kept_rows.eq,:) = niX;
+    else
+        recover.lambda.eqlin.lambdaX = zeros(S.Internal.me,2*(nb+nc+nlam));
+        recover.lambda.eqlin.lambdaX(kept_rows.eq,:) = niX;
+    end
     recover.lambda.eqlin.lambdaTh = zeros(S.Internal.me,S.d+1);
     recover.lambda.eqlin.lambdaTh(kept_rows.eq,:) = niTh;
     
@@ -364,7 +560,11 @@ if equations
 %     recover.lambdaX = [recover.lambdaX; niX];
 %     recover.lambdaTh = [recover.lambdaTh; niTh];
 else
-    recover.lambda.eqlin.lambdaX = zeros(0,2*nd);
+    if r<nc
+        recover.lambda.eqlin.lambdaX = zeros(0,2*(nb+2*nc+nlam));
+    else
+        recover.lambda.eqlin.lambdaX = zeros(0,2*(nb+nc+nlam));
+    end
     recover.lambda.eqlin.lambdaTh = zeros(0,S.d+1);
 end
 
@@ -404,6 +604,14 @@ if ~isempty(Q)
     S.Q = Q;
 end
 S.recover = recover;
+% indicate which variables correspond to binaries
+if ~isempty(S.vartype)
+    if r<nc
+        S.vartype = [repmat('B',1,nb), repmat('C',1,2*nc+nlam)];
+    else
+        S.vartype = [repmat('B',1,nb), repmat('C',1,nc+nlam)];
+    end
+end
 
 % validate data
 S.validate;

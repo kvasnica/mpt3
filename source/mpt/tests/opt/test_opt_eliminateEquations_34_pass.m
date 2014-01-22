@@ -6,19 +6,9 @@ function test_opt_eliminateEquations_34_pass
 
 global MPTOPTIONS
 
-m = 21; n = 8; me=1; d=2;
-S.A = randn(m,n);
-S.b = 13*rand(m,1);
-S.pB = randn(m,d);
-S.f = randn(n,1);
-S.pF = randn(n,d);
-S.Ae = 5*randn(me,n);
-S.be = randn(me,1);
-S.Ath = [eye(d);-eye(d)];
-S.bth = [3*ones(d,1);4*ones(d,1)];
-S.vartype = 'CCCCBCCB';
+load data_opt_eliminateEquations_34
 
-
+[m,n] = size(S.A);
 ind_b = find(S.vartype=='B');
 nb = nnz(ind_b);
 

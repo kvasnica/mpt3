@@ -42,7 +42,13 @@ if ~isempty(S.vartype)
     
     % find continuous variables
     ind_b = find(S.vartype=='B');
+    if isempty(ind_b)
+        ind_b = zeros(0,1);
+    end
     ind_i = find(S.vartype=='I');
+    if isempty(ind_i)
+        ind_i = zeros(0,1);
+    end
     ind_c = find(S.vartype=='C');
     nr = numel(ind_c);
 
@@ -121,20 +127,20 @@ end
 % factorize AeC to get an invertible mapping
 % AeB*xB + AeI*xI + AeC(Br,Bc)*x(Bc) + AeC(Br,Nc)*x(Nc) = be(Br) + pE(Br,:)*th
 [Le,Ue,pe,qe] = lu(sparse(AeC),'vector');
-if rank(full(Ue(:,1:rec)))~=rec
+if rank(full(Ue(:,1:rec)),MPTOPTIONS.abs_tol)~=rec
     % if invertibility is not achieved, we need to factorize differently
     % try full factorization but we with different combination of
     % variables
     for i=1:S.n-rec
         [Le,Ue,pe] = lu(sparse(AeC(:,i:rec+i-1)),'vector');
         qe = 1:S.n;
-        if rank(full(Ue(:,1:rec)))~=rec
+        if rank(full(Ue(:,1:rec)),MPTOPTIONS.abs_tol)~=rec
             continue
         else
             break;
         end
     end
-    if rank(full(Ue(:,1:rec)))~=rec
+    if rank(full(Ue(:,1:rec)),MPTOPTIONS.abs_tol)~=rec
         error('EliminateEquations: Could not find invertible submatrix for removing equalities.');
     end
 end
@@ -156,6 +162,9 @@ end
 % new index sets based on decomposition of continuous variables
 ind_m = ind_c(Bc); % basic continuous variables
 ind_n = ind_c(Nc); % non-basic continuous variables
+if isempty(ind_n)
+    ind_n=zeros(0,1);
+end
 
 % substitute x(Bc) = C1*xB + C2*yB + C3*x(Nc) + D1 + D2*th
 % xB are binary variables, yB are new binary created from integer variables
