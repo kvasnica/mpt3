@@ -804,29 +804,29 @@ R.addFunction(Lw,'w');
 % if LCP was created from LP/QP, compute also primal, dual variables and
 % the value function
 if ~isempty(lc.recover)
-    TT = lc.recover.uX*x + lc.recover.uTh;    
+    TT = lc.recover.uX*x + lc.recover.uTh;
     
-    % compute primal variables        
+    % compute primal variables
     Lprimal = lc.P*TT;
     R.addFunction(AffFunction(Lprimal(:,1:end-1),Lprimal(:,end)),'primal');
     
-   % compute dual variables for inequalities
-   %Ldual = lc.recover.lambdaX*x + lc.recover.lambdaTh;
-   Lineq = lc.recover.lambda.ineqlin.lambdaX*x + lc.recover.lambda.ineqlin.lambdaTh;
-   R.addFunction(AffFunction(Lineq(:,1:end-1),Lineq(:,end)),'dual-ineqlin');
-   
-   % dual variables for equalities
-   Leq = lc.recover.lambda.eqlin.lambdaX*x + lc.recover.lambda.eqlin.lambdaTh;
-   R.addFunction(AffFunction(Leq(:,1:end-1),Leq(:,end)),'dual-eqlin');
+    % compute dual variables for inequalities
+    %Ldual = lc.recover.lambdaX*x + lc.recover.lambdaTh;
+    Lineq = lc.recover.lambda.ineqlin.lambdaX*x + lc.recover.lambda.ineqlin.lambdaTh;
+    R.addFunction(AffFunction(Lineq(:,1:end-1),Lineq(:,end)),'dual-ineqlin');
     
-   % dual variables for lower bounds
-   Llb = lc.recover.lambda.lower.lambdaX*x + lc.recover.lambda.lower.lambdaTh;
-   R.addFunction(AffFunction(Llb(:,1:end-1),Llb(:,end)),'dual-lower');
-   
-   % dual variables for upper bounds
-   Lub = lc.recover.lambda.upper.lambdaX*x + lc.recover.lambda.upper.lambdaTh;
-   R.addFunction(AffFunction(Lub(:,1:end-1),Lub(:,end)),'dual-upper');
-   
+    % dual variables for equalities
+    Leq = lc.recover.lambda.eqlin.lambdaX*x + lc.recover.lambda.eqlin.lambdaTh;
+    R.addFunction(AffFunction(Leq(:,1:end-1),Leq(:,end)),'dual-eqlin');
+    
+    % dual variables for lower bounds
+    Llb = lc.recover.lambda.lower.lambdaX*x + lc.recover.lambda.lower.lambdaTh;
+    R.addFunction(AffFunction(Llb(:,1:end-1),Llb(:,end)),'dual-lower');
+    
+    % dual variables for upper bounds
+    Lub = lc.recover.lambda.upper.lambdaX*x + lc.recover.lambda.upper.lambdaTh;
+    R.addFunction(AffFunction(Lub(:,1:end-1),Lub(:,end)),'dual-upper');
+    
     % compute the objective value
     Y = TT(:,1:end-1);
     T = TT(:,end);
@@ -837,9 +837,14 @@ if ~isempty(lc.recover)
         at = 0.5*T'*lc.obj.H*T + lc.obj.f'*T + lc.obj.c;
         R.addFunction(QuadFunction(qt,lt,at),'obj');
     else
+        qt = lc.obj.pF'*Y + lc.obj.Y;
         lt = T'*lc.obj.pF + lc.obj.f'*Y + lc.obj.C;
         at = lc.obj.f'*T + lc.obj.c;
-        R.addFunction(AffFunction(lt,at),'obj');
+        if any(any(qt))
+            R.addFunction(QuadFunction(qt,lt,at),'obj');
+        else
+            R.addFunction(AffFunction(lt,at),'obj');
+        end
     end
 end
 
