@@ -161,7 +161,7 @@ classdef FilterBehavior < MPTUIHandle
 			elseif isequal(concat_type, 'map')
 				out = containers.Map;
 				for i = 1:length(filters)
-					out(filters{i}) = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));
+					out(filters{i}) = obj.callFilterFrom(filters{i}, from, obj.(filters{i}));
 				end
 			elseif isequal(concat_type, '[]')
 				out = obj.callFilterFrom(filters{1}, from, obj.(filters{1}));

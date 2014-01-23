@@ -10,12 +10,12 @@ if isa(m, 'containers.Map')
 			master_component = k{i};
 		end
 		if nargin<4
-			master_key = k{i};
+			local_master_key = k{i};
 		else
-			master_key = [master_key '.' k{i}];
+			local_master_key = [master_key '.' k{i}];
 		end
 		if ~isempty(v)
-			[new_s, inits] = map2struct(v, inits, master_component, master_key);
+			[new_s, inits] = map2struct(v, inits, master_component, local_master_key);
 			s.(k{i}) = new_s;
 		end
 	end
