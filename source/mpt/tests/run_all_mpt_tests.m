@@ -121,7 +121,7 @@ if n_error>0 && ~options.rerunfailed
 	fprintf('Failed tests:\n\n');
 	for i = 1:length(failed)
 		[~, testname] = fileparts(failed{i});
-		if usejava('jvm')
+		if usejava('desktop')
 			fprintf('%s (<a href="matlab:opentoline(''%s'', 1, 0)">edit</a>)\n', ...
 				testname, [failed{i} '.m']);
 		else
@@ -134,7 +134,7 @@ end
 fprintf('\n');
 fprintf('   Total: %d\n', length(test_files));
 fprintf('  Failed: %d', n_error);
-if n_error>0 && usejava('jvm')
+if n_error>0 && usejava('desktop')
 	% show a link to re-run all failed tests (only when running a
 	% java-enabled matlab)
 	fprintf(' (<a href="matlab: eval(''run_all_mpt_tests --rerunfailed'')">re-run all failed</a>)');
@@ -213,7 +213,7 @@ catch
 	if options.onlyerrors
 		fprintf('%s%s ', testname, repmat('.',1,50-length(testname)));
 	end
-	if usejava('jvm')
+	if usejava('desktop')
 		fprintf('<a href="matlab:opentoline(''%s'', %d, 0)">error</a> (%.1f)\n', ...
 			L.stack(1).file, L.stack(1).line, runtime);
 	else
