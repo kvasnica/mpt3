@@ -323,10 +323,10 @@ options.glpk.mipgap = 0; % The relative mip gap tolerance.
 % details in http://www.gurobi.com/doc/40/refman/node572.html
 % only some important settings are here, the rest is kept to be default
 
-options.gurobi.BarIterLimit=1e12;
+options.gurobi.BarIterLimit=Inf;
 % >0, Limits the number of barrier iterations performed (barrier only).
 
-options.gurobi.CutOff = 1e12;
+options.gurobi.CutOff = Inf;
 % If the objective value for the optimal solution is better than the
 % specified cutoff, the solver will return the optimal solution. Otherwise,
 % it will terminate with a CUTOFF status (see the Status Code section for
@@ -335,13 +335,13 @@ options.gurobi.CutOff = 1e12;
 options.gurobi.IterationLimit=1e6; 
 % >0, Limits the number of simplex iterations performed.
 
-options.gurobi.NodeLimit=1e12;
+options.gurobi.NodeLimit=Inf;
 % >0, Limits the number of MIP nodes explored (MIP only).
 
-options.gurobi.SolutionLimit=1e12;
+options.gurobi.SolutionLimit=Inf;
 % >0, Limits the number of feasible solutions found (MIP only).
 
-options.gurobi.TimeLimit=1e12;
+options.gurobi.TimeLimit=Inf;
 % >0, Limits the total time expended (in seconds).
 
 options.gurobi.BarConvTol = 1e-8;
@@ -426,7 +426,7 @@ options.gurobi.Presolve=-1;
 % Controls the presolve level. A value of -1 corresponds to an automatic
 % setting. Other options are off (0), conservative (1), or aggressive (2).
 
-options.gurobi.TimeLimit=1e12;
+options.gurobi.TimeLimit=Inf;
 % >0, Limits the total time expended (in seconds).
 
 options.gurobi.Threads=0;
