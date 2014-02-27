@@ -93,7 +93,7 @@ classdef MLDSystem < AbstractSystem
 			if S.nxb>0
 				% last 'nxb' elements are binary
 				obj.x.with('binary');
-				obj.x.binary = S.nxb+1:S.nx;
+				obj.x.binary = S.nxr+1:S.nx;
 			end
 			
 			u = SystemSignal(obj.nu);
@@ -105,7 +105,7 @@ classdef MLDSystem < AbstractSystem
 			if S.nub>0
 				% last 'nub' elements are binary
 				obj.u.with('binary');
-				obj.u.binary = S.nub+1:S.nu;
+				obj.u.binary = S.nur+1:S.nu;
 			end
 			
 			y = SystemSignal(obj.ny);
@@ -117,7 +117,7 @@ classdef MLDSystem < AbstractSystem
 			if S.nyb>0
 				% last 'nyb' elements are binary
 				obj.y.with('binary');
-				obj.y.binary = S.nyb+1:S.ny;
+				obj.y.binary = S.nyr+1:S.ny;
 			end
 			
 			d = SystemSignal(obj.nd);
