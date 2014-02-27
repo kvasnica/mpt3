@@ -58,8 +58,16 @@ classdef MLDSystem < AbstractSystem
             elseif ischar(source)
                 % compile using HYSDEL
 				S = obj.compile_hysdel(source, parameters);
-			end
-			
+            end
+
+            % allow for MLD structures without affine terms
+            if ~isfield(S, 'B5')
+                S.B5 = zeros(S.nx, 1);
+            end
+            if ~isfield(S, 'D5')
+                S.D5 = zeros(S.ny, 1);
+            end
+            
 			obj.S = S;
 			
 			obj.A = S.A;
