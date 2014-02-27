@@ -56,11 +56,12 @@ if ~isempty(problem.recover)
 end
 
 % Generate a YALMIP optimizer object for testing feasibility
-bigM = MPTOPTIONS.infbound;
+bigM = 1e6;
 w = sdpvar(n,1); wBnd = sdpvar(n,1);
 z = sdpvar(n,1); zBnd = sdpvar(n,1);
 x = sdpvar(size(Q,2),1);
 con = set(w - M*z == Q*x + q) + set((1-wBnd)*bigM >= w >= 0) + set((1-zBnd)*bigM >= z >= 0);
+%con = con + set( problem.Ath*x <= problem.bth );
 % If wBnd(i) == 0, then w(i) = 0, same for z
 s = sdpsettings;
 opt = optimizer(con, 0, s, [wBnd;zBnd], [w;z]);
@@ -102,7 +103,7 @@ for iii = 1:n
     % First check - are they full rank?
     rankTest = ones(1,size(Izero,2));
     for i = 1:size(Izero,2)
-        if rank(A(:,Ibasis(:,i)),MPTOPTIONS.abs_tol) < iii
+        if rank(A(:,Ibasis(:,i))) < iii
             rankTest(i) = 0;
         end
     end
@@ -172,7 +173,7 @@ sol.xopt = U;
 sol.exitflag = flag;
 sol.how = how;
 sol.stats.solveTime = time;
-
+sol.stats.numLPs = numLPs;
 
 fprintf('mpt_enum_plcp: %d regions\n',U.Num);
 
@@ -185,7 +186,6 @@ end
 % store internal data
 U.setInternal('feasible_bases',B);
 U.setInternal('infeasible_bases',INFEAS);
-U.setInternal('LPs',numLPs);
 
 
 
