@@ -1,0 +1,82 @@
+SYSTEM mpt3HysdelSystem {
+  INTERFACE {
+    STATE {
+      REAL xx1 [0, 10000], yy1 [0, 11.1], xxv1 [0, 50], yyv1 [0, 11.1];
+      REAL x1 [0, 10000], xv1 [0, 50];
+      BOOL xb1, xb2, xb3, xb4, xb5;
+    }
+    INPUT {
+      REAL ur1 [-4, 4];
+      BOOL ub1, ub3;
+    }
+    OUTPUT {
+      REAL y1, y2, y3, y4, y5;
+    }
+    PARAMETER {
+      REAL param1, param2, param3, epsilon;
+    }
+  }
+  IMPLEMENTATION {
+    AUX {
+      REAL zr1, zr2,zr3, zr4, zr5, zr6;
+      BOOL zb1, zb2, zb3, zb4, zb5, zb6, zb7, zb8;
+    }
+    MUST{
+      ~(ub1 & ub3);
+
+      ~(xb1 & xb2);
+      ~(xb1 & xb3);
+      ~(xb1 & xb4);
+      ~(xb1 & xb5);
+      ~(xb4 & xb2);
+      ~(xb4 & xb3);
+      ~(xb4 & xb5);
+      ~(xb5 & xb3);
+      ~(xb5 & xb2);
+      ~(xb3 & xb2);
+    }
+/*Event Generator EG*/
+    AD{
+      zb1 = yyv1-yy1 >= epsilon;
+      zb2 = yyv1-yy1 <= -epsilon;
+    }
+    LOGIC{
+      zb3 = ~zb1 & ~zb2;
+      zb4 = xb1;
+      zb5 = xb2;
+      zb6 = xb3;
+      zb7 = xb4;
+      zb8 = xb5;
+    }
+    AUTOMATA{
+       xb1       = (xb1 & ~ub1 & ~ub3) | (xb2 & ~zb1) | (xb3 & ~zb2);
+       xb4   = (xb1 & ub1);
+       xb5   = (xb1 & ub3);
+       xb2      = xb4 | (xb2 & zb1);
+       xb3      = xb5 | (xb3 & zb2);
+    }
+    DA{
+      zr1 = {IF zb4                            THEN yy1};
+      zr2 = {IF zb6 | zb8              THEN yy1 - param3*param1};
+      zr3 = {IF zb5 | zb7              THEN yy1 + param3*param1};
+      zr4 = {IF zb4 | zb6 | zb5       THEN yyv1};
+      zr5 = {IF zb8                       THEN yyv1 - param2};
+      zr6 = {IF zb7                       THEN yyv1 + param2};
+    }
+    CONTINUOUS {
+      xx1 = xx1 + param1*xxv1 + 0.5*param1*param1*ur1;
+      yy1 = zr1 + zr2 + zr3;
+      xxv1 = xxv1 + param1*ur1;
+      yyv1 = zr4 + zr5 + zr6;
+
+      x1 = x1;
+    }
+    OUTPUT {
+      y1 = xx1;
+      y2 = yy1;
+      y3 = xxv1;
+      y4 = yyv1;
+      y5 = x1;
+    }
+  }
+}
