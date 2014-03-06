@@ -245,6 +245,7 @@ classdef PolyUnion < Union
 		  % For more information see Polyhedron/slice
 		  
 		  error(nargchk(3, 3, nargin));
+          error(obj.rejectArray());
 		  sliced_set = obj.Set.slice(dims, values);
 		  new = PolyUnion(sliced_set);
 		  % TODO: propagate properties preserved under slicing:
