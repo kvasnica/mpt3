@@ -39,11 +39,11 @@ if exist('Cplex','file')==6
         
     elseif strcmpi(S.problem_type,'MILP')
         % direct call to cplexmilp
-        [R.xopt,R.obj,exitflag,OUTPUT] = cplexmilp(S.f,S.A,S.b,S.Ae,S.be,[],[],[],S.lb,S.ub,S.vartype,S.x0,options);
+        [R.xopt,R.obj,exitflag,OUTPUT] = cplexmilp(S.f,S.A,S.b,S.Ae,S.be,[],[],[],S.lb,S.ub,S.vartype',S.x0,options);
         R.lambda = [];
     elseif strcmpi(S.problem_type,'MIQP')
         % direct call to cplexmiqp
-        [R.xopt,R.obj,exitflag,OUTPUT] = cplexmiqp(S.H,S.f,S.A,S.b,S.Ae,S.be,[],[],[],S.lb,S.ub,S.vartype,S.x0,options);
+        [R.xopt,R.obj,exitflag,OUTPUT] = cplexmiqp(S.H,S.f,S.A,S.b,S.Ae,S.be,[],[],[],S.lb,S.ub,S.vartype',S.x0,options);
         R.lambda = [];
     end
     
