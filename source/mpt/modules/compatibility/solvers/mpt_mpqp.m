@@ -99,7 +99,11 @@ end
 activeConstraints = {};
 
 % set of feasible parameters
-Phard = polytope(solution.xopt.convexHull);
+try
+    Phard = polytope(solution.xopt.convexHull);
+catch
+    Phard = polytope(Opt(Matrices).feasibleSet(solution.xopt.Set));
+end
 
 % optimizer
 Fi = cell(1,solution.xopt.Num); 
