@@ -40,9 +40,9 @@ if isempty(MPTOPTIONS)
 end
 
 % Extract the input data
-M = sparse(problem.M);
-Q = sparse(problem.Q);
-q = sparse(problem.q);
+M = problem.M;
+Q = problem.Q;
+q = problem.q;
 
 n = size(M,1);
 A = full([eye(n) -M]);
@@ -55,16 +55,33 @@ if ~isempty(problem.recover)
     end
 end
 
-% Generate a YALMIP optimizer object for testing feasibility
-bigM = 1e6;
-w = sdpvar(n,1); wBnd = sdpvar(n,1);
-z = sdpvar(n,1); zBnd = sdpvar(n,1);
-x = sdpvar(size(Q,2),1);
-con = set(w - M*z == Q*x + q) + set((1-wBnd)*bigM >= w >= 0) + set((1-zBnd)*bigM >= z >= 0);
-%con = con + set( problem.Ath*x <= problem.bth );
-% If wBnd(i) == 0, then w(i) = 0, same for z
-s = sdpsettings;
-opt = optimizer(con, 0, s, [wBnd;zBnd], [w;z]);
+% bigM = 1e6;
+% % Generate a YALMIP optimizer object for testing feasibility
+% w = sdpvar(n,1); wBnd = sdpvar(n,1);
+% z = sdpvar(n,1); zBnd = sdpvar(n,1);
+% x = sdpvar(size(Q,2),1);
+% con = set(w - M*z == Q*x + q) + set((1-wBnd)*bigM >= w >= 0) + set((1-zBnd)*bigM >= z >= 0);
+% con = con + set( problem.Ath*x <= problem.bth );
+% if ~isempty(problem.Ae)
+%     con = con + set( problem.Ae*z == problem.be );
+% end
+% % If wBnd(i) == 0, then w(i) = 0, same for z
+% s = sdpsettings;
+% opt = optimizer(con, 0, s, [wBnd;zBnd], [w;z;x]);
+
+% if isempty(problem.Ae)
+%     Ae = [eye(n) -M -Q];
+%     be = q;
+% else
+%     Ae = [eye(n) -M -Q;
+%             zeros(problem.me,n) problem.Ae zeros(problem.me,problem.d)];
+%     be = [q; problem.be];
+% end
+% 
+
+S.A = [-M -Q;  -eye(n) zeros(n,problem.d)];
+S.b = [q; zeros(n,1)];
+I = eye(n);
 
 
 %%
@@ -107,10 +124,30 @@ for iii = 1:n
             rankTest(i) = 0;
         end
     end
-    indTest = find(rankTest);
+       indTest = find(rankTest);
     
     % Test if each basis has any feasible children
-    [~, lp_infeas] = opt{Izero(:,indTest)};
+%    [res0, lp_infeas] = opt{Izero(:,indTest)};
+    lp_infeas = zeros(1,size(indTest,2));
+%    lp_infeasn = lp_infeas;
+    for jj=1:size(indTest,2)
+        % MPT call
+        wbnd = Izero(1:n,indTest(jj));
+        zbnd = Izero(n+1:2*n,indTest(jj));
+        nz = nnz(zbnd);
+
+        S.Ae = [-M(wbnd,:) -Q(wbnd,:);
+                I(zbnd,:) zeros(nz,problem.d);
+                problem.Ae zeros(problem.me,problem.d)];
+        S.be = [q(wbnd); zeros(nz,1); problem.be];
+
+        res = mpt_solve(S);
+        
+        lp_infeas(jj) = (res.exitflag==MPTOPTIONS.INFEASIBLE);
+           
+    end
+    
+        
     numLPs = numLPs + sum(rankTest);
     rankTest(indTest(lp_infeas==1)) = 0;
     
@@ -137,6 +174,7 @@ for iii = 1:n
     
 end
 
+
 % final statistics
 fprintf('%2i / %2i', iii, n);
 fprintf('%10i', size(B,2));
@@ -153,7 +191,7 @@ for i=1:nreg
     basis = [B(:,i)>0; B(:,i)<0];
     region = getRegion(basis, problem);
     if ~isempty(region)
-        if region.isFullDim
+        if region.isFullDim && region.isBounded
             R = [R, region];
         end
     end   
@@ -203,9 +241,12 @@ if any(any(isnan(H)))
     return;
 end
 Hn = [H; problem.Ath problem.bth];
+zero_rows = sum(abs(Hn),2)<MPTOPTIONS.zero_tol;
+Hn(zero_rows,:)=[];
 
 % H-represenation of a region
 region = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
+region.normalize;
 
 % add function handles
 x = zeros(problem.n*2,problem.d+1); % Solution

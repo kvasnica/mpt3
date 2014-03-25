@@ -98,7 +98,7 @@ kept_rows = 1:me;
 if re<me
     while me ~= re
         % find linearly dependent rows Ae*x - pE*th = be
-        [~,~,p] = lu(sparse([Ae -pE be]),'vector');
+        [~,~,p,~] = lu(sparse([Ae -pE be]),'vector');
         rd = p(re+1:end);
         
         % remove linearly dependent rows

@@ -111,9 +111,8 @@ S.m = size(A,1);
 
 % Remove equality constraints
 equations = false;
+rbi = false;
 if S.me > 0
-    equations = true;
-    
     % extract variables for recovering multipliers
     Ae = S.Ae;
     Am = A;
@@ -125,12 +124,28 @@ if S.me > 0
     fm = S.f;    
     Fm = S.pF;
     
-    % eliminate equations
-    S.eliminateEquations;
-    
-    % If there are any equations left, then the parameter set is not full-dim
-    if S.me > 0
-        error('qp2lcp: Parameter space is not full-dimensional.'); 
+    % check if the rank of the factored matrix is equal to zero - only
+    % in case the elimination cannot be executed
+    if ~isempty(S.vartype)        
+        Aec = S.Ae(:,S.vartype=='C');
+        Aeb = S.Ae(:,S.vartype=='B');
+        Aei = S.Ae(:,S.vartype=='I');
+        if rank(Aec)==0
+            % mark this case
+            rbi = true;
+            disp('qp2lcp: The problem has been transformed, but the equality constraints on binary/integer variables are still present.');
+        end
+    end
+    if ~rbi
+        equations = true;
+        
+        % eliminate equations
+        S.eliminateEquations;
+        
+        % If there are any equations left, then the parameter set is not full-dim
+        if S.me > 0
+            error('qp2lcp: Parameter space is not full-dimensional.');
+        end
     end
 end
 
@@ -580,13 +595,24 @@ end
 % clear unnecessary fields
 S.A  = []; S.b  = []; S.pB = [];
 S.Ae = []; S.be = []; S.pE = [];
+if rbi
+    % case where the equality constraints on binary/integer variables
+    % cannot be eliminated
+    S.Ae = zeros(S.me,size(M,1));
+    S.Ae(:,1:nxb) = Aeb;    
+    S.be = S.Internal.constraints.be;
+    if ~isempty(ind_i)
+        S.Ae(:,nxb+1:nxb+nyb) = Aei*T;
+        S.be = S.Internal.constraints.be - Aei*t;
+    end
+end
 S.H  = []; S.f  = []; S.pF = [];
 S.Y  = []; S.C  = []; S.c  = [];
 S.lb = []; S.ub = [];
 
 S.n  = size(M,1); % Problem dimension
 S.m  = 0; % Number of inequalities
-S.me = 0; % Number of equality constraints
+S.me = numel(S.be); % Number of equality constraints
 % Number of parameters
 if ~isempty(Q)
     S.d = size(Q,2);
