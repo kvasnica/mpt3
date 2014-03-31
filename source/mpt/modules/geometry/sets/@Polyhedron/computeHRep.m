@@ -33,7 +33,7 @@ end
 
 obj.minVRep();
 if isempty(obj.R_int) && obj.Dim>1 && obj.isFullDim() && ...
-		size(obj.V_int, 1)>=obj.Dim+1
+		size(obj.V_int, 1)>=obj.Dim+1 && size(obj.V_int, 2)<=3
 	% try convhulln first; requires following conditions to be met:
 	% * no rays
 	% * dimension at least 2
