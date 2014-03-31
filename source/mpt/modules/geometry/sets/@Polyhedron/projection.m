@@ -90,8 +90,11 @@ else
 			method = 'fourier';
 		elseif P.Dim - length(dims) <= DELTA_DIMS_CHOOSE_FOURIER
 			method = 'fourier';
-		else
+        elseif P.isFullDim()
+            % must have a fully dimensional polyhedron
 			method = 'mplp';
+        else
+            method = 'ifourier';
 		end
 		
 	end
