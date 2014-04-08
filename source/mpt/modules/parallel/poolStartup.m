@@ -5,6 +5,8 @@ function poolStartup
 % Parallel Computing toolbox is needed to allow this feature.
 %
 
-mpt_init;
+try
+    mpt_init;
+end
 
 end
