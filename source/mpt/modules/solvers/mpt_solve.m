@@ -19,6 +19,7 @@ if isstruct(Sin) && isfield(Sin, 'quicklp') && Sin.quicklp
     S.test = false;
     S.d = [];
     S.c = 0;
+    S = sub_fix_nan(S);
     R = sub_callsolver(S, MPTOPTIONS);
     return
 
@@ -33,6 +34,7 @@ elseif isstruct(Sin) && isfield(Sin, 'quickqp') && Sin.quickqp
     S.test = false;
     S.d = [];
     S.c = 0;
+    S = sub_fix_nan(S);
     R = sub_callsolver(S, MPTOPTIONS);
     return
 end
@@ -332,6 +334,9 @@ if any(S.lb==Inf) || any(S.ub==-Inf)
     return;
 end
 
+% replace NaNs with zero rows
+S = sub_fix_nan(S);
+
 % % replace any Inf,-Inf terms with S.options.InfBound
 % if S.test
 %     S.lb(S.lb == -Inf) = -1e9;
@@ -521,6 +526,8 @@ if ~isempty(R.obj)
     R.obj = R.obj + S.c;
 end
 
+end
+
 %-------------------------------------------------------------------------------
 function R=sub_callsolver(S, MPTOPTIONS)
 
@@ -648,6 +655,7 @@ end
 %     end
 % end
 
+end
 
 %-------------------------------------------------------------------------------
 function R=sub_call_yalmip(S)
@@ -707,13 +715,18 @@ else
     end
 end
 
+end
 
+%-------------------------------------------------------------------------------
 function S = sub_initialize_args(arg_set, opt_arg_set)
 % if the optional argument is not defined, assign empty value
 
 args = [arg_set, opt_arg_set];
 S = cell2struct(cell(1,length(args)),args,2);
 
+end
+
+%-------------------------------------------------------------------------------
 function sub_error_checks(S)
 % additional checks
 
@@ -807,4 +820,29 @@ else
        error('mpt_solve: Field "q" must be a column vector of dimension %d x 1.',S.n);
    end
    validate_realvector(S.q);
+end
+
+end
+
+%-------------------------------------------------------------------------------
+function S = sub_fix_nan(S)
+% replace NaN rows in constraints with zeros
+
+if ~isempty(S.b) || ~isempty(S.A)
+    mnan = isnan(S.b) | any(isnan(S.A),2);
+    if any(mnan)
+        nmnan = nnz(mnan);
+        S.A(mnan,:) = zeros(nmnan,S.n);
+        S.b(mnan) = zeros(nmnan,1);
+    end
+end
+if ~isempty(S.be) || ~isempty(S.Ae)
+    menan = isnan(S.be) | any(isnan(S.Ae),2);
+    if any(menan)
+        nmenan = nnz(menan);
+        S.Ae(menan,:) = zeros(nmenan,S.n);
+        S.be(menan) = zeros(nmenan,1);
+    end
+end
+
 end
