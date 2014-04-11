@@ -12,14 +12,6 @@ function mpt_init
 % global iteration counter (to detect how often mpt_solve is called)
 global MPTOPTIONS
 
-% check matlab compatibility. We need at least R2011a (7.12.0) or newer
-% since we rely on the copyable class
-try
-	old_matlab = verLessThan('matlab', '7.12');
-catch
-	old_matlab = true;
-end
-
 % remove MPT2 from the path
 %
 % we detect MPT2 path based on whether mpt_computeTrajectory can be seen,
@@ -34,6 +26,14 @@ if exist(mpt2_file_to_check, 'file')
 	rehash toolbox
 	% restore global variables
 	global MPTOPTIONS
+end
+
+% check matlab compatibility. We need at least R2011a (7.12.0) or newer
+% since we rely on the copyable class
+try
+	old_matlab = verLessThan('matlab', '7.12');
+catch
+	old_matlab = true;
 end
 
 % main path
