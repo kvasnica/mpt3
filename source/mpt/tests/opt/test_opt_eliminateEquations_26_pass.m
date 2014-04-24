@@ -18,8 +18,12 @@ problem = Opt(S);
 r1 = problem.solve;
 
 % eliminate equations and solve reduced problem
-[~,msg] = run_in_caller('problem.eliminateEquations');
+problem.eliminateEquations;
 
-asserterrmsg(msg,'EliminateEquations: Matrix of equality constraints is row-dependent')
+r2 = problem.solve;
+
+if r1.exitflag ~= r2.exitflag
+    error('The reduced problem must return the same flag as the original problem.')
+end
 
 end

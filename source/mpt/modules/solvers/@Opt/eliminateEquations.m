@@ -146,18 +146,6 @@ if rank(full(Ue(:,1:rec)),MPTOPTIONS.abs_tol)~=rec
 end
 Br = pe(1:rec); Bc = qe(1:rec);
 Nr = pe(rec+1:end); Nc = qe(rec+1:end);
-if S.isParametric
-    if rank([Ae(Nr,:) -pE(Nr,:) be(Nr,:)],MPTOPTIONS.abs_tol)~=0
-        % Nr must be zero, otherwise there are remaining equalities on the
-        % parameters and other variables that cannot be eliminated
-        error('EliminateEquations: Equality constraints on the parameter cannot be eliminated.');
-    end
-else
-    if rank([Ae(Nr,:) be(Nr,:)],MPTOPTIONS.abs_tol)~=0
-        % Nr must be zero, otherwise there are remaining equalities on the
-        error('EliminateEquations: Matrix of equality constraints is row-dependent.');
-    end
-end
 
 % new index sets based on decomposition of continuous variables
 ind_m = ind_c(Bc); % basic continuous variables
@@ -165,6 +153,7 @@ ind_n = ind_c(Nc); % non-basic continuous variables
 if isempty(ind_n)
     ind_n=zeros(0,1);
 end
+
 
 % substitute x(Bc) = C1*xB + C2*yB + C3*x(Nc) + D1 + D2*th
 % xB are binary variables, yB are new binary created from integer variables
@@ -385,21 +374,38 @@ S.n=nxb+nyb+nxn;
 S.me=length(Nr);
 S.m=size(S.A,1);
 
-% remaining equality constraints on the parameter
-% 0 = be + pE*th
-S.Ae = Ae;
-S.be = be;
-S.Ae(Br,:) = [];
-S.be(Br,:) = [];
-if S.isParametric
-    S.pE(Br,:) = [];
+if S.me>0
+    disp('EliminateEquations: The problem has been transformed, but some of the equality constraints could not have been removed.');
 end
 
+% remaining equality constraints on the parameter
+% 0 = be + pE*th
 % correct empty matrices with proper dimensions
-if isempty(S.Ae)
-    S.Ae = zeros(S.me,S.n);
+S.Ae = zeros(S.me,S.n);
+S.be = zeros(S.me, 1);
+if S.isParametric
     S.pE = zeros(S.me,S.d);
 end
+
+% remaining equality constraints
+if ~isempty(Nr)
+    if isempty(ind_i)
+        % no integers
+        S.Ae = [Ae(Nr,ind_b)+Ae(Nr,ind_m)*C1, Ae(Nr,ind_m)*C3];
+        S.be = be(Nr) - Ae(Nr,ind_m)*D1;
+        if S.isParametric
+            S.pE = pE(Nr,:);
+        end
+    else
+        S.Ae = [Ae(Nr,ind_b)+Ae(Nr,ind_m)*C1, Ae(Nr,ind_i)*T+Ae(Nr,ind_m)*C2, Ae(Nr,ind_m)*C3];
+        S.be = be(Nr) - Ae(Nr,ind_i)*t - Ae(Nr,ind_m)*D1;
+        if S.isParametric
+            S.pE = pE(Nr,:) - Ae(Nr,ind_m)*D2; 
+        end
+    end
+end
+
+
 
 % set up lb/ub
 if ~isempty(S.lb)

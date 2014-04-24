@@ -111,8 +111,7 @@ S.m = size(A,1);
 
 % Remove equality constraints
 equations = false;
-rbi = false;
-if S.me > 0
+if S.me > 0    
     % extract variables for recovering multipliers
     Ae = S.Ae;
     Am = A;
@@ -125,28 +124,23 @@ if S.me > 0
     Fm = S.pF;
     
     % check if the rank of the factored matrix is equal to zero - only
-    % in case the elimination cannot be executed
-    if ~isempty(S.vartype)        
-        Aec = S.Ae(:,S.vartype=='C');
-        Aeb = S.Ae(:,S.vartype=='B');
-        Aei = S.Ae(:,S.vartype=='I');
-        if rank(Aec)==0
-            % mark this case
-            rbi = true;
-            disp('qp2lcp: The problem has been transformed, but the equality constraints on binary/integer variables are still present.');
-        end
+    % in case the elimination cannot be executed    
+    if isempty(S.vartype)
+        S.vartype = repmat('C',1,S.n);
     end
-    if ~rbi
+    if rank(S.Ae(:,S.vartype=='C'),MPTOPTIONS.abs_tol)~=0
         equations = true;
-        
+
         % eliminate equations
         S.eliminateEquations;
-        
-        % If there are any equations left, then the parameter set is not full-dim
-        if S.me > 0
-            error('qp2lcp: Parameter space is not full-dimensional.');
-        end
-    end
+    end    
+end
+
+% store remaining equality constraints
+if S.me>0
+   eqlin.Ae = S.Ae;
+   eqlin.be = S.be;
+   eqlin.pE = S.pE;
 end
 
 % identify integer/binary variables
@@ -274,6 +268,17 @@ if r<nc
     bnew = gamma;
     if S.isParametric
         Bnew = delta;
+    end
+    
+    % modify equality constraint (if any) s.t. Ae*z = be + pE*th
+    % [Ae(:,xb)*xb + Ae(:,x+)*x+ + Ae(:,x-)*x- + 0*lam ] = be + pE*th 
+    if S.me>0
+        if isempty(ind_i)
+            S.Ae = [eqlin.Ae(:,ind_b) eqlin.Ae(:,ind_c) -eqlin.Ae(:,ind_c) zeros(S.me,S.m)];
+        else            
+            S.Ae = [eqlin.Ae(:,ind_b) eqlin.Ae(:,ind_i)*T eqlin.Ae(:,ind_c) -eqlin.Ae(:,ind_c) zeros(S.me,S.m)];
+            S.be = eqlin.be - eqlin.Ae(:,ind_i)*t;
+        end
     end
     
     % create M,q for LCP
@@ -453,6 +458,18 @@ else
     if S.isParametric
         pBnew = delta(Qv,:)-beta(Qv,:)*ibetaP*delta(Pv,:);
     end
+    if S.me>0
+        if isempty(ind_i)
+            S.Ae = [eqlin.Ae(:,ind_b)+eqlin.Ae(:,ind_c)*C1, eqlin.Ae(:,ind_c)*C3, zeros(S.me,nlam)];
+            S.be = eqlin.be -eqlin.Ae(:,ind_c)*D1;
+        else            
+            S.Ae = [eqlin.Ae(:,ind_b)+eqlin.Ae(:,ind_c)*C1, eqlin.Ae(:,ind_i)*T+eqlin.Ae(:,ind_c)*C2, eqlin.Ae(:,ind_c)*C3, zeros(S.me,nlam)];
+            S.be = eqlin.be -eqlin.Ae(:,ind_i)*t -eqlin.Ae(:,ind_c)*D1;
+        end
+        if S.isParametric
+            S.pE = eqlin.pE - eqlin.Ae(:,ind_c)*D2;
+        end        
+    end    
     
     % create M,q for LCP
     M = [-eye(nb) zeros(nb,nc+nlam);
@@ -594,18 +611,6 @@ end
 
 % clear unnecessary fields
 S.A  = []; S.b  = []; S.pB = [];
-S.Ae = []; S.be = []; S.pE = [];
-if rbi
-    % case where the equality constraints on binary/integer variables
-    % cannot be eliminated
-    S.Ae = zeros(S.me,size(M,1));
-    S.Ae(:,1:nxb) = Aeb;    
-    S.be = S.Internal.constraints.be;
-    if ~isempty(ind_i)
-        S.Ae(:,nxb+1:nxb+nyb) = Aei*T;
-        S.be = S.Internal.constraints.be - Aei*t;
-    end
-end
 S.H  = []; S.f  = []; S.pF = [];
 S.Y  = []; S.C  = []; S.c  = [];
 S.lb = []; S.ub = [];
@@ -630,6 +635,7 @@ if ~isempty(Q)
     S.Q = Q;
 end
 S.recover = recover;
+
 % indicate which variables correspond to binaries
 if ~isempty(S.vartype)
     if r<nc
