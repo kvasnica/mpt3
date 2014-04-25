@@ -19,6 +19,6 @@ problem = Opt(S);
 % full-dimensional
 [worked, msg] = run_in_caller('problem.solve; ');
 assert(~worked);
-asserterrmsg(msg,'EliminateEquations: Equality constraints on the parameter cannot be eliminated.');
+asserterrmsg(msg,'PLCP solver does not solve problems with equality constraints. Try a different solver.');
 
 end

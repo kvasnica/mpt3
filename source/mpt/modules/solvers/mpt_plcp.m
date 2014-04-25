@@ -57,6 +57,11 @@ if ISPARALLEL
     disp('Running in parallel');
 end
 
+% if there are some equality constraints present, throw error
+if opt.me>0
+   error('PLCP solver does not solve problems with equality constraints. Try a different solver.');
+end
+
 % put LCP arguments together
 lc.M  = opt.M;
 lc.Q  = opt.Q;

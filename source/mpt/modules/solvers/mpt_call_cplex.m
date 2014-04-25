@@ -95,9 +95,9 @@ if exist('Cplex','file')==6
             elseif strcmpi(S.problem_type,'QP')
                 [~,~,ef]=cplexqp(S.H,S.f,S.A,S.b,S.Ae,S.be,lb,ub,S.x0,options);
             elseif strcmpi(S.problem_type,'MILP')
-                [~,~,ef] = cplexmilp(S.f,S.A,S.b,S.Ae,S.be,[],[],[],lb,ub,S.vartype,S.x0,options);
+                [~,~,ef] = cplexmilp(S.f,S.A,S.b,S.Ae,S.be,[],[],[],lb,ub,S.vartype',S.x0,options);
             elseif strcmpi(S.problem_type,'MIQP')
-                [~,~,ef] = cplexmiqp(S.H,S.f,S.A,S.b,S.Ae,S.be,[],[],[],lb,ub,S.vartype,S.x0,options);
+                [~,~,ef] = cplexmiqp(S.H,S.f,S.A,S.b,S.Ae,S.be,[],[],[],lb,ub,S.vartype',S.x0,options);
             end
             if ef==1
                 % optimal -> the problem is unbounded
