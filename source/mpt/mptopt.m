@@ -363,7 +363,7 @@ classdef mptopt < handle
                     'Each row is interpreted as a color, with the first element specifying the',...
                     'intensity of red light, the second green, and the third blue. Color intensity',...
                     'can be specified on the interval 0.0 to 1.0.']);
-            elseif max(max(val))>=1 || min(min(val))<=0
+            elseif max(max(val))>1 || min(min(val))<0
                 error('mptopt: Colormap values must be within interval [0, 1].');
             elseif ~isnumeric(val)
                 error('mptopt: Colormap must be a numerical value.');
