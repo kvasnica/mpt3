@@ -614,11 +614,9 @@ if hull.isEmptySet && any(~regions.isEmptySet)
     flag = -4;
     how = 'wrong adjacency list';
     if MPTOPTIONS.verbose>=0
-        fprintf('Adjacency list is wrong, computing the feasible set via projection (may take a while)...\n');
+        fprintf('Feasible set is wrong, returning outer approximation.\n');
     end
-
-    % recompute the feasible set via Opt/feasibleSet()
-    hull = opt.feasibleSet();
+    hull = PolyUnion(regions).outerApprox();
 end
 
 % normalize regions to return normalized solution
