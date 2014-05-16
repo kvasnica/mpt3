@@ -207,8 +207,28 @@ if nargin==2 && isfield(S, 'isParametric') && S.isParametric
 			S.solver = MPTOPTIONS.lcpsolver;
 		otherwise
 			error('%s problems not supported.', S.problem_type);
-	end
+    end
 
+    % check bounds on parameters (issue #108)
+    if isfield(S, 'Ath') && ~isempty(S.Ath)
+        if any(S.Ath*param_value-S.bth > MPTOPTIONS.abs_tol)
+            % the parameter is out of bounds => problem is infeasible
+            R.xopt = zeros(S.n,1);
+            R.obj = Inf;
+            R.lambda.ineqlin = [];
+            R.lambda.eqlin = [];
+            R.lambda.lower = [];
+            R.lambda.upper = [];
+            if S.test
+                R.exitflag = 2;
+            else
+                R.exitflag = MPTOPTIONS.INFEASIBLE;
+            end
+            R.how = 'infeasible';
+            return
+        end
+    end
+    
 	% substitute the parameter into constraints
 	if ~isempty(S.Q)
 		% PLCP problem
