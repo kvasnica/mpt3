@@ -12,10 +12,16 @@ function sol = mpt_plcp(opt)
 
 
 % global options
-global MPTOPTIONS ISPARALLEL
+global MPTOPTIONS ISPARALLEL BNDH INPUT_LCP
 if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
+
+% halfspace representation of the feasible set
+BNDH = zeros(0, opt.d+1);
+
+% copy of the input problem (used in is_boundary_facet())
+INPUT_LCP = opt.copy();
 
 % pick DFS or BFS but not both
 if MPTOPTIONS.modules.solvers.plcp.bfs
@@ -560,36 +566,44 @@ if MPTOPTIONS.modules.solvers.plcp.adjcheck
     adj_list_verified = true;
 end
 
-% compute the set of feasible parameters
-hull = feasible_set(regions, adj_list, opt);
+% compute the set of feasible parameters: first try the boundary facet
+% identified during region exploration
+hull = Polyhedron('H', BNDH).normalize().minHRep();
 
-% quick sanity check: does the feasible set contain the chebycenters of all
-% regions?
-if ~sub_check_feasible_set(hull, regions)
+if hull.isEmptySet && any(~regions.isEmptySet)
+    if MPTOPTIONS.verbose>=1
+        fprintf('Feasible set is empty despite non-empty regions, recomputing via the adjacency list...\n');
+    end
+    hull = feasible_set(regions, adj_list, opt);
     
-    if adj_list_verified
-        % the adjacency list was verified previously, yet the feasible set
-        % is wrong. Declare it as an empty set such that it is recomputed
-        % by projection lated
-        hull = Polyhedron.emptySet(opt.d);
-    else
-        % verify the adjacency list
-        if MPTOPTIONS.verbose>=0
-            fprintf('Fixing the adjacency list...\n');
-        end
-        adj_list = verify_graph(regions,adj_list);
-        adj_list_verified = true;
-        if MPTOPTIONS.verbose>=0
-            fprintf('...done.\n');
-        end
-    
-        % and reconstruct the feasible set based on the fixed list
-        hull = feasible_set(regions, adj_list, opt);
-
-        % check correctness of the feasible set
-        if ~sub_check_feasible_set(hull, regions)
-            % the feasible set is still wrong
+    % quick sanity check: does the feasible set contain the chebycenters of all
+    % regions?
+    if ~sub_check_feasible_set(hull, regions)
+        
+        if adj_list_verified
+            % the adjacency list was verified previously, yet the feasible set
+            % is wrong. Declare it as an empty set such that it is recomputed
+            % by projection lated
             hull = Polyhedron.emptySet(opt.d);
+        else
+            % verify the adjacency list
+            if MPTOPTIONS.verbose>=0
+                fprintf('Fixing the adjacency list...\n');
+            end
+            adj_list = verify_graph(regions,adj_list);
+            adj_list_verified = true;
+            if MPTOPTIONS.verbose>=0
+                fprintf('...done.\n');
+            end
+            
+            % and reconstruct the feasible set based on the fixed list
+            hull = feasible_set(regions, adj_list, opt);
+            
+            % check correctness of the feasible set
+            if ~sub_check_feasible_set(hull, regions)
+                % the feasible set is still wrong
+                hull = Polyhedron.emptySet(opt.d);
+            end
         end
     end
 end
@@ -930,6 +944,10 @@ thn = thf+g'*MPTOPTIONS.region_tol/2;
 % neighboring basis I
 [Radj, piv] = lcp_getRegionFromTheta(thn, lc, R.Internal.I, HASH, regions, UNEX);
 R.setInternal('piv', R.Internal.piv + piv);
+if isempty(Radj)
+    % possible boundary
+    update_boundary(R, i);
+end
 
 % if Radj is considered as empty region (but feasible), we need to adjust
 % the step size until not empty or infeasible region is found
@@ -944,6 +962,7 @@ if ~builtin('isempty',Radj)
        R.setInternal('piv', R.Internal.piv + piv);
        if builtin('isempty',Radj)
            % did not find feasible region, possible boundary, return
+           update_boundary(R, i);
            return;
        end
        k = k+1;
@@ -954,6 +973,9 @@ if ~builtin('isempty',Radj)
     end
     % if the recomputed Radj is not empty, go to the end
     if isEmptySet(Radj)
+        % possible boundary
+        update_boundary(R, i);
+        
         % new step
         tn = shoot(Radj,g,thn);
         if tn.exitflag==MPTOPTIONS.OK
@@ -1207,7 +1229,11 @@ Hth(n < MPTOPTIONS.zero_tol,:) = []; % eliminate zero rows
 % Bring gamma into the basis (initial entering variable)
 enter = 2*lc.n+1;
 
-Adj = lcp_pivot(I, enter, lcnew, -1, Hth, [], 0, f, HASH, regions, UNEX);
+[Adj, adj_flag] = lcp_pivot(I, enter, lcnew, -1, Hth, [], 0, f, HASH, regions, UNEX);
+% check whether the facet is really boundary
+if adj_flag>0
+    update_boundary(R, i);
+end
 
 Radj = cell(1,length(Adj));
 for j=1:length(Adj)
@@ -1233,7 +1259,7 @@ end
 
 
 %% MAIN PIVOTING FUNCTION
-function Adj = lcp_pivot(I, enter, lc, gammaVar, Hth, Adj, piv, f, HASH, regions, UNEX)
+function [Adj, adj_flag] = lcp_pivot(I, enter, lc, gammaVar, Hth, Adj, piv, f, HASH, regions, UNEX)
 %
 % for given basis LC (determined by index set I), do a pivot step with 
 % "enter" as an entering variable
@@ -1251,7 +1277,9 @@ function Adj = lcp_pivot(I, enter, lc, gammaVar, Hth, Adj, piv, f, HASH, regions
 %          Adj - structure with adjacent basis
 %          piv - pivot counter
 %
-
+%  outputs: Adj: updated structure with adjacent basis
+%           adj_flag: 0 if an adjacent region was found
+%                     1 if the facet appears to be boundary
 
 % pivoting new LCP problem, including variable alpha for step size
 % w - M*z  = qnew + Qnew*thf + Q*gamma*alpha  + eps
@@ -1266,6 +1294,8 @@ global MPTOPTIONS
 %if isempty(opt)
 %    opt = Opt; 
 %end
+
+adj_flag = 0;
 
 % limit the maximum number of pivots (if singularity appears or cycles)
 if piv>MPTOPTIONS.modules.solvers.plcp.maxpivots
@@ -1316,6 +1346,7 @@ if all(~P) && gammaVar>0
         if (MPTOPTIONS.verbose >= 2 ) || (MPTOPTIONS.modules.solvers.plcp.debug >= 1)
             fprintf('Boundary facet.\n');
         end
+        adj_flag = 1;
         return;
     end
 end
@@ -1325,6 +1356,7 @@ if all(~Z)
         fprintf('Warning: No facet constraints are active!... continuing\n')
 %        fprintf('Boundary facet.\n');
     end
+    adj_flag = 2;
   return
 end
 
@@ -1733,7 +1765,7 @@ if all(~PZ)
         Iout(leave)   = enter;
         
 
-        Adj = lcp_pivot(Iout, comp_leave, lc, gammaVar, Hth, Adj, piv+1, f, HASH, regions, UNEX);
+        [Adj, adj_flag] = lcp_pivot(Iout, comp_leave, lc, gammaVar, Hth, Adj, piv+1, f, HASH, regions, UNEX);
     end;
 else
     % Pivot is unique and not a function of theta
@@ -1778,7 +1810,7 @@ else
     %
     %   fprintf('Pivot : enter %2i leave %2i | enter / leave : %s / %s \n', enter, iLeave, eType, lType);
     
-    Adj = lcp_pivot(I, comp_leave, lc, gammaVar, Hth, Adj, piv+1, f, HASH, regions, UNEX);
+    [Adj, adj_flag] = lcp_pivot(I, comp_leave, lc, gammaVar, Hth, Adj, piv+1, f, HASH, regions, UNEX);
 end
 end
 
@@ -2412,4 +2444,78 @@ else
 end
 
 end
+
+%-----------------------------------------------------------
+function update_boundary(region, index)
+% updates the stack of boundary half-spaces
+
+global BNDH
+
+if is_boundary_facet(region, index)
+    BNDH = [BNDH; region.H(index, :)];
+end
+
+% FUTURE: before calling is_boundary_facet() check whether the half-space
+% is already in BNDH. If it is, we can exit quickly. Note that such a check
+% requires the half-space to be normalized, e.g. to h'*x<=1
+%
+% % normalize the candidate half-space to h'*x<=1
+% hs = region.H(index, :);
+% % avoid dividing by zero
+% if abs(hs(end))>1e-6
+%     hs = hs./hs(end);
+% end
+% 
+% % is the half-space already included? (helps to reduce the number of LCPs
+% % to be solved)
+% included = any(sum(abs(BNDH-repmat(hs, size(BNDH, 1), 1)), 2)<1e-8);
+% if ~included 
+%     if is_boundary_facet(region, index)
+%         BNDH = [BNDH; hs];
+%     end
+% end
+
+end
+
+
+%-----------------------------------------------------------
+function isboundary = is_boundary_facet(region, index)
+% checks whether a given facet is indeed a boundary of the feasible set
+%
+% A facet is boundary if:
+% * the LCP problem is infeasible when solved for a point accross the facet
+% * the LCP problem is feasible when solved for an interior point of the
+%   region, close to the investigated facet
+
+global MPTOPTIONS INPUT_LCP
+
+% if enabled, we also check whether the problem is feasible on an inward
+% point of the investigated facet
+check_inward = false;
+
+% compute a point on the facet
+facet = region.chebyCenter(index);
+if facet.exitflag == MPTOPTIONS.OK
+    % compute the point accross the j-th facet
+    step_size = MPTOPTIONS.rel_tol*10;
+    dx = region.A(index, :)'/norm(region.A(index, :)')*step_size;
+    % solve the problem for the new point
+    lcpsol = INPUT_LCP.solve(facet.x+dx);
+    % infeasible = candidate boundary facet, feasible = not boundary
+    isboundary = (lcpsol.exitflag ~= MPTOPTIONS.OK);
+    if check_inward && isboundary
+        % check the inwards direction, must be feasible, otherwise we have
+        % a fake boundary
+        lcpsol = INPUT_LCP.solve(facet.x-dx);
+        
+        % infeasible outwards, feasible inwards => boundary facet
+        % infeasible outwards, infeasible inwards => not boundary
+        isboundary = (lcpsol.exitflag==MPTOPTIONS.OK);
+    end
+else
+    % no point on the facet found = not boundary
+    isboundary = false;
+end
+
+end % function
 
