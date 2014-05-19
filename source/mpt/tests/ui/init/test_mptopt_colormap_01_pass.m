@@ -2,6 +2,10 @@ function test_mptopt_colormap_01_pass
 % issue 107
 
 ops = mptopt();
+% reset the color map upon exit
+orig_colormap = ops.colormap;
+c = onCleanup(@() mptopt('colormap', orig_colormap));
+
 ops.colormap = [1 0 0];
 ops.colormap = [0 1 0];
 ops.colormap = [0 0 1];
