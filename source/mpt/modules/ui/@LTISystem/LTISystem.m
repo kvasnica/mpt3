@@ -419,9 +419,6 @@ classdef LTISystem < AbstractSystem
 			if obj.nu>0 && options.U.Dim~=obj.nu
 				error('Input constraints must be a polyhedron in %dD.', obj.nu);
 			end
-			if any(options.X.isEmptySet)
-				error('State constraints must not be empty.');
-			end
 			if options.X.Dim~=obj.nx
 				error('State constraints must be a polyhedron in %dD.', obj.nx);
 			end
