@@ -2449,29 +2449,40 @@ function update_boundary(region, index)
 
 global BNDH
 
-if is_boundary_facet(region, index)
-    BNDH = [BNDH; region.H(index, :)];
-end
+use_caching = true;
 
-% FUTURE: before calling is_boundary_facet() check whether the half-space
+% Before calling is_boundary_facet() we check whether the half-space
 % is already in BNDH. If it is, we can exit quickly. Note that such a check
 % requires the half-space to be normalized, e.g. to h'*x<=1
 %
-% % normalize the candidate half-space to h'*x<=1
-% hs = region.H(index, :);
-% % avoid dividing by zero
-% if abs(hs(end))>1e-6
-%     hs = hs./hs(end);
-% end
-% 
-% % is the half-space already included? (helps to reduce the number of LCPs
-% % to be solved)
-% included = any(sum(abs(BNDH-repmat(hs, size(BNDH, 1), 1)), 2)<1e-8);
-% if ~included 
-%     if is_boundary_facet(region, index)
-%         BNDH = [BNDH; hs];
-%     end
-% end
+% An another reason is to reduce the number of (possibly redundant)
+% boundary half-spaces.
+
+% half-space to check
+hs = region.H(index, :);
+
+if use_caching
+    % normalize the candidate half-space to h'*x<=+/-1
+    % avoid dividing by zero
+    if abs(hs(end))>1e-6
+        % note that we must divide by abs(hs(end)) as not to reverse the
+        % inequality if hs(end) is negative
+        hs = hs./abs(hs(end));
+    end
+    
+    % is the half-space already included? (helps to reduce the number of LCPs
+    % to be solved)
+    included = any(sum(abs(BNDH-repmat(hs, size(BNDH, 1), 1)), 2)<1e-8);
+else
+    included = false;
+end
+
+if ~included
+    % check the boundary status by solving an LCP
+    if is_boundary_facet(region, index)
+        BNDH = [BNDH; hs];
+    end
+end
 
 end
 
