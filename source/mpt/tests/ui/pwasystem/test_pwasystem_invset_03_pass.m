@@ -5,10 +5,12 @@ sys = LTISystem('A', 1, 'f', 3);
 sys.x.min = -1;
 sys.x.max = 1;
 pwa = PWASystem([sys, sys]);
+pwa.x.min = -1;
+pwa.x.max = 1;
 
-S = sys.invariantSet();
+S = pwa.invariantSet();
 assert(isa(S, 'Polyhedron'));
-assert(S.Dim==1);
-assert(S.isEmptySet());
+assert(isequal([S.Dim], [1 1]));
+assert(all(S.isEmptySet()));
 
 end
