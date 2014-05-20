@@ -12,7 +12,7 @@ function sol = mpt_plcp(opt)
 
 
 % global options
-global MPTOPTIONS ISPARALLEL BNDH INPUT_LCP
+global MPTOPTIONS BNDH INPUT_LCP
 if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
@@ -378,16 +378,16 @@ while ~builtin('isempty',UNEX)
                     
           if MPTOPTIONS.modules.solvers.plcp.fixedstep %FIXEDSTEP
               %always perform fixed step over the facet
-              Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX);
+              Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
           else
               % compute the step size via pivoting from R
-              Radj{i} = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX);
+              Radj{i} = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
               
               if MPTOPTIONS.modules.solvers.plcp.rescue
                   % if the variable step approach returns empty, but feasible
                   % region, try again with fixed step
                   if builtin('isempty',Radj{i}) || all(Radj{i}.isEmptySet)
-                      Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX);
+                      Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
                   end
               end
           end
@@ -395,7 +395,7 @@ while ~builtin('isempty',UNEX)
       end
 
   else
-      for i = 1:size(R.H,1)
+      for i = 1:size(R.H,1),
           
           if MPTOPTIONS.modules.solvers.plcp.debug >= 2
               % plot actual facet
@@ -416,10 +416,10 @@ while ~builtin('isempty',UNEX)
           
           if MPTOPTIONS.modules.solvers.plcp.fixedstep
               %always perform fixed step over the facet
-              Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX);
+              Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
           else
               % compute the step size via pivoting from R
-              Radj{i} = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX);
+              Radj{i} = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
               
               if MPTOPTIONS.modules.solvers.plcp.rescue
                   % if the variable step approach returns empty, but feasible
@@ -428,7 +428,7 @@ while ~builtin('isempty',UNEX)
                       if (MPTOPTIONS.verbose>=2) || (MPTOPTIONS.modules.solvers.plcp.debug>=1)
                           disp('Neighbor is empty, correcting with fixed step over the facet.');
                       end
-                      Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX);
+                      Radj{i} = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX, ISPARALLEL);
                   end
               end
           end
@@ -897,7 +897,7 @@ end
 
 end
 
-function Radj = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX)
+function Radj = lcp_ComputeAdj_fixedstep(R,i,lc, HASH, regions, UNEX, ISPARALLEL)
 %
 %  computes an adjacent region by considering a small step beyond facet
 %  with a fixed size
@@ -942,7 +942,7 @@ thn = thf+g'*MPTOPTIONS.region_tol/2;
 % neighboring basis I
 [Radj, piv] = lcp_getRegionFromTheta(thn, lc, R.Internal.I, HASH, regions, UNEX);
 R.setInternal('piv', R.Internal.piv + piv);
-if isempty(Radj)
+if ~ISPARALLEL && isempty(Radj)
     % possible boundary
     update_boundary(R, i);
 end
@@ -960,7 +960,9 @@ if ~builtin('isempty',Radj)
        R.setInternal('piv', R.Internal.piv + piv);
        if builtin('isempty',Radj)
            % did not find feasible region, possible boundary, return
-           update_boundary(R, i);
+           if ~ISPARALLEL
+               update_boundary(R, i);
+           end
            return;
        end
        k = k+1;
@@ -972,7 +974,9 @@ if ~builtin('isempty',Radj)
     % if the recomputed Radj is not empty, go to the end
     if isEmptySet(Radj)
         % possible boundary
-        update_boundary(R, i);
+        if ~ISPARALLEL
+            update_boundary(R, i);
+        end
         
         % new step
         tn = shoot(Radj,g,thn);
@@ -1127,7 +1131,7 @@ end
 
 end
 
-function Radj = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX)
+function Radj = lcp_ComputeAdj(R,i,lc, HASH, regions, UNEX, ISPARALLEL)
 %
 % computes adjacent region along the given facet via pivoting from region R
 %
@@ -1229,7 +1233,7 @@ enter = 2*lc.n+1;
 
 [Adj, adj_flag] = lcp_pivot(I, enter, lcnew, -1, Hth, [], 0, f, HASH, regions, UNEX);
 % check whether the facet is really boundary
-if adj_flag>0
+if ~ISPARALLEL && adj_flag>0
     update_boundary(R, i);
 end
 
