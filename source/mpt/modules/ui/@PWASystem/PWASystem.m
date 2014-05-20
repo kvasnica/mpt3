@@ -287,9 +287,6 @@ classdef PWASystem < AbstractSystem
 			if numel(options.U)~=1
 				error('Input constraints must be a single polyhedron.');
 			end
-			if any(options.X.isEmptySet)
-				error('State constraints must not be empty.');
-			end
 			if obj.nu>0 && options.U.isEmptySet()
 				error('Input constraints must not be empty.');
 			end
@@ -327,6 +324,9 @@ classdef PWASystem < AbstractSystem
 				dynN{n} = dyn;
 			end
 			S = SN{end};
+            if isempty(S)
+                S = Polyhedron.emptySet(obj.nx);
+            end
 			dyn = dynN{end};
 		end
 
