@@ -1,4 +1,4 @@
-function test_ltisystem_forwardreach_02_pass
+function test_ltisystem_reachset_05_pass
 % tests error messages in LTISystem/reachableSet
 
 model = LTISystem('A', [1 1; 0 1], 'B', [1; 0.5]);
@@ -18,12 +18,6 @@ U = 1;
 [worked, msg] = run_in_caller('model.reachableSet(''U'', U);');
 assert(~worked);
 assert(~isempty(strfind(msg, 'Input argument must be a "Polyhedron" class.')));
-
-% X must not be empty
-P = Polyhedron([1 0; -1 0], [-1; 0]);
-[worked, msg] = run_in_caller('model.reachableSet(''X'', P);');
-assert(~worked);
-assert(~isempty(strfind(msg, 'State constraints must not be empty.')));
 
 % U must not be empty
 P = Polyhedron([1; -1], [-1; 0]);
