@@ -38,8 +38,19 @@ end
 
 if numel(P)>1 || numel(S)>1
 	% first compare outer approximations
-	B1 = PolyUnion(P).outerApprox;
-	B2 = PolyUnion(S).outerApprox;
+    if all(P.isEmptySet())
+        % if all sets in P are empty, PolyUnion(P) produces an empty object
+        % for which the outer approximation is always an empty set in R^0.
+        % Thus we need to maintain dimensions. (issue #110)
+        B1 = P(1);
+    else
+        B1 = PolyUnion(P).outerApprox;
+    end
+    if all(S.isEmptySet())
+        B2 = S(1);
+    else
+        B2 = PolyUnion(S).outerApprox;
+    end
 	if ~(B1==B2)
 		% bounding boxes differ, sets cannot be equal
 		ts = false;
