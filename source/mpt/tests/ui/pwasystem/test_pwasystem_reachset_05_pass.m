@@ -7,14 +7,14 @@ sys.x.max = 1;
 pwa = PWASystem([sys, sys]);
 X = Polyhedron.emptySet(1);
 
-R = sys.reachableSet('direction', 'backward', 'X', X);
+R = pwa.reachableSet('direction', 'backward', 'X', X);
 assert(isa(R, 'Polyhedron'));
-assert(R.Dim==1);
-assert(R.isEmptySet());
+assert(isequal([R.Dim], [1 1]));
+assert(all(R.isEmptySet()));
 
-R = sys.reachableSet('direction', 'forward', 'X', X);
+R = pwa.reachableSet('direction', 'forward', 'X', X);
 assert(isa(R, 'Polyhedron'));
-assert(R.Dim==1);
-assert(R.isEmptySet());
+assert(isequal([R.Dim], [1 1]));
+assert(all(R.isEmptySet()));
 
 end
