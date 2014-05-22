@@ -145,6 +145,7 @@ fprintf(' Runtime: %.1f seconds\n\n', runtime);
 
 % store the list of failed tests for re-run
 test_files = test_files(with_error);
+mlock;
 
 end
 
