@@ -23,6 +23,8 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
+assert(isa(P, 'Polyhedron'), 'The first input must be a Polyhedron object.');
+
 % check if S is an array or polyhedron
 if isa(S,'Polyhedron')
     if numel(S)>1
