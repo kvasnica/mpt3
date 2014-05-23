@@ -587,8 +587,8 @@ classdef polytope
 			end
 			z = obj.P.distance(arg);
 			dist = z.dist;
-			x = z.xP;
-			y = z.yS;
+			x = z.x;
+			y = z.y;
 		end
 		
 		function out = nconstr(obj)
