@@ -182,8 +182,6 @@ fprintf('%12i', size(INFEAS,2));
 fprintf('%10.2e', numLPs);
 fprintf('\n');
 
-time = etime(clock, tStart);
-
 % construct regions
 nreg = size(B,2);
 R = [];
@@ -210,7 +208,7 @@ end
 sol.xopt = U;
 sol.exitflag = flag;
 sol.how = how;
-sol.stats.solveTime = time;
+sol.stats.solveTime = etime(clock, tStart);
 sol.stats.numLPs = numLPs;
 
 fprintf('mpt_enum_plcp: %d regions\n',U.Num);
