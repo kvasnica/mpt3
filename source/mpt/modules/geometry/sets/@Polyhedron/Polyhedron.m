@@ -532,7 +532,32 @@ classdef Polyhedron < ConvexSet
 			else
 				H = [P(:); Q(:)];
 			end
-		end
+        end
+        
+        function [new, unique_idx, idx] = unique(P)
+            % Returns unique components of an array of Polyhedron objects
+            %
+            % U = P.unique() returns only the unique elements of the array
+            % P. [U, idx] = P.unique() returns the indices of unique
+            % elements as the second output.
+            
+            idx = false(numel(P), numel(P));
+            is_unique = true(size(P));
+            for i = 1:numel(P)-1
+                for j = i+1:numel(P)
+                    if ~(idx(j, i))
+                        answer = P(i)==P(j);
+                        idx(j, i) = answer;
+                        if answer
+                            is_unique(j) = false;
+                            break
+                        end
+                    end
+                end
+            end
+            new = copy(P(is_unique));
+            unique_idx = find(is_unique);
+        end
 		
 		function answer = isFullSpace(P)
 			% returns true if the polyhedron represents R^n
