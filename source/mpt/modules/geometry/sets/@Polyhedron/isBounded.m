@@ -30,6 +30,10 @@ for i=1:length(P)
             P(i).Internal.Bounded = true;
         elseif P(i).hasVRep
             P(i).Internal.Bounded = size(P(i).R,1) == 0;
+        elseif P(i).hasHRep && ~P(i).isFullDim()
+            % project the lower-dimensional polyhedron onto its affine hull
+            % and check boundedness there (issue #112)
+            P(i).Internal.Bounded = P(i).projectOnAffineHull().isBounded();
         elseif P(i).hasHRep
             sol = P(i).chebyCenter;
             %P(i).Internal.Bounded = true;
