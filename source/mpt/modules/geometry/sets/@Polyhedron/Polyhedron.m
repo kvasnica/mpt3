@@ -684,9 +684,9 @@ classdef Polyhedron < ConvexSet
 			% R^n is represented by 0'*x<=1
 			S = Polyhedron(zeros(1, dim), 1);
 			S.irredundantHRep = true;
-			S.Internal.Empty = false;
-			S.Internal.FullDim = true;
-			S.Internal.Bounded = false;
+			S.Internal.Empty = (dim==0); % R^0 is an empty set
+			S.Internal.FullDim = (dim>0); % R^0 is not fully dimensional
+			S.Internal.Bounded = (dim==0); % R^0 is bounded
 			S.Internal.lb = -Inf(dim, 1);
 			S.Internal.ub = Inf(dim, 1);
 		end

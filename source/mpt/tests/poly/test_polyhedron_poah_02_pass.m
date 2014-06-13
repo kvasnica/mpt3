@@ -19,4 +19,10 @@ Q = P.projectOnAffineHull();
 assert(Q.Dim==1);
 assert(Q.isFullSpace());
 
+% projection of a single point is an empty set
+P = Polyhedron('Ae',[-1 -0.4;0 3.1],'be',[-0.1;0.5],'lb',[-2;-3],'ub',[2;3]);
+Q = P.projectOnAffineHull();
+assert(Q.Dim==0);
+assert(Q.isEmptySet());
+
 end
