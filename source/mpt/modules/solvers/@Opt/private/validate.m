@@ -420,8 +420,11 @@ else
         opt.Internal.lb = lb(opt.d+1:opt.d+opt.n); % extracted lower bound on decision variables
         opt.Internal.ub = ub(opt.d+1:opt.d+opt.n); % extracted upper bound on decision variables        
         opt.Internal.removed_rows.ineqlin = find(hull.I(1:opt.m));
-        opt.Internal.removed_rows.lower = [opt.Internal.removed_rows.lower; find(hull.I(opt.m+1:opt.m+nnz(~ilb)))];
-        opt.Internal.removed_rows.upper = [opt.Internal.removed_rows.upper; find(hull.I(opt.m+nnz(~ilb)+1:opt.m+nnz(~ilb)+nnz(~iub)))];
+        remained.lb = setdiff(transpose(1:opt.n),opt.Internal.removed_rows.lower); % indices that have remained after elimination of -Inf lower bound
+        remained.ub = setdiff(transpose(1:opt.n),opt.Internal.removed_rows.upper); % indices that have remained after elimination of Inf upper bound
+        % append the indices that have been eliminated from the remaining lb/ub constraints
+        opt.Internal.removed_rows.lower = [opt.Internal.removed_rows.lower; remained.lb(hull.I(opt.m+1:opt.m+nnz(~ilb)))];
+        opt.Internal.removed_rows.upper = [opt.Internal.removed_rows.upper; remained.ub(hull.I(opt.m+nnz(~ilb)+1:opt.m+nnz(~ilb)+nnz(~iub)))];
         
         
         % Inequalities of P that only involve the parameter
