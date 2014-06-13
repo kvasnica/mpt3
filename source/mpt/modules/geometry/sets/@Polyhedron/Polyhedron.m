@@ -558,6 +558,32 @@ classdef Polyhedron < ConvexSet
             new = copy(P(is_unique));
             unique_idx = find(is_unique);
         end
+        
+        function Q = projectOnAffineHull(P)
+            % Projects the polyhedron on its affine hull
+            %
+            % Given a polyhedron P = { x | A*x<=b, Ae*x=be }, calling
+            % Q = P.projectOnAffineHull() produces a new polyhedron
+            % Q = { z | A*F*z <= b - A*x0 } where F is in the null space of
+            % Ae and x0 is any solution to Ae*x0=be.
+            %
+            % The equality constraints are identified via
+            % Polyhedron/affineHull().
+            %
+            % The dimensionality of Q is dim(P)-rank(Ae, be).
+            
+            P.minHRep();
+            Q = P.copy();
+            for i = 1:numel(P)
+                He = P(i).affineHull();
+                if ~isempty(He)
+                    F = null(He(:, 1:end-1));
+                    x0 = He(:, 1:end-1)\He(:, end);
+                    Q(i) = Polyhedron(P(i).A*F, P(i).b - P(i).A*x0);
+                end
+            end
+                
+        end
 		
 		function answer = isFullSpace(P)
 			% returns true if the polyhedron represents R^n
