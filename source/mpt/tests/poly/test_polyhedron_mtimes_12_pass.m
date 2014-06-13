@@ -1,13 +1,12 @@
 function test_polyhedron_mtimes_12_pass
-%
-% polyhedron-matrix
-%
+% tests P*M
 
-P = ExamplePoly.randHrep('d',3,'ne',2);
-A = [randn(2,3); 0 0 0];
-
-[worked, msg] = run_in_caller('R = P*A; ');
-assert(~worked);
-asserterrmsg(msg,'Multiplication from the right by a matrix is not well-defined for a polyhedron.');
+P = Polyhedron.unitBox(2);
+M = [1 1; 0 1];
+Q = P*M;
+Aexp = P.A*M;
+bexp = P.b;
+assert(norm(Q.A - Aexp, Inf) < 1e-8);
+assert(norm(Q.b - bexp, Inf) < 1e-8);
 
 end

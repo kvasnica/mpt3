@@ -130,7 +130,7 @@ switch [P_class S_class]
             Pnew = Polyhedron('V',alpha*poly.V, 'R', poly.R);
         end
     case ['Polyhedron' 'matrix']
-        error('Multiplication from the right by a matrix is not well-defined for a polyhedron.')
+        Pnew = P.invAffineMap(S);
     case ['matrix' 'Polyhedron']
         Pnew = S.affineMap(P);
 end
