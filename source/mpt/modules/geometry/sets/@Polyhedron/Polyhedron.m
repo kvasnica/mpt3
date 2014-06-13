@@ -577,15 +577,16 @@ classdef Polyhedron < ConvexSet
             for i = 1:numel(P)
                 He = P(i).affineHull();
                 if ~isempty(He)
-                    if isempty(P(i).H)
-                        % special case where the projection is R^m where
-                        % "m" is dim(P)-rank(Ae)
-                        Q(i) = Polyhedron.fullSpace(P(i).Dim - rank(He(:, 1:end-1)));
+                    % fully dimensional in a lower dimension
+                    F = null(He(:, 1:end-1));
+                    x0 = He(:, 1:end-1)\He(:, end);
+                    A = P(i).A*F;
+                    b = P(i).b - P(i).A*x0;
+                    if isempty(A)
+                        % projection is R^m with m = dim(P)-rank(Ae)
+                        Q(i) = Polyhedron.fullSpace(size(A, 2));
                     else
-                        % fully dimensional in a lower dimension
-                        F = null(He(:, 1:end-1));
-                        x0 = He(:, 1:end-1)\He(:, end);
-                        Q(i) = Polyhedron(P(i).A*F, P(i).b - P(i).A*x0);
+                        Q(i) = Polyhedron(A, b);
                     end
                 end
             end
