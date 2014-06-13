@@ -22,6 +22,9 @@ end
 
 % store the original problem
 opt = S.copy;
+% make a copy of the original problem before we modify it via
+% eliminateEquations()
+S = S.copy();
 
 if S.me>0   
     % eliminate equations first
