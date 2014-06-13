@@ -11,10 +11,7 @@ end
 
 d = P.project([1; 2]);
 
-if ~isempty(d.dist)
-    error('Must be empty here.');
-end
-    
-
+% distance to an empty set is Inf by convention (issue #111)
+assert(d.dist==Inf);
 
 end

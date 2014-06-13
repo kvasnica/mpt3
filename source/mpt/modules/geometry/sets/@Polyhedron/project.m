@@ -65,7 +65,7 @@ for j = 1:n_points
     end
     
     sol(1,j).exitflag    = opt.exitflag;
-    sol(1,j).dist    = [];
+    sol(1,j).dist    = Inf; % infeasible proble = infinite distance by convention
     if sol(1,j).exitflag == MPTOPTIONS.OK,
         sol(1,j).x       = opt.xopt(1:obj.Dim);
         sol(1,j).dist = norm(sol(1,j).x - y(:,j));

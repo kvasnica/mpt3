@@ -41,7 +41,7 @@ if numel(P)>1
 end
 
 % pre-alocate output
-ret = struct('exitflag', [], 'dist', [], 'x', [], 'y', []);
+ret = struct('exitflag', [], 'dist', Inf, 'x', [], 'y', []);
 
 %% S is supposedly a point
 if ~isa(S,'Polyhedron') 
@@ -53,6 +53,13 @@ end
 %% S is Polyhedron
 if S.Dim ~= P.Dim
     error('Both polyhedra have to be of the same dimension.');
+end
+
+if P.isEmptySet() || S.isEmptySet()
+    % distance from an empty set is infinite by convention (issue #111)
+    ret.exitflag = MPTOPTIONS.INFEASIBLE;
+    ret.dist = Inf;
+    return
 end
 
 % Get representations of both polyhedra
@@ -86,10 +93,6 @@ if sol.exitflag==MPTOPTIONS.OK
     ret.dist = norm(x-y);
     ret.x = x;
     ret.y = y;
-else
-   ret.dist = [];
-   ret.x = [];
-   ret.y = [];
 end
 
 end
