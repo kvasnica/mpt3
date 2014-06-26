@@ -8,7 +8,7 @@ if numel(in)>1
 	% remove overlaps based on cost
 	NoOverlaps = PUs.min('obj');
 else
-	NoOverlaps = in{1};
+	NoOverlaps = PUs;
 end
 
 % convert back to MPT2 format
