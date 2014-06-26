@@ -330,6 +330,80 @@ classdef PolyUnion < Union
               E = Polyhedron(He(:, 1:end-1), He(:, end));
           end
       end
+      
+      function result = compare(P1, P2, function_name)
+          % Compares two PWA functions
+          %
+          %   result = P1.compare(P2, function_name)
+          %
+          % Output:
+          %   0 if P1(x) == P2(x) for all x
+          %   1 if P1(x) >= P2(x) for all x
+          %   2 if P1(x) <= P2(x) for all x
+          %   3 if P1(x) >= P2(x) for some x and P1(x) <= P2(x) for some
+          %     other x
+          
+          global MPTOPTIONS
+          
+          error(nargchk(2, Inf, nargin));
+          assert(isa(P1, 'PolyUnion'), 'The first input must be a PolyUnion object.');
+          assert(isa(P2, 'PolyUnion'), 'The second input must be a PolyUnion object.');
+          error(P1.rejectArray());
+          error(P2.rejectArray());
+          
+          if nargin < 3 || isempty(function_name)
+              % if no function is specified, take the first one
+              if length(P1.listFunctions)>1
+                  error('Please specify which function to use for comparison.');
+              else
+                  fnames = P1.listFunctions();
+                  if isempty(fnames)
+                      error('The object has no functions.');
+                  end
+                  function_name = fnames{1};
+              end
+          end
+          
+          if ~ischar(function_name)
+			  error('The function name must be a string.');
+		  elseif ~P1.hasFunction(function_name) || ~P2.hasFunction(function_name)
+			  error('No such function "%s" in the object.', function_name);
+		  elseif ~isa(P1.index_Set(1).Functions(function_name), 'AffFunction') || ...
+                  ~isa(P2.index_Set(1).Functions(function_name), 'AffFunction')
+			  error('Function "%s" must be affine.', function_name);
+          end
+
+          if P1.Dim~=P2.Dim || P1.Domain~=P2.Domain
+              error('The functions must be defined over the same domain.');
+          end
+          
+          % since we only support PWA functions for now, it is enough to
+          % compare the function values at the vertices
+          vals = [];
+          for i = 1:P1.Num
+              V = P1.Set(i).V;
+              for j = 1:size(V, 1)
+                  x = V(j, :)';
+                  fP1 = P1.Set(i).Functions(function_name).feval(x);
+                  fP2 = P2.feval(x, function_name, 'tiebreak', @(z) 0);
+                  vals = [vals; fP1(:) fP2(:)];
+              end
+          end          
+          
+          if norm(vals(:, 1)-vals(:, 2), Inf) < MPTOPTIONS.abs_tol
+              % P1(x) = P2(x) for all x
+              result = 0;
+          elseif all(vals(:, 1) >= vals(:, 2))
+              % P1(x) >= P2(x) for all x
+              result = 1;
+          elseif all(vals(:, 2) >= vals(:, 1))
+              % P2(x) >= P1(x) for all x
+              result = 2;
+          else
+              % P1(x)<=P2(x) and P2(y)<=P1(y)
+              result = 3;
+          end
+      end
   end  
 end
 
