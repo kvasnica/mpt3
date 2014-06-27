@@ -788,14 +788,20 @@ R = Polyhedron(Hn(:, 1:end-1), Hn(:, end));
 zero_rows = sum(abs(R.A),2)<MPTOPTIONS.zero_tol;
 % scaling matrix
 Hscaled = Hn;
-[An,D1,D2] = mpt_scale_matrix(Hn(~zero_rows,:));
-% D1 must be nonnegative
-if (all(diag(D1)>MPTOPTIONS.zero_tol))
-    % respect zero rows in the original system
-    Hscaled(~zero_rows,:) = D1*Hn(~zero_rows,:);
-    % create a scaled polyhedron to avoid numerical problems in redudancy
-    % elimination and detection of empty polyhedra
-    R = Polyhedron(Hscaled(:, 1:end-1), Hscaled(:, end));
+% detect zero columns
+Hnz = Hn(~zero_rows,:);
+zero_cols = sum(abs(Hnz),1)<MPTOPTIONS.zero_tol;
+% do not scale if there is any zero column
+if ~any(zero_cols)
+    [An,D1,D2] = mpt_scale_matrix(Hnz);
+    % D1 must be nonnegative
+    if (all(diag(D1)>MPTOPTIONS.zero_tol))
+        % respect zero rows in the original system
+        Hscaled(~zero_rows,:) = D1*Hn(~zero_rows,:);
+        % create a scaled polyhedron to avoid numerical problems in redudancy
+        % elimination and detection of empty polyhedra
+        R = Polyhedron(Hscaled(:, 1:end-1), Hscaled(:, end));
+    end
 end
 
 % exit quickly if the polyhedron is empty
