@@ -31,9 +31,24 @@ for i=1:length(P)
         elseif P(i).hasVRep
             P(i).Internal.Bounded = size(P(i).R,1) == 0;
         elseif P(i).hasHRep && ~P(i).isFullDim()
-            % project the lower-dimensional polyhedron onto its affine hull
-            % and check boundedness there (issue #112)
-            P(i).Internal.Bounded = P(i).projectOnAffineHull().isBounded();
+            if ~isempty(P(i).affineHull())
+                % project the lower-dimensional polyhedron onto its affine hull
+                % and check boundedness there (issue #112)
+                P(i).Internal.Bounded = P(i).projectOnAffineHull().isBounded();
+            else
+                % note that we declare a set lower-dimensional if the radius of
+                % its chebyshev's ball drops below a tolerance. that does not
+                % imply there are equalities, that's why we also need to check
+                % whether we in fact have a non-empty affine hull, otherwise we
+                % would start to cycle (test_polyhedron_isbounded_17_pass)
+                %
+                % hence we check boundedness by computing the outer box
+                % approximation
+                P(i).outerApprox();
+                P(i).Internal.Bounded = all(~isinf(P(i).Internal.lb)) & ...
+                    all(~isinf(P(i).Internal.ub));
+            end
+            
         elseif P(i).hasHRep
             sol = P(i).chebyCenter;
             %P(i).Internal.Bounded = true;
