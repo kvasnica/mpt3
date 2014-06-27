@@ -60,5 +60,13 @@ U2 = PolyUnion(P2);
 [~, msg] = run_in_caller('U1.compare(U2)');
 asserterrmsg(msg, 'The functions must be defined over the same domain.');
 
+% incompatible ranges
+P1 = Polyhedron.unitBox(1);
+P1.addFunction(AffFunction(1, 1), 'x');
+U1 = PolyUnion(P1);
+P2 = Polyhedron.unitBox(1);
+P2.addFunction(AffFunction([0; 0], [1; 0]), 'x');
+U2 = PolyUnion(P2);
+[~, msg] = run_in_caller('U1.compare(U2)');
 
 end

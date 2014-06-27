@@ -371,6 +371,9 @@ classdef PolyUnion < Union
 		  elseif ~isa(P1.index_Set(1).Functions(function_name), 'AffFunction') || ...
                   ~isa(P2.index_Set(1).Functions(function_name), 'AffFunction')
 			  error('Function "%s" must be affine.', function_name);
+          elseif P1.index_Set(1).Functions(function_name).R ~= ...
+              P2.index_Set(1).Functions(function_name).R
+              error('Both functions must have the same range.');
           end
 
           if P1.Dim~=P2.Dim || P1.Domain~=P2.Domain
