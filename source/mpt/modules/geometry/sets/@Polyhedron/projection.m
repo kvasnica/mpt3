@@ -155,7 +155,7 @@ else
 				% eliminate one dimension at a time
                 t = tic;
 				for i = 1:length(dims_eliminate)
-                    if toc(t) > MPTOPTIONS.report_period
+                    if MPTOPTIONS.verbose > 0 && toc(t) > MPTOPTIONS.report_period
                         fprintf('progress: %d/%d\n', i, length(dims_eliminate));
                         t = tic;
                     end
@@ -208,9 +208,15 @@ else
 					else
 						dat = Opt('A',[D -Pn.b],'b', zeros(n,1), 'pB',-C,'f',[zeros(k,1);1], 'Ath',[eye(d); -eye(d)], 'bth', ones(2*d,1),'solver', solver);
 					end
-				end
+                end
 				
-				sol = dat.solve;
+                if MPTOPTIONS.verbose > 0
+                    % verbose output enabled
+                    sol = dat.solve();
+                else
+                    % keep silent on verbose<=0
+                    evalc('sol = dat.solve;');
+                end
 				
 				% The normals of the facets is the cost function
 				A = zeros(sol.xopt.Num,dat.d);
