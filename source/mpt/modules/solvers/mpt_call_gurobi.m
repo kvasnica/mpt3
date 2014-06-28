@@ -8,7 +8,7 @@ if isempty(MPTOPTIONS) && ~S.test
 end
 
 if strcmpi(S.problem_type,'LCP')
-    error('mpt_call_lcp: GUROBI solver does not solve %s problems!',S.problem_type);
+    error('mpt_call_gurobi: GUROBI solver does not solve %s problems!',S.problem_type);
 end
 
 % if ~ispc
