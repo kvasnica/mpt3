@@ -98,7 +98,12 @@ else
     if isfield(opt, 'Ath'), d = max([d size(opt.Ath,2)]); end
     
     opt.H  = [];
-    opt.pF = zeros(n,d);
+    if isfield(mat, 'D')
+        % parameterized cost th'*D*x (issue #117)
+        opt.pF = mat.D;
+    else
+        opt.pF = zeros(n,d);
+    end
     opt.f  = mat.H';
 end
 
