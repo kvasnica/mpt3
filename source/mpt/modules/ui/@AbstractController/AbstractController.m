@@ -272,7 +272,114 @@ classdef AbstractController < FilterBehavior & ComponentBehavior & IterableBehav
 			% See ClosedLoop/simulate for more information.
 			
 			out = ClosedLoop(obj, obj.model).simulate(x0, N_sim, varargin{:});
-		end
+        end
+        
+        function [avg_p, max_p, P1, P2, X0] = comparePerformance(this, other, varargin)
+            % Compares performance of two controllers
+            %
+            %   [avg_diff, max_diff] = ctrl.comparePerformance(other)
+            %
+            % Compares the performance of two controllers by simulating
+            % their closed-loop response. The simulations are performed for
+            % a grid of initial conditions. Each closed-loop response is
+            % then evaluated as \sum x_i'*Qx*x_i+u_i'*Qu*u_i+y_i'*Qy*y_i.
+            %
+            % The function returns five outputs:
+            %   avg_diff: average relative difference of performance (in %)
+            %   max_diff: worst-case relative difference (in %)
+            %         P1: performance of the baseline controller (each entry
+            %             indicates the closed-loop performance for the
+            %             corresponding initial condition)
+            %         P2: performance of the other controller (each entry
+            %             indicates the closed-loop performance for the
+            %             corresponding initial condition)
+            %         X0: list of initial conditions
+            %
+            % Various options can be specified by 
+            %   ctrl.comparePerformance(other, 'option1', value1, ...)
+            %
+            % List of options:
+            %       'X0': array of initial conditions to investigate
+            %             (if provided, the "domain" and "grid" options are
+            %             ignored)
+            %   'domain': the range of initial conditions to investigate as
+            %             a Polyhedron object (if one of the controllers is
+            %             an explicit one, the domain is taken from
+            %             ctrl.optimizer.Domain)
+            %     'grid': density of the grid of initial conditions 
+            %             (default is 20)
+            %     'Nsim': number of simulation steps
+            %             (default is 20)
+            %       'Qx': penalty matrix to evaluate performance
+            %             (default is eye(nx))
+            %       'Qu': penalty matrix to evaluate performance
+            %             (default is eye(nu))
+            %       'Qy': penalty matrix to evaluate performance
+            %             (default is zeros(ny))
+            
+            assert(isa(other, 'AbstractController'), 'The other controller must be an MPT controller.');
+            
+            ip = inputParser;
+            ip.addParamValue('domain', [], @validate_polyhedron);
+            ip.addParamValue('grid', 10, @isscalar);
+            ip.addParamValue('Nsim', 20, @isscalar);
+            ip.addParamValue('Qx', eye(this.model.nx), @validate_realmatrix);
+            ip.addParamValue('Qu', eye(this.model.nu), @validate_realmatrix);
+            ip.addParamValue('Qy', zeros(this.model.ny), @validate_realmatrix);
+            ip.addParamValue('X0', [], @validate_realmatrix);
+            ip.parse(varargin{:});
+            options = ip.Results;
+            if isempty(options.X0)
+                if isempty(options.domain)
+                    if isa(this, 'EMPCController')
+                        options.domain = this.optimizer.Domain;
+                    elseif isa(other, 'EMPCController')
+                        options.domain = other.optimizer.Domain;
+                    else
+                        error('The "domain" parameter must be specified.');
+                    end
+                end
+                options.X0 = options.domain.grid(options.grid);
+            end
+            
+            % performance function
+            perf = @(d) sum(diag(d.X'*options.Qx*d.X)) + ...
+                sum(diag(d.U'*options.Qu*d.U)) + ...
+                sum(diag(d.Y'*options.Qy*d.Y));
+            
+            % evaluate performance for each starting point
+            nx0 = size(options.X0, 1);
+            P1 = zeros(nx0, 1);
+            P2 = zeros(nx0, 1);
+            for i = 1:nx0
+                if i==1
+                    fprintf('Comparing performance  ...');
+                else
+                    fprintf(1, ' \b\b\b\b\b%2d %%', fix(i/nx0*100));
+                end
+                if i==nx0
+                    fprintf('\n');
+                end
+                x0 = options.X0(i, :)';
+                d1 = this.simulate(x0, options.Nsim);
+                d2 = other.simulate(x0, options.Nsim);
+                P1(i) = perf(d1);
+                P2(i) = perf(d2);
+            end
+            
+            % round to 10 decimal places to avoid numerical noise
+            P1 = round(P1*1e10)/1e10;
+            P2 = round(P2*1e10)/1e10;
+            
+            d = abs(P1-P2)./P1;
+            % avoid division by zero
+            d(isnan(d)) = 0;
+            avg_p = mean(d)*100;
+            max_p = max(d)*100;
+            
+            X0 = options.X0;
+        end
+
 
 	end
 
