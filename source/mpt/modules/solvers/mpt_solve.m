@@ -609,6 +609,9 @@ end
 if any(strcmpi(S.solver,{'gurobi','gurobi_mex','gurobimex'}))
     % GUROBI
     R = mpt_call_gurobi(S);
+    
+elseif strcmpi(S.solver, 'mosek')
+    R = mpt_call_mosek(S);
 
 elseif strcmpi(S.solver,'quadprog')
     % quadprog
