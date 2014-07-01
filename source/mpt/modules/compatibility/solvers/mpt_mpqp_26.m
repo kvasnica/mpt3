@@ -299,12 +299,7 @@ constraintStorage=[];   %storage structure for active constraints
 xB=[]; %structure for storing all the points xBeyond
 xBRegion=[]; %structure for storing region assosiated to point
 
-if Options.qpsolver==1,
-    options=optimset(optimset('quadprog'),'Display','off',...
-		'LargeScale','off', 'Algorithm', 'active-set');
-else
-    options=[];
-end
+options=[];
 
 
 bboxOpt.noPolyOutput = 1;
@@ -351,11 +346,7 @@ if(isemptypoly)
     %================================================%
     % Solve optimization problem for point xFeasible %
     %================================================%
-    if Options.qpsolver==1,
-        options=optimset(optimset('quadprog'),'Display','off','LargeScale','off');
-    else
-        options=[];
-    end
+    options=[];
 
     % removing redundant constraints helps to improve robustness for
     % certain QP solvers (e.g. for quadprog)
