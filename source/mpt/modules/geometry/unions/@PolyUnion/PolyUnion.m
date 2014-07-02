@@ -371,6 +371,8 @@ classdef PolyUnion < Union
 		  elseif ~isa(P1.index_Set(1).Functions(function_name), 'AffFunction') || ...
                   ~isa(P2.index_Set(1).Functions(function_name), 'AffFunction')
 			  error('Function "%s" must be affine.', function_name);
+          elseif P1.index_Set(1).Functions(function_name).R~=1
+              error('The function to compare must be scalar');
           elseif P1.index_Set(1).Functions(function_name).R ~= ...
               P2.index_Set(1).Functions(function_name).R
               error('Both functions must have the same range.');
@@ -387,8 +389,8 @@ classdef PolyUnion < Union
               V = P1.Set(i).V;
               for j = 1:size(V, 1)
                   x = V(j, :)';
-                  fP1 = P1.Set(i).Functions(function_name).feval(x);
-                  fP2 = P2.feval(x, function_name, 'tiebreak', @(z) 0);
+                  fP1 = P1.feval(x, function_name, 'tiebreak', function_name);
+                  fP2 = P2.feval(x, function_name, 'tiebreak', function_name);
                   vals = [vals; fP1(:) fP2(:)];
               end
           end          
