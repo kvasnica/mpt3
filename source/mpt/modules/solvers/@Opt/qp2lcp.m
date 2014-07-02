@@ -325,7 +325,7 @@ if r<nc
     % multipliers for the original inequalities
     kept_rows.ineq = setdiff(1:S.Internal.m,S.Internal.removed_rows.ineqlin);
     recover.lambda.ineqlin.lambdaX = zeros(S.Internal.m,2*(nb+2*nc+S.m));
-    recover.lambda.ineqlin.lambdaX(kept_rows.ineq,nb+2*nc+S.m+nb+2*nc+1:nb+2*nc+S.m+nb+2*nc+S.Internal.m) = eye(numel(kept_rows.ineq));
+    recover.lambda.ineqlin.lambdaX(kept_rows.ineq,nb+2*nc+S.m+nb+2*nc+1:nb+2*nc+S.m+nb+2*nc+S.Internal.m) = eye(numel(kept_rows.ineq),S.Internal.m);
     recover.lambda.ineqlin.lambdaTh = zeros(S.Internal.m,S.d+1);
     
     % multipliers for the original lower bound
