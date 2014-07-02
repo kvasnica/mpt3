@@ -136,10 +136,19 @@ for iii = 1:n
         zbnd = Izero(n+1:2*n,indTest(jj));
         nz = nnz(zbnd);
 
-        S.Ae = [-M(wbnd,:) -Q(wbnd,:);
+        if isempty(problem.Ae)
+            % no equality constraints on binary variables
+            S.Ae = [-M(wbnd,:) -Q(wbnd,:);
+                I(zbnd,:) zeros(nz,problem.d)];
+            S.be = [q(wbnd); zeros(nz,1)];
+        else
+            % append equality constraints on binary variables if present
+            S.Ae = [-M(wbnd,:) -Q(wbnd,:);
                 I(zbnd,:) zeros(nz,problem.d);
                 problem.Ae zeros(problem.me,problem.d)];
-        S.be = [q(wbnd); zeros(nz,1); problem.be];
+            S.be = [q(wbnd); zeros(nz,1); problem.be];
+        end
+        
 
         res = mpt_solve(S);
         
