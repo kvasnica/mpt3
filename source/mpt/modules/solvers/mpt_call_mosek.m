@@ -39,7 +39,12 @@ end
 
 % call the solver
 command = 'minimize echo(0)'; % keep silent
-[~, res] = mosekopt(command, prob);
+if S.test
+    options = [];
+else
+    options = MPTOPTIONS.modules.solvers.mosek;
+end
+[~, res] = mosekopt(command, prob, options);
 
 if isfield(res.sol, 'int')
     % integer solution

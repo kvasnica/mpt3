@@ -447,6 +447,11 @@ options.gurobi.Aggregate = 0;
 % aggregation can lead to an accumulation of numerical errors. Turning it
 % off can sometimes improve solution accuracy.
 
+%% MOSEK options
+try
+    [~, res] = mosekopt('param');
+    options.mosek = res.param;
+end
 
 %% NAG options
 options.nag.qp.ftol = 1e-9;
