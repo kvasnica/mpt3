@@ -46,14 +46,18 @@ else
 end
 [~, res] = mosekopt(command, prob, options);
 
-if isfield(res.sol, 'int')
+if ~isfield(res, 'sol')
+    error(res.rmsg);
+elseif isfield(res.sol, 'int')
     % integer solution
     out = res.sol.int;
 elseif isfield(res.sol, 'bas')
     % prefer the simplex algorithm over interior point
     out = res.sol.bas;
-else
+elseif isfield(res.sol, 'itr')
     out = res.sol.itr;
+else
+    error('mpt_call_mosek: unexpected output from the solver.');
 end
 
 % parse the output
