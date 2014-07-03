@@ -18,7 +18,8 @@ B = Polyhedron.unitBox(2);
 method = 'mplp';
 T = evalc('Q = plus(A, B, method);');
 % mpt_plcp must have been called:
-assert(~isempty(strfind(T, 'mpt_plcp')));
+% Note that after ebfb2a3a9f14 Polyhedron/projection is silent
+assert(isempty(strfind(T, 'mpt_plcp')));
 
 assert(R==Q);
 
