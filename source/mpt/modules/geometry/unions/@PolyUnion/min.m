@@ -111,13 +111,13 @@ fprintf(' done in %.2f seconds\n', etime(clock, t));
 
 for ipart = 1:numel(PUs)
 
-	% list of regions in which the function is better than in the
-	% 'ipart/ireg' region
-	better_regions = [];
-
 	fprintf('Union %d (out of %d)...\n', ipart, numel(PUs));
 
 	for ireg = 1:numel(PUs(ipart).Set)
+
+        % list of regions in which the function is better than in the
+        % 'ipart/ireg' region
+        better_regions = [];
 
 		%fprintf('Union %d (out of %d), region %d (out of %d)...\n', ...
 		%	ipart, numel(PUs), ireg, numel(PUs(ipart).Set));
