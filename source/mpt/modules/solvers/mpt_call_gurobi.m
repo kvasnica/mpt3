@@ -11,43 +11,6 @@ if strcmpi(S.problem_type,'LCP')
     error('mpt_call_gurobi: GUROBI solver does not solve %s problems!',S.problem_type);
 end
 
-% if ~ispc
-%     % before calling GUROBI, we need to check out whether the path to shared
-%     % libraries contains the directory with "libgurobi.so"
-%     d = which('libgurobi.so');
-%     id = findstr(d,filesep);
-%     dn = d(1:id(end)-1);
-%     if isunix && ~ismac
-%         p = getenv('LD_LIBRARY_PATH');
-%         % path is not set
-%         if isempty(strfind(p,dn))
-%             % append to the path variable
-%             setenv('LD_LIBRARY_PATH',[p,':',dn]);
-%         end
-%     elseif ismac
-%         p = getenv('DYLD_LIBRARY_PATH');
-%         % path is not set
-%         if isempty(strfind(p,dn))
-%             % append to the path variable
-%             setenv('DYLD_LIBRARY_PATH',[p,':',dn]);
-%         end
-%     else
-%         p = getenv('PATH');
-%         % path is not set
-%         if isempty(strfind(p,dn))
-%             % append to the path variable
-%             setenv('PATH',[p,';',dn]);
-%         end
-%     end
-% end
-% 
-% % adjust size of A, B to have at least one row if it's empty
-% if (S.m+S.me)==0
-%     S.A = sparse([1 zeros(1,S.n-1)]);
-%     S.b = 1e12;
-%     S.m = 1;
-% end
-
 
 % merge constraints, must be in sparse format
 A = sparse([S.Ae; S.A]);
@@ -100,13 +63,6 @@ else
     opts.OutputFlag= 0;
 end
 
-% % for MAC we need to load shared libraries into memory and the simplest way
-% % to do this without needing root privileges is to change the directory
-% if ismac
-%     current_dir = pwd;
-%     cd(dn);
-% end
-
 % put arguments to a struct
 model.A = A;
 model.rhs = b;
@@ -151,30 +107,6 @@ else
 end
 
 
-% % QP, MIQP
-% if any(strcmpi(S.problem_type,{'QP','MIQP'}))
-%     % extract row, column and value information from a sparse matrix
-%     [qrow, qcol, qval] = find(S.H);
-%     opts.QP.qval = 0.5*qval';
-%     %MH: gurobi_mex does not detect the platform correctly, must supply 32bit int anyway
-%     %     if any(strcmp(computer,{'PCWIN','GLNX86','MACI'}))
-%     opts.QP.qrow = int32(qrow'-1);
-%     opts.QP.qcol = int32(qcol'-1);
-%     %      elseif any(strcmp(computer,{'PCWIN64','GLNXA64','MACI64'}))
-%     %          opts.QP.qcol = int64(qcol'-1);
-%     %          opts.QP.qrow = int64(qrow'-1);
-%     %      end
-% end
-% 
-% if strcmpi(S.problem_type,'QP')
-%     [R.xopt,R.obj,flag,output,lambda] = gurobi_mex(S.f, 1, A, b, ctypes, lb, ub, S.vartype, opts);
-%     lam = -lambda.Pi;
-% elseif strcmpi(S.problem_type,'MIQP')
-%     % no lambda for MIP
-%     [R.xopt,R.obj,flag,output] = gurobi_mex(S.f, 1, A, b, ctypes, lb, ub, S.vartype, opts);
-%     lam = NaN(size(A,1),1);
-% end
-
 % assign Lagrange multipliers
 if isempty(lam)
    R.lambda.ineqlin = [];
@@ -200,16 +132,6 @@ else
         R.lambda.upper = zeros(S.n,1);
     end    
 end
-
-% % change back the directory
-% if ismac
-%     cd(current_dir)
-% end
-
-% % recalculate the objective function for QP, MIQP
-% if ~isempty(R.xopt) && any(strcmpi(S.problem_type,{'QP','MIQP'}))
-%     R.obj = 0.5*R.xopt'*S.H*R.xopt + S.f'*R.xopt;
-% end
 
 switch result.status
     case 'LOADED'
