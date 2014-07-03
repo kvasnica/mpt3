@@ -90,6 +90,25 @@ for i = 1:numel(PUs)
 	end
 end
 
+% map of intersecting regions
+t = clock;
+fprintf('Computing the intersection map...');
+RegionsIntersect = cell(numel(PUs), numel(PUs));
+for i = 1:numel(PUs)-1
+    for j = i+1:numel(PUs)
+        if ~PartitionsIntersect(i, j), continue, end
+        map = false(PUs(i).Num, PUs(j).Num);
+        for ir = 1:PUs(i).Num
+            for jr = 1:PUs(j).Num
+                status = PUs(i).Set(ir).doesIntersect(PUs(j).Set(jr), 'fully');
+                map(ir, jr) = status;
+            end
+        end
+        RegionsIntersect{i, j} = map;
+    end
+end
+fprintf(' done in %.2f seconds\n', etime(clock, t));
+
 for ipart = 1:numel(PUs)
 
 	% list of regions in which the function is better than in the
@@ -105,15 +124,19 @@ for ipart = 1:numel(PUs)
 		
 		for jpart = setdiff(1:numel(PUs), ipart)
 		
-			if ~PartitionsIntersect(ipart, jpart)
-				% partitions do not intersect, no reason to check regions
-				continue
-			end
+            if ~PartitionsIntersect(ipart, jpart)
+                % partitions do not intersect, no reason to check regions
+                continue
+            elseif ipart < jpart
+                dointersect = RegionsIntersect{ipart, jpart};
+            else
+                dointersect = RegionsIntersect{jpart, ipart}';
+            end
 			
 			for jreg = 1:numel(PUs(jpart).Set)
 				
 				% do the regions intersect?
-				if PUs(ipart).Set(ireg).doesIntersect(PUs(jpart).Set(jreg), 'fully')
+                if dointersect(ireg, jreg)
 					% compare function in the intersection
                     Q = PUs(ipart).Set(ireg).intersect(PUs(jpart).Set(jreg));
 					
