@@ -662,7 +662,68 @@ classdef Polyhedron < ConvexSet
 		% are doing! In general cases you should use Polyhedron/contains()
 		% instead.
 		[isin, inwhich, closest] = isInside(P, x, Options);
-		
+
+        function answer = doesIntersect(P1, P2, how)
+            % Returns true if P1 and P2 intersect
+            %
+            % answer = P1.doesIntersect(P2) returns true if the intersection
+            % of P1 and P2 is not an empty set.
+            %
+            % answer = P1.doesIntersect(P2, 'fully') returns true if the
+            % intersection is a fully dimensional set.
+            %
+            % P1 and P2 must be single Polyhedron objects. The check
+            % requires the H-representation of both polyhedrons.
+            %
+            % This is a faster version of P1.intersect(P2).isEmptySet() and
+            % P1.intersect(P2).isFulDim().
+            
+            % Note that this method is intended to be as fast as possible
+            % for a good performance of PolyUnion/min()
+            
+            global MPTOPTIONS
+            if nargin<3
+                how = '';
+            end
+            
+            assert(isa(P1, 'Polyhedron') && isa(P2, 'Polyhedron'), 'Both objects must be a Polyhedron.');
+            assert(numel(P1)==1 && numel(P2)==1, 'Arrays are not supported.');
+            assert(P1.Dim==P2.Dim, 'Both polyhedra must be in the same dimension.');
+            
+            % first check intersection of bounding boxes
+            if ~(isfield(P1.Internal, 'lb') && isfield(P1.Internal, 'ub'))
+                P1.outerApprox();
+            end
+            if ~(isfield(P2.Internal, 'lb') && isfield(P2.Internal, 'ub'))
+                P2.outerApprox();
+            end
+            lb1 = P1.Internal.lb;
+            ub1 = P1.Internal.ub;
+            lb2 = P2.Internal.lb;
+            ub2 = P2.Internal.ub;
+            if any(lb1-ub2>10*MPTOPTIONS.rel_tol) || ...
+                    any(lb2-ub1>10*MPTOPTIONS.rel_tol)
+                % bonding boxes do not intersect => sets do not intersect
+                answer = false;
+                return
+            end
+            
+            % check emptiness/full dimensionality of the intersection
+            if (isempty(P1.H) && ~isempty(P2.H)) || ...
+                    (isempty(P2.H) && ~isempty(P1.H))
+                % one of them is an empty set => no intersection
+                answer = false;
+                return
+            end
+            
+            H = [P1.H; P2.H];
+            if isequal(how, 'fully')
+                answer = fast_isFullDim(H);
+            else
+                answer = ~fast_isEmptySet(H);
+            end
+        end
+        
 	end
 	
 	methods(Static)
