@@ -113,9 +113,9 @@ for ipart = 1:numel(PUs)
 			for jreg = 1:numel(PUs(jpart).Set)
 				
 				% do the regions intersect?
-				Q = PUs(ipart).Set(ireg).intersect(PUs(jpart).Set(jreg));
-				if Q.isFullDim
+				if PUs(ipart).Set(ireg).doesIntersect(PUs(jpart).Set(jreg), 'fully')
 					% compare function in the intersection
+                    Q = PUs(ipart).Set(ireg).intersect(PUs(jpart).Set(jreg));
 					
 					ifun = PUs(ipart).Set(ireg).getFunction(func);
 					jfun = PUs(jpart).Set(jreg).getFunction(func);
@@ -224,4 +224,6 @@ if isa(Pfinal, 'double') && isempty(Pfinal)
 	out = PolyUnion;
 else
 	out = PolyUnion('Set', Pfinal', 'overlaps', false, 'Domain', domains);
+end
+
 end
