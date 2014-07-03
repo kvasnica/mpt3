@@ -323,6 +323,16 @@ options.glpk.mipgap = 0; % The relative mip gap tolerance.
 % details in http://www.gurobi.com/doc/40/refman/node572.html
 % only some important settings are here, the rest is kept to be default
 
+% Determines whether dual reductions are performed in presolve. You should
+% disable these reductions if you received an optimization status of
+% INF_OR_UNBD and would like a more definitive conclusion.
+% http://www.gurobi.com/documentation/5.6/reference-manual/dualreductions
+%
+% In short, setting DualReduction=0 prevents Gurobi from returning the
+% INF_OR_UNBD status upon which mpt_call_gurobi() needs to solve the
+% problem a second time to obtain a definite answer
+options.gurobi.DualReductions = 0;
+
 options.gurobi.BarIterLimit=Inf;
 % >0, Limits the number of barrier iterations performed (barrier only).
 
