@@ -32,6 +32,7 @@ else
 			P = [P, Pk];
 		end
 		new = PolyUnion('Set', P, 'Bounded', true, 'FullDim', true, ...
+            'Overlaps', sol{i}.overlaps, ...
 			'Convex', sol{i}.convex, 'Domain', toPolyhedron(sol{i}.Pfinal));
 		pu = [pu, new];
 		
