@@ -716,7 +716,7 @@ classdef Polyhedron < ConvexSet
                 return
             end
             
-            H = [P1.H; P2.H];
+            H = [P1.H; P2.H; P1.He; -P1.He; P2.He; -P2.He];
             if isequal(how, 'fully')
                 answer = fast_isFullDim(H);
             else
