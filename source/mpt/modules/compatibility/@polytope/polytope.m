@@ -194,7 +194,7 @@ classdef polytope
             % plot each object separately, hence we need to hold on
             prevHold = ishold;
             if ~ishold,
-                clf;
+                newplot;
             end
             hold('on');
             

@@ -136,7 +136,7 @@ end
 
 prevHold = ishold;
 if ~ishold,
-	clf;
+	newplot;
 end
 hold('on');
 

@@ -32,7 +32,7 @@ if iscell(obj.Set)
 	% hold the plot for the first element of the array
 	prevHold = ishold;
 	if ~ishold,
-		clf;
+		newplot;
 	end
 	hold('on');
 
