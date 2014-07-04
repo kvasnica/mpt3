@@ -94,26 +94,9 @@ for i=1:length(reg)
             T = [r.Fi{i} r.Gi{i}];
         end
         
-%         % Compute cost [x;1]'*Q*[x;1]
-%         if ~isempty(opt.H)
-%             Q = 0.5*T'*opt.H*T + [opt.pF opt.f]'*T;
-%         else
-%             Q = [opt.pF opt.f]'*T;
-%         end
-%         
-%         obj.add(   PolyFunc(      regions.P(end), 'func', @(x) [x 1]*Q*[x 1]', 'user', struct('Q', Q)));
-%         
-%         
-%         % Compute primal/dual variables requested by user
-%         xopt.add(PolyAffineFunc(regions.P(end), 'funcDat', P*T));
-
         % compute primal variables
         Lprimal = P*T;
         reg(i).addFunction(AffFunction(Lprimal(:,1:end-1),Lprimal(:,end)),'primal');
-        
-%         % compute dual variables
-%         Ldual = S.recover.lambdaX*x + S.recover.lambdaTh;
-%         reg(i).addFunction(AffFunction(Ldual(:,1:end-1),Ldual(:,end)),'dual');
         
         % compute the objective value
         Y = T(:,1:end-1);
@@ -126,10 +109,6 @@ for i=1:length(reg)
 
     end
 end
-
-%ret.regions = regions;
-%ret.primal    = xopt;
-%ret.obj     = obj;
 
 ret.xopt = PolyUnion('Set',reg,'Domain', toPolyhedron(r.Phard),...
 	'Convex',true,'Overlaps',false,'Bounded',true,'Fulldim',true,'Connected',true);
