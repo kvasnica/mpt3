@@ -330,8 +330,10 @@ options.glpk.mipgap = 0; % The relative mip gap tolerance.
 %
 % In short, setting DualReduction=0 prevents Gurobi from returning the
 % INF_OR_UNBD status upon which mpt_call_gurobi() needs to solve the
-% problem a second time to obtain a definite answer
-options.gurobi.DualReductions = 0;
+% problem a second time to obtain a definite answer.
+%
+% The default in Gurobi 5.6.3 is DualReductions=1
+options.gurobi.DualReductions = 1;
 
 options.gurobi.BarIterLimit=Inf;
 % >0, Limits the number of barrier iterations performed (barrier only).

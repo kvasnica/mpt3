@@ -63,6 +63,12 @@ else
     opts.OutputFlag= 0;
 end
 
+if isfield(S, 'quicklp') || isfield(S, 'quickqp')
+    % prevent gurobi from returning the INF_OR_UNBD status:
+    % http://www.gurobi.com/documentation/5.6/reference-manual/infunbdinfo
+    opts.InfUnbdInfo=1;
+end
+
 % put arguments to a struct
 model.A = A;
 model.rhs = b;
