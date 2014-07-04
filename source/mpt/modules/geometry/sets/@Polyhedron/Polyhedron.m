@@ -651,7 +651,80 @@ classdef Polyhedron < ConvexSet
 					
 				end
 			end
-		end
+        end
+        
+        function D = dual(obj)
+            % Computes the polar dual of a polytope
+            %
+            % D = P.dual() computes the dual of a polyhedron P. The
+            % polyhedron must be bounded (i.e., a polytope) and be fully
+            % dimensional. The two exceptions are the dual of an empty set
+            % (whose dual is R^n) and the dual of R^n (which is an empty
+            % set). The input polytope is not required to contain the
+            % origin in its interior.
+            %
+            % The dual of P = { x | Ax \le b } (which contains the origin
+            % in its interior) is D = { A'y | y \ge 0, \sum y=1}.
+            %
+            % If the polytope is given in the vertex representation, i.e.,
+            % P = { V'y | y \ge 0, \sum y = 1 }, then the polar dual is
+            % D = { x | Vx \le 1 }.
+            
+            if numel(obj)>1
+                % element-wise operation on arrays
+                D = obj.forEach(@(e) e.dual());
+                return
+            end
+            
+            if obj.isFullSpace()
+                % polar dual of R^n is an empty set in R^n
+                D = Polyhedron.emptySet(obj.Dim);
+                
+            elseif obj.isEmptySet()
+                % polar dual of an empty set is the whole euclidian space
+                D = Polyhedron.fullSpace(obj.Dim);
+                
+            elseif obj.isFullDim() && obj.isBounded()
+                if obj.hasHRep
+                    % find an interior point
+                    int_point = obj.interiorPoint();
+                    % shift the polytope such that it contains the origin
+                    % as an interior point
+                    P = obj + (-int_point.x);
+                    % normalize the shifted polytope to { x | Ax <= 1 }
+                    A = P.A./repmat(P.b, 1, P.Dim);
+                    % compute the dual D = { A'*y | y >= 0, sum(y)=1 }
+                    D = Polyhedron(A);
+                    % shift the dual back by +int_point
+                    D = D + int_point.x;
+                    % compute the H-representation
+                    D.computeHRep();
+                    
+                elseif obj.hasVRep
+                    % find an interior point
+                    int_point = obj.interiorPoint();
+                    % shift the polytope by -x_int such that it contains
+                    % the origin as an interior point
+                    P = obj + (-int_point.x);
+                    % compute the dual D = { x | V*x <= 1 }
+                    D = Polyhedron(P.V, ones(size(P.V, 1), 1));
+                    % shift the dual back by +x_int
+                    D = D + int_point.x;
+                    % compute the V-representation
+                    D.computeVRep();
+                    
+                else
+                    % this should not happen, we should have at least one
+                    % representation available
+                    error('Unexpected error, please report to mpt@control.ee.ethz.ch');
+                    
+                end
+                
+            else
+                error('The polyhedron must be bounded and be fully dimensional.');
+            end
+                
+        end
 	end
 	
 	methods(Hidden)
