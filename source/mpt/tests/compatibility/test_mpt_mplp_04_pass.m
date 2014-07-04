@@ -18,7 +18,6 @@ disp(T);
 assert(length(sol.xopt.Set)==28);
 % make sure mpt_mplp_26 was really called
 assert(~isempty(findstr(T, 'mpt_mplp:')));
-assert(~isempty(findstr(T, 'Calling mpt_mplp')));
 % make sure the domain was returned
 assert(isa(sol.xopt.Domain, 'Polyhedron'));
 assert(length(sol.xopt.Domain)==1);

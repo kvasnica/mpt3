@@ -12,6 +12,5 @@ disp(T);
 assert(length(sol.xopt.Set)==2);
 % make sure mpt_mplp_26 was really called
 assert(~isempty(findstr(T, 'mpt_mplp:')));
-assert(~isempty(findstr(T, 'Calling mpt_mplp')));
 
 end

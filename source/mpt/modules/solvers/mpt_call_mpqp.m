@@ -62,7 +62,9 @@ Matrices.Cc = S.c;
 Matrices.bndA = S.Ath;
 Matrices.bndb = S.bth;
 
-disp('Calling mpt_mpqp_26 with default options...')
+if MPTOPTIONS.verbose >= 1
+    disp('Calling mpt_mpqp_26 with default options...')
+end
 start_time = clock;
 [r.Pn,r.Fi,r.Gi,r.activeConstraints,r.Phard,r.details]=mpt_mpqp_26(Matrices);
 

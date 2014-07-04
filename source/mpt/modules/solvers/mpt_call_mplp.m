@@ -62,7 +62,9 @@ if any(S.pF(:))
     Matrices.D = S.pF;
 end
 
-disp('Calling mpt_mplp_26 with default options...')
+if MPTOPTIONS.verbose >= 1
+    disp('Calling mpt_mplp_26 with default options...')
+end
 start_time = clock;
 [r.Pn,r.Fi,r.Gi,r.activeConstraints,r.Phard,r.details]=mpt_mplp_26(Matrices);
 
