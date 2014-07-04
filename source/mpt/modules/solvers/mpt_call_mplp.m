@@ -16,10 +16,6 @@ if ~strcmpi(S.problem_type,'LP')
     error('mpt_call_mplp: MPLP solver does not solve %s problems!',S.problem_type);
 end
 
-if norm(S.pF(:),Inf)>MPTOPTIONS.rel_tol
-   error('mpt_call_mplp: This type of problem cannot be solved with MPLP solver.');
-end
-
 % store the original problem
 opt = S.copy;
 % make a copy of the original problem before we modify it via
@@ -36,10 +32,6 @@ end
 % extraction of lower and upper bounds on the variables from equation 
 % G*U <= W + E*th and puts them into separate fields. We need to put these 
 % bounds back.
-
-if any(S.pF(:))
-    error('MPLP solver does not solve problems with the parameterized cost (i.e. for nonzero "pF" matrix). Use PLCP solver instead.');
-end
 
 Matrices.G = S.A;
 Matrices.W = S.b;
@@ -65,6 +57,10 @@ Matrices.H = S.f;
 Matrices.F = S.C;
 Matrices.bndA = S.Ath;
 Matrices.bndb = S.bth;
+if any(S.pF(:))
+    % add parameterized cost
+    Matrices.D = S.pF;
+end
 
 disp('Calling mpt_mplp_26 with default options...')
 start_time = clock;
@@ -121,7 +117,8 @@ for i=1:length(reg)
         Y = T(:,1:end-1);
         R = T(:,end);
 
-        lt = opt.f'*Y + opt.C;
+        % add parameterized cost theta'*pF*x (issue #122)
+        lt = R'*opt.pF + opt.f'*Y + opt.C;
         at = opt.f'*R + opt.c;
         reg(i).addFunction(AffFunction(lt,at),'obj');
 
