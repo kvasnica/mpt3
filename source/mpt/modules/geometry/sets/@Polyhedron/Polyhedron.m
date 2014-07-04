@@ -725,6 +725,193 @@ classdef Polyhedron < ConvexSet
             end
                 
         end
+        
+        function sol = fmax(obj, function_name)
+            % Maximizes a function over a polyhedron
+            %
+            % sol = P.fmin(fun) maximizes a given function over a
+            % polyhedron. The optimizer is returned in sol.xopt, the
+            % objective value in sol.obj, and the optimization status in
+            % sol.exitflag and sol.how.
+            %
+            % The function to be maximized must be attached to the
+            % polyhedron and must be scalar-valued.
+            %
+            % If the problem to be solved is non-convex, YALMIP's status is
+            % returned in sol.info.
+            
+            error(obj.rejectArray());
+            
+            if nargin < 2
+                function_name = '';
+            end
+            sol = obj.fmin(function_name, -1);
+        end
+        
+        function sol = fmin(obj, function_name, direction)
+            % Minimizes a function over a polyhedron
+            %
+            % sol = P.fmin(fun) minimizes a given function over a
+            % polyhedron. The optimizer is returned in sol.xopt, the
+            % objective value in sol.obj, and the optimization status in
+            % sol.exitflag and sol.how.
+            %
+            % The function to be minimized must be attached to the
+            % polyhedron and must be scalar-valued.
+            %
+            % If the problem to be solved is non-convex, YALMIP's status is
+            % returned in sol.info.
+            
+            global MPTOPTIONS
+
+            error(obj.rejectArray());
+
+            if nargin < 3
+                direction = 1; % 1 = minimize, -1 = maximize
+            end
+            if nargin < 2
+                function_name = '';
+            end
+
+            if isempty(function_name)
+                % if no function is specified, take the first one
+                fnames = obj.listFunctions();
+                assert(numel(fnames)>0, 'The object has no functions.');
+                assert(numel(fnames)==1, 'The object has multiple functions, specify the one to optimize.');
+                function_name = fnames{1};
+            end
+            assert(ischar(function_name), 'The function name must be a string.');
+            assert(obj.hasFunction(function_name), 'No such function "%s" in the object.', function_name);            
+
+            fun = obj.Functions(function_name);
+
+            if obj.isEmptySet()
+                % trivially infeasible
+                sol.xopt = NaN(obj.Dim, 1);
+                sol.obj = direction*Inf;
+                sol.exitflag = MPTOPTIONS.INFEASIBLE;
+                sol.how = 'infeasible';
+                return
+            end
+            
+            if (isa(fun, 'QuadFunction') && direction==1 && min(eig(fun.H))>=0 ) || ...
+                    (isa(fun, 'QuadFunction') && direction==-1 && max(eig(fun.H))<=0 ) || ...
+                    isa(fun, 'AffFunction') || ...
+                    ((isa(fun, 'OneNormFunction') || isa(fun, 'InfNormFunction')) && direction==1)
+                % min of convex quadratic function => QP
+                % max of concave quadratic function => Qp
+                % min/max of linear function => LP
+                % min of 1-norm or Inf-norm => LP
+                
+                assert(fun.R==1, 'The function to minimize must be scalar.');
+                
+                prob.lb = [];
+                prob.ub = [];
+                if isa(fun, 'QuadFunction')
+                    prob.H = direction*2*fun.H; % mpt_solve minimizes 0.5 x'Hx + f'x !
+                    prob.quickqp = true;
+                else
+                    prob.quicklp = true;
+                end
+                if isa(fun, 'OneNormFunction')
+                    % min ||Qx||_1 is equivalent to
+                    % min sum(e) s.t. -e <= Qx <= e
+                    % where "e" is a rows(Q)-by-1 vector
+                    Q = fun.weight;
+                    ne = size(Q, 1);
+                    prob.A = [obj.A, zeros(size(obj.A, 1), ne); ...
+                        Q, -eye(ne); ...
+                        -Q, -eye(ne)];
+                    prob.b = [obj.b; zeros(2*ne, 1)];
+                    prob.Ae = [obj.Ae, zeros(size(obj.Ae, 1), ne)];
+                    prob.be = obj.be;
+                    prob.f = [zeros(1, obj.Dim), ones(1, ne)];
+                    
+                elseif isa(fun, 'InfNormFunction')
+                    % min ||Qx||_inf is equivalent to
+                    % min e s.t. -e <= Qx <= e
+                    % where "e" is a scalar
+                    Q = fun.weight;
+                    nQ = size(Q, 1);
+                    prob.A = [obj.A, zeros(size(obj.A, 1), 1); ...
+                        Q, -ones(nQ, 1); ...
+                        -Q, -ones(nQ, 1)];
+                    prob.b = [obj.b; zeros(2*nQ, 1)];
+                    prob.Ae = [obj.Ae, zeros(size(obj.Ae, 1), 1)];
+                    prob.be = obj.be;
+                    prob.f = [zeros(1, obj.Dim), 1];
+                    
+                else
+                    % add linear terms for LPs and QPs
+                    prob.f = direction*fun.F;
+                    prob.A = obj.A;
+                    prob.b = obj.b;
+                    prob.Ae = obj.Ae;
+                    prob.be = obj.be;
+                    
+                end
+                
+                sol = mpt_solve(prob);
+                switch sol.exitflag
+                    case MPTOPTIONS.OK
+                        if isa(fun, 'NormFunction')
+                            % remove the slacks from the optimizer
+                            sol.xopt = sol.xopt(1:obj.Dim);
+                        else
+                            sol.obj = sol.obj + direction*fun.g;
+                        end
+                        
+                    case MPTOPTIONS.INFEASIBLE
+                        sol.obj = Inf;
+                        sol.xopt = NaN(obj.Dim, 1);
+                        
+                    case MPTOPTIONS.UNBOUNDED
+                        sol.obj = -Inf;
+                        sol.xopt = NaN(obj.Dim, 1);
+                        
+                    otherwise
+                        error('Unknown result from the solver.');
+                end
+                
+            else
+                % general functions are minimized via YALMIP
+                
+                x = sdpvar(obj.Dim, 1);
+                con = [obj.A*x<=obj.b, obj.Ae*x<=obj.be];
+                J = direction*fun.feval(x);
+                assert(isscalar(J), 'The function to minimize must be scalar.');
+                info = solvesdp(con, J, sdpsettings('verbose', 0, 'debug', 1));
+                switch info.problem
+                    case {0, 3, 4, 5}
+                        sol.xopt = double(x);
+                        sol.obj = double(J);
+                        sol.how = 'ok';
+                        sol.exitflag = MPTOPTIONS.OK;
+                        
+                    case {2, 12, 15}
+                        % unbounded (note that we know the problem should
+                        % have been feasible since the domain is not an
+                        % empty set)
+                        sol.obj = -Inf;
+                        sol.xopt = NaN(obj.Dim, 1);
+                        sol.how = 'unbounded';
+                        sol.exitflag = MPTOPTIONS.UNBOUNDED;
+                        
+                    otherwise
+                        % infeasible
+                        sol.obj = Inf;
+                        sol.xopt = NaN(obj.Dim, 1);
+                        sol.how = 'infeasible';
+                        sol.exitflag = MPTOPTIONS.INFEASIBLE;
+                end
+                
+                sol.info = info;
+            end
+            
+            % adjust the cost when maximizing
+            sol.obj = sol.obj*direction;
+        end
+        
 	end
 	
 	methods(Hidden)
