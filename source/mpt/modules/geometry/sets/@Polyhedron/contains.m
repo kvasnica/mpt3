@@ -200,9 +200,9 @@ if S.hasVRep && (P.hasHRep || (~isempty(S.V_int) && isempty(S.R_int)))
 	end
 else
 	% S is an H-rep or in incompatible V-rep => Need an H-rep of P and S
-	P.minHRep();
-	S.minHRep();
-	
+	P.computeHRep();
+    S.computeHRep();
+    
 	% check outer approximations first
 	P.outerApprox();
 	S.outerApprox();
@@ -216,8 +216,13 @@ else
 		% approximation of P, hence S cannot be contained in P
 		tf = false;
 		return
-	end
-	
+    end
+
+    % only compute minimal H-representations after performing the
+    % boundingbox-based heuristics
+    P.minHRep();
+	S.minHRep();
+
 	% check also equalities
 	A = [P.A;P.Ae;-P.Ae]; b = [P.b;P.be;-P.be];
 	
