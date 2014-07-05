@@ -132,7 +132,7 @@ for i=1:res.xopt.Num
     % region index
     %ireg = find_region(xc.x,r.xopt.Set,r.xopt.Internal.adj_list);
     %[~,ireg]=isInside(r.xopt.Set,xc.x);
-    ireg = locatePoint(r.xopt,xc.x);
+    [~, ireg] = r.xopt.contains(xc.x);
     
     % evaluate solutions
     x1 = feval(res.xopt.Set(i),xc.x,'primal');
