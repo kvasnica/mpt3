@@ -977,8 +977,7 @@ classdef Polyhedron < ConvexSet
             P2.computeHRep();
             
             % check emptiness/full dimensionality of the intersection
-            if (isempty(P1.H_int) && ~isempty(P2.H_int)) || ...
-                    (isempty(P2.H_int) && ~isempty(P1.H_int))
+            if isempty([P1.H_int; P1.He_int]) || isempty([P2.H_int; P2.He_int])
                 % one of them is an empty set => no intersection
                 answer = false;
                 return
