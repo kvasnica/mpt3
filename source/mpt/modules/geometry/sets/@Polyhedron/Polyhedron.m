@@ -559,7 +559,7 @@ classdef Polyhedron < ConvexSet
             unique_idx = find(is_unique);
         end
         
-        function Q = projectOnAffineHull(P)
+        function Q = projectOnAffineHull(P, He)
             % Projects the polyhedron on its affine hull
             %
             % Given a polyhedron P = { x | A*x<=b, Ae*x=be }, calling
@@ -575,7 +575,12 @@ classdef Polyhedron < ConvexSet
             P.minHRep();
             Q = P.copy();
             for i = 1:numel(P)
-                He = P(i).affineHull();
+                if nargin < 2
+                    % to make Polyhedron/isBounded() more efficient, we
+                    % allow to pass the pre-computed affine hull as the
+                    % second argument 
+                    He = P(i).affineHull();
+                end
                 if ~isempty(He)
                     % fully dimensional in a lower dimension
                     F = null(He(:, 1:end-1));
