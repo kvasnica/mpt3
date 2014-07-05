@@ -25,7 +25,7 @@ end
 % deal with arrays
 if numel(P)>1
     PnS(size(P)) = Polyhedron;
-    parfor i=1:numel(P)
+    for i=1:numel(P)
         PnS(i) = intersect(P(i),S);
     end
     return;

@@ -6,7 +6,7 @@ function ts = isBounded(obj)
 % deal with arrays
 if numel(obj)>1
     ts = -ones(size(obj));
-    parfor i=1:numel(obj)
+    for i=1:numel(obj)
         ts(i) = obj(i).isBounded;
     end
     return;

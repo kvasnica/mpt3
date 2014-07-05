@@ -8,7 +8,7 @@ function Q = uplus(P)
 Q(size(P)) = Polyhedron;
 
 % copy polyhedron
-parfor i=1:length(P)
+for i=1:length(P)
     Q(i) = Polyhedron(P(i));
 end
 

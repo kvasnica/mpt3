@@ -29,7 +29,7 @@ end
 nU = numel(U1);
 if numel(U1)>1
    ts = false(size(U1));
-   parfor i=1:nU
+   for i=1:nU
         ts(i) = U1(i).eq(U2);
    end
    return;

@@ -64,7 +64,7 @@ end
 %% find closest region if necessary
 if ~isin && nargout>2
 	d = Inf(1, U.Num);
-	parfor i=1:U.Num
+	for i=1:U.Num
 		if iscell_set
 			s = distance(U.Set{i}, x);
 		else

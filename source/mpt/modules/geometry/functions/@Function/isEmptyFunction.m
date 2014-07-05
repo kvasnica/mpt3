@@ -5,6 +5,6 @@ function ts = isEmptyFunction(obj)
 %
 
 ts = zeros(size(obj));
-parfor i=1:numel(obj)
+for i=1:numel(obj)
     ts(i) = isempty(obj(i).Handle);
 end

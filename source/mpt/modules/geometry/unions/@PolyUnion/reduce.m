@@ -66,7 +66,7 @@ end
 % deal with arrays
 if numel(U)>1
     kept = cell(size(U));
-    parfor i=1:numel(U)
+    for i=1:numel(U)
         kept{i} = U(i).reduce;
     end
     return;
@@ -94,7 +94,7 @@ end
 % get the radius of the polyhedra (if possible) to sort the polyhedra from
 % the smallest 
 r = zeros(1,U.Num);
-parfor i=1:U.Num
+for i=1:U.Num
     % compute chebycenter
     ip = U.Set(i).interiorPoint;
     if ~isempty(ip.r)

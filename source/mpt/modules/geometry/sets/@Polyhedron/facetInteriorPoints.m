@@ -33,7 +33,7 @@ x = xp.x;
 
 m = size(P.H,1);
 sol = zeros(m, P.Dim);
-parfor j=1:m
+for j=1:m
     n = P.H(j,1:end-1);
     
     % Project x onto each facet to see if it's interior

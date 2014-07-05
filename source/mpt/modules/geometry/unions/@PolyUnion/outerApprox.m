@@ -11,7 +11,7 @@ end
 % deal with arrays
 if numel(U)>1
     B(size(U)) = Polyhedron;
-    parfor i=1:numel(U)
+    for i=1:numel(U)
         B(i) = U(i).outerApprox;
     end
     return;

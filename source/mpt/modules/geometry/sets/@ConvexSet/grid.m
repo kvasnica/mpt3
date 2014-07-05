@@ -64,7 +64,7 @@ for ii=1:n_states,
 end
 npoints = size(datapoints,1);
 isin = false(npoints, 1);
-parfor i = 1:npoints,
+for i = 1:npoints,
     isin(i) = P.contains(datapoints(i,:)');
 end
 X = datapoints(isin, :);

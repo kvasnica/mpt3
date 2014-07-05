@@ -9,7 +9,7 @@ Q(size(P)) = Polyhedron;
 
 % revert the H- and V-representations, do not recompute vertices/halfspaces
 % if they are not available in the source
-parfor i=1:length(P)
+for i=1:length(P)
     if P(i).hasHRep && ~P(i).hasVRep
         Q(i) = Polyhedron('H', [-P(i).A P(i).b], ...
             'He', [-P(i).Ae P(i).be]);

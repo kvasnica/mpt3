@@ -18,7 +18,7 @@ end
 
 % deal with arrays
 if numel(S)>1
-    parfor i=1:numel(S)
+    for i=1:numel(S)
         S(i).qp2lcp(reduce_flag);
     end
     return

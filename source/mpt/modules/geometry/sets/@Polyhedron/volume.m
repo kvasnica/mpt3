@@ -11,7 +11,7 @@ function vol = volume(P)
 no = numel(P);
 if no>1
     vol = zeros(size(P));
-    parfor i=1:no
+    for i=1:no
         vol(i) = P(i).volume;
     end
     return;

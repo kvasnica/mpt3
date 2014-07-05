@@ -12,7 +12,7 @@ end
 % deal with arrays
 ret=cell(size(opt));
 if numel(opt)>1
-    parfor i=1:numel(opt)
+    for i=1:numel(opt)
         ret{i} = opt(i).solve;
     end
     return

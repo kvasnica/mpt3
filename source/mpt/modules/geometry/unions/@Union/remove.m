@@ -7,7 +7,7 @@ validate_indexset(index);
 
 % deal with arrays
 if numel(obj)>1
-    parfor i=1:numel(obj)
+    for i=1:numel(obj)
         obj(i) = obj(i).remove(index);
     end
     return;

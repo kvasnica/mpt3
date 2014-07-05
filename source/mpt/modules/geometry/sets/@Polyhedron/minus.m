@@ -45,7 +45,7 @@ end
 % deal with arrays
 if numel(P)>1
     Pdiff(size(P)) = Polyhedron;
-    parfor i=1:numel(P)
+    for i=1:numel(P)
         Pdiff(i) = minus(P(i),S);
     end
     return;

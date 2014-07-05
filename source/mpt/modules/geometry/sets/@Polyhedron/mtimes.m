@@ -70,7 +70,7 @@ end
 % deal with arrays if P is polyhedron
 if strcmpi(P_class,'Polyhedron') && numel(P)>1
     Pnew(size(P)) = Polyhedron;
-    parfor i=1:numel(P)
+    for i=1:numel(P)
         Pnew(i) = mtimes(P(i),S);
     end
     return;

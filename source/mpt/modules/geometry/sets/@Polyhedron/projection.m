@@ -46,7 +46,7 @@ end
 no = numel(P);
 if no>1
 	q(size(P)) = Polyhedron;
-	parfor i=1:no
+	for i=1:no
 		q(i) = P(i).projection(dims, method, solver);
 	end
 	return;

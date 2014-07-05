@@ -11,7 +11,7 @@ end
 
 % deal with arrays
 if numel(opt)>1
-    parfor i=1:numel(opt)
+    for i=1:numel(opt)
         opt(i).validate;
     end
     return

@@ -13,7 +13,7 @@ end
 %% deal with arrays
 if length(P)>1
     Pnew(size(P)) = Polyhedron;
-    parfor i=1:length(P)
+    for i=1:length(P)
         Pnew(i) = P(i).homogenize(type);
     end
     return;

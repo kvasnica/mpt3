@@ -15,7 +15,7 @@ if length(unique(s))~=1
    error('Only the same objects can be concatenated.');
 end
 
-parfor i=1:length(varargin)
+for i=1:length(varargin)
     varargin{i} = transpose(varargin{i}(:));
 end
 

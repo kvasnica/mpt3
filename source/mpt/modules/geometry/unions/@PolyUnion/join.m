@@ -15,7 +15,7 @@ if no<=1
     out = obj;
 else    
     dims = zeros(no, 1);
-    parfor i=1:no
+    for i=1:no
         dims(i) = obj(i).Dim;
     end
     
@@ -26,7 +26,7 @@ else
     % do not check convexity, overlaps, and connectivity
     % check boundedness
     bnd = cell(no, 1);
-    parfor i=1:no
+    for i=1:no
         bnd{i} = obj(i).Internal.Bounded;
     end
     ie = cellfun('isempty',bnd);
@@ -47,7 +47,7 @@ else
     
     % check dimensionality
     d = cell(no, 1);
-    parfor i=1:no
+    for i=1:no
         d{i} = obj(i).Internal.FullDim;
     end
     id = cellfun('isempty',d);
