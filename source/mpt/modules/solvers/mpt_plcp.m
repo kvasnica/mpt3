@@ -144,7 +144,7 @@ R = lcp_getRegion(lc, Io, HASH, [], [], piv);
 % The region returned by the first shot might be empty. This happens
 % usually around origin for LP. We retry to find another region by
 % perturbing initial theta by a small value.
-if builtin('isempty',R) || R.isEmptySet || ~R.isBounded || ~R.isFullDim
+if builtin('isempty',R) || R.isEmptySet || ~R.isFullDim || ~R.isBounded
     % try using the interior point approach
     P = Polyhedron('H', [-lc.Q -lc.M lc.q; zeros(lc.n,lc.d) -eye(lc.n) zeros(lc.n,1)]);
     ip = P.interiorPoint;
@@ -190,7 +190,7 @@ if builtin('isempty',R) || R.isEmptySet || ~R.isBounded || ~R.isFullDim
     
     R = lcp_getRegion(lc, Io, HASH, [], [], piv);
 
-    if builtin('isempty',R) || R.isEmptySet || ~R.isBounded || ~R.isFullDim
+    if builtin('isempty',R) || R.isEmptySet || ~R.isFullDim || ~R.isBounded
         % if fo is exactly zero, the region might be empty, therefore we
         % perturb a bit and try again
         fo = fo + 1e-2*randn(lc.d,1);
@@ -214,7 +214,7 @@ if builtin('isempty',R) || R.isEmptySet || ~R.isBounded || ~R.isFullDim
         Io = sort(Io(:))';
         
         R = lcp_getRegion(lc, Io, HASH, [], [], piv);
-        if builtin('isempty',R) || R.isEmptySet || ~R.isBounded || ~R.isFullDim
+        if builtin('isempty',R) || R.isEmptySet || ~R.isFullDim || ~R.isBounded
             % unfortunately, now we must capitulate here
             sol.xopt = PolyUnion;
             sol.xopt.setInternal('theta0', fo);
@@ -445,7 +445,7 @@ while ~builtin('isempty',UNEX)
           % do not add it to the list of unexplored regions if is
           % empty, lower-dimensional, unbounded or it overlaps existing
           % regions                    
-          if ~Radj{i}(j).isEmptySet && Radj{i}(j).isBounded && Radj{i}(j).isFullDim
+          if ~Radj{i}(j).isEmptySet && Radj{i}(j).isFullDim && Radj{i}(j).isBounded
 
               % put the discovered basis into the hash table regardless of
               % the overlap
@@ -1711,7 +1711,7 @@ if all(~PZ)
             end
                         
             reg=Polyhedron(Hth(:, 1:end-1), Hth(:, end));
-            if reg.isEmptySet || ~reg.isBounded || ~reg.isFullDim
+            if reg.isEmptySet || ~reg.isFullDim || ~reg.isBounded
                 continue;
             end
 
