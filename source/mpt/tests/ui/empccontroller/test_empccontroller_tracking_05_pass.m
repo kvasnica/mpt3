@@ -17,7 +17,7 @@ L.u.penalty = [];
 L.u.with('deltaPenalty');
 L.u.deltaPenalty = QuadFunction(1);
 ctrl = EMPCController(L, N);
-assert(ctrl.nr==8);
+assert(ctrl.nr==9);
 [u, feasible, openloop] = ctrl.evaluate(x0, 'x.reference', xref, 'u.previous', uprev);
 Jgood = 3.07555555555555; % from MPT2
 assert(abs(openloop.cost-Jgood) <= 1e-8);
