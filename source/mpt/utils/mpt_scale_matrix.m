@@ -42,24 +42,19 @@ D2 = eye(n);
 row_norm = 1;
 column_norm = 1;
 k=0;
-r = zeros(m,1); rn = r;
-c = zeros(n,1); cn = c;
 
 % tolerance
 tol = MPTOPTIONS.rel_tol;
 
 while (row_norm>tol) && (column_norm>tol)
-    
-    for i=1:m
-        r(i) = sqrt(norm(A(i,:),Inf));
-        rn(i) = 1 - norm(A(i,:),Inf);
-    end    
+    nA = max(abs(A), [], 2);
+    r = sqrt(nA);
+    rn = 1 - nA;
     DR = diag(1./r);
-    
-    for i=1:n
-        c(i) = sqrt(norm(A(:,i),Inf));
-        cn(i) = 1 - norm(A(:,i),Inf);
-    end    
+
+    nA = max(abs(A), [], 1)';
+    c = sqrt(nA);
+    cn = 1-nA;
     DC = diag(1./c);
     
     % matrix updates
