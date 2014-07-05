@@ -320,13 +320,14 @@ classdef Opt < handle & matlab.mixin.Copyable
             if isstruct(obj.Internal)
                 nf = fieldnames(obj.Internal);
                 for i=1:numel(nf)
-                    if ismethod(obj.Internal.(nf{i}),'copy');
-                        U.Internal.(nf{i}) = obj.Internal.(nf{i}).copy;
+                    x = obj.Internal.(nf{i});
+                    if isobject(x) && ismethod(x, 'copy');
+                        U.Internal.(nf{i}) = x.copy();
                     end
                 end
             else
-                if ismethod(obj.Internal,'copy');
-                    U.Internal = obj.Internal.copy;
+                if isobject(obj.Internal) && ismethod(obj.Internal,'copy');
+                    U.Internal = obj.Internal.copy();
                 end
             end
             % we don't know what type of arguments can be stored inside
@@ -335,12 +336,13 @@ classdef Opt < handle & matlab.mixin.Copyable
             if isstruct(obj.Data)
                 nd = fieldnames(obj.Data);
                 for i=1:numel(nd)
-                    if ismethod(obj.Data.(nd{i}),'copy');
-                        U.Data.(nd{i}) = obj.Data.(nd{i}).copy;
+                    x = obj.Data.(nd{i});
+                    if isobject(x) && ismethod(x,'copy');
+                        U.Data.(nd{i}) = x.copy();
                     end
                 end
             else
-                if ismethod(obj.Data,'copy');
+                if isobject(obj.Data) && ismethod(obj.Data,'copy');
                     U.Data = obj.Data.copy;
                 end                
             end
