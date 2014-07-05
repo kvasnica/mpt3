@@ -804,8 +804,8 @@ if ~any(zero_cols)
     end
 end
 
-% exit quickly if the polyhedron is empty
-if R.isEmptySet()
+% exit quickly if the polyhedron is not fully dimensional
+if ~R.isFullDim()
     R = [];
     return;
 end
