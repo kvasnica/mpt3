@@ -11,25 +11,22 @@ if isempty(sol{1})
 else	
 	pu = [];
 	for i = 1:numel(sol)
-		P = [];
+        P = toPolyhedron(sol{i}.Pn);
 		for j = 1:length(sol{i}.Pn)
-			Pk = Polyhedron('H', double(sol{i}.Pn(j)));
 			% add functions to mimic the output of Opt.solve:
 			%     'z'    'w'    'primal'    'dual'    'obj'
-			
-			Pk.addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'z');
-			Pk.addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'w');
-			Pk.addFunction(AffFunction(sol{i}.Fi{j}, sol{i}.Gi{j}), 'primal');
-			Pk.addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'dual');
+			P(j).addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'z');
+			P(j).addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'w');
+			P(j).addFunction(AffFunction(sol{i}.Fi{j}, sol{i}.Gi{j}), 'primal');
+			P(j).addFunction(AffFunction(0*sol{i}.Fi{j}, 0*sol{i}.Gi{j}), 'dual');
 			if isempty(sol{i}.Ai{j})
 				% affine expression for the cost
-				Pk.addFunction(AffFunction(sol{i}.Bi{j}, sol{i}.Ci{j}), 'obj');
+				P(j).addFunction(AffFunction(sol{i}.Bi{j}, sol{i}.Ci{j}), 'obj');
 			else
 				% quadratic expression for the cost
-				Pk.addFunction(QuadFunction(sol{i}.Ai{j}, sol{i}.Bi{j}, ...
+				P(j).addFunction(QuadFunction(sol{i}.Ai{j}, sol{i}.Bi{j}, ...
 					sol{i}.Ci{j}), 'obj');
 			end
-			P = [P, Pk];
 		end
 		new = PolyUnion('Set', P, 'Bounded', true, 'FullDim', true, ...
             'Overlaps', sol{i}.overlaps, ...
