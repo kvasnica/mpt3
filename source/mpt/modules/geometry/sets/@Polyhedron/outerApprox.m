@@ -37,6 +37,12 @@ elseif obj.hasVRep
 	obj.Internal.lb = lb;
 	obj.Internal.ub = ub;
 	
+elseif obj.isEmptySet()
+    lb = Inf(obj.Dim, 1);
+    ub = -Inf(obj.Dim, 1);
+    obj.Internal.lb = lb;
+    obj.Internal.ub = ub;
+    
 else
 	% for Hrep we have to solve 2 LPs per each dimension
 	H = obj.H_int;
