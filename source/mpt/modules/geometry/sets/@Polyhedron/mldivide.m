@@ -155,9 +155,6 @@ for j = 1:size(QkH, 1)
 	% P = P.intersect(j-th face of Q)
 	PH = [PH; QkH(j, :)]; 
 end
-if numel(R)==0
-	R = Polyhedron.emptySet(P.Dim);
-end
 
 end
 
