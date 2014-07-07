@@ -25,13 +25,13 @@ end
 
 
 % single bounding box for arrays
-BP = U.Set.outerApprox;
+U.Set.outerApprox();
 d = U.Dim;
 lb = Inf(d, 1);
 ub = -Inf(d, 1);
-for i = 1:length(BP)
-    lb = min(lb, BP(i).Internal.lb);
-    ub = max(ub, BP(i).Internal.ub);
+for i = 1:U.Num
+    lb = min(lb, U.Set(i).Internal.lb);
+    ub = max(ub, U.Set(i).Internal.ub);
 end
 
 Hbox = [eye(d) ub; -eye(d) -lb];
