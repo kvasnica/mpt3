@@ -225,7 +225,6 @@ else
     % only compute minimal H-representations after performing the
     % boundingbox-based heuristics
     P.minHRep();
-	S.minHRep();
 
 	% check also equalities
 	A = [P.A;P.Ae;-P.Ae]; b = [P.b;P.be;-P.be];
