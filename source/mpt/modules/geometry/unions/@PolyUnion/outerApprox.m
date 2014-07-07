@@ -36,10 +36,6 @@ end
 
 Hbox = [eye(d) ub; -eye(d) -lb];
 
-% get rid of inf terms for constructing bounding box
-zh = isinf([ub; lb]);
-Hbox(zh,:) = [];
-
 B = Polyhedron(Hbox(:, 1:end-1), Hbox(:, end));
 
 % store internally
