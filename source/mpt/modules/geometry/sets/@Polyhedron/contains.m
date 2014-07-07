@@ -149,6 +149,27 @@ elseif S.Dim ~= P.Dim
 	
 end
 
+if isempty(S.R_int) && isempty(P.R_int) && ...
+        ~(S.hasVRep && P.hasHRep)
+	% check outer approximations first, but only if we don't have any rays,
+	% otherwise computing the outer approximation is expensive. If S is in
+	% V-rep and P in Hrep, we also bypass since P.contains(S) is cheap to
+	% test directly.
+	P.outerApprox();
+	S.outerApprox();
+	Plb = P.Internal.lb;
+	Pub = P.Internal.ub;
+	Slb = S.Internal.lb;
+	Sub = S.Internal.ub;
+	bbox_tol = MPTOPTIONS.rel_tol*1e2;
+    if any(Slb + bbox_tol < Plb) || any(Sub - bbox_tol > Pub),
+        % outer approximation of S is not contained in the outer
+        % approximation of P, hence S cannot be contained in P
+        tf = false;
+        return
+    end
+end
+
 tf = true;
 if S.hasVRep && (P.hasHRep || (~isempty(S.V_int) && isempty(S.R_int)))
 	% to check P.contains(S) with S in V-rep we reuquire either
@@ -200,23 +221,6 @@ if S.hasVRep && (P.hasHRep || (~isempty(S.V_int) && isempty(S.R_int)))
 	end
 else
 	% S is an H-rep or in incompatible V-rep => Need an H-rep of P and S
-	P.computeHRep();
-    S.computeHRep();
-    
-	% check outer approximations first
-	P.outerApprox();
-	S.outerApprox();
-	Plb = P.Internal.lb;
-	Pub = P.Internal.ub;
-	Slb = S.Internal.lb;
-	Sub = S.Internal.ub;
-	bbox_tol = MPTOPTIONS.rel_tol*1e2;
-	if any(Slb + bbox_tol < Plb) || any(Sub - bbox_tol > Pub),
-		% outer approximation of S is not contained in the outer
-		% approximation of P, hence S cannot be contained in P
-		tf = false;
-		return
-    end
 
     % only compute minimal H-representations after performing the
     % boundingbox-based heuristics
