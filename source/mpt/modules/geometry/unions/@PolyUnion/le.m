@@ -1,6 +1,8 @@
 function status = le(U1, U2)
 % tests whether U1 is a (non-strict) subset of U2
 
+global MPTOPTIONS
+
 if isa(U1, 'Polyhedron')
 	U1 = PolyUnion(U1);
 end
@@ -28,9 +30,13 @@ end
 % heuristics: check containement of outer approximations
 B1 = U1.outerApprox();
 B2 = U2.outerApprox();
-if ~(B1 <= B2)
-	status = false;
-	return
+bbox_tol = 10*MPTOPTIONS.rel_tol;
+if any(B1.Internal.lb + bbox_tol < B2.Internal.lb) || ...
+        any(B1.Internal.ub - bbox_tol > B2.Internal.ub),
+    % outer approximation of B1 is not contained in the outer
+    % approximation of B2, hence B1 cannot be contained in B2
+    status = false;
+    return
 end
 
 if U2.Num==1
