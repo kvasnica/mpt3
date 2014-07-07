@@ -181,7 +181,7 @@ if Y.isEmptySet()
 elseif Y.Dim ~= R.Dim
 	error('MPT:Polyhedron', 'All polyhedra must be in the same dimension.');
 
-elseif R.isEmptySet() || Y.intersect(R).isEmptySet()
+elseif R.isEmptySet() || ~Y.doesIntersect(R)
 	% special cases where Y\R = Y
 	% 1) R is empty set
 	% 2) Y and R do not intersect
