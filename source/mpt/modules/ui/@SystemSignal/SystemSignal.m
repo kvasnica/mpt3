@@ -83,7 +83,8 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
             % Returns the kind of the variable ('x', 'u', 'y', ...)
             
             out = isfield(obj.userData, 'kind') && ...
-                ismember(obj.userData.kind, kind);
+                ((ischar(kind) && isequal(obj.userData.kind, kind)) || ...
+                (iscell(kind) && ismember(obj.userData.kind, kind)));
 		end
 		
 		function setKind(obj, kind)
