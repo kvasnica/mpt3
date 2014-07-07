@@ -119,9 +119,6 @@ for ipart = 1:numel(PUs)
         % 'ipart/ireg' region
         better_regions = [];
 
-		%fprintf('Union %d (out of %d), region %d (out of %d)...\n', ...
-		%	ipart, numel(PUs), ireg, numel(PUs(ipart).Set));
-		
 		for jpart = setdiff(1:numel(PUs), ipart)
 		
             if ~PartitionsIntersect(ipart, jpart)
