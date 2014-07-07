@@ -80,7 +80,6 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				end
 			end
 			
-			obj.system.initialize(x0);
 			X = x0(:); U = []; Y = []; J = [];
 			for k = 1:N_sim
 
@@ -107,8 +106,12 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				if ~feasible
 					warning('No control action found at step %d, aborting.', k);
 					break
-				end
-				[x0, y] = obj.system.update(u);
+                end
+                
+                % note: we could use obj.system.update(u) here, but that
+                % introduces significant overhead. update_equation is much
+                % faster.
+				[x0, y] = obj.system.update_equation(x0, u);
 				X = [X x0];
 				U = [U u];
 				Y = [Y y];
