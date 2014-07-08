@@ -112,7 +112,7 @@ end
 % dual variables
 R.lambda.ineqlin = lambda(S.me+1:S.me+S.m);
 R.lambda.eqlin = lambda(1:S.me);
-R.lambda.lower = [];
-R.lambda.upper = [];
+R.lambda.lower = NaN(S.n, 1);
+R.lambda.upper = NaN(S.n, 1);
 
 end
