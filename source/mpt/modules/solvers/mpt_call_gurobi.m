@@ -11,7 +11,7 @@ assert(~isequal(S.problem_type, 'LCP'), 'mpt_call_gurobi: GUROBI solver does not
 
 % A*x <= rhs
 model.A = sparse([S.Ae; S.A]);
-model.rhs = [S.be; S.b];
+model.rhs = full([S.be; S.b]);
 model.sense = char(['='*ones(S.me, 1); '<'*ones(S.m, 1)]); 
 
 % lb <= x <= ub
