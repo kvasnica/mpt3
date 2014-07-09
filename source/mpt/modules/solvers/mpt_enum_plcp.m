@@ -81,6 +81,10 @@ end
 
 S.A = [-M -Q;  -eye(n) zeros(n,problem.d)];
 S.b = [q; zeros(n,1)];
+S.f = zeros(size(S.A, 2), 1);
+S.lb = [];
+S.ub = [];
+S.quicklp = true; % performance!
 I = eye(n);
 
 
