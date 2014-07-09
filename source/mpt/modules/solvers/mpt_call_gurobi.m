@@ -67,7 +67,7 @@ switch result.status
         R.xopt = result.x;
         
         % dual optimizer
-        if isequal(S.problem_type(1:2), 'MI')
+        if ~isfield(result, 'pi')
             % no dual variables for mixed-integer problems
             lambda = NaN(size(model.A, 1), 1);
         else
