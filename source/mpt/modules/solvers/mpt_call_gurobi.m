@@ -27,7 +27,7 @@ else
 end
 
 % types of variables (Binary, Integer, ...)
-if ~isempty(S.vartype)
+if isfield(S, 'vartype') && ~isempty(S.vartype)
     model.vtype = S.vartype;
 end
 

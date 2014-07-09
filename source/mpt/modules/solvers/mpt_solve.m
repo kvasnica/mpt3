@@ -557,6 +557,11 @@ if isequal(lower(S.solver(1:3)), 'cdd')
     R = mpt_call_cdd(S);
 	return
 
+elseif any(strcmpi(S.solver,{'gurobi','gurobi_mex','gurobimex'}))
+    % GUROBI
+    R = mpt_call_gurobi(S);
+    return
+
 elseif isequal(lower(S.solver),'lcp')
     % LCP solver
 	if ~isfield(S, 'routine')
@@ -606,11 +611,7 @@ if ~isfield(S, 'H')
 	S.H = zeros(S.n);
 end
 
-if any(strcmpi(S.solver,{'gurobi','gurobi_mex','gurobimex'}))
-    % GUROBI
-    R = mpt_call_gurobi(S);
-    
-elseif strcmpi(S.solver, 'mosek')
+if strcmpi(S.solver, 'mosek')
     R = mpt_call_mosek(S);
 
 elseif strcmpi(S.solver,'quadprog')
