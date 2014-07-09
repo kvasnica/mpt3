@@ -379,8 +379,12 @@ classdef LTISystem < AbstractSystem
 
 					if XUn.isEmptySet()
 						continue
-					end
-					Xn = XUn.projection(1:obj.nx);
+                    end
+                    if obj.nu > 0
+                        Xn = XUn.projection(1:obj.nx);
+                    else
+                        Xn = XUn;
+                    end
 					Xn.minHRep();
 					SN{i} = [SN{i}, Xn];
 				end
