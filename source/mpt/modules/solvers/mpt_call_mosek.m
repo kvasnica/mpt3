@@ -107,8 +107,8 @@ R.xopt = out.xx(1:S.n);
 R.obj = out.pobjval;
 
 % Lagrange multipliers
-R.lambda.ineqlin = out.suc(1:S.m);
-R.lambda.eqlin = out.suc(S.m+1:end);
+R.lambda.ineqlin = -out.y(1:S.m);
+R.lambda.eqlin = -out.y(S.m+1:end);
 R.lambda.lower = out.slx;
 R.lambda.upper = out.sux;
 
