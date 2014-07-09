@@ -20,7 +20,7 @@ prob.bux = S.ub;
 % QP: min 0.5*x'*q*x + c'*x
 switch S.problem_type
     case {'QP', 'MIQP'}
-        [prob.qosubi,prob.qosubj,prob.qoval] = find(tril(sparse(2*S.H)));
+        [prob.qosubi,prob.qosubj,prob.qoval] = find(tril(sparse(S.H)));
         prob.c = S.f(:);
     case {'LP', 'MILP'}
         prob.c = S.f(:);
