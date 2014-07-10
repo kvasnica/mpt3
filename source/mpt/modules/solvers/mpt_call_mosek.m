@@ -78,11 +78,11 @@ else
 end
 
 switch out.prosta
-    case 'PRIMAL_AND_DUAL_FEASIBLE'
+    case {'PRIMAL_AND_DUAL_FEASIBLE', 'PRIMAL_FEASIBLE'}
         exitflag = 1;
     case 'DUAL_INFEASIBLE'
         exitflag = 3;
-    case 'PRIMAL_INFEASIBLE'
+    case {'PRIMAL_INFEASIBLE', 'PRIMAL_INFEASIBLE_OR_UNBOUNDED'}
         exitflag = 2;
     case 'MSK_RES_TRM_USER_CALLBACK'
         exitflag = -1;
