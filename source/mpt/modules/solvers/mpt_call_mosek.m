@@ -46,6 +46,23 @@ else
 end
 [~, res] = mosekopt(command, prob, options);
 
+if res.rcode==2000 || res.rcode==2001
+    % infeasible according to callmosek.m
+    if S.test
+        R.exitflag = 2;
+    else
+        R.exitflag = MPTOPTIONS.INFEASIBLE;
+    end
+    R.how = 'infeasible';
+    R.obj = Inf;
+    R.xopt = NaN(S.n, 1);
+    R.lambda.ineqlin = NaN(S.m, 1);
+    R.lambda.eqlin = NaN(S.me, 1);
+    R.lambda.lower = NaN(S.n, 1);
+    R.lambda.upper = NaN(S.n, 1);
+    return
+end
+
 if ~isfield(res, 'sol')
     error(res.rmsg);
 elseif isfield(res.sol, 'int')
@@ -60,30 +77,23 @@ else
     error('mpt_call_mosek: unexpected output from the solver.');
 end
 
-% parse the output
-if res.rcode == 2001
-    % infeasible according to callmosek.m
-    exitflag = 2;
-    R.how = 'infeasible';
-else
-    switch out.prosta
-        case 'PRIMAL_AND_DUAL_FEASIBLE'
-            exitflag = 1;
-        case 'DUAL_INFEASIBLE'
-            exitflag = 3;
-        case 'PRIMAL_INFEASIBLE'
-            exitflag = 2;
-        case 'MSK_RES_TRM_USER_CALLBACK'
-            exitflag = -1;
-        case 'MSK_RES_TRM_STALL'
-            exitflag = -1;
-        case 'UNKNOWN'
-            exitflag = -1;
-        otherwise
-            exitflag = -1;
-    end
-    R.how = lower(out.solsta);
+switch out.prosta
+    case 'PRIMAL_AND_DUAL_FEASIBLE'
+        exitflag = 1;
+    case 'DUAL_INFEASIBLE'
+        exitflag = 3;
+    case 'PRIMAL_INFEASIBLE'
+        exitflag = 2;
+    case 'MSK_RES_TRM_USER_CALLBACK'
+        exitflag = -1;
+    case 'MSK_RES_TRM_STALL'
+        exitflag = -1;
+    case 'UNKNOWN'
+        exitflag = -1;
+    otherwise
+        exitflag = -1;
 end
+R.how = lower(out.solsta);
 if S.test
     R.exitflag = exitflag;
 else
