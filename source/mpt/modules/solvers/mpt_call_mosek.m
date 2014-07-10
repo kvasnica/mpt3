@@ -93,20 +93,24 @@ switch out.prosta
     otherwise
         exitflag = -1;
 end
-R.how = lower(out.solsta);
 if S.test
     R.exitflag = exitflag;
+    R.how = lower(out.solsta);
 else
     % translate exitflags to MPT codes
     switch exitflag
         case 1,
             R.exitflag = MPTOPTIONS.OK;
+            R.how = 'ok';
         case 2
             R.exitflag = MPTOPTIONS.INFEASIBLE;
+            R.how = 'infeasible';
         case 3
             R.exitflag = MPTOPTIONS.UNBOUNDED;
+            R.how = 'unbounded';
         otherwise
             R.exitflag = MPTOPTIONS.ERROR;
+            R.how = 'error';
     end
 end
 
