@@ -428,7 +428,7 @@ classdef polytope
 			for i = 1:length(varargin)
 				Q = varargin{i};
 				if ~isempty(Q.P(1).H)
-					P = builtin('horzcat', P, Q.P);
+					P = [P, Q.P];
 				end
 			end
 			if isempty(P)
