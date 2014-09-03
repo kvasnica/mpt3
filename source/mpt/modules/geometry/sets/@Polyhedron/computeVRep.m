@@ -37,6 +37,9 @@ end
 done = false;
 backupTried = false;
 
+% work with minimal H-representations to improve numerics
+obj.minHRep();
+
 % Do vertex enumeration with CDD
 if isempty(obj.H_int)
 	A = obj.He_int(:,1:end-1);
