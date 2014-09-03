@@ -695,13 +695,15 @@ if ~all(S.vartype=='C')
 end
 
 % initialize constraint set
-F = set([]);
-
 if ~isempty(S.A) && ~isempty(S.b)
-    F = set(S.A*x <= S.b, 'ineq');
+    Fi = [ S.A*x <= S.b ];
+else
+    Fi = [];
 end
 if ~isempty(S.Ae) && ~isempty(S.be)
-    F = F + set(S.Ae*x == S.be, 'eq');
+    Fe = [ S.Ae*x == S.be ];
+else
+    Fe = [];
 end
 
 % objective function
@@ -714,13 +716,13 @@ end
 %options.solver = S.solver;
 options=sdpsettings('Verbose',0,'warning',0,'solver',S.solver);
 
-solution = solvesdp(F, obj, options);
+solution = solvesdp(Fi+Fe, obj, options);
 R.xopt = double(x);
 R.obj = double(obj);
 if ~isempty(S.A) && ~isempty(S.b)
-    R.lambda = dual(F('ineq'));
+    R.lambda = dual(Fi);
 else
-    R.lambda = dual(F('eq'));
+    R.lambda = dual(Fe);
 end
 
 if solution.problem==0,

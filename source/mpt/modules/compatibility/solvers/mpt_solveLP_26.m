@@ -667,9 +667,9 @@ global mptOptions
 f = f(:);
 nx = size(A,2);
 x = sdpvar(nx,1);
-F = set(A*x <= B);
+F = [A*x <= B];
 if ~isempty(Aeq),
-    F = F + set(Aeq*x == Beq);
+    F = F + [Aeq*x == Beq];
 end
 options = mptOptions.sdpsettings;
 options.solver = solver;

@@ -44,7 +44,7 @@ d = solvesdp(obj.constraints, cost, obj.opts);
 
 % if we don't know if it is feasible or unbounded, retry with artificial bounds
 if ismember(d.problem,[12, 15])
-    F = obj.contraints + set( -MPTOPTIONS.infbound*ones(size(obj.vars)) <= obj.vars <= MPTOPTIONS.infbound*ones(size(obj.vars)) );
+    F = obj.contraints + [ -MPTOPTIONS.infbound*ones(size(obj.vars)) <= obj.vars <= MPTOPTIONS.infbound*ones(size(obj.vars)) ];
     d = solvesdp(F, cost, obj.opts);
     % if solution is feasible -> unbounded
     if d.problem == 0

@@ -60,10 +60,10 @@ end
 % w = sdpvar(n,1); wBnd = sdpvar(n,1);
 % z = sdpvar(n,1); zBnd = sdpvar(n,1);
 % x = sdpvar(size(Q,2),1);
-% con = set(w - M*z == Q*x + q) + set((1-wBnd)*bigM >= w >= 0) + set((1-zBnd)*bigM >= z >= 0);
-% con = con + set( problem.Ath*x <= problem.bth );
+% con = [w - M*z == Q*x + q] + [(1-wBnd)*bigM >= w >= 0] + [(1-zBnd)*bigM >= z >= 0];
+% con = con + [ problem.Ath*x <= problem.bth ];
 % if ~isempty(problem.Ae)
-%     con = con + set( problem.Ae*z == problem.be );
+%     con = con + [ problem.Ae*z == problem.be ];
 % end
 % % If wBnd(i) == 0, then w(i) = 0, same for z
 % s = sdpsettings;
