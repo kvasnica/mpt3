@@ -279,7 +279,6 @@ classdef Polyhedron < ConvexSet
 				A = varargin{1}; b = varargin{2};
 				if isnumeric(A) && isnumeric(b)
 					% Hrep polyhedron without equality constraints: Polyhedron(A, b)
-					H = full([A b]);
 					[n, d] = size(A);
 					if n~=length(b)
 						error('Number of rows does not hold between arguments "A", "b".')
@@ -291,14 +290,22 @@ classdef Polyhedron < ConvexSet
 						% normalize a'*x <= +/-Inf to 0'*x <= +/- 1
 						A(InfRows, :) = 0*A(InfRows, :);
 						b(InfRows) = sign(b(InfRows));
-						H = full([A, b]);
-					end
+                    end
 
+                    H = [A, b];
 					% replace nearly-zero entries by zero
-					H(abs(H)<MPTOPTIONS.zero_tol) = 0;
+                    if issparse(H)
+                        % much faster version of H(abs(H)<tol)=0 for sparse
+                        % matrices (by J. Loefberg)
+                        [i,j,k] = find(H);
+                        k(abs(k)<MPTOPTIONS.zero_tol)=0;
+                        H = sparse(i,j,k,size(H,1),size(H,2));
+                    else
+                        H(abs(H)<MPTOPTIONS.zero_tol) = 0;
+                    end
 
 					obj.Dim = d;
-					obj.H_int = H;
+					obj.H_int = full(H);
 					obj.He_int = zeros(0, d+1);
 					obj.hasHRep = ~isempty(obj.H_int);
 					obj.V_int = zeros(0, d);
@@ -442,19 +449,51 @@ classdef Polyhedron < ConvexSet
 				end
 				
 				% replace nearly-zero entries by zero
-				p.H(abs(p.H)<MPTOPTIONS.zero_tol) = 0;
+                if issparse(p.H)
+                    % much faster version of H(abs(H)<tol)=0 for sparse
+                    % matrices (by J. Loefberg)
+                    [i,j,k] = find(p.H);
+                    k(abs(k)<MPTOPTIONS.zero_tol)=0;
+                    p.H = sparse(i,j,k,size(p.H,1),size(p.H,2));
+                else
+                    p.H(abs(p.H)<MPTOPTIONS.zero_tol) = 0;
+                end
 			end
 			if ~isempty(p.He)
 				% replace nearly-zero entries by zero
-				p.He(abs(p.He)<MPTOPTIONS.zero_tol) = 0;
+                if issparse(p.He)
+                    % much faster version of H(abs(H)<tol)=0 for sparse
+                    % matrices (by J. Loefberg)
+                    [i,j,k] = find(p.He);
+                    k(abs(k)<MPTOPTIONS.zero_tol)=0;
+                    p.He = sparse(i,j,k,size(p.He,1),size(p.He,2));
+                else
+                    p.He(abs(p.He)<MPTOPTIONS.zero_tol) = 0;
+                end
 			end
 			if ~isempty(p.V)
 				% replace nearly-zero entries by zero
-				p.V(abs(p.V)<MPTOPTIONS.zero_tol) = 0;
+                if issparse(p.V)
+                    % much faster version of H(abs(H)<tol)=0 for sparse
+                    % matrices (by J. Loefberg)
+                    [i,j,k] = find(p.V);
+                    k(abs(k)<MPTOPTIONS.zero_tol)=0;
+                    p.V = sparse(i,j,k,size(p.V,1),size(p.V,2));
+                else
+                    p.V(abs(p.V)<MPTOPTIONS.zero_tol) = 0;
+                end
 			end
 			if ~isempty(p.R)
 				% replace nearly-zero entries by zero
-				p.R(abs(p.R)<MPTOPTIONS.zero_tol) = 0;
+                if issparse(p.R)
+                    % much faster version of H(abs(H)<tol)=0 for sparse
+                    % matrices (by J. Loefberg)
+                    [i,j,k] = find(p.R);
+                    k(abs(k)<MPTOPTIONS.zero_tol)=0;
+                    p.R = sparse(i,j,k,size(p.R,1),size(p.R,2));
+                else
+                    p.R(abs(p.R)<MPTOPTIONS.zero_tol) = 0;
+                end
 			end
 
 			% Assign data
