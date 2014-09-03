@@ -40,18 +40,20 @@ backupTried = false;
 % work with minimal H-representations to improve numerics
 obj.minHRep();
 
-% Do vertex enumeration with CDD
-if isempty(obj.H_int)
-	A = obj.He_int(:,1:end-1);
-	B = obj.He_int(:,end);
-elseif isempty(obj.He_int)
-	A = obj.H_int(:,1:end-1);
-	B = obj.H_int(:,end);
-else
-	A = [obj.He_int(:,1:end-1); obj.H_int(:,1:end-1)];
-	B = [obj.He_int(:,end); obj.H_int(:,end)];
+% shift the polytope such that it contains the origin in its interior --
+% helps CDD a lot
+xc = zeros(obj.Dim, 1);
+if obj.isBounded()
+    xc = obj.chebyCenter.x;
 end
+Ai = obj.A;
+bi = obj.b - Ai*xc;
+Ae = obj.Ae;
+be = obj.be - Ae*xc;
+A = [Ae; Ai]; % equalities must come first
+B = [be; bi];
 
+% Do vertex enumeration with CDD
 while ~done
 	try
 		% change almost-zero elements to zero
@@ -70,8 +72,10 @@ while ~done
 		catch
 			% if CDD fails, retry with Matlab version
 			[s.V,s.R,s.A,s.B] = mpt_nlrs('extreme',obj);
-		end
-		
+        end
+        % shift vertices back
+		s.V = s.V + repmat(xc', size(s.V, 1), 1);
+        
 		if size(s.V,1) == 0 % This is a cone... we need an explicit vertex
 			obj.V_int = [obj.V_int; zeros(1,obj.Dim)];
 		else
