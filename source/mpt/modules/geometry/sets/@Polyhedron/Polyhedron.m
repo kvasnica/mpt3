@@ -305,7 +305,7 @@ classdef Polyhedron < ConvexSet
                     end
 
 					obj.Dim = d;
-					obj.H_int = full(H);
+					obj.H_int = H;
 					obj.He_int = zeros(0, d+1);
 					obj.hasHRep = ~isempty(obj.H_int);
 					obj.V_int = zeros(0, d);
@@ -335,7 +335,7 @@ classdef Polyhedron < ConvexSet
 					i = isinf(mat.W);
 					mat.G(i,:) = [];
 					mat.W(i,:) = [];
-					obj = Polyhedron('H', full([mat.G mat.W]), 'He', full([mat.Aeq mat.beq]));
+					obj = Polyhedron('H', [mat.G mat.W], 'He', [mat.Aeq mat.beq]);
 					return
 				end
 				
@@ -497,10 +497,10 @@ classdef Polyhedron < ConvexSet
 			end
 
 			% Assign data
-			obj.H_int  = full(p.H);
-			obj.He_int = full(p.He);
-			obj.V_int  = full(p.V);
-			obj.R_int  = full(p.R);
+			obj.H_int  = p.H;
+			obj.He_int = p.He;
+			obj.V_int  = p.V;
+			obj.R_int  = p.R;
 			obj.irredundantVRep = false;
 			obj.irredundantHRep = false;
 			obj.hasHRep = ~isempty(p.H) || ~isempty(p.He);
