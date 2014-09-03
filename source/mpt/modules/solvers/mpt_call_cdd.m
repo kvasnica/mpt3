@@ -20,9 +20,11 @@ if isfield(S, 'quicklp')
 		% add bounds
 		H.A = [H.A; I; -I];
 		H.B = [H.B; S.ub; -S.lb];
-	end
+    end
+    H.A = full(H.A);
+    H.B = full(H.B);
 	H.lin = 1:S.me;
-	H.obj = S.f(:)';
+	H.obj = full(S.f(:)');
 	R = cddmex('solve_lp',H);
 	R.obj = R.objlp;
 	if R.how==1
