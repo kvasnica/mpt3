@@ -79,7 +79,7 @@ end
 Aeq = [];
 Beq = [];
 ind_eq = [];
-sumM = sum(A, 2) + B;
+sumM = A*randn(size(A,2),1) + B;
 for ii = 1:ne-1,
     s = sumM(1);
     
