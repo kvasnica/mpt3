@@ -20,6 +20,7 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			end
 			
 			% TODO: check compatibility of number of states/inputs
+            assert(isa(system, 'AbstractSystem'), 'Invalid type of the second argument.');
             obj.system = system;
             obj.controller = controller;
 		end
