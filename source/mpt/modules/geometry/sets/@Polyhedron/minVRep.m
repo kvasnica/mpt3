@@ -21,6 +21,7 @@ if isempty(obj.V_int) && isempty(obj.R_int)
 	return
 end
 
+use_cddmex = true;
 if isempty(obj.R_int) && obj.Dim>1 && obj.isFullDim() && ...
 		size(obj.V_int, 1)>=obj.Dim+1
 	% try convhulln first; requires following conditions to be met:
@@ -28,13 +29,15 @@ if isempty(obj.R_int) && obj.Dim>1 && obj.isFullDim() && ...
 	% * dimension at least 2
     % * the set is full-dimensional
 	% * the set has at least d+1 vertices
-    K = convhulln(obj.V_int);
-	s.V = obj.V_int(unique(K), :);
-	s.R = obj.R_int;
-	
-else
+    try
+        K = convhulln(obj.V_int);
+        s.V = obj.V_int(unique(K), :);
+        s.R = obj.R_int;
+        use_cddmex = false;
+    end
+end
+if use_cddmex
     s = cddmex('reduce_v', struct('V', obj.V_int, 'R', obj.R_int));
-    
 end
 	
 obj.V_int = s.V;
