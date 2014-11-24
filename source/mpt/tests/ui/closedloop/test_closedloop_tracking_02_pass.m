@@ -26,7 +26,7 @@ assert(abs(sum(d.cost) - Jgood) <= 1e-8);
 % correct dimension (single column)
 d = loop.simulate(x0, Nsim, 'x.reference', xref(:, end));
 Jgood = 10.9776574436656;
-assert(abs(sum(d.cost) - Jgood) <= 1e-7);
+assert(abs(sum(d.cost) - Jgood) <= 1e-6);
 
 % xref must be either a vector or a matrix with Nsim columns
 [~, msg] = run_in_caller('loop.simulate(x0, Nsim, ''x.reference'', [1 1; 0 0])');
