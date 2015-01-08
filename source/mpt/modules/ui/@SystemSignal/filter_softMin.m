@@ -49,7 +49,7 @@ function out = on_instantiate(obj, varargin)
 % called after the object was instantiated
 
 % soft constraint require introducing new variables
-obj.Internal.soft_min = sdpvar(obj.n, obj.N);
+obj.Internal.soft_min = sdpvar(obj.n, obj.N, 'full');
 out = [];
 
 end
