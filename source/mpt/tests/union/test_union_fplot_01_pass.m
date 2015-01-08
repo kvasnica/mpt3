@@ -14,12 +14,12 @@ U.add(P2);
 % U.Set must be a cell, which requires a different way of plotting
 assert(iscell(U.Set));
 h = U.fplot();
-assert(isnumeric(h));
+assert(isnumeric(h) | isa(h, 'matlab.graphics.primitive.Line'));
 assert(numel(h)==2);
 
 % now plot also the underlying sets
 h = U.fplot('show_set', true);
-assert(isnumeric(h));
+assert(isnumeric(h) | isa(h, 'matlab.graphics.primitive.Data'));
 assert(numel(h)==4);
 
 end

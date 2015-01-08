@@ -11,7 +11,7 @@ P.addFunction(L,'gain');
 
 % must get two handles
 h = P.fplot();
-assert(isa(h, 'double'));
+assert(isa(h, 'double') | isa(h, 'matlab.graphics.primitive.Patch')); % the latter is for R2014b
 assert(numel(h)==2);
 
 end
