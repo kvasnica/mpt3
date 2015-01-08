@@ -53,7 +53,16 @@ end
 
 % use to paralellize the code
 % check if the matlab pool is running
-if ~isempty(which('matlabpool'))
+if ~isempty(which('parpool'))
+    % R2014b and newer
+    poolobj = gcp('nocreate'); % If no pool, do not create new one.
+    if isempty(poolobj)
+        poolsize = 0;
+    else
+        poolsize = poolobj.NumWorkers
+    end
+    ISPARALLEL = poolsize>0;
+elseif ~isempty(which('matlabpool'))
     ISPARALLEL = matlabpool('size')>0;
 else
     ISPARALLEL = false;
