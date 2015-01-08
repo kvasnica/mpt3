@@ -1,4 +1,4 @@
-function filter = blockFilter(varargin)
+function filter = filter_block(varargin)
 % Filter's skeleton
 
 % set up the filter
