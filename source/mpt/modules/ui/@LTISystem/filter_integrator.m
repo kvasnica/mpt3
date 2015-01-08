@@ -25,7 +25,7 @@ end
 if x_ref && y_ref
 	error('Please remove either "x.reference" or "y.reference" filters.');
 elseif ~(x_ref || y_ref)
-	error('Either state or input tracking must be enabled.');
+	error('Either state or output tracking must be enabled.');
 end
 
 if y_ref

@@ -16,7 +16,7 @@ L = LTISystem('A', [1 1; 0.2 1], 'B', [1; 0.5], 'C', [1 0]);
 L.x.penalty = QuadFunction(eye(2));
 L.u.penalty = QuadFunction(1);
 [~, msg] = run_in_caller('L.with(''integrator'');');
-asserterrmsg(msg, 'Either state or input tracking must be enabled.');
+asserterrmsg(msg, 'Either state or output tracking must be enabled.');
 
 % input tracking not allowed
 L = LTISystem('A', [1 1; 0.2 1], 'B', [1; 0.5], 'C', [1 0]);
