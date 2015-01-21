@@ -40,9 +40,22 @@ classdef LTISystem < AbstractSystem
 			% direct feedthrough, false otherwise
 			
 			out = (nnz(obj.D)~=0);
-		end
-	end
-	
+        end
+    end
+
+    methods(Access=protected)
+        
+        function out = display_internal(obj)
+            % Returns a string information about the system
+            
+            plural = @(s, n) [num2str(n) ' ' s repmat('s', 1, double(n~=1))];
+            out = sprintf('%s with %s, %s, %s', class(obj), ...
+					plural('state', obj.nx), ...
+					plural('input', obj.nu), ...
+					plural('output', obj.ny));
+        end
+    end
+    
     methods
         
         function obj = LTISystem(varargin)

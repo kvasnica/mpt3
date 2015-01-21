@@ -25,8 +25,23 @@ classdef MLDSystem < AbstractSystem
 		S  % Full MLD structure returned from HYSDEL
 		nz % Number of auxiliary real variables
 		nd % Number of auxiliary binary variables
-	end
+    end
     
+    methods(Access=protected)
+        
+        function out = display_internal(obj)
+            % Returns a string information about the system
+            
+            plural = @(s, n) [num2str(n) ' ' s repmat('s', 1, double(n~=1))];
+            out = sprintf('%s with %s, %s, %s, %s, %s', class(obj), ...
+                plural('state', obj.nx), ...
+                plural('input', obj.nu), ...
+                plural('output', obj.ny), ...
+                plural('auxiliary real', obj.nz), ...
+                plural('auxiliary bin', obj.nd));
+        end
+    end
+
     methods
         
         function obj = MLDSystem(source, parameters)

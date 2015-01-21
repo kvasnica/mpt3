@@ -46,7 +46,12 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 		
 		% Feedthrough indication. Must return true if the system has direct
 		% feedthrough, false otherwise
-		out = has_feedthrough(obj)		
+		out = has_feedthrough(obj)
+    end
+    
+    methods(Abstract, Access=protected)
+        % Display information about the system
+        out = display_internal(obj)
 	end
 	
 	methods
@@ -66,15 +71,8 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 				fprintf('Array of %d %ss\n', numel(obj), class(obj));
 			elseif isempty(obj.nx)
 				fprintf('Empty %s\n', class(obj));
-			else
-				fprintf('%s with %s, %s, %s', class(obj), ...
-					plural('state', obj.nx), ...
-					plural('input', obj.nu), ...
-					plural('output', obj.ny));
-				if isequal(class(obj), 'PWASystem')
-					fprintf(', %d modes', obj.ndyn);
-				end
-				fprintf('\n');
+            else
+                disp(obj.display_internal());
 			end
 		end
 
