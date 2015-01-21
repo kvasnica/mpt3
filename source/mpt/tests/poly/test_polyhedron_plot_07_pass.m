@@ -20,7 +20,8 @@ P.plot('colororder', 'random', 'colormap', 'mpt'); close all;
 % wrong colororder
 [worked, msg] = run_in_caller('P.plot(''colororder'', ''wrong'');');
 assert(~worked);
-assert(~isempty(strfind(msg, 'Argument ''colororder'' failed validation')));
+asserterrmsg(msg, 'Argument ''colororder'' failed validation', ...
+    'The value of ''colororder'' is invalid.');
 close all
 
 end

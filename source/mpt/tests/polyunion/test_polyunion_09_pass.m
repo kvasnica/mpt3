@@ -9,7 +9,8 @@ Y = YSet(x,F);
 
 [worked, msg] = run_in_caller('U = PolyUnion(Y); ');
 assert(~worked);
-asserterrmsg(msg,'Argument ''Set'' failed validation @(x)isa(x,''Polyhedron'').');
+asserterrmsg(msg,'Argument ''Set'' failed validation @(x)isa(x,''Polyhedron'').', ...
+    'The value of ''Set'' is invalid.');
 
 
 end

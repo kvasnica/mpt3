@@ -1,3 +1,8 @@
-function asserterrmsg(msg, string)
+function asserterrmsg(msg, varargin)
 
-assert(~isempty(strfind(msg, string)));
+for i = 1:length(varargin)
+    if ~isempty(strfind(msg, varargin{i}))
+        return
+    end
+end
+assert(~isempty(strfind(msg, varargin{1})));

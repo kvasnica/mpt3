@@ -12,7 +12,8 @@ asserterrmsg(msg, 'More than one point please.');
 
 % unrecognized option
 [~, msg] = run_in_caller('V = mpt_voronoi([1 2], ''bogus'', 1);');
-asserterrmsg(msg, 'Argument ''bogus'' did not match any valid parameter of the parser.');
+asserterrmsg(msg, 'Argument ''bogus'' did not match any valid parameter of the parser.', ...
+    '''bogus'' is not a recognized parameter.');
 
 % wrong option
 [~, msg] = run_in_caller('V = mpt_voronoi([1 2], ''bound'', 1);');
