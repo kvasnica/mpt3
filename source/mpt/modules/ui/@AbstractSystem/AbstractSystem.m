@@ -251,7 +251,7 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
             obj.initialize(xn);
 		end
 		
-		function y = output(obj, u)
+		function [y, varargout] = output(obj, u)
 			% Evaluates the output equation
 			
 			x = obj.getValues('x');
@@ -267,7 +267,8 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			end
 			u = obj.validateInput(u);
 			
-			y = obj.output_equation(x, u);
+            varargout = cell(1, nargout-1);
+			[y, varargout{:}] = obj.output_equation(x, u);
 		end
 		
 	end
