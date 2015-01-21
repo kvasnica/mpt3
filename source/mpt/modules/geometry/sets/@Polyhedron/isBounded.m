@@ -53,12 +53,7 @@ for i=1:length(P)
         elseif P(i).hasHRep
             sol = P(i).chebyCenter;
             %P(i).Internal.Bounded = true;
-            if sol.exitflag == MPTOPTIONS.UNBOUNDED
-                P(i).Internal.Bounded = false;
-                continue;
-            elseif norm(sol.r,Inf)>=MPTOPTIONS.infbound || isinf(sol.r)
-                % check if the value function equals infbound or inf
-                % (relax the infbound due to isbounded_09_pass test)
+            if sol.exitflag == MPTOPTIONS.UNBOUNDED || sol.r==Inf
                 P(i).Internal.Bounded = false;
                 continue;
             end
