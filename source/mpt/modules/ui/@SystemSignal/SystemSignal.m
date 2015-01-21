@@ -197,9 +197,11 @@ classdef SystemSignal < FilterBehavior & IterableBehavior
 			if obj.n==0
 				out = Polyhedron;
 			else
-				% TODO: include bounds from the setConstraint filter
 				out = Polyhedron([eye(obj.n); -eye(obj.n)], ...
 					[sanitize_inf(obj.max); -sanitize_inf(obj.min)]);
+                if obj.hasFilter('setConstraint')
+                    out = out & obj.setConstraint;
+                end
 			end
 		end
 	end
