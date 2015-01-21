@@ -770,6 +770,29 @@ classdef Polyhedron < ConvexSet
                 
         end
         
+        function x = randomPoint(obj)
+            % Generates a random point inside a polytope
+            %
+            % Let v_i, i=1...n denote the vertices of a bounded polytope.
+            % Then the random point is x = \sum L_i*v_i where 0<=L_i<=1 and
+            % sum(L_i)=1.
+
+            % TODO: more efficient procedure for H-polytopes
+            % TODO: support polyhedra
+            
+            error(obj.rejectArray());
+            if ~obj.isBounded()
+                error('The polyhedron must be bounded.');
+            end
+            
+            nv = size(obj.V, 1);
+            % random vector with 0<=L(:)<=1 and sum(L)=1
+            L = rand(nv, 1);
+            L = L/sum(L);
+            
+            x = obj.V'*L;
+        end
+        
         function sol = fmax(obj, function_name)
             % Maximizes a function over a polyhedron
             %
