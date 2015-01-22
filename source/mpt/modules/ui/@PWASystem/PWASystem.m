@@ -290,15 +290,22 @@ classdef PWASystem < AbstractSystem
 			ip.addParamValue('direction', 'forward', @ischar);
 			ip.addParamValue('N', 1, @isnumeric);
             ip.addParamValue('X', ...
-				obj.x.boundsToPolyhedron(), ...
+				[], ...
 				@validate_polyhedron);
             ip.addParamValue('U', ...
-				obj.u.boundsToPolyhedron(), ...
+				[], ...
 				@validate_polyhedron);
 			ip.addParamValue('merge', true, @islogical);
 			ip.parse(varargin{:});
 			options = ip.Results;
 
+            if isempty(options.X)
+                options.X = obj.x.boundsToPolyhedron();
+            end
+            if isempty(options.U)
+                options.U = obj.u.boundsToPolyhedron();
+            end
+            
 			if numel(options.U)~=1
 				error('Input constraints must be a single polyhedron.');
 			end
