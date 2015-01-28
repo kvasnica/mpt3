@@ -745,7 +745,12 @@ classdef BinTreePolyUnion < PolyUnion
 				NegIdx = intersect(find(obj.Internal.BinaryTree.Neg(i, :)), Idx);
 				PosIdx = intersect(find(obj.Internal.BinaryTree.Pos(i, :)), Idx);
 				% fitness of the i-th hyperplane
-				D(i) = max(numel(NegIdx), numel(PosIdx));
+                if isempty(NegIdx) || isempty(PosIdx)
+                    % exclude hyperplanes which do not split the space
+                    D(i) = Inf;
+                else
+                    D(i) = max(numel(NegIdx), numel(PosIdx));
+                end
 			end
 			% which hyperplane is the best cut?
 			[~, BestIdx] = min(D(:, 1));
