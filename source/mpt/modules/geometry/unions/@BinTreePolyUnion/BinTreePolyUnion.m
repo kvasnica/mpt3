@@ -617,14 +617,16 @@ classdef BinTreePolyUnion < PolyUnion
 				obj.Num);
 			Neg = false(nH, obj.Num);
 			Pos = false(nH, obj.Num);
+            % tolerance for checking full dimensionality of intersections
+            tol = 10*MPTOPTIONS.rel_tol;
 			tic
 			for i = 1:nH
 				if toc>MPTOPTIONS.report_period
 					fprintf('Progress: %d/%d\n', i, nH);
 					tic
 				end
-				[Neg(i, :), Pos(i, :)] = obj.getPosition(H(i, :));
-			end
+				[Neg(i, :), Pos(i, :)] = obj.getPosition(H(i, :), tol);
+            end
 			obj.Internal.BinaryTree.runtime.H = etime(clock, start_time);
 			fprintf('...done in %.1f seconds.\n', ...
 				obj.Internal.BinaryTree.runtime.H);
@@ -684,7 +686,7 @@ classdef BinTreePolyUnion < PolyUnion
 				obj.Internal.BinaryTree.n_nodes);
 		end
 
-		function [negative, positive] = getPosition(obj, hp)
+		function [negative, positive] = getPosition(obj, hp, tol)
 			% Determines location of regions w.r.t. hyperplane hp*[x; -1]=0:
 			%  negative(i)=1 if the i-th region has full-dimensional
 			%                intersection with {x | hp*[x; -1] <= 0}
@@ -697,14 +699,18 @@ classdef BinTreePolyUnion < PolyUnion
 			negative = false(1, obj.Num);
 			positive = false(1, obj.Num);
 			for i = 1:obj.Num
-				if fast_isFullDim([obj.Set(i).H; hp])
-					% intersection with {x | hp*[x; -1]<=0}
-					negative(i) = true;
-				end
-				if fast_isFullDim([obj.Set(i).H; -hp])
-					% intersection with {x | hp*[x; -1]>=0}
-					positive(i) = true;
-				end
+                [s, r] = fast_isFullDim([obj.Set(i).H; hp]);
+                if s && -r.obj > tol
+					% full dimensional intersection with {x | hp*[x;-1]<=0} 
+                    % with the chebyradius greater than tol
+                    negative(i) = true;
+                end
+                [s, r] = fast_isFullDim([obj.Set(i).H; -hp]);
+                if s && -r.obj > tol
+                    % full dimensional intersection with {x | hp*[x;-1]>=0}
+                    % with the chebyradius greater than tol
+                    positive(i) = true;
+                end
 			end
 			
 		end
