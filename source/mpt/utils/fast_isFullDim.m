@@ -1,4 +1,4 @@
-function status = fast_isFullDim(H)
+function [status, ret] = fast_isFullDim(H)
 % returns true if {x | H*[x; -1]<=0} is fully dimensional
 
 global MPTOPTIONS

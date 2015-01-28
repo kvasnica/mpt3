@@ -1,4 +1,4 @@
-function status = fast_isEmptySet(H, He)
+function [status, ret] = fast_isEmptySet(H, He)
 % returns true if {x | H*[x; -1]<=0, He*[x; -1]=0} is empty
 
 global MPTOPTIONS
