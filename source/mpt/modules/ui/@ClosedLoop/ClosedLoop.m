@@ -163,8 +163,8 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				b = [b; obj.system.x.max; -obj.system.x.min];
 				
 				% ymin <= y <= ymax
-				A = [A; obj.system.C; -obj.system.C];
-				b = [b; obj.system.y.max; -obj.system.y.min];
+				A = [A; (obj.system.C+obj.system.D*F); -(obj.system.C+obj.system.D*F)];
+				b = [b; obj.system.y.max-obj.system.D*g; obj.system.D*g-obj.system.y.min];
 				
 				D = Polyhedron('A', A, 'b', sanitize_inf(b));
 				D = D.intersect(obj.system.domainx);
