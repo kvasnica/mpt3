@@ -317,6 +317,7 @@ classdef EMPCController < AbstractController
 			ip.addParamValue('marker', '.');
 			ip.addParamValue('markersize', 20);
 			ip.addParamValue('model', obj.model);
+            ip.addParamValue('openloop', false);
 			ip.parse(varargin{:});
 			options = ip.Results;
 
@@ -341,8 +342,15 @@ classdef EMPCController < AbstractController
 				else
 					x0 = options.x0;
 					button = 3;
-				end
-				data = loop.simulate(x0, options.N_sim, varargin{:});
+                end
+                if options.openloop
+                    [~, ~, ol] = obj.evaluate(x0);
+                    model = options.model.copy();
+                    model.initialize(x0);
+                    data = model.simulate(ol.U);
+                else
+                    data = loop.simulate(x0, options.N_sim, varargin{:});
+                end
 				plot(data.X(1, :), data.X(2, :), options.color, ...
 					'linewidth', options.linewidth, ...
 					'marker', options.marker, ...
