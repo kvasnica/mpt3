@@ -151,9 +151,57 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			
 			if obj.controller.optimizer.Dim ~= obj.controller.model.nx
 				error('Tracking controllers not supported.');
-			end
-			
-			if isa(obj.system, 'LTISystem') && length(obj.controller.optimizer.Set)==1
+            end
+
+            if isa(obj.system, 'ULTISystem') && length(obj.controller.optimizer.Set)==1
+                % Uncertain LTI system + linear controller
+                
+                feedback = obj.controller.optimizer.Set.getFunction('primal');
+                F = feedback.F(1:obj.system.nu, :);
+                g = feedback.g(1:obj.system.nu);
+                assert(nnz(g)==0, 'Only linear controllers are supported.');
+                unc = obj.system.cellifyMatrices();
+
+                % 1) domain of the closed-loop system
+                A = []; b = [];
+                % umin <= F*x+g <= umax
+                A = [A; F; -F];
+                b = [b; obj.system.u.max-g; -obj.system.u.min+g];
+                % xmin <= x <= xmax
+                A = [A; eye(obj.system.nx); -eye(obj.system.nx)];
+                b = [b; obj.system.x.max; -obj.system.x.min];
+                % ymin <= (C*x+D*u) <= ymax
+                for ic = 1:numel(unc.C)
+                    for id = 1:numel(unc.D)
+                        A = [A; ...
+                            (unc.C{ic}+unc.D{id}*F); ...
+                            -(unc.C{ic}+unc.D{id}*F)];
+                        b = [b; obj.system.y.max-unc.D{id}*g; ...
+                            unc.D{id}*g-obj.system.y.min];
+                    end
+                end
+                D = Polyhedron('A', A, 'b', sanitize_inf(b));
+                D = D.intersect(obj.system.domainx);
+
+                % 2) uncertain dynamics of the closed-loop system
+                nA = numel(unc.A);
+                nB = numel(unc.B);
+                An = cell(1, nA*nB);
+                i = 0;
+                for ia = 1:nA
+                    for ib = 1:nB
+                        i = i + 1;
+                        An{i} = unc.A{ia}+unc.B{ib}*F;
+                    end
+                end
+                out = ULTISystem('A', An, 'C', obj.system.C, ...
+                    'D', obj.system.D, 'domain', D);
+                out.d = obj.system.d.copy();
+                
+            elseif isa(obj.system, 'ULTISystem')
+                error('Uncertain LTI systems with PWA controllers not yet supported.');
+                
+            elseif isa(obj.system, 'LTISystem') && length(obj.controller.optimizer.Set)==1
 				% LTI system + linear controller = LTI system with
 				% domain restricted to the set where the controller
 				% satisfies constraints (not necessarily recursively,
