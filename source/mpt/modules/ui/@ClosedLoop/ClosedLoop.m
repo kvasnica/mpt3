@@ -81,9 +81,11 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 					ref.position = ref_positions(i)+1;
 					references(end+1) = ref;
 				end
-			end
+            end
 			
-			X = x0(:); U = []; Y = []; J = [];
+            include_disturbance = isa(obj.system, 'ULTISystem');
+            
+			X = x0(:); U = []; Y = []; D = []; J = [];
 			for k = 1:N_sim
 
 				if k>1
@@ -114,15 +116,25 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
                 % note: we could use obj.system.update(u) here, but that
                 % introduces significant overhead. update_equation is much
                 % faster.
-				[x0, y] = obj.system.update_equation(x0, u);
+                if include_disturbance
+                    [x0, y, ~, d] = obj.system.update_equation(x0, u);
+                else
+                    [x0, y] = obj.system.update_equation(x0, u);
+                end
 				X = [X x0];
 				U = [U u];
 				Y = [Y y];
+                if include_disturbance
+                    D = [D d];
+                end
 				J = [J openloop.cost];
 			end
 			out.X = X;
 			out.U = U;
 			out.Y = Y;
+            if include_disturbance
+                out.D = D;
+            end
 			out.cost = J;
 		end
 
