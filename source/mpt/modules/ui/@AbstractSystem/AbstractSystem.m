@@ -61,7 +61,28 @@ classdef AbstractSystem < FilterBehavior & ComponentBehavior & IterableBehavior
 			
 			obj.Internal.system.instantiated = false;
 			obj.Internal.system.N = [];
-		end
+        end
+        
+        function out = mtimes(A, B)
+            % A*B creates a closed-loop system
+
+            if isa(A, 'AbstractSystem') && isa(B, 'AbstractController')
+                model = A;
+                ctrl = B;
+            elseif isa(A, 'AbstractSystem') && isa(B, 'double')
+                model = A;
+                ctrl = SFController(model, B);
+            elseif isa(B, 'AbstractSystem') && isa(A, 'AbstractController')
+                model = B;
+                ctrl = A;
+            elseif isa(B, 'AbstractSystem') && isa(A, 'double')
+                model = B;
+                ctrl = SFController(model, A);
+            else
+                error('Unsupported inputs.');
+            end
+            out = ClosedLoop(ctrl, model);
+        end
 		
 		function display(obj)
 			% display method
