@@ -124,8 +124,8 @@ else
         for idyn = 1:length(PWA{ip}.Hi)
             
             if isempty(PWA{ip}.Hi{idyn}),
-                PWA{ip}.Hi{idyn} = zeros(ub, nxr+nur);
-                PWA{ip}.Ki{idyn} = zeros(ub,1);
+                PWA{ip}.Hi{idyn} = zeros(length(ub), nxr+nur);
+                PWA{ip}.Ki{idyn} = zeros(length(ub),1);
             end
             
             sysStruct.A{end+1} = [PWA{ip}.fx{idyn} zeros(nx, nxb)];
