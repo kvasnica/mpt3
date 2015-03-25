@@ -317,9 +317,20 @@ classdef PWASystem < AbstractSystem
 			end
 			if obj.nu>0 && options.U.Dim~=obj.nu
 				error('Input constraints must be a polyhedron in %dD.', obj.nu);
-			end
+            end
 
-			X = options.X*options.U;
+            % only keep non-empty sets
+            X = options.X(find(~[options.X.isEmptySet()]));
+            if isempty(X)
+                % all targets are empty -> reach set is empty and exit
+                S = Polyhedron.emptySet(obj.nx);
+                SN{1} = S;
+                dyn = 1;
+                dynN = {1};
+                return
+            end
+			X = X*options.U;
+            %X = options.X*options.U;
 			SN = {}; dynN = {};
 			for n = 1:options.N
 				Xp = []; dyn = [];
@@ -346,6 +357,8 @@ classdef PWASystem < AbstractSystem
 				dynN{n} = dyn;
 			end
 			S = SN{end};
+            % only keep non-empty sets
+            S = S(find(~[S.isEmptySet()]));
             if isempty(S)
                 S = Polyhedron.emptySet(obj.nx);
             end
