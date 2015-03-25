@@ -325,13 +325,12 @@ classdef PWASystem < AbstractSystem
                 % all targets are empty -> reach set is empty and exit
                 S = Polyhedron.emptySet(obj.nx);
                 SN{1} = S;
-                dyn = 1;
-                dynN = {1};
+                dyn = 0;
                 return
             end
 			X = X*options.U;
             %X = options.X*options.U;
-			SN = {}; dynN = {};
+			SN = {}; dynN = {0};
 			for n = 1:options.N
 				Xp = []; dyn = [];
 				for j = 1:obj.ndyn
@@ -351,11 +350,16 @@ classdef PWASystem < AbstractSystem
 					end
 					Xp = [Xp, R];
 					dyn = [dyn j*ones(1, numel(R))];
-				end
-				X = Xp*options.U;
-				SN{n} = Xp;
-				dynN{n} = dyn;
-			end
+                end
+                if ~Xp.isEmptySet,
+                    X = Xp*options.U;
+                    SN{n} = Xp;
+                    dynN{n} = dyn;
+                end
+            end
+            if isempty(SN)
+                SN{1} = Polyhedron.emptySet(obj.nx);
+            end
 			S = SN{end};
             % only keep non-empty sets
             S = S(find(~[S.isEmptySet()]));

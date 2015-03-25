@@ -9,12 +9,12 @@ X = Polyhedron.emptySet(1);
 
 R = pwa.reachableSet('direction', 'backward', 'X', X);
 assert(isa(R, 'Polyhedron'));
-assert(isequal([R.Dim], [1 1]));
+assert(isequal([R.Dim], [1]));
 assert(all(R.isEmptySet()));
 
 R = pwa.reachableSet('direction', 'forward', 'X', X);
 assert(isa(R, 'Polyhedron'));
-assert(isequal([R.Dim], [1 1]));
+assert(isequal([R.Dim], [1]));
 assert(all(R.isEmptySet()));
 
 end

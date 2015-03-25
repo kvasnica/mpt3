@@ -10,7 +10,7 @@ pwa.x.max = 1;
 
 S = pwa.invariantSet('X', Polyhedron.emptySet(1));
 assert(isa(S, 'Polyhedron'));
-assert(isequal([S.Dim], [1 1]));
+assert(isequal([S.Dim], [1]));
 assert(all(S.isEmptySet()));
 
 end
