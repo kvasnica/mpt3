@@ -197,60 +197,8 @@ classdef MPCController < AbstractController
             % export the problem to YALMIP
             Ydata = obj.toYALMIP();
             
-            % expand the YALMIP model
-            yopts = sdpsettings('verbose', 0);
-            w = warning;
-            warning('off');
-            try
-                [Fexp, failure, cause] = expandmodel(Ydata.constraints, Ydata.objective, yopts);
-            catch
-                warning(w);
-                error(lasterr);
-            end
-            warning(w)
-            if failure,
-                fprintf('\n%s\n\n', cause);
-                error('Cannot deal with given setup, see message above.');
-            end
-            
-            % now export the expanded model into MPT format
-            yopts.expand = 0;
-            [~, ~, ~, model] = export(Fexp, Ydata.objective, yopts);
-            
-            % define which variables should be treated as parameters
-            model.parametric_variables = find(ismember(model.used_variables,getvariables(Ydata.internal.parameters(:))));
-            model.requested_variables = find(ismember(model.used_variables,getvariables(Ydata.variables.u(:))));
-
-            % convert the YALMIP model to MPT matrices
-            Matrices = yalmip2mpt(model);
-            
-            % we do not support binaries yet
-            if ~isempty(model.binary_variables) || ~isempty(model.integer_variables)
-                error('Formulations with binary/integer variables not supported.');
-            end
-            
-            % Remove equality constraints and trivial stuff from big-M
-            [equalities,redundant] = mpt_detect_fixed_rows(Matrices);
-            if ~isempty(equalities)
-                % Constraint of the type Ex == W, i.e. lower-dimensional
-                % parametric space
-                if any(sum(abs(Matrices.G(equalities,:)),2)==0)
-                    warning('Lower-dimensional constraints in the parametric space.');
-                    return
-                end
-            end
-            Matrices = mpt_collect_equalities(Matrices,equalities);
-            Matrices = mpt_remove_equalities(Matrices,redundant);
-            Matrices = mpt_project_on_equality(Matrices);
-            
-            % remove from Matrices fields introduced by YALMIP which might confuse Opt
-            fields_to_remove = {'requested_variables', 'param_var', 'free_var', ...
-                'binary_var_index', 'getback', 'lb', 'ub'};
-            for i = 1:length(fields_to_remove)
-                if isfield(Matrices, fields_to_remove{i})
-                    Matrices = rmfield(Matrices, fields_to_remove{i});
-                end
-            end
+            Matrices = mpt_yalmip2mpt(Ydata.constraints, Ydata.objective, ...
+                Ydata.internal.parameters(:), Ydata.variables.u(:));
         end
 	end
 
