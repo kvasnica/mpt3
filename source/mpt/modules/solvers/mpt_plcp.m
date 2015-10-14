@@ -505,7 +505,10 @@ while ~builtin('isempty',UNEX)
       end
     
     % if there are zero indices (empty neighbor), we need to remove them
-    adj_list{actual_region}{i}(adj_list{actual_region}{i}<=0)=[];
+    to_delete = adj_list{actual_region}{i}<=0;
+    if ~isempty(to_delete)
+        adj_list{actual_region}{i}(to_delete)=[];
+    end
   end
   
   if MPTOPTIONS.verbose >= 1
