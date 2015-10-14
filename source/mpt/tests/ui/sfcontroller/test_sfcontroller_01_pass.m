@@ -4,7 +4,7 @@ function test_sfcontroller_01_pass
 % model must be provided
 K = 1;
 [~, msg] = run_in_caller('ctrl = SFController(K)');
-asserterrmsg(msg, 'Not enough input arguments.');
+asserterrmsg(msg, 'The first input must be a system model.');
 
 % controller must be provided
 sys = LTISystem('A', 1, 'B', 1);

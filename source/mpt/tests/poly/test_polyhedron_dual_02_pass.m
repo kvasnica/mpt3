@@ -32,6 +32,6 @@ assert(norm(D.V - Vexp, Inf) < 1e-6);
 P = Polyhedron([2 1;1 1;1 2;2 2]);
 D = P.dual();
 Vexp = [-0.5 1.5;1.5 -0.5;3.5 1.5;1.5 3.5];
-assert(norm(D.V - Vexp, Inf) < 1e-6);
+assert(norm(sortrows(D.V) - sortrows(Vexp), Inf) < 1e-6);
 
 end
