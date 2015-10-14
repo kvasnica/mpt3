@@ -68,7 +68,18 @@ else
   r = rank(T,MPTOPTIONS.abs_tol);
   pr = p(1:r); pn = p(r+1:end);
   qr = q(1:r); qn = q(r+1:end);
-
+ 
+  rk = rank(full(U(:,1:r)));
+  if rk~=r
+      % if invertibility is not achieved try reduced echelon elimination
+      [~,jb]=rref(T,MPTOPTIONS.abs_tol);
+      [L,U,p] = lu(sparse(T(:,jb)),'vector');
+      % update column selection
+      q = [jb, setdiff(1:H.Dim,jb)];
+      pr = p(1:r); pn = p(r+1:end);
+      qr = q(1:r); qn = q(r+1:end);
+  end
+  
   beta = T(pr,qr) \ eye(r);
   
   % Build polyhedron who's projection is the full-dimensional portion of the mapping
