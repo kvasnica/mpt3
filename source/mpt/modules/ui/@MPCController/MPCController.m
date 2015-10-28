@@ -65,11 +65,12 @@ classdef MPCController < AbstractController
 			end
 		end
         		
-		function obj = construct(obj)
+		function obj = construct(obj, sdpopt)
 			% Converts the MPC problem into a YALMIP's optimizer object
             %
             % Syntax:
             %   ctrl.construct()
+            %   ctrl.construct(sdpopt) -- uses the specified sdpsettings
 
 			% make sure we have the prediction horizon available
 			error(obj.assert_controllerparams_defined);
@@ -78,8 +79,11 @@ classdef MPCController < AbstractController
 				Y = obj.toYALMIP();
 			else
 				Y = obj.yalmipData;
-			end
+            end
 			
+            if nargin==2
+                Y.internal.sdpsettings = sdpopt;
+            end
 			% construct YALMIP's optimizer object with the first state as
 			% the initial condition
 			obj.optimizer = optimizer(Y.constraints, Y.objective, ...
@@ -199,6 +203,17 @@ classdef MPCController < AbstractController
             
             Matrices = mpt_yalmip2mpt(Ydata.constraints, Ydata.objective, ...
                 Ydata.internal.parameters(:), Ydata.variables.u(:));
+        end
+        
+        function f = toFiordos(obj)
+            % Exports the MPC controller to FiOrdOs
+            %
+            %   ctrl.toFiordos()
+            
+            Y = obj.toYALMIP();
+            opt = optimizer(Y.constraints, Y.objective, [], ...
+                Y.internal.parameters, Y.variables.u(:));
+            f = fiordos(opt);
         end
 	end
 
