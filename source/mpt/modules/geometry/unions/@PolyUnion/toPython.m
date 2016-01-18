@@ -10,7 +10,7 @@ function toPython(obj, filename, function_to_export, tiebreak)
 % ---
 %
 %       obj: single PolyUnion or an array thereof
-%  filename: name of exported file (the '.m' extension will be added)
+%  filename: name of exported file (the '.py' extension will be added)
 %  function: name of function to be exported
 %  tiebreak: name of function to use to resolve tiebreaks
 %            (use 'first-region' to break the sequential search once
