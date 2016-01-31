@@ -160,7 +160,10 @@ classdef LTISystem < AbstractSystem
 			end
 			if size(obj.A, 1)~=size(obj.B, 1)
 				error('The "B" matrix must have %d rows.', obj.nx);
-			end
+            end
+            if size(obj.C, 2)~=size(obj.A, 2)
+                error('The "C" matrix must have %d columns.', obj.nx);
+            end
 			if size(obj.C, 1)~=size(obj.D, 1)
 				error('The "D" matrix must have %d rows.', obj.ny);
 			end
