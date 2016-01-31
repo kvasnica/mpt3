@@ -34,7 +34,7 @@ end
 
 reference = zeros(obj.n, M);
 if obj.hasFilter('reference')
-	if ismember(obj.Internal.reference.type, {'free', 'symbolic'})
+	if ismember(obj.Internal.reference.type, {'free', 'preview', 'symbolic'})
 		% symbolic reference (vector or matrix)
 		reference = obj.Internal.reference.var;
 	elseif ~isempty(obj.reference)

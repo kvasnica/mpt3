@@ -24,8 +24,8 @@ function out = on_variables(obj, varargin)
 %  .parametric: logical, if true, the variable will become part of the
 %              vector of initial conditions
 switch obj.Internal.reference.type
-	case 'free'
-		out.var = obj.Internal.reference.var;
+	case {'free', 'preview'}
+		out.var = obj.Internal.reference.var(:);
 		out.parametric = true;
 	case 'symbolic'
 		% symbolic references are only used internally (e.g. in
@@ -44,19 +44,35 @@ function out = on_constraints(obj, varargin)
 % called when constructing constraints
 
 out = [];
-if isequal(obj.Internal.reference.type, 'free')
-	% bound symbolic references using signal's min/max values
-	%
-	% do not include +/-Inf bounds
-	v = obj.Internal.reference.var;
-	for i = 1:length(v)
-		if ~isinf(obj.min(i))
-			out = out + [ obj.min(i) <= v(i) ];
-		end
-		if ~isinf(obj.max(i))
-			out = out + [ v(i) <= obj.max(i) ];
-		end
-	end
+switch obj.Internal.reference.type
+    case 'free'
+        % bound symbolic references using signal's min/max values
+        %
+        % do not include +/-Inf bounds
+        v = obj.Internal.reference.var;
+        for i = 1:length(v)
+            if ~isinf(obj.min(i))
+                out = out + [ obj.min(i) <= v(i) ];
+            end
+            if ~isinf(obj.max(i))
+                out = out + [ v(i) <= obj.max(i) ];
+            end
+        end
+    case 'preview'
+        % bound symbolic references using signal's min/max values
+        %
+        % do not include +/-Inf bounds
+        v = obj.Internal.reference.var;
+        for k = 1:size(v, 2)
+            for i = 1:size(v, 1)
+                if ~isinf(obj.min(i))
+                    out = out + [ obj.min(i) <= v(i, k) ];
+                end
+                if ~isinf(obj.max(i))
+                    out = out + [ v(i) <= obj.max(i, k) ];
+                end
+            end
+        end
 end
 
 end
@@ -65,8 +81,11 @@ end
 function out = on_instantiate(obj, varargin)
 % called after the object was instantiated
 
-if ismember(obj.Internal.reference.type, {'free', 'symbolic'})
-	obj.Internal.reference.var = sdpvar(obj.n, 1);
+switch obj.Internal.reference.type
+    case {'free', 'symbolic'}
+        obj.Internal.reference.var = sdpvar(obj.n, 1);
+    case 'preview'
+        obj.Internal.reference.var = sdpvar(obj.n, obj.N, 'full');
 end
 out = [];
 
@@ -99,6 +118,10 @@ elseif isa(value, 'char')
 			% free reference which becomes part of the vector of initial
 			% conditions
 			obj.Internal.reference.type = 'free';
+        case 'preview'
+            % free reference with trajectory preview becomes part of the
+            % vector of initial conditions
+            obj.Internal.reference.type = 'preview';
 		case 'symbolic',
 			% symbolic reference, which is not part of the initial
 			% conditions
