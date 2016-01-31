@@ -2,7 +2,7 @@ function test_mpccontroller_tracking_06_pass
 % reference tracking with trajectory preview (1 output)
 
 ny = 1;
-L = LTISystem('A', [1 1; 0.1 1], 'B', [1; 0.5], 'C', eye(ny));
+L = LTISystem('A', [1 1; 0.1 1], 'B', [1; 0.5], 'C', [1 0]);
 L.u.penalty = QuadFunction(1);
 L.u.min = -5;
 L.u.max = 5;
@@ -14,10 +14,10 @@ N = 10;
 mpc = MPCController(L, N);
 Y = mpc.toYALMIP();
 % 2 states, 10 preview references
-assert(Y.internal.xinitFormat.n_xinit == 2+N*ny);
+assert(Y.internal.xinitFormat.n_xinit == L.nx+N*ny);
 assert(isequal(Y.internal.xinitFormat.names{1}, 'x.init'));
 assert(isequal(Y.internal.xinitFormat.names{2}, 'y.reference'));
-assert(isequal(Y.internal.xinitFormat.dims{1}, [2 1]));
+assert(isequal(Y.internal.xinitFormat.dims{1}, [L.nx 1]));
 assert(isequal(Y.internal.xinitFormat.dims{2}, [N*ny 1]));
 
 x0 = [1; 1];
