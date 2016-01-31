@@ -69,7 +69,7 @@ switch obj.Internal.reference.type
                     out = out + [ obj.min(i) <= v(i, k) ];
                 end
                 if ~isinf(obj.max(i))
-                    out = out + [ v(i) <= obj.max(i, k) ];
+                    out = out + [ v(i, k) <= obj.max(i) ];
                 end
             end
         end
