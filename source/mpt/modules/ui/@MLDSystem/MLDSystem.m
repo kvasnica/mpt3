@@ -270,8 +270,26 @@ classdef MLDSystem < AbstractSystem
 				d = xopt.xopt(1:obj.nd);
 				z = xopt.xopt(obj.nd+1:end);
 				if feasible
-					xn = obj.A*x0 + obj.B1*u + obj.B2*d + obj.B3*z + obj.B5;
-					y = obj.C*x0 + obj.D1*u + obj.D2*d + obj.D3*z + obj.D5;
+                    xn = obj.A*x0 + obj.B5;
+                    if ~isempty(obj.B1);
+                        xn = xn + obj.B1*u;
+                    end
+                    if ~isempty(obj.B2)
+                        xn = xn + obj.B2*d;
+                    end
+                    if ~isempty(obj.B3)
+                        xn = xn + obj.B3*z;
+                    end
+                    y = obj.C*x0 + obj.D5;
+					if ~isempty(obj.D1)
+                        y = y + obj.D1*u;
+                    end
+                    if ~isempty(obj.D2)
+                        y = y + obj.D2*d;
+                    end
+                    if ~isempty(obj.D3)
+                        y = y + obj.D3*z;
+                    end
 				end
 			end
 			
