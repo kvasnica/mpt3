@@ -4,7 +4,12 @@ function [worked, msg] = run_in_caller(statement)
 % 'msg' (if any)
 
 try
-	evalin('caller', statement);
+    if ischar(statement)
+        evalin('caller', statement);
+    else
+        % statement is a function handle
+        feval(statement);
+    end
 	worked = true;
 	msg = '';
 catch
