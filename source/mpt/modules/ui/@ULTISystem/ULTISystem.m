@@ -503,9 +503,10 @@ classdef ULTISystem < LTISystem
                 
                 if obj.nu==0
                     % autonomous systems
-                    Z = (options.X-(obj.E*options.D))*A;
+                    Z = invAffineMap(options.X-(obj.E*options.D), A);
                 else
-                    Z = ((options.X-(obj.E*options.D))+((-B)*options.U))*A;
+                    % non-autonomous systems
+                    Z = invAffineMap((options.X-(obj.E*options.D))+((-B)*options.U), A);
                 end
             end
             
