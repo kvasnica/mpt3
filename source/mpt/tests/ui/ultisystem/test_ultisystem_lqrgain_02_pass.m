@@ -9,8 +9,8 @@ sys.u.penalty = QuadFunction(1.5);
 [K, P] = sys.LQRGain();
 Kexp = -0.883035394883899;
 Pexp = 11.3245553180111;
-assert(norm(K-Kexp)<1e-6);
-assert(norm(P-Pexp)<1e-6);
+assert(norm(K-Kexp)<1e-4);
+assert(norm(P-Pexp)<1e-4);
 assert(max(abs(eig(A+B*K)))<1); % check stability
 
 % different weights
@@ -21,8 +21,8 @@ sys.u.penalty = QuadFunction(1);
 [K, P] = sys.LQRGain();
 Kexp = -0.618031461495362;
 Pexp = 1.61803398806263;
-assert(norm(K-Kexp)<1e-6);
-assert(norm(P-Pexp)<1e-6);
+assert(norm(K-Kexp)<1e-4);
+assert(norm(P-Pexp)<1e-4);
 assert(max(abs(eig(A+B*K)))<1); % check stability
 
 % same result for disturbances, which should be ignored
@@ -34,8 +34,8 @@ sys.d.max = 1;
 [K, P] = sys.LQRGain();
 Kexp = -0.618031461495362;
 Pexp = 1.61803398806263;
-assert(norm(K-Kexp)<1e-6);
-assert(norm(P-Pexp)<1e-6);
+assert(norm(K-Kexp)<1e-4);
+assert(norm(P-Pexp)<1e-4);
 
 % parametric uncertainty
 A = {1, 2};
@@ -46,8 +46,8 @@ sys.u.penalty = QuadFunction(1);
 [K, P] = sys.LQRGain();
 Kexp = -0.374999999998982;
 Pexp = 4.86666665350617;
-assert(norm(K-Kexp)<1e-6);
-assert(norm(P-Pexp)<1e-6);
+assert(norm(K-Kexp)<1e-4);
+assert(norm(P-Pexp)<1e-4);
 % check that all combinations give a stable system
 for ia = 1:numel(A)
     for ib = 1:numel(B)

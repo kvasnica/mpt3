@@ -30,8 +30,8 @@ sys = ULTISystem('A', A, 'B', B);
 [K, P] = sys.stabilizingGain();
 Kexp = -0.366592797156274;
 Pexp = 1e-4;
-assert(norm(K-Kexp)<1e-6);
-assert(norm(P-Pexp)<1e-6);
+assert(norm(K-Kexp)<1e-4);
+assert(norm(P-Pexp)<1e-4);
 % check that all combinations give a stable system
 for ia = 1:numel(A)
     for ib = 1:numel(B)
