@@ -2232,7 +2232,9 @@ for i=1:length(regions)
     
     % clear regions outside of the range first
     for j=1:length(adj_list{i})
-        adj_list{i}{j}(adj_list{i}{j}>length(regions)) = [];
+        if ~isempty(adj_list{i}{j})
+            adj_list{i}{j}(adj_list{i}{j}>length(regions)) = [];
+        end
     end
     
     % check each facet
