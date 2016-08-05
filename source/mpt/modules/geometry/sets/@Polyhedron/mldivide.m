@@ -249,7 +249,7 @@ elseif R.isFullDim() || (~isempty(R.Ae) && ~isempty(Y.Ae) && ...
 		end
 	end
 		
-elseif rank([R.He; Y.He]) > max(size(R.He, 1), size(Y.He, 1))
+elseif rank([R.He; Y.He], MPTOPTIONS.zero_tol) > max(size(R.He, 1), size(Y.He, 1))
 	% both are lower dimensional, but their affine hulls do not intersect,
 	% hence Y\R=Y
 	res = Polyhedron(Y);
