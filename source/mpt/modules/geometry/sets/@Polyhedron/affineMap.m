@@ -52,15 +52,26 @@ if H.hasVRep
 else
   
   if size(H.Ae,1) > 0
-    % Remove equalities
-    %opt = Opt(H); opt.pF = T'; opt.f = zeros(size(T,2),1);
-    opt = Opt('P',H,'pF',T','f',zeros(size(T,2),1));
-    opt = opt.eliminateEquations;
-    
-    % Compute the mapping for the new representation of the polyhedron
-    Pnew = Polyhedron('H', [opt.A opt.b]).affineMap(opt.pF',method) + T*opt.recover.th(:,end);
-    
-    return
+      
+      if size(H.A, 1)==0
+          % edge case: no inequalities
+          % simple solution if "T" is invertible
+          if size(T, 1)==size(T, 2) && abs(det(T)) > MPTOPTIONS.abs_tol
+              Pnew = Polyhedron('Ae', H.Ae*inv(T), 'be', H.be);
+          else
+              % TODO: support lower-dimensional mappings
+              error('Corner case: no ineqaulities. The map must be square and invertible.');
+          end
+          
+      else
+          % Remove equalities
+          opt = Opt('P',H,'pF',T','f',zeros(size(T,2),1));
+          opt = opt.eliminateEquations;
+          
+          % Compute the mapping for the new representation of the polyhedron
+          Pnew = Polyhedron('H', [opt.A opt.b]).affineMap(opt.pF',method) + T*opt.recover.th(:,end);
+      end
+      return
   end
 
   % Compute permutation of T s.t. P*y = [T1 T2; T3 T4]*[xr;xn] with rank T1 = rank T and Q*x=[xr;xn]
