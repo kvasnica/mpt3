@@ -545,7 +545,7 @@ classdef Polyhedron < ConvexSet
 			answer = false(size(P));
 			for i = 1:numel(P)
 				% note that conversion to H-rep will be performed!
-				answer(i) = isempty(null([P.A; P.Ae]));
+				answer(i) = isempty(null([P(i).A; P(i).Ae]));
 			end
 		end
 		
