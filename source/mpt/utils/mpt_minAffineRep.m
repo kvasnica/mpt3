@@ -6,6 +6,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
+nHe = He;
 if size(He,1) == 0
     return
 end
