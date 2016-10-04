@@ -87,13 +87,13 @@ if obj.irredundantHRep == false
 	% TODO: put these into MPTOPTIONS.modules.geometry.polyhedron.reduce
 	bounding_box = true;
 	rayshooting = true;
-	
-	if bounding_box
+    
+    H = obj.H_int;
+    He = obj.He_int;
+	if bounding_box && ~isempty(H)
 		% -1 => Redundant
 		%  0 => Unknown
 		%  1 => Irredundant
-		H = obj.H_int; 
-		He = obj.He_int;
 		irr = zeros(size(H,1),1);
 		
 		A = H(:, 1:end-1);
