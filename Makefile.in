@@ -88,22 +88,24 @@ distcode: txt
 	@rm -rf $(RELEASEDIR)/$(MPTNAME)
 
 # upload mpt on the web
-uploadcode: 
+uploadcode:
 	@test -f $(RELEASEDIR)/$(MPTNAME).tgz || $(MAKE) distcode
 ifeq ($(UNSTABLE),1)
 	@echo "Uploading $(MPTNAME).tgz to mpt@autserv01:~/public_html/tbx/pool/mpt3/unstable"
 	@scp $(RELEASEDIR)/$(MPTNAME).tgz mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3/unstable/
+	@ssh mpt@autserv01.ee.ethz.ch "chmod a+r /home/mpt/public_html/tbx/pool/mpt3/unstable/*"
 	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/unstable/$(MPTNAME).tgz"
 else
 	@echo "Uploading $(MPTNAME).tgz to mpt@autserv01:~/public_html/tbx/pool/mpt3/"$(MODVERSION)
 	@# create directory if it does not exist
-	@mkdir -p "$(RELEASEDIR)/$(MODVERSION)" 
+	@mkdir -p "$(RELEASEDIR)/$(MODVERSION)"
 	@# move the file to directory
 	@mv $(RELEASEDIR)/$(MPTNAME).tgz "$(RELEASEDIR)/$(MODVERSION)/"
 	@# upload the directory
 	@scp -r $(RELEASEDIR)/$(MODVERSION) mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3/
+	@ssh mpt@autserv01.ee.ethz.ch "chmod a+r /home/mpt/public_html/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
 	@# move the file back from the directory
-	@mv "$(RELEASEDIR)/$(MODVERSION)/$(MPTNAME).tgz" "$(RELEASEDIR)/" 
+	@mv "$(RELEASEDIR)/$(MODVERSION)/$(MPTNAME).tgz" "$(RELEASEDIR)/"
 	@# remove the auxiliary directory
 	@rm -r "$(RELEASEDIR)/$(MODVERSION)"
 	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
