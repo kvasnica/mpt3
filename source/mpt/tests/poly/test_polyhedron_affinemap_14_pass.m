@@ -12,15 +12,20 @@ assert(EoD==D);
 
 % map must be square
 T = [1 0];
-[~, msg] = run_in_caller('Q = T*D');
-asserterrmsg(msg, 'Corner case: no ineqaulities. The map must be square and invertible.');
+Q = T*D;
+He_exp = [1 0];
+assert(norm(Q.He-He_exp)<1e-6);
+assert(isempty(Q.H));
 
-% map must be invertible
+% square map, not invertible
 T = [1 0; 0 0];
-[~, msg] = run_in_caller('Q = T*D');
-asserterrmsg(msg, 'Corner case: no ineqaulities. The map must be square and invertible.');
+Q = T*D;
+assert(Q.Dim==2);
+assert(isempty(Q.H));
+He_exp = [1 0 0; 0 1 0];
+assert(norm(Q.He-He_exp)<1e-6);
 
-% invertible map
+% square invertible map
 T = [2 0; 0 0.5];
 Q = T*D;
 He_exp = [0 2 0;0.5 0 0];

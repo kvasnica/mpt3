@@ -55,12 +55,19 @@ else
       
       if size(H.A, 1)==0
           % edge case: no inequalities
-          % simple solution if "T" is invertible
           if size(T, 1)==size(T, 2) && abs(det(T)) > MPTOPTIONS.abs_tol
+              % simple solution if "T" is invertible
               Pnew = Polyhedron('Ae', H.Ae*inv(T), 'be', H.be);
           else
-              % TODO: support lower-dimensional mappings
-              error('Corner case: no ineqaulities. The map must be square and invertible.');
+              % lower-dimensional mapping, solution as suggester by Magnus
+              % Nilsson
+              nT = size(T,1);
+              p = H.Ae\H.be; % particular solution to Ae*d=be
+              Ae = zeros(nT); % a bit ugly way to avoid empty matrices for Ae when it should be zero matrices.
+              Ae = [null([T*null(H.Ae)]')';Ae]; % Concatenate with the zero matrix...
+              Ae = Ae(1:nT, :);                 % ...and remove superfluous rows.
+              be = Ae*T*p;
+              Pnew = Polyhedron('Ae', Ae, 'be', be);
           end
           
       else
