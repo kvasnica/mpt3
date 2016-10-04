@@ -529,7 +529,9 @@ classdef Polyhedron < ConvexSet
             end
 
 			% Compute a minimum representation for the affine set
-			obj.minAffineRep;
+            if ~isempty(obj.He_int)
+                obj.He_int = mpt_minAffineRep(obj.He_int);
+            end
 			
 		end
 
