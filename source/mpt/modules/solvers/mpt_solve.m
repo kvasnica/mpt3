@@ -39,7 +39,7 @@ elseif isstruct(Sin) && isfield(Sin, 'quickqp') && Sin.quickqp
     return
 end
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 % assuming that the problem is defined in a structure S of Opt class
 % 

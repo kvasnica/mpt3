@@ -588,8 +588,8 @@ classdef PWASystem < AbstractSystem
             % Outputs:
             %     L: PolyUnion object with the Lyapunov function
             
+            narginchk(2, 2);
             error(obj.rejectArray());
-            error(nargchk(2, 2, nargin));
             if obj.nu>0
                 error('This method only supports autonomous systems.');
             end

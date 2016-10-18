@@ -20,7 +20,7 @@ function toC(obj, function_name, file_name, tie_break_fcn)
 global MPTOPTIONS
 
 % argument checks
-error(nargchk(2, 4, nargin));
+narginchk(2, 4);
 
 if ~ischar(function_name)
     error('The function name must be given as a string.');

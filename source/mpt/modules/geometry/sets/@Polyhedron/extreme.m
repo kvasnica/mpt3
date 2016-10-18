@@ -26,7 +26,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2, 2, nargin));
+narginchk(2, 2);
 
 if numel(obj)>1
 	% deal with arrays

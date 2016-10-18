@@ -3,7 +3,7 @@ function ts = validate_marker(s)
 % checks the validity of marker
 %
 
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 if ~ischar(s)
     error('Argument must be a char.');

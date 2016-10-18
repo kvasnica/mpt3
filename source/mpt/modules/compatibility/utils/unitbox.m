@@ -53,7 +53,7 @@ function P=unitbox(dimension, boxsize)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 if dimension<1,
     error('unitbox: dimension of the hypercube must be greater zero!');

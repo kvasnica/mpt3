@@ -43,7 +43,7 @@ if isempty(MPTOPTIONS)
 	MPTOPTIONS=mptopt;
 end
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 % This function acts as a wrapper for the Opt class and delegates solving
 % the parametric program to mpt_solvemp().

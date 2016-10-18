@@ -6,7 +6,7 @@ function ts = validate_color(s)
 % vector defining RGB colors according to Matlab syntax.
 %
 
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 % prepare output
 ts = true;

@@ -33,7 +33,7 @@ function [fval, feasible] = feval(obj, x, function_name)
 %       stored column-wise), make Union/feval to behave similarly
 
 %% basic error checks
-error(nargchk(2, 3, nargin));
+narginchk(2, 3);
 if nargin==2
 	function_name = '';
 end

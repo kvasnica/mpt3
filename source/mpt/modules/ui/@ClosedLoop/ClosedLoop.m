@@ -42,7 +42,7 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 			% Simulates the closed-loop system for a given number of steps
 			%
 			
-			error(nargchk(3, Inf, nargin));
+			narginchk(3, Inf);
 			error(validate_vector(x0, obj.system.nx, 'initial state'));
 
 			% internal helper to derimine if "string" ends up with "part"

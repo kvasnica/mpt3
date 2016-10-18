@@ -232,7 +232,7 @@ classdef LTISystem < AbstractSystem
 				MPTOPTIONS = mptopt;
 			end
 			
-			error(nargchk(3, 3, nargin, 'struct'))
+			narginchk(3, 3);
 			if ~ischar(type)
 				error('The first input must be a string.');
 			end

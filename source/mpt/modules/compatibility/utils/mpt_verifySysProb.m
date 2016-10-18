@@ -54,7 +54,7 @@ function [sysStruct,probStruct]=mpt_verifySysProb(sysStruct,probStruct,Options)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(2,3,nargin));
+narginchk(2, 3);
 
 global mptOptions;
 

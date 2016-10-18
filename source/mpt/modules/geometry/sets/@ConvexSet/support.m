@@ -17,7 +17,7 @@ function supp = support(obj, x)
 %
 
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 % x can be an array of points put in a matrix
 validate_realmatrix(x);

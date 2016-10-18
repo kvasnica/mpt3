@@ -3,7 +3,7 @@ function obj=setHandle(obj, h)
 % assigns function handle to a "Function" object 
 %
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 if numel(h)~=numel(obj)
     error('There must be %d handles present in a cell.',numel(obj));

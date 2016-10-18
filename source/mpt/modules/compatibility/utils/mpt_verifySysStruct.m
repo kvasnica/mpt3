@@ -53,7 +53,7 @@ function sysStruct=mpt_verifySysStruct(sysStruct,Options)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 global mptOptions;
 

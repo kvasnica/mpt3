@@ -3,7 +3,7 @@ function I = orderForPlot(v, n)
 % normal n s.t. they form a closed surface as a patch object.
 %
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 validate_realmatrix(v);
 validate_realvector(n);

@@ -15,7 +15,7 @@ if isempty(MPTOPTIONS)
    MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,4,nargin));
+narginchk(2, 4);
 
 if nargin < 3
     [ts, iP, iQ] = isNeighbor(P,Q);

@@ -3,7 +3,7 @@ function Q = getFacet(P, varargin)
 % Returns the facet of the polyhedron P for given inequality index. 
 %
 
-error(nargchk(1, 2, nargin));
+narginchk(1, 2);
 
 % empty array
 if numel(P)==0

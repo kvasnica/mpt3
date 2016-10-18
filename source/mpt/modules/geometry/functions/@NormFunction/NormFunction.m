@@ -44,7 +44,7 @@ classdef NormFunction < Function
 				return
 			end
 			
-			error(nargchk(1,2,nargin));
+			narginchk(1, 2);
 			
 			% validation of arguments is done in setters
 			obj.type = type;

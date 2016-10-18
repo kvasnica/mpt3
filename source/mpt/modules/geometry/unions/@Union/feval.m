@@ -120,7 +120,7 @@ function [fval, feasible, idx, tie_value] = feval(obj, x, varargin)
 % in sets specified by the "indices" option, hence skipping expensive
 % point location.
 
-error(nargchk(2, Inf, nargin));
+narginchk(2, Inf);
 
 fval = [];
 feasible = false;

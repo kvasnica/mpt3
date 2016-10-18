@@ -23,7 +23,7 @@ function S = slice(P, dims, values, varargin)
 
 global MPTOPTIONS
 
-error(nargchk(2, Inf, nargin));
+narginchk(2, Inf);
 if nargin<3
 	values = zeros(size(dims));
 end

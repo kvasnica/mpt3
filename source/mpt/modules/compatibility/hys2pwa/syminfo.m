@@ -34,7 +34,7 @@ if nargin == 0
    return
 end  
 
-error(nargchk(1,5,nargin));
+narginchk(1, 5);
 
 % ==============================================================================
 % Define optional arguments

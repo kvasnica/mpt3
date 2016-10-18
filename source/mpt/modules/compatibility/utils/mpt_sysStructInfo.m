@@ -59,7 +59,7 @@ function [nx,nu,ny,ndyn,nbool,ubool,intInfo] = mpt_sysStructInfo(sysStruct)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 if ~isstruct(sysStruct),
     error('mpt_sysStructInfo: Input argument must be a sysStruct structure!');

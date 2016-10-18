@@ -51,7 +51,7 @@ classdef BinTreePolyUnion < PolyUnion
 			end
 			
 			%% validation
-			error(nargchk(1, 1, nargin));
+			narginchk(1, 1);
 			if ~isa(in, 'PolyUnion') || numel(in)~=1
 				error('Input must be a single PolyUnion object.');
 			elseif in.Num<1
@@ -90,7 +90,7 @@ classdef BinTreePolyUnion < PolyUnion
 			% Point location using binary search trees
 
 			%% validation and error checks
-			error(nargchk(2, 2, nargin));
+			narginchk(2, 2);
 			% use obj.forEach(@(u) u.contains(x)) to evaluate arrays
 			error(obj.rejectArray());
 			isin = false;
@@ -130,7 +130,7 @@ classdef BinTreePolyUnion < PolyUnion
 			
 			global MPTOPTIONS
 			
-			error(nargchk(2, 3, nargin));
+			narginchk(2, 3);
             error(obj.rejectArray());
             
             if ~ischar(function_name)

@@ -8,7 +8,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 if ~isa(diagnostic,'struct')
     error('Input argument must be structure - diagnostic info about the solution from YALMIP.');

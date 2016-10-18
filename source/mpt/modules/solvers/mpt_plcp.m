@@ -2216,7 +2216,7 @@ if isempty(MPTOPTIONS)
 end
 
 validate_polyhedron(regions);
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 if ~isa(adj_list,'cell')
     error('Provided adjacency list must be in a CELL format.');

@@ -32,7 +32,7 @@ function toPython(obj, filename, function_to_export, tiebreak)
 global MPTOPTIONS
 
 %% parsing
-error(nargchk(4, 4, nargin));
+narginchk(4, 4);
 
 %% validation
 if sum([obj.Num])==0

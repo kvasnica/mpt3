@@ -39,7 +39,7 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
 	  function obj = addFunction(obj, F, FuncName)
 		  % adds a function to the object
 		  
-		  error(nargchk(3, 3, nargin));
+		  narginchk(3, 3);
 		  if numel(obj)==1
 			  % check domain
 			  if (isa(F, 'AffFunction') || isa(F, 'QuadFunction')) && ...
@@ -187,7 +187,7 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
 		  % which only contains the first "n" rows of the original
 		  % function.
 		  
-		  error(nargchk(3, 3, nargin));
+		  narginchk(3, 3);
 		  [~, errmsg] = obj.validateFunctionName(FuncName);
 		  error(errmsg);
 		  
@@ -242,7 +242,7 @@ classdef ConvexSet < ConvexSetInterface & IterableBehavior & matlab.mixin.Copyab
           % DO NOT USE THIS METHOD UNLESS YOU PERFECTLY KNOW WHAT YOU ARE DOING          
           %
           
-          error(nargchk(3,3,nargin));
+          narginchk(3, 3);
           
           if ~ischar(name)
               error('Name must be a string.');

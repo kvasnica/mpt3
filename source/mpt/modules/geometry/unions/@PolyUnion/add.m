@@ -8,7 +8,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 if ~isa(C,'Polyhedron')
     error('Argument must be a Polyhedron object.');

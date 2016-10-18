@@ -9,7 +9,7 @@ if isempty(MPTOPTIONS)
 	MPTOPTIONS=mptopt;
 end
 
-error(nargchk(1,4,nargin));
+narginchk(1, 4);
 
 default_index = 1;
 default_colororder = 'fixed';

@@ -3,7 +3,7 @@ function ts = validate_linestyle(s)
 % checks the validity of linestyle
 %
 
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 if ~ischar(s)
     error('Argument must be a char.');

@@ -115,7 +115,7 @@ function [Pn,Fi,Gi,activeConstraints,Phard,details]=mpt_mplp_26(Matrices,Options
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 if nargin<2
 	Options = [];
 end
@@ -289,7 +289,7 @@ function [Pn,Fi,Gi,activeConstraints, Phard,details]=mpt_mplp_ver7(Matrices,Opti
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 global mptOptions;
 if ~isstruct(mptOptions),

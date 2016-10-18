@@ -35,7 +35,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 validate_realmatrix(x);
 
 if numel(obj)==0

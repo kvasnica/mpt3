@@ -1069,7 +1069,7 @@ classdef Polyhedron < ConvexSet
 		function S = emptySet(dim)
 			% Polyhedron.emptySet(n) constructs an empty set in R^n
 
-			error(nargchk(1, 1, nargin));
+			narginchk(1, 1);
 			S = Polyhedron(zeros(0, dim), zeros(0, 1));
 			S.Internal.Empty = true;
 			S.Internal.FullDim = false;
@@ -1093,7 +1093,7 @@ classdef Polyhedron < ConvexSet
 		function B = unitBox(dim)
 			% Polyhedron.unitBox(n) constructs a unit box in "n" dimensions
 			
-			error(nargchk(1, 1, nargin));
+			narginchk(1, 1);
 			B = Polyhedron('lb', -ones(dim, 1), 'ub', ones(dim, 1), ...
 				'irredundantHRep', true);
 		end

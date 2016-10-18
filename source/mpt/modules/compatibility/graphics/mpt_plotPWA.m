@@ -7,7 +7,7 @@ function handle=mpt_plotPWA(PA,Fi,Gi,Options)
 
 mpt_obsoleteFunction;
 
-error(nargchk(3,4,nargin));
+narginchk(3, 4);
 
 if ~isa(PA,'polytope')
     error('mpt_plotPWA: First input argument MUST be a polytope');

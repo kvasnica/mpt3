@@ -47,7 +47,7 @@ function [Gret, keptrows]=mpt_getFullRankSubset(Gt,AllSubsets)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 if(nargin<2 | isempty(AllSubsets))
     AllSubsets=0;

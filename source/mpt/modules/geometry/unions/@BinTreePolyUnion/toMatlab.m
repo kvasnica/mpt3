@@ -43,7 +43,7 @@ function toMatlab(obj, filename, function_to_export, varargin)
 global MPTOPTIONS
 
 %% parsing
-error(nargchk(3, Inf, nargin));
+narginchk(3, Inf);
 
 %% validation
 if sum([obj.Num])==0

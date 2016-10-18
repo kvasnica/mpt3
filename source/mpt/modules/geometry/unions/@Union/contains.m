@@ -18,7 +18,7 @@ function [isin, inwhich, closest] = contains(U, x, fastbreak)
 %            expensive, do not ask for the third output unless you really
 %            need it.
 
-error(nargchk(2, 3, nargin));
+narginchk(2, 3);
 % use obj.forEach(@(u) u.contains(x)) to evaluate arrays
 error(U.rejectArray());
 

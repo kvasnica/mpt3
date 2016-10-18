@@ -42,7 +42,7 @@ function tf = contains(P, x, fastbreak)
 
 global MPTOPTIONS
 
-error(nargchk(2, 3, nargin));
+narginchk(2, 3);
 if ~( isnumeric(x) || isa(x, 'Polyhedron') )
 	error('The input must be a real vector/matrix or a Polyhedron object.');
 end

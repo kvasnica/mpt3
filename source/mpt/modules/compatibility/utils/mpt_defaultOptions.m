@@ -45,7 +45,7 @@ function Options = mpt_defaultOptions(Options, varargin)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(2,Inf,nargin));
+narginchk(2, Inf);
 
 nargs = length(varargin);
 if rem(nargs, 2)~=0,

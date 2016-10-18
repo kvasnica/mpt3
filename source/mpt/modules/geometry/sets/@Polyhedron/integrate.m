@@ -18,7 +18,7 @@ function I = integrate(P, function_name)
 %
 % http://www-sop.inria.fr/members/Konstantin.Avratchenkov/pubs/simplex.ps
 
-error(nargchk(1, 2, nargin));
+narginchk(1, 2);
 if nargin<2
 	function_name = '';
 end

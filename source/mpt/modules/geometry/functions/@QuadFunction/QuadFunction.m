@@ -44,7 +44,7 @@ classdef QuadFunction < Function
 				MPTOPTIONS = mptopt;
 			end
 			
-			error(nargchk(1,4,nargin));
+			narginchk(1, 4);
 			
 			% check H
 			Hm = varargin{1};
@@ -164,7 +164,7 @@ classdef QuadFunction < Function
 			% new function fn=z'*Hn*z + Fn*z + gn where the "dims"
 			% coordinates of "x" are replaced by fixed "values".
 
-			error(nargchk(3, 3, nargin));
+			narginchk(3, 3);
 			
 			% validation
 			for i=1:numel(dims)

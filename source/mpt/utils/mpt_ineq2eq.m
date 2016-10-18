@@ -64,7 +64,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,3,nargin));
+narginchk(2, 3);
 if nargin<3    
     % set tolerance if not defined
     tol = MPTOPTIONS.abs_tol;

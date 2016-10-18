@@ -35,7 +35,7 @@ classdef AffFunction < Function
 			%
 			% for more details, type "help AffFunction"
 			
-			error(nargchk(1,3,nargin));
+			narginchk(1, 3);
 			
 			% check F
 			if ~isa(F, 'sdpvar')
@@ -123,7 +123,7 @@ classdef AffFunction < Function
 			% with
 			%   keep = setdiff(1:nx, dims)
 
-			error(nargchk(3, 3, nargin));
+			narginchk(3, 3);
 			
 			% validation
 			for i=1:numel(dims)

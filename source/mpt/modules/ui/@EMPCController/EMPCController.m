@@ -242,7 +242,7 @@ classdef EMPCController < AbstractController
 			%  'separation': Saturation-based separation
 			%                (see SeparationController)
 			
-			error(nargchk(1, Inf, nargin));
+			narginchk(1, Inf);
 			if nargin < 2
 				method = 'greedy';
 			end

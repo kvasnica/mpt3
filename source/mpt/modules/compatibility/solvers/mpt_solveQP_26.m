@@ -76,7 +76,7 @@ function [xopt,lambda,how,exitflag,objqp]=mpt_solveQP(H,f,A,B,Aeq,Beq,x0,solver,
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(4,10,nargin));
+narginchk(4, 10);
 
 global mptOptions;
 

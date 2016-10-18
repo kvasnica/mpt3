@@ -19,7 +19,7 @@ if isempty(MPTOPTIONS)
     MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 % check vector x
 validate_realvector(x);

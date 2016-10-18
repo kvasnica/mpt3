@@ -53,7 +53,7 @@ function probStruct=mpt_verifyProbStruct(probStruct,Options)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 global mptOptions;
 

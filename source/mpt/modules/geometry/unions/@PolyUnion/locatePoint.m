@@ -12,7 +12,7 @@ function [index, details] = locatePoint(U,x)
 %        - details with the number of operations needed
 %
 
-error(nargchk(2, 2, nargin));
+narginchk(2, 2);
 % use U.forEach(@(u) u.contains(x)) to evaluate arrays
 error(U.rejectArray());
 

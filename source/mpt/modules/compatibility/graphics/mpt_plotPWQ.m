@@ -7,7 +7,7 @@ function h_all=mpt_plotPWQ(Pn,Ai,Bi,Ci,meshgridpoints,Options)
 
 mpt_obsoleteFunction;
 
-error(nargchk(4,6,nargin));
+narginchk(4, 6);
 
 if ~isa(Pn,'polytope')
     error('mpt_plotPWQ: First input argument MUST be a polytope');

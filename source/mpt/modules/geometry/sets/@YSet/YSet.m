@@ -45,7 +45,7 @@ classdef YSet < ConvexSet
 		  return
 	  end
 	  
-      error(nargchk(2,3,nargin));
+      narginchk(2, 3);
       
       if ~isvector(vars)
           error('Variables must be provided as vectors only.');

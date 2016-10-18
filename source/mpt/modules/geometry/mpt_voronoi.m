@@ -21,7 +21,7 @@ function [V, cells] = mpt_voronoi(S, varargin)
 %      empty cells)
 
 % at least one input please
-error(nargchk(1, Inf, nargin));
+narginchk(1, Inf);
 if ~isa(S, 'double') || isempty(S)
 	error('First input must be a non-empty set of points.');
 end

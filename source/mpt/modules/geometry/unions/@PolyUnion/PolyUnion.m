@@ -142,7 +142,7 @@ classdef PolyUnion < Union
 		  
 		  %% validation
 		  error(obj.rejectArray());
-		  error(nargchk(2, Inf, nargin));
+		  narginchk(2, Inf);
 		  if ~ischar(function_name)
 			  error('The function name must be a string.');
 		  elseif ~obj.hasFunction(function_name)
@@ -244,7 +244,7 @@ classdef PolyUnion < Union
 		  %
 		  % For more information see Polyhedron/slice
 		  
-		  error(nargchk(3, 3, nargin));
+		  narginchk(3, 3);
           error(obj.rejectArray());
 		  sliced_set = obj.Set.slice(dims, values);
 		  new = PolyUnion(sliced_set);
@@ -345,7 +345,7 @@ classdef PolyUnion < Union
           
           global MPTOPTIONS
           
-          error(nargchk(2, Inf, nargin));
+          narginchk(2, Inf);
           assert(isa(P1, 'PolyUnion'), 'The first input must be a PolyUnion object.');
           assert(isa(P2, 'PolyUnion'), 'The second input must be a PolyUnion object.');
           error(P1.rejectArray());

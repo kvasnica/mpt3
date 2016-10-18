@@ -657,7 +657,7 @@ classdef mptopt < handle
             %
             % Return a random color from the MPT colormap
             %
-            error(nargchk(0,0,nargin));
+            narginchk(0, 0);
             a = mptopt;
             i = ceil(rand*size(a.colormap,1));
             col = a.colormap;
@@ -721,13 +721,13 @@ classdef mptopt < handle
         
         function y = properties
             % returns a list of properties for "mptopt" class
-            error(nargchk(0,0,nargin));
+            narginchk(0, 0);
             y = properties('mptopt');
         end
         
         function y = constant_properties
             % returns a list of constant properties for "mptopt" class
-            error(nargchk(0,0,nargin));
+            narginchk(0, 0);
             m = ?mptopt;
             y = [];
             for i=1:length(m)

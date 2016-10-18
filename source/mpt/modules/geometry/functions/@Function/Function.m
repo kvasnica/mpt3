@@ -63,7 +63,7 @@ classdef Function < handle & IterableBehavior
 		function new = slice(obj, dims, values)
 			% Slice a function through given coordinates
 
-			error(nargchk(3, 3, nargin));
+			narginchk(3, 3);
 			
 			% A very general implementation is to restore the vector "x" by
 			% x(dims)=values, x(keep)=z, where "keep" are the indices which
@@ -96,7 +96,7 @@ classdef Function < handle & IterableBehavior
 			% YOU ARE DOING
 			%
 			
-			error(nargchk(3,3,nargin));
+			narginchk(3, 3);
 			
 			if ~ischar(name)
 				error('Name must be a string.');

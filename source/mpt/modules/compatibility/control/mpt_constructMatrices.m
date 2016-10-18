@@ -137,7 +137,7 @@ function [G,W,E,H,F,Y,Cf,Cx,Cc,symmetric,bndA,bndb,Pinvset]=mpt_constructMatrice
 
 mpt_obsoleteFunction;
 
-error(nargchk(2,4,nargin));
+narginchk(2, 4);
 
 global mptOptions;
 if ~isstruct(mptOptions),
@@ -1555,7 +1555,7 @@ function [A,B,C,D,Q,R,ymin,ymax,umin,umax,dumin,dumax,bndA,bndb]=mpt_evalSystem(
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 if ~isfield(sysStruct,'verified'),
     sysStruct=mpt_verifySysStruct(sysStruct);

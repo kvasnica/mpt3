@@ -85,7 +85,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 	  function obj = addFunction(obj, fun, FuncName)
 		  % adds a function to each member of the union
 		  
-		  error(nargchk(3, 3, nargin));
+		  narginchk(3, 3);
 		  
 		  % attach the function to each element of the set
 		  for i = 1:numel(obj)
@@ -104,7 +104,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 	  function U = getFunction(obj, FuncName)
 		  % returns function indexed by the string FuncName
 
-		  error(nargchk(2, 2, nargin));
+		  narginchk(2, 2);
 		  for i = 1:numel(obj)
 			  % make sure the function exists
 			  if any(~obj(i).hasFunction(FuncName))
@@ -128,7 +128,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 	  function obj = removeFunction(obj, FuncNames)
 		  % removes function indexed by the string FuncName
 
-		  error(nargchk(2, 2, nargin));
+		  narginchk(2, 2);
 		  % make a copy before removing function(s)
 		  for i = 1:numel(obj)
 			  % make sure the function exists
@@ -210,7 +210,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  %   queried, and "m" is the number of unions. then out(i, j)=true
 		  %   if the j-th union contains FuncName{i}
 
-		  error(nargchk(2, 2, nargin));
+		  narginchk(2, 2);
 		  out = []; % default output for empty arrays
 		  if numel(obj)==1 && numel(obj.Set)>0
 			  if iscell(obj.Set)
@@ -295,7 +295,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
 		  
 		  %% validation
 		  error(obj.rejectArray());
-		  error(nargchk(2, Inf, nargin));
+		  narginchk(2, Inf);
 		  if ~ischar(function_name)
 			  error('The function name must be a string.');
 		  elseif ~obj.hasFunction(function_name)
@@ -336,7 +336,7 @@ classdef Union < handle & IterableBehavior & matlab.mixin.Copyable
           % DO NOT USE THIS METHOD UNLESS YOU PERFECTLY KNOW WHAT YOU ARE DOING
           %
           
-          error(nargchk(3,3,nargin));
+          narginchk(3, 3);
           
           if ~ischar(name)
               error('Name must be a string.');

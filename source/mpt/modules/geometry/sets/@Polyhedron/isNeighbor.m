@@ -14,7 +14,7 @@ if isempty(MPTOPTIONS)
    MPTOPTIONS = mptopt;
 end
 
-error(nargchk(2,4,nargin));
+narginchk(2, 4);
 
 validate_polyhedron(Q);
 

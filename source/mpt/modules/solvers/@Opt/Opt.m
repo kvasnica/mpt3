@@ -147,7 +147,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             
             global MPTOPTIONS
             
-            error(nargchk(1, 2, nargin));
+            narginchk(1, 2);
             if ~obj.isParametric
                 error('The problem is not parametric.');
             end

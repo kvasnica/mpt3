@@ -16,7 +16,7 @@ function ret = distance(obj, x)
 %     y - the point inside this Set that is the closest to x
 %
 
-error(nargchk(2,2,nargin));
+narginchk(2, 2);
 
 % if obj is an array, put the results inside an array
 if numel(obj)>1

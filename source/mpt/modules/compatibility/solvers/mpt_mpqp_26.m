@@ -110,7 +110,7 @@ function [Pn,Fi,Gi,activeConstraints,Phard,details]=mpt_mpqp(Matrices,Options)
 %
 % ---------------------------------------------------------------------------
 
-error(nargchk(1,2,nargin));
+narginchk(1, 2);
 
 nu=size(Matrices.H,1);
 nx=size(Matrices.E,2);

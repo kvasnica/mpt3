@@ -4,7 +4,7 @@ function R = mpt_solvemp(S)
 %
 
 % input arguments is one object of OPT class
-error(nargchk(1,1,nargin));
+narginchk(1, 1);
 
 if ~isa(S,'Opt')
     error('mpt_solvemp: Input argument must be an "Opt" class.');
