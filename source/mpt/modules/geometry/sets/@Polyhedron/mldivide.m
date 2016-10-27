@@ -187,6 +187,10 @@ elseif R.isEmptySet() || ~Y.doesIntersect(R)
 	
 end
 
+% identify implicit equalities
+Y.minAffineRep();
+R.minAffineRep();
+
 Y.minHRep();
 R.minHRep();
 res = [];
@@ -264,7 +268,7 @@ else
 	
 	% project R and Y on the fully-dimensional null space of R
 	F = null(R.Ae);
-	x0 = R.interiorPoint.x;
+    x0 = R.Ae\R.be;
 	Y_Z = Polyhedron('H', [Y_A*F, Y_b-Y_A*x0], 'He', [Y.Ae*F, Y.be-Y.Ae*x0]);
 	R_Z = Polyhedron(R_A*F, R_b-R_A*x0);
 
