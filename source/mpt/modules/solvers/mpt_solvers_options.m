@@ -574,7 +574,8 @@ options.quadprog.TolFun = 1e-10;
 options.quadprog.TolX = 1e-10;
 % Termination tolerance on X
 
-options.quadprog.Algorithm = 'active-set';
+options.quadprog.Algorithm = 'trust-region-reflective';
+%options.quadprog.Algorithm = 'interior-point-convex';
 % Algorithm to use
 
 options.quadprog.LargeScale='off';
