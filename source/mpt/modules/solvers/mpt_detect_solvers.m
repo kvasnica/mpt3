@@ -40,7 +40,13 @@ parametric_solvers_list = {...
     {'MPQP',{'mpt_mpqp.m'},20},...
     {'MPLP',{'mpt_mplp.m'},30},...
     {'ENUMPLCP',{'mpt_enum_plcp.m'},40},...
+    {'ENUMPQP',{'mpt_enum_pqp.m'},50},...
+    {'RLENUMPQP',{'mpt_enum_pqp.m'},60},...
     };
+
+parametric_solvers_types.LP = {'MPLP','PLCP','ENUMPLCP'};
+parametric_solvers_types.QP = {'MPQP','PLCP','ENUMPLCP','ENUMPQP','RLENUMPQP'};
+parametric_solvers_types.LCP = {'PLCP','ENUMPLCP'};
 
 % found solvers as strings
 disp('MPT searches for solvers on the path ...');
@@ -183,9 +189,9 @@ if isempty(solvers.LCP)
 end
 
 % sort parametric solvers according to type of problem they solve
-solvers.parametric.LP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPLP','PLCP','ENUMPLCP'}),1);
-solvers.parametric.QP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'MPQP','PLCP','ENUMPLCP'}),1);
-solvers.parametric.LCP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),{'PLCP','ENUMPLCP'}),1);
+solvers.parametric.LP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),parametric_solvers_types.LP),1);
+solvers.parametric.QP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),parametric_solvers_types.QP),1);
+solvers.parametric.LCP = parametric_found_solvers(ismember(parametric_found_solvers(:,1),parametric_solvers_types.LCP),1);
 
 % exit if no LP solver is working
 if isempty(LPorder)

@@ -38,6 +38,14 @@ switch upper(S.solver)
         % call MPLP solver
         R = mpt_call_mplp(S);
         
+    case {'ENUMPQP'}
+        % enumeration-based pQP solver
+        R = mpt_enum_pqp(S, struct('regions', true));
+
+    case {'RLENUMPQP'}
+        % enumeration-based pQP solver
+        R = mpt_enum_pqp(S, struct('regions', false));
+
     otherwise
         
         % unknown solver

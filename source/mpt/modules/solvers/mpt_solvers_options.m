@@ -685,3 +685,19 @@ options.sedumi.errors = 0;
 % (default 0)
 % If this field is 1 then SeDuMi outputs some error
 % measures as defined in the Seventh DIMACS Challenge. 
+
+%% mpt_enumpqp
+%     .prune_infeasible: if true, list of candidate active sets is pruned
+%                        by removing entries that were previously
+%                        discovered as infeasible (default=true)
+options.enum_pqp.prune_infeasible = true;
+
+%         .feasible_set: if 'projection', the set of feasible parameters is
+%                        computed by projection. If 'regions', the set is
+%                        calculcated by exploring which facets of critical
+%                        regions are at the boundary of the feasible set.
+%                        If 'box', the feasible set is costructed as the
+%                        outer box approximation of the union of critical
+%                        regions. (default='projection')
+options.enum_pqp.feasible_set = 'regions';
+
