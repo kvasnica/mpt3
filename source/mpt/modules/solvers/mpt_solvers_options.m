@@ -560,7 +560,7 @@ options.qpspline.verbose = 0;
 
 %% QUADPROG
 if exist('quadprog','file')==2
-    options.quadprog = optimset;
+    options.quadprog = optimset('quadprog');
 end
 options.quadprog.Display = 'off';
 % no display
@@ -582,7 +582,7 @@ options.quadprog.LargeScale='off';
 
 %% LINPROG
 if exist('linprog','file')==2
-    options.linprog = optimset;
+    options.linprog = optimset('linprog');
 end
 
 options.linprog.Display = 'off';
