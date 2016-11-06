@@ -3,7 +3,8 @@ function test_polyhedron_integrate_02_pass
 
 P = Polyhedron('lb', -1, 'ub', 2);
 vol = P.volume();
-assert(vol==3);
+vol_exp = 3;
+assert(norm(vol-vol_exp)<1e-7);
 const = 2.5;
 lin = 1;
 quad = 1.5;
