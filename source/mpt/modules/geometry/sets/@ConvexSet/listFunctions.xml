@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>listFunctions</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Shows functions attached to a convex set.
+	</info>
+	
+	<syntax>l = listFunctions(Set)</syntax>
+	<syntax>l = Set.listFunctions</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Shows all <tt>Function</tt> objects that are attached to a convex  <tt>Set</tt>. 
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>l</name>
+        <descr>List of function names stored with the set.</descr>
+		<class name="cell"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> The polyhedron contains two functions "a" and "b".</descr>
+        <cmd> P = ExamplePoly.randHrep; </cmd>
+        <cmd> P.addFunction(AffFunction([1, -2]),'a'); </cmd>
+        <cmd> P.addFunction(QuadFunction([0 0.4;-0.1 0.2]),'b'); </cmd>        
+        <descr> List all functions in the set </descr>
+        <cmd> l = P.listFunctions </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>addFunction</related>
+    <related>getFunction</related>
+    <related>removeFunction</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

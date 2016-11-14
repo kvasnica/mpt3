@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>slice</function>
+  
+  <info>
+    Slice the polyhedron through given dimensions at specified values.
+  </info>
+  <syntax>S = P.slice(dims, values)</syntax>
+  <syntax>S = slice(P, dims, values)</syntax>
+  <syntax>S = P.slice(dims, values, 'keepDim', true/false)</syntax>
+
+  <descr> 
+      Compute the intersection of <i>P</i> with a subspace spanning the dimensions <tt>dims</tt> at
+      given <tt>values</tt>. If the argument <tt>values</tt> are omitted, the value is assumed to be
+      zero, i.e. <tt>values = zeros(size(dims))</tt>.
+
+     <!-- 
+      For each element <i>v</i> in <tt>values</tt>, slice computes:
+     <latex>
+          $$ E ( P \cap \{ x\ ~|~  E x = v \} ) $$
+     </latex>
+     where <i>E</i> is a matrix which <i>i^{\text{th}}</i> row is the <tt>dims(i)</tt> elementary vector.
+     -->
+     For a polyhedron given in H-representation
+     <latex>
+         $$ P = {x ~|~ Ax \le b,~ A_{\text{eq}}x = b_{\text{eq}} },  $$
+     </latex>     
+     the <tt>slice</tt> operation over <tt>dims</tt> at given <tt>values</tt> returns a polyhedron
+     in a reduced dimension <tt>P.Dim-length(dims)</tt>
+     <latex>
+         $$ S = { x ~|~ A_{(:,\text{keep})}x &lt;= b - A_{(:, \text{dims})}\text{values} }. $$
+     </latex>
+     This corresponds to the default choice <tt>keepdim=false</tt>.<br />
+     Alternatively, by invoking <tt>keepdim=true</tt>, the polyhedron <tt>S</tt> will be returned in the same
+     dimension as <tt>P</tt>
+     <latex>
+         $$ S = { x ~|~ Ax \le b,~ A_{\text{eq}}x = b_{\text{eq}}, x(\text{dims}) == \text{values} }. $$
+     </latex>
+      
+      
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>dims</name>
+    <descr>Dimensions to cut through</descr>
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>values</name>
+    <descr>Set of values at which to compute the slices.</descr>
+    <class name="double"/>
+    <default>0</default>
+  </input>
+
+  <output>
+    <name>S</name>
+    <descr>Polyhedron that represents the cut of the polyhedron <tt>P</tt> over the specified dimensions.</descr>
+    <class name="Polyhedron"/>
+  </output>
+  
+  <!--
+  <example>
+    <descr>Create a polytope:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+    <descr>Compute slices:</descr>
+    <cmd>offsets = linspace(-1.5,1.5,7);</cmd>
+    <cmd>Ps = P.slice(1:2, offsets);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot('alpha',0.2); hold on;
+	 for(i=1:length(offsets))
+	    Ps(i).affineMap([eye(2);0 0]).plus([0;0;offsets(i)]).plot;
+	 end
+    </cmd>
+  </example>
+
+  <example>
+    <descr>Create unbounded polyhedron:</descr>
+    <cmd>P = ExamplePoly.randHrep('d',3,'ne',1,'nr',1);</cmd>
+    <descr>Slice it:</descr>
+    <cmd>offsets = linspace(-2,2,10);</cmd>
+    <cmd>Ps = P.slice(1:2, offsets);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot('alpha',0.2); hold on;
+	 for(i=1:length(offsets))
+	    Ps(i).affineMap([eye(2);0 0]).plus([0;0;offsets(i)]).plot;
+	 end
+    </cmd>
+  </example>
+  -->   
+  
+  <!-- new examples that show cuts-->
+  <example>
+      <descr> Create random symmetric polytope in dimension 3.</descr>
+          <cmd>P = ExamplePoly.poly3d_sin('d',3);</cmd>
+          <descr>Compute slices over the dimension 2 but preserve the dimension </descr>
+          <cmd>S = P.slice(2,0,'keepDim',true);</cmd>
+          <descr>Plot the result</descr>
+          <cmd>P.plot('alpha',0.2,'color','lightblue'); hold on;
+              S.plot('color','blue','alpha',0.2,'linestyle','--','linewidth',3);
+              axis tight;
+          </cmd>
+ </example>
+ <example>
+      <descr>Create a polytope in 4D from five points.</descr>
+      <cmd>v = [-7, -3, -10, 2; 1,-5, 6, 8; -2, 6, -5, -5; 4, -4, 9, -8; 3, -4, 5, -3]; </cmd>
+      <cmd>P = Polyhedron(v);</cmd>
+      <descr>Slice it over dimensions 2 and 4 at values [1;-5] </descr>
+      <cmd>S = P.slice([2,4], [1;-5])</cmd>
+      <descr> The resulting polyhedron <tt>S</tt> is in reduced dimension and can be plotted.</descr>
+      <cmd> S.plot('color','green','alpha',0.5); </cmd>      
+  </example>
+
+  
+  <related>projection</related>
+  <related>project</related>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

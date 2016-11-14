@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>MLDSystem</function>
+  
+  <info>
+    Represents mixed logical dynamical systems
+  </info>
+  <syntax>sys = MLDSystem(source_file)</syntax>
+
+  <descr> 
+    This class represents mixed logical dynamical (MLD) systems of the form
+    <latex>
+      \begin{align*}
+        x^+ &amp; = A x + B_1 u + B_2 d + B_3 z + B_5\\
+	y &amp; = C x + D_1 u + D_2 d + D_3 z + D_5\\
+	E_2 d + E_3 z &amp; \leq E_1 u + E_4 x + E_5
+      \end{align*}
+    </latex>
+    where <i>x</i> is the state vector, <i>u</i> is the vector of
+    inputs, <i>y</i> is the vector of outputs, <i>d</i> is the vector
+    of auxiliary binary variables, and <i>z</i> is the vector of
+    auxiliary real variables.<br/>
+
+    Each MLD system defines following properties:
+    <ul>
+      <li><tt>A</tt>, <tt>B1</tt>, <tt>B2</tt>, <tt>B3</tt>, <tt>B5</tt>: matrices of the
+      state-update equation (read-only)</li>
+      <li><tt>C</tt>, <tt>D1</tt>, <tt>D2</tt>, <tt>D3</tt>, <tt>D5</tt>: matrices of the
+      output equation (read-only)</li>
+      <li><tt>E1</tt>, <tt>E2</tt>, <tt>E3</tt>, <tt>E4</tt>, <tt>E5</tt>: matrices of the
+      constraints (read-only)</li>
+      <li><tt>nx</tt>, <tt>nu</tt>, <tt>ny</tt>, <tt>nd</tt>, <tt>nz</tt>: number of states,
+      inputs, outputs, binaries, and aux reals (read-only)</li>
+      <li><tt>x</tt>: specifications of system's states (see <tt>help
+      SystemSignal</tt>)</li>
+      <li><tt>u</tt>: specifications of system's inputs (see <tt>help
+      SystemSignal</tt>)</li>
+      <li><tt>y</tt>: specifications of system's outputs (see <tt>help
+      SystemSignal</tt>)</li>
+      <li><tt>d</tt>: specifications of binary variables (see <tt>help
+      SystemSignal</tt>)</li>
+      <li><tt>d</tt>: specifications of auxiliary real variables (see <tt>help
+      SystemSignal</tt>)</li>
+    </ul>
+
+    MLD models are automatically created from a corresponding HYSDEL
+    source file upon calling the constructor as follows:<br/>
+
+    <tt>mldsys = MLDSystem('model.hys')</tt>
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

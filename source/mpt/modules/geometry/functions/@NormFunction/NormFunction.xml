@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>NormFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Class representing 1- or infinity-norm function.
+	</info>
+
+    <syntax>f = NormFunction(flag)</syntax>
+    <syntax>f = NormFunction(flag, Q)</syntax>
+    
+
+	<!-- long description of the function -->
+	<descr>
+        The common object for representing 1- and infinity- norm functions given as <i>f=\|x\|_{p}</i> 
+        where <i>p\in\{1,\infty\}</i>. The one norm is given as a sum of absolute values
+        <latex>
+            $$ f_1 = \sum_{i=1}^{n} |x_i| $$
+        </latex>
+        and the infinity norm is given as the maximum over the absolute values
+        <latex>
+            $$ f_{\infty} = \max{(|x_1|,\ldots,|x_n|)} $$
+        </latex>
+        where <i>n</i> is the dimension of the vector <i>x</i>. If the weighing matrix <tt>Q</tt> 
+        is provided, then the product <i>f=\|Qx\|_{p}</i> is considered. The weight <tt>Q</tt>
+        does not need to be square. Function value is always scalar. <br />
+			
+        2-norms are not supported because they are neither quadratic,
+		nor piecewise linear.<br />
+			
+		Do not use these objects in the user interface. Use
+        <tt>OneNormFunction</tt> and <tt>InfNormFunction</tt> objects instead.
+        
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>1</name>
+        <descr>Flag indicating the type of the norm. It can be either <tt>1</tt> or <tt>Inf</tt>.
+        </descr>
+        <class name="double">
+            <option>1</option>
+            <option>Inf</option>
+        </class>
+	</input>
+	<input>
+		<name>Q</name>
+		<descr>Weighing matrix where the number of columns determines the dimension of the vector argument.
+         </descr>
+        <class name="double"/>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>f</name>
+		<descr> The <tt>NormFunction</tt> object. </descr>
+        <class name="NormFunction"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr>Construct 1-norm function <i>f_1 = |2x_1| + |-3x_2|</i>.</descr>		
+        <cmd>f1=NormFunction(1,diag([2,-3]))</cmd>
+        <descr> Evaluate the function in the point [2;1]. </descr>
+        <cmd> f1.feval([2;1]) </cmd>
+        <descr>Construct infinity-norm function <i>f_{\infty} = \max{(|2x_1|,|-3x_2|)}</i>.</descr>		
+        <cmd>finf=NormFunction(Inf,diag([2,-3]))</cmd>
+        <descr> Evaluate the function in the point [2;1]. </descr>
+        <cmd> finf.feval([2;1]) </cmd>
+       
+    </example>    
+
+	<!-- multiple related function can be defined -->
+    <related>OneNormFunction</related>
+    <related>InfNormFunction</related>
+    <related>AffFunction</related>
+	<related>QuadFunction</related>
+
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

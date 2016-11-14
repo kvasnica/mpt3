@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isAdjacent</function>
+	
+	<info>Test if a polyhedron shares a facet with another polyhedron.</info>
+	<syntax>ts  = P.isAdjacent(Q)</syntax>
+	<syntax>ts  = isAdjacent(P,Q)</syntax>
+    <syntax>[ts, iP, iQ] = isAdjacent(P,Q,fP,fQ)</syntax>
+
+	<descr>
+        Return true if the polyhedron <i>P</i> has a facet to facet property with the polyhedron <i>Q</i>.
+        Both polyhedrons must be in H-representation. If they are not, the irredundant
+        H-representation will be computed.
+        
+        Basically, the function tests if polyhedra <i>P</i> and <i>S</i> are adjacent by
+        solving LP problem consecutively for each facet. The polyhedra are declared as adjacent if
+        their intersection is of dimension <i>d-1</i> and if the facet of polyhedron <i>P</i> is also
+        a facet for the polyhedron <i>S</i>.
+        
+        If you want to test just specific 
+        facets, you can provide them in <tt>fP</tt> and <tt>fQ</tt> arguments.                 
+        
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="true">
+	  <name>Q</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>fP</name>
+      <descr>Index of a facet to test from polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</input>
+	<input required="false">
+	  <name>fQ</name>
+      <descr>Index of a facet to test from polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+      <descr>Logical statement if the polyhedron <i>P</i> is in a face to face property with <i>Q</i>.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+	<output>
+	  <name>iP</name> 
+      <descr>Index of a facet from polyhedron <i>P</i> that is common with polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</output>
+	<output>
+	  <name>iQ</name> 
+      <descr>Index of a facet from polyhedron <i>Q</i> that is common with polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</output>
+ 
+    <example>
+        <descr>Create two polyhedra <i>P</i> and <i>Q</i>.</descr>
+        <cmd> H1 = [ 0.8905, 0.23614, 10;
+            -0.055625, 0.030184, 0;
+            -0.21887, -0.06688, 0;
+            0, -1, 10;
+            1,  0, 10;
+            0,  1,  5;
+        0,  1, 20]; </cmd>
+        <cmd> H2 = [0.055625, -0.030184, 0;
+            -0.053731, -0.010858, 0;
+        0,  1,  10];</cmd>
+        <cmd> P = Polyhedron('H',H1); </cmd>
+        <cmd> Q = Polyhedron('H',H2); </cmd>
+        <descr> Plot the polyhedrons. </descr>
+        <cmd> plot([P,Q]); </cmd>
+        <descr> The polyhedrons are touching but are not adjacent because the common part is a facet of <tt>P</tt> but not a facet of <tt>Q</tt>. </descr>
+        <cmd> P.isAdjacent(Q) </cmd>               
+        <descr> If the polyhedrons are touching on the facet, they are neighbors that can be checked by <tt>isNeighbor</tt> method. </descr>
+        <cmd> P.isNeighbor(Q) </cmd>               
+    </example>
+    <example>
+        <descr>Create two polyhedra <i>P</i> and <i>Q</i>.</descr>
+        <cmd> H1 = [ 0.8905, 0.23614, 10;
+            -0.055625, 0.030184, 0;
+            -0.21887, -0.06688, 0;
+            0, -1, 10;
+            1,  0, 10;
+            0,  1,  5;
+        0,  1, 20]; </cmd>
+        <cmd> H2 = [ 1.84286377 -1 0;
+               1.05619465 1 7.865634;
+              -4.9485172  -1 0];</cmd>
+        <cmd> P = Polyhedron('H',H1); </cmd>
+        <cmd> Q = Polyhedron('H',H2); </cmd>
+        <descr> Plot the polyhedrons. </descr>
+        <cmd> plot([P,Q]); </cmd>
+        <descr> The polyhedra share the same facet so they are in face to face property and declared as adjacent.
+            The indices of the common facet are returned in variables <tt>iP</tt> and <tt>iQ</tt>. 
+        </descr>       
+       <cmd> [ts, iP, iQ] = P.isAdjacent(Q) </cmd>                
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>isNeighbor</related>	
+
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+	<license macro="GPL2"/>
+</help>

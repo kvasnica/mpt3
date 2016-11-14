@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_call_sedumi</function>
+	
+	<info>
+		A gateway function to SEDUMI solver (without errorchecks)
+	</info>
+
+    <syntax>R = mpt_call_sedumi(S)</syntax>
+
+    <descr>
+		The function implements calls to solve LP directly and QP via transformation to second order cone.
+        
+        For LP in a form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {f}^{T}x \label{eq:sedumi:LP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b  \label{eq:sedumi:LP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:sedumi:LP0-eq}
+            \end{eqnarray} 
+        </latex>
+        we need to get a following form accepted by SEDUMI        
+        <latex>            
+			\begin{eqnarray}
+  				\min &amp;&amp;  {{f}_{f}}^{T}x \label{eq:sedumi:LPf-obj}\\
+				\text{s.t.} &amp;&amp; {A}_{f}x \ge  {b}_{f} \label{eq:sedumi:LPf-ineq1} \\
+				&amp;&amp; x \ge 0	\label{eq:sedumi:LPf-ineq2}
+            \end{eqnarray}
+        </latex>
+        This can be achieved by introducing variables <i>x^{+} \ge 0</i>, <i>x^{-} \ge 0</i>, and <i>y \ge 0</i> 
+        <latex>
+            \begin{eqnarray*}
+            x &amp;=&amp; {x}^{+} - {x}^{-} \\
+            y &amp;=&amp; -Ax+b  \\
+            \end{eqnarray*}
+        </latex>
+        and putting them in one vector <i>z = [x^{+},~ x^{-}, ~y]</i>. The LP to be solved by SEDUMI is formed
+        by 
+        <latex>
+            \begin{eqnarray}
+                {f}_{f} &amp;=&amp; \begin{pmatrix} f &amp; -f &amp; 0 \end{pmatrix} \\
+                {A}_{f} &amp;=&amp; \begin{pmatrix} -A &amp; A &amp; -I \\ {A}_{e} &amp; -{A}_{e} &amp; 0 \end{pmatrix} \\
+                {b}_{f} &amp;=&amp; \begin{pmatrix} -b \\ {b}_{e} \end{pmatrix}                
+            \end{eqnarray}                        
+        </latex>
+        and solved in <i>z</i> variables.
+        For QP of the form
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp; \frac{1}{2}{x}^{T}Hx {f}^{T}x \label{eq:sedumi:QP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b  \label{eq:sedumi:QP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:sedumi:QP0-eq}
+            \end{eqnarray} 
+        </latex>
+        we need to impose constraints a in quadratic cone <i>\mathcal{K}</i> and to express the above problem as
+        <latex>
+            \begin{eqnarray}
+  				\min &amp;&amp; {c}_{n}^{T}x \label{eq:sedumi:LPn-obj} \\
+				\text{s.t.} &amp;&amp; {A}_{n}x =  {b}_{n}  \label{eq:sedumi:LPn-eq}\\
+				&amp;&amp; x \in \mathcal{K} \label{eq:sedumi:LPn-K}
+            \end{eqnarray} 
+        </latex>
+        Since QP is convex, we can express <i>\eqref{eq:sedumi:QP0-obj}-\eqref{eq:sedumi:QP0-eq}</i> in an epigraph form
+        <latex>
+			\begin{eqnarray}  				
+                \min &amp;&amp; t \label{eq:sedumi:QP1:obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b  \label{eq:sedumi:QP1-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} \label{eq:sedumi:QP1-eq} \\
+                &amp;&amp; \frac{1}{2}{x}^{T}Hx + {f}^{T}x \le t \label{eq:sedumi:QP1-t} \\
+            \end{eqnarray} 
+        </latex>
+        over quadratic constraints <i>\eqref{eq:sedumi:QP1-t}</i>. From the literature for convex programming 
+        follows that the quadratic constraints <i>\eqref{eq:sedumi:QP1-t}</i> can be written as conic constraints
+        <latex>
+            \begin{equation}
+            \left\{~(x,t) ~|~ \left( {x}^{T}{Q}^{T}Qx + {f}^{T}x -t ~\le~ 0 \right) ~=~ \left(
+             \frac{1-{f}^{T}x+t}{2}  ~\le~ \begin{Vmatrix}Qx \\ \frac{1+{f}^{T}x-t}{2} \end{Vmatrix}_{2} \right) ~\right\}
+            \end{equation}
+        </latex>
+        where the matrix <i>Q</i> is a Cholesky factor of <i>0.5H = Q^{T}Q</i>.
+        This equivalence allows us to rewrite the epigraph form of QP <i>\eqref{eq:sedumi:QP1:obj}-\eqref{eq:sedumi:QP1-t}</i>
+        to a primal form <i>\eqref{eq:sedumi:LPn-obj}-\eqref{eq:sedumi:LPn-K}</i> accepted by SEDUMI. Equality and inequality 
+        constraints are treated the same way as in LP case, i.e. by introducing the new variables <i>x = x^{+} - x^{-}</i>, 
+        <i>x^{+} \ge 0</i>, <i>x^{-} \ge 0</i>, and <i>y=-Ax+b</i>, <i>y \ge 0</i>. Moreover, to express conic constraints
+        we need two more variables <i>v~\in~\mathcal{R}^{1}</i>, <i>u~\in~\mathcal{R}^{n+1}</i>
+        <latex>
+            \begin{eqnarray*}
+            v &amp;=&amp; \frac{1-{f}^{T}x+t}{2} \\
+            u &amp;=&amp; \begin{pmatrix} Qx \\ \frac{1+{f}^{T}x-t}{2} \end{pmatrix} 
+            \end{eqnarray*}
+        </latex>
+        Collecting all variables to one column vector <i>z = [t,~ x^{+},~ x^{-},~ y,~ v,~ u]</i> the linear equality constraints
+        <i>\eqref{eq:sedumi:LPn-eq}</i> can be expressed in <i>z</i> variable as <i> A_{n}z = c_{c}</i> where
+        <latex>
+            \begin{eqnarray*}
+            {A}_{n} &amp;=&amp; 
+            \begin{pmatrix}
+            0 &amp; -A &amp; A &amp; -I &amp; 0 &amp; 0 \\
+            0 &amp; {A}_{e} &amp; -{A}_{e} &amp; 0 &amp; 0 &amp; 0 \\            
+            0 &amp; Q &amp; -Q &amp; 0 &amp; 0 &amp; -I \\
+           \frac{-1}{2} &amp; \frac{{f}^{T}}{2} &amp; \frac{{-f}^{T}}{2} &amp; 0 &amp; 0 &amp; -1 \\
+            \frac{1}{2} &amp; \frac{{-f}^{T}}{2} &amp; \frac{{f}^{T}}{2} &amp; 0 &amp; -1 &amp; 0 \\
+            \end{pmatrix}  \\
+            {b}_{n} &amp;=&amp;
+            \begin{pmatrix}
+            -b \\ {b}_{e} \\ 0 \\ \frac{-1}{2} \\ \frac{-1}{2}
+            \end{pmatrix}
+            \end{eqnarray*}
+        </latex>
+        The objective function in <i>\eqref{eq:sedumi:LPn-obj}</i> is composed as <i>c_n^T = [1,~ 0,~ 0,~ 0,~ 0,~ 0]</i>. 
+        The individual constraints <i>\mathcal{K}</i> in <i>\eqref{eq:sedumi:LPn-K}</i> are given in <i>z</i> vector
+        as follows: <i>t</i> is free variable, <i>x^{+}</i>, <i>x^{-}</i>, <i>y</i> are restricted to be nonnegative and 
+        <i>u</i>, <i>v</i> form the conic constraint <i>v\ge\|u\|_{2}</i>.
+        
+                        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>S</name>
+        <descr>Structure of the <tt>Opt</tt> class</descr>
+        <class name="struct">
+			<field>
+				<name>H</name>
+				<descr>Quadratic part of the objective function.</descr>
+				<class name="double"/>
+                <default>[]</default>
+			</field>
+            <field>
+                <name>f</name>
+                <descr>Linear part of the objective function.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>A</name>
+                <descr>Linear part of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>b</name>
+                <descr>Right hand side of the inequality constraints <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>Ae</name>
+                <descr>Linear part of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>be</name>
+                <descr>Right hand side of the equality constraints <i>{A}_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>lb</name>
+                <descr>Lower bound for the variables <i>x \ge \text{lb}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>ub</name>
+                <descr>Upper bound for the variables <i>x \le \text{ub}</i>.</descr>
+                <class name="double"/>
+                <default>[]</default>
+            </field>
+            <field>
+                <name>n</name>
+                <descr>Problem dimension (number of variables).</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>m</name>
+                <descr>Number of inequalities in <i>Ax \le b</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>me</name>
+                <descr>Number of equalities in <i>A_{e}x=b_{e}</i>.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>problem_type</name>
+                <descr>A string specifying the problem to be solved (only LP and QP are allowed).</descr>
+                <class name="char"/>
+            </field>
+            <field>
+                <name>test</name>
+                <descr>Call (false) or not to call (true) MPT global settings.</descr>
+                <class name="logical"/>
+                <default>false</default>
+            </field>
+        </class>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>R</name>
+		<descr>result structure</descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>optimal solution</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>obj</name>
+				<descr>Optimal objective value.</descr>
+				<class name="double"/>
+			</field>                                                                        
+			<field>
+				<name>lambda</name>
+				<descr>Lagrangian multipliers</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+
+
+	<!-- multiple related function can be defined -->
+    <related>mpt_solve</related>    
+	
+	<!-- multiple literature sources can be given -->
+	<literature macro="boyd_cvxbook"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

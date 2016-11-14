@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>plus</function>
+	
+	<info>Minkowski addition for union of polyhedra</info>
+	<syntax>U + W</syntax>
+	<syntax>U.plus(W)</syntax>
+
+	<descr>
+            Computation of Minkowski addition for the union of polyhedra in the same dimension.
+            The algorithm proceeds in the following way:
+            <ol>
+                <li>Compute the Minkowski summation for each of the polyhedron contained in the union to get. </li>
+                <li>Compute the convex hull of the union. </li>
+                <li>Compute the set difference between the convex hull and the union. </li>
+                <li>Compute the set difference between the Minkowski sum for each polyhedron and set obtained in the previous result. </li>
+            </ol>
+            The result is a non-overlapping union of the polyhedra.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+	<input required="true">
+	  <name>W</name>
+	  <descr>Polyhedron to be summed with the union that is in the same dimension as the union.</descr>
+	  <class name="Polyhedron"/>
+	</input>
+    
+    
+    <example>
+        <descr> Create two polyhedra that form unbounded and non-overlapping union. </descr>
+        <cmd> P(1) = Polyhedron('V',[1 0; 0 0],'R',[0 -1;0.3 -1;-0.3 -1]); </cmd>
+        <cmd> P(2) = Polyhedron('V',[1 0; 0 0; 0 1; 1 1]); </cmd>
+        <cmd> U = PolyUnion('Set',P,'overlaps',false,'bounded',false) </cmd>
+        <descr> Compute Minkowski addition for full-dimensional and bounded polyhedron <i>W</i>.</descr>
+        <cmd> W = Polyhedron('lb',[-0.1, -0.2],'ub',[0.1, 0.2]); </cmd>
+        <cmd> Uw = U + W </cmd>
+        <descr> Plot the new union <tt>Uw</tt> </descr>
+        <cmd> U.plot('color','lightblue'), hold on, Uw.plot </cmd>
+        <descr> Compute Minkowski addition for low-dimensional and bounded polyhedron <i>S</i>.</descr>
+        <cmd> S = Polyhedron('lb',[0, -0.2],'ub',[0, 0.2]); </cmd>
+        <cmd> Us = U + S </cmd>
+        <descr> Plot the new union <tt>Us</tt> </descr>
+        <cmd> U.plot('color','lightgreen'), hold on, Us.plot </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>convexHull</related>
+    <related>minus</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>    
+   
+    <license macro="GPL2"/>
+</help>

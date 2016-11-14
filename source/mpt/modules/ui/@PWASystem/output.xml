@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>output</function>
+  
+  <info>
+    Returns value of the output variables
+  </info>
+  <syntax>y = system.output()</syntax>
+  <syntax>y = system.output(u)</syntax>
+
+  <descr> 
+    This function evaluates the system's output equation and returns
+    the calculated output.<br/>
+
+    For systems with direct feed-through, it is necessary to provide
+    the vector of inputs as the first input argument.
+  </descr>
+
+  <input required="false">
+    <name>u</name>
+    <descr>Vector of system's inputs</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>y</name>
+    <descr>Vector of outputs</descr>
+    <class name="double"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

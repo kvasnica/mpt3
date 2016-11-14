@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>toC</function>
+  
+  <info>
+    Export of PWA/PWQ function to C-code
+  </info>
+  <syntax>controller.toC('function')</syntax>
+  <syntax>controller.toC('function','filename')</syntax>
+  <syntax>controller.toC('function','filename','tie_break_fcn')</syntax>
+
+  <descr> 
+      The function <tt>toC()</tt> exports given piecewise affine (PWA) or piecewise quadratic (PWQ) function
+      to C-language including a sequential evaluation routine. The PWA/PWQ function must be attached to the 
+      <tt>PolyUnion</tt> object.<br />    
+      If the file name is not provided, the default output name is <tt>mpt_getInput</tt>.<br />
+      The export routine generates two files on the output:
+      <ul>
+          <li><tt>mpt_getInput.c</tt> - which contains the PWA/PWQ function including the sequential search </li>
+          <li><tt>mpt_getInput_mex.c</tt> - mex interface for evaluation in Matlab </li>
+      </ul>
+      The file <tt>mpt_getInput_mex</tt> can be compiled inside Matlab and used for fast evaluation of PWA/PWQ 
+      function. The compilation is invoked by <tt>mex</tt> routine as follows:<br />
+      <tt>mex mpt_getInput_mex</tt><br />
+      
+      The PWA/PWQ function can be exported using the tie-break option if the function is multiple valued. 
+      The tie-breaking option determines which value of PWA/PWQ function will be evaluated based on the selecting the
+      minimum in the tie-breaking function. In this case, the tie-breaking function must be attached to the 
+      <tt>PolyUnion</tt> object as well. If no tie-breaking function is provided, the first found value 
+      in the sequential search of PWA/PWQ function is evaluated.<br />
+      
+      The function <tt>toC()</tt> can export the floating point numbers to single or double precision. The default
+      setting is <tt>double</tt> but this can be modified in global options<br />
+      <tt>modules.geometry.unions.PolyUnion.toC</tt>.
+      
+  </descr>
+
+  <input required="true">
+    <name>function</name>
+    <descr>Name of the attached PWA/PWQ function to export.</descr>
+    <class name="char"/>
+  </input>
+  <input required="false">
+    <name>filename</name>
+    <descr>Base name of the file to be generated.</descr>
+    <class name="char"/>
+  </input>
+  <input required="false">
+    <name>tie_break_fcn</name>
+    <descr>Name of the attached scalar PWA/PWQ function to be used in tie-breaking case.</descr>
+    <class name="char"/>
+  </input>
+
+  
+  <author macro="author_herceg"/>
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

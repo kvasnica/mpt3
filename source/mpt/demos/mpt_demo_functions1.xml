@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_functions1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Demonstration of functions associated to sets
+	</info>
+	
+    <syntax>mpt_demo_functions1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Demonstration of functions associated to sets.
+	</descr>
+
+    <example>
+            <descr>Constructing general functions </descr>
+            <descr>Create Function object <i>f(x) = x</i>. </descr>
+            <cmd> F1 = Function(@(x)x) </cmd>
+            <descr> Create Function object <i>f(x) = x_{1}-{x}_{2}^{3}</i>. </descr>
+            <cmd> F2 = Function(@(x) x_(1)-x_(2)^3) </cmd>
+            <descr> Create Function with parameter <i>K</i>, <i>f(x) = -\log{(Kx)} </i>. </descr>
+            <descr> Since the parameter value may change, we first create the  object with the parameter <i>K</i>. </descr>
+            <cmd> F3 = Function([],struct('K',eye(2))) </cmd>
+            <descr> Once the object has been created, we can assign the handle and refer to already stored parameter <i>K</i>. </descr>
+            <cmd> F3.setHandle(@(x) -log(F3.Data.K*x)) </cmd>
+            <descr> We can change the value of the parameter any time later. </descr>
+            <cmd> F3.Data.K = 2*eye(2) </cmd>
+        </example>
+        
+        <example>
+            <descr> Constructing linear and affine functions </descr>
+            <descr> Affine map <i> f(x) = 6x + 1</i> </descr>
+            <cmd> L1 = AffFunction(6,1) </cmd>
+            <descr> Affine map <i> f(x) = -x_1+x_2 + 1 </i> </descr>
+            <cmd> L2 = AffFunction([-1,1],1) </cmd> 
+            <descr> Vector function <i>f(x) = I_{2}\begin{pmatrix}x_1\\x_2\end{pmatrix} + \begin{pmatrix} 1\\2\end{pmatrix}</i>. </descr>
+            <cmd> L3 = AffFunction(eye(2),[1;2]) </cmd>
+            <descr> Linear function <i>f(x) = I_{2}x</i> </descr>
+            <cmd> L4 = AffFunction(eye(5)) </cmd>
+        </example>
+        
+        <example>
+            <descr> Constructing quadratic functions </descr>
+            <descr> Quadratic map <i>f(x) = 0.5x^2 + 1</i>. </descr>
+            <cmd> Q1 = QuadFunction(1,1) </cmd>
+            <descr> Quadratic map <i>f(x) = x^2 - 4</i>. </descr>
+            <cmd> Q2 = QuadFunction(2,-4) </cmd>
+            <descr> Quadratic map <i>f(x) = {x_{1}}^{2}+{x_{2}}^{2} + 1</i> </descr>
+            <cmd> Q3 = QuadFunction(eye(2),[0,0],1) </cmd>
+        </example>
+        
+        <example>
+            <descr> Assign function to a set </descr>
+            <descr> Construct the polyhedron first. </descr>
+            <cmd> P1 = Polyhedron('lb',-1,'ub',1)</cmd>
+            <descr> Assign the function to a set under under the name "a". </descr>
+            <cmd> P1.addFunction(QuadFunction(4,-1),'a') </cmd>
+            <descr> Another polyhedron</descr>
+            <cmd> P2 = Polyhedron('V',[-1 1;1 1; -1 -1]) </cmd>
+            <descr> Assign the function under the name "b". </descr>
+            <cmd> P2.addFunction(AffFunction(-eye(2),[-1;2]),'b') </cmd>
+            <descr> You can assign names to functions handles. </descr>
+            <cmd>P3 = Polyhedron('lb',[-1;-1],'ub',[1;1])</cmd>
+            <cmd>P3.addFunction(Function(@(x)x.^2-x.^3+1),'gain') </cmd>
+            <cmd>P3.addFunction(AffFunction(randn(2)),'power') </cmd>
+            
+            <descr> Multiple functions can be assign only at separate calls. </descr>
+            <cmd> P4 = Polyhedron('V',randn(6,2)); </cmd>
+            <cmd> L(1) = AffFunction(randn(2),randn(2,1)); </cmd>
+            <cmd> L(2) = AffFunction(randn(2),randn(2,1)); </cmd>
+            <cmd> P4.addFunction(L(1),'a') </cmd>
+            <cmd> P4.addFunction(L(2),'b') </cmd>
+        </example>
+        
+        <example>
+            <descr> Plotting of functions </descr>
+            <descr> Plot the function over the set based on the name </descr>
+            <cmd> P3.fplot('gain') </cmd>
+            <cmd> P3.fplot('power') </cmd>
+            <descr> Plot the first element of the vector valued function "a" </descr>
+            <cmd> P4.fplot('a','position',1,'color','y') </cmd>            
+            <descr> Plot the second element of the vector valued function "b" based on the index.</descr> 
+            <cmd> P4.fplot('b','position',2,'color','m') </cmd>            
+        </example>
+
+        <example>
+            <descr> Evaluation of functions </descr>
+            <descr> Evaluate the function based on the name </descr>
+            <cmd> P3.feval([1;0],'power') </cmd>
+            <descr> Evaluate the function "gain" </descr>
+            <cmd> P3.feval([-1;0],'gain') </cmd>
+        </example>
+    
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_functions2</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_pwa1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstration for modeling PWA systems
+	</info>
+	
+    <syntax>mpt_demo_pwa1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Demonstration for modeling PWA system comprising of two linear time-invariant models:        
+        <latex>
+            \begin{eqnarray*}
+            {{x}^{+}} &amp; = &amp;
+            \begin{cases} 
+                {A_{1}}x + Bu &amp;\mbox{if } {{x}_{1}} \le 0 \\
+                {A_{2}}x + Bu &amp;\mbox{if } {{x}_{1}} \ge 0 \\
+            \end{cases} \\
+            y &amp;=&amp; Cx + Du
+            \end{eqnarray*}
+        </latex>
+	</descr>
+
+    <example>
+        <descr>  PWA systems are created by defining each dynamics as an LTI system: </descr>
+        <cmd> B = [0; 1]; C = [1 0]; D = 0; </cmd>
+
+        <descr> First dynamics: </descr>
+        <cmd> alpha = -pi/3; </cmd>
+        <cmd> A1 = 0.8*[cos(alpha) -sin(alpha); sin(alpha) cos(alpha)]; </cmd>
+
+        <cmd> dyn1 = LTISystem('A', A1, 'B', B, 'C', C, 'D', D); </cmd>
+        
+        <descr> We need to tell that dynamics 1 should be active if <i>x_1 \le 0</i>: </descr>
+        <cmd>dyn1.setDomain('x', Polyhedron([1 0], 1)); </cmd>
+
+        <descr> Second dynamics: </descr>
+        <cmd>alpha = pi/3;</cmd>
+        <cmd> A2 = 0.8*[cos(alpha) -sin(alpha); sin(alpha) cos(alpha)]; </cmd>
+
+        <cmd> dyn2 = LTISystem('A', A2, 'B', B, 'C', C, 'D', D); </cmd>
+        
+        <descr> Region of validity of the dynamics (<i>x_1 \ge 0</i> ): </descr>
+        <cmd> dyn2.setDomain('x', Polyhedron([-1 0], 0)); </cmd>
+
+        <descr> Create the PWA description using an array of LTI systems: </descr>
+        <cmd> pwa = PWASystem([dyn1 dyn2]); </cmd>
+
+        <descr> Optionally we can set constraints: </descr>
+        <cmd> pwa.x.min = [-10; -10]; </cmd>
+        <cmd> pwa.x.max = [10; 10]; </cmd>
+        <cmd> pwa.y.min = -10; </cmd>
+        <cmd> pwa.y.max = 10; </cmd>
+        <cmd> pwa.u.min = -1; </cmd>
+        <cmd> pwa.u.max = 1; </cmd>
+
+        <descr> Define an on-line MPC controller for such a system </descr>
+        <cmd> horizon = 2; </cmd>
+        <cmd> onl_ctrl = MPCController(pwa, horizon); </cmd>
+        
+        <descr> Set one-norm penalties used in the cost function: </descr>
+        <cmd>onl_ctrl.model.x.penalty = OneNormFunction(10*eye(2)); </cmd>
+        <cmd>onl_ctrl.model.u.penalty = OneNormFunction(1); </cmd>
+
+        <descr> Construct the explicit solution </descr>
+        <cmd> exp_ctrl = onl_ctrl.toExplicit(); </cmd>
+
+        <descr> Obtain the closed-loop optimizers for a particular initial condition </descr>
+        <cmd> x0 = [-4; 0]; </cmd>
+        <cmd> Uonl = onl_ctrl.evaluate(x0) </cmd>
+        <cmd> Uexp = exp_ctrl.evaluate(x0) </cmd>
+    </example>
+    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

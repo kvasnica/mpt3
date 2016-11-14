@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>copy</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Create a copy of an object derived from the <tt>Union</tt> class.
+	</info>
+	
+	<syntax>Unew = U.copy</syntax>
+    <syntax>Unew = copy(U)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Create a copy of the union <tt>U</tt> and return a new object <tt>Unew</tt> with same properties as the original union object.
+        Changing one object does not affect the second one because the objects are not connected by reference. <br />        
+        Note that this method is different versus the equality assignment <tt>Unew = U</tt> which points to the same object.
+    </descr>
+
+	<input required="true">
+		<name>U</name>
+        <descr>Any object derived from the <tt>Union</tt> class, e.g. <tt>PolyUnion</tt>, etc.</descr>
+		<class name="Union"/>
+	</input>   
+    <output>
+		<name>Unew</name>
+        <descr>New object which is an exact copy of the original object <tt>U</tt>.</descr>
+		<class name="Union"/>       
+    </output>
+        
+	<!-- multiple related function can be defined -->
+	<related>PolyUnion</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

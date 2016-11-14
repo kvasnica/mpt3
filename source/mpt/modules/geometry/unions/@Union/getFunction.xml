@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>getFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Extract function handle from the union of convex sets.
+	</info>
+	
+	<syntax>F = getFunction(U, FuncName)</syntax>
+	<syntax>F = U.getFunction(FuncName)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Extract  <tt>Function</tt> object that is attached to a union <tt>U</tt> 
+        under the name <tt>FuncName</tt>. 
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Union of sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="Union"/>
+	</input>
+
+    <input required="true">
+		<name>FuncName</name>
+        <descr>Name of the function to extract.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>F</name>
+        <descr>Function object stored under the <tt>FuncName</tt> string.</descr>
+		<class name="Function"/>
+	</output>
+
+	<!-- multiple related function can be defined -->
+    <related>hasFunction</related>
+    <related>addFunction</related>
+    <related>removeFunction</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

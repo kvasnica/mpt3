@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>intersect</function>
+	
+	<info>Intersect two polyhedra.</info>
+	<syntax>PnS  = intersect(P, S)</syntax>
+
+	<descr>
+	  Compute the intersection of two polyhedra:
+ 
+	  <latex>
+	    $$ \texttt{PnS} = P \cap S $$
+	  </latex>
+
+	  Note: If <i>P</i> or <i>S</i> are in V-rep, then this function will first compute their convex
+	  hull.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="true">
+	  <name>S</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>PnS</name> 
+	  <descr>Intersection of <i>P</i> and <i>S</i>.</descr>
+	  <class name="Polyhedron"/>
+	</output>
+
+	<example>
+	  <descr>Intersect two polytopes.</descr>
+	  <cmd>P = ExamplePoly.randVrep;</cmd>
+	  <cmd>S = ExamplePoly.randHrep;</cmd>
+	  <cmd>PnS = intersect(P,S)</cmd>
+	  <cmd>plot([P;S],'alpha',0.1);hold on; 
+	    plot(PnS,'color','r','alpha',0.6);</cmd>
+	</example>  
+
+	<example>
+	  <descr>Intersect a polytope and an unbounded polyhedron.</descr>
+	  <cmd>P = Polyhedron('V', [1 1;0 1;1 0], 'R', -[1 0]);</cmd>
+	  <cmd>S = Polyhedron('H', [randn(10,2) 4*ones(10,1)]);</cmd>
+	  <cmd>PnS = intersect(P,S)</cmd>
+	  <cmd>plot(P,'color','b','alpha',0.1);hold on;
+	       plot(S,'color','g','alpha',0.1); plot(PnS,'color','r','alpha',0.6);</cmd>
+	</example>  
+
+	<example>
+	  <descr>Intersect a 3D polytope and a lower dimensional cone.</descr>
+	  <cmd>P = Polyhedron('lb',-0.5*ones(3,1), 'ub', 0.5*ones(3,1));</cmd>
+	  <cmd>S = Polyhedron('R', [-1 0 .5;-1 2 2]);</cmd>
+	  <cmd>PnS = intersect(P,S)</cmd>
+	  <cmd>plot(P,'color','b','alpha',0.1);hold on;
+	       plot(S,'color','g','alpha',0.1); plot(PnS,'color','r','alpha',1);</cmd>
+	</example>
+
+	<!-- multiple literature sources can be given -->
+	<!-- <literature>Fukuda : PolyFaq</literature> -->
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+  	<license macro="GPL2"/>
+</help>

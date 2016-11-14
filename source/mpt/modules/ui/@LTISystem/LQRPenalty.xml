@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>LQRPenalty</function>
+  
+  <info>
+    Linear-quadratic regulator design for LTI systems
+  </info>
+
+  <syntax>P = system.LQRPenalty()</syntax>
+
+  <descr> 
+    <tt>P = system.LQRPenalty()</tt> calculates the solution of the
+    discre-time Riccati equation.<br/>
+
+    Note that this function requires that penalties on states and
+    inputs are defined in <tt>system.x.penalty</tt> and
+    <tt>system.u.penalty</tt> (see "<tt>help SystemSignal</tt>" and
+    "<tt>help Function</tt>").
+  </descr>
+
+  <output>
+    <name>P</name>
+    <descr>Solution of the discrete-time Riccati equation</descr>
+    <class name="double"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

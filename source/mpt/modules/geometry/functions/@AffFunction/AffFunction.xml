@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>AffFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Representation of affine functions in the form F*x + g
+	</info>
+	
+	<syntax>L = AffFunction(F,g)</syntax>
+	<syntax>L = AffFunction(F)</syntax>
+    <syntax>L = AffFunction(F,g,Data)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>AffFunction</tt> class represents affine functions of the form <i>f(x) = F*x + g </i> 
+        where <i>F</i> is a real matrix and <i>g</i> is a real column vector. Dimensions of <i>F</i>
+        and <i>g</i> must coincide such that the output is a vector or scalar.               
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>F</name>
+        <descr>Real matrix representing the coefficients in the linear term <i>F</i> in  <i>f(x) = F*x + g </i>.
+        </descr>
+        <class name="double"/>
+	</input>
+	<input required="true">
+		<name>g</name>
+        <descr>Real vector representing the affine terms <i>g</i> in  <i>f(x) = F*x + g </i>.
+        </descr>
+        <class name="double"/>
+	</input>
+	<input required="false">
+		<name>Data</name>
+        <descr>Any data related to the function.
+        </descr>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>L</name>
+		<descr> <tt>AffFunction</tt> object. </descr>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+            <descr>Construct affine function <i>l(x) = 3x + 1</i> </descr>		
+            <cmd>L = AffFunction(3,1)</cmd>
+            <descr>Construct linear function <i>k(x) = 2\pi x</i> </descr>
+            <cmd>k = AffFunction(2*pi)</cmd>
+    </example>
+    <example>
+            <descr>Construct vectorized affine function <i>f(x) = \begin{pmatrix} x_1 + 2x_2 + 1\\ 3x_1 + 4x_2 -1 \end{pmatrix} </i>
+            with respect to vector <i>x</i> with two elements</descr>
+            <cmd> F = AffFunction([1 2;3 4],[1; -1]) </cmd>       
+    </example>
+    <example>
+        <descr> Construct affine function <i>y = Fx+g</i> where <i>F</i> and <i>g</i> are regression coefficients from
+        the data <i>x</i> and <i>y</i>. </descr>
+        <descr> The data we want to store </descr>
+        <cmd> data.x = 0:0.01:0.5;</cmd>
+        <cmd> data.y = sin(data.x);</cmd>
+        <cmd> data.file= 'DSCa001';</cmd>
+        <descr> Compute the regression coefficients and store them in <tt>h</tt></descr>
+        <cmd> h = polyfit(data.x,data.y,1); </cmd>
+        <descr> We can store the data from which the function was obtained under <tt>Data</tt> property </descr>
+        <cmd> A=AffFunction(h(1),h(2),data)</cmd>
+	</example>
+
+
+	<!-- multiple related function can be defined -->
+    <related>Function</related>
+    <related>QuadFunction</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

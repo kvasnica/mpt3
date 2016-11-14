@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>extreme</function>
+  
+  <info>
+      Compute an extreme point of this set in the given direction.
+  </info>
+  <syntax>s = S.extreme(x)</syntax>
+  <syntax>s = extreme(S, x)</syntax>
+  
+  <descr>
+      Compute an extreme point of this set in the direction given by the point <tt>x</tt>.
+  </descr>
+  
+  <input required="true">
+    <name>S</name>
+    <descr>A convex set described as <tt>YSet</tt> object.</descr>
+    <class name="YSet"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point given as vector. Note that for <tt>YSet</tt> with symmetric matrix variable,
+    the point <tt>x</tt> must be given as vector with symmetric terms.</descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>s</name>
+    <descr>The output structure with the information about the extreme point and the exit status from the optimization.</descr>
+    <class name="struct">
+            <field>
+				<name>exitflag</name>
+				<descr>Exit status from the optimization, i.e. an integer value that informs 
+                if the result was feasible (1), or otherwise (different from 1).</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization.</descr>
+				<class name="char"/>
+			</field>            
+            <field>
+				<name>x</name>
+                <descr>Computed extreme point that lies on the boundary of the set <tt>S</tt>.</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>supp</name>
+                <descr>The support of this set in the direction <tt>x</tt> which represents the optimal value of the objective
+                function in the optimization problem <i>\underset{y}{\text{max}} \; {{x}^{T}y}, \quad 
+                   \text{s.t.} \quad  y \in \texttt{Set} </i>.            
+                </descr>
+				<class name="double"/>
+			</field>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Create a set in 2D as intersection of the following inequalities.</descr>
+    <cmd>x = sdpvar(2,1);</cmd>
+    <cmd>F = [ [-3 0.3;0.1 -1;-0.1 2]*x&lt;=[0.8;2.1;1.5] ];</cmd>
+    <cmd>F = [F; 0.3*x'*x-4*x(1)+2*x(2)&lt;=0.1];</cmd>
+    <cmd>S = YSet(x,F);</cmd>
+    <descr>Compute the extreme point in the direction of the point v=[0;2].</descr>
+    <cmd>v = [6;0];</cmd>
+    <cmd>s = S.extreme(v);</cmd>
+    <descr> The computed extreme point is lying the edge of the set.</descr>
+    <descr> We can plot the set and the point <tt>s.x</tt>. </descr>
+    <cmd> S.plot; hold on; text(s.x(1),s.x(2),'\bf x'); </cmd>
+  </example>
+   
+  <related>contains</related>
+  <related>project</related>
+  <related>shoot</related>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+  
+</help>

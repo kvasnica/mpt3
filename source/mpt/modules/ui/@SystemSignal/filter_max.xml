@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>max</function>
+  
+  <info>
+    Upper bound on a signal
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+      This filter introduces the upper bound <i>\text{ub}</i> on the
+      signal <i>s</i>, i.e. <i> s_{k} \le \text{ub} </i>.    
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>project</function>
+  
+  <info>
+    Project a point onto the given polyhedron.
+  </info>
+  <syntax>ret = P.project(x)</syntax>
+  <syntax>ret = project(P, x)</syntax>
+
+  <descr> 
+    Computes the projection of the point <i>y</i> onto this polyhedron by solving the
+    optimization problem:
+    <latex>
+      $$\min \{ {\|y-x\|}_{2}^{2} ~|~ x \in P \}$$
+    </latex>
+
+    If <i>P</i> is a vector of <i>m</i> Polyhedra and <i>x</i> is a matrix of size <i>n \times \texttt{P.Dim}</i>,
+    then <tt>ret</tt> is a cell array with the structure fields  that correspond the projection of each point in the matrix.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>y</name>
+    <descr>Vector of size <tt>P.Dim</tt> that represent single point <i>y</i>, or matrix of size <i>\text{P.Dim}\times n</i>
+    that corresponds to multiple points merged column-wise.
+    </descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>ret</name>
+    <descr>Optimal solution</descr>
+    <class name="struct">
+      <field>
+	<name>x</name>
+	<descr>Projected point or [] if <i>P</i> is empty</descr>
+      </field>
+      <field>
+	<name>exitflag</name>
+	<descr>Informs about the termination status of the optimization problem.</descr>
+	<class name="double">
+	  <option>mptopt.OK</option>
+	  <option>mptopt.INFEASIBLE</option>
+	  <option>mptopt.UNBOUNDED</option>
+	  <option>mptopt.ERR</option>
+	</class>
+      </field>
+      <field>
+	<name>dist</name>
+	<descr>Distance from <i>y</i> to the set <i>P</i>.</descr>
+      </field>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Create polyhedron:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin;</cmd>
+    <descr>Choose a point and project:</descr>
+    <cmd>y = [2;2];</cmd>
+    <cmd>ret = P.project(y);</cmd>
+    <descr>Plot the result</descr>
+    <cmd>P.plot; hold on; pplot([ret.x';y'],'or');
+      axis square; th=linspace(0,2*pi,100)';
+      pplot(ret.dist*[sin(th) cos(th)]+repmat(y',100,1),'k');</cmd>
+  </example>
+    
+  <related>projection</related>
+  
+  <author macro="author_cnj"/> 
+  <license macro="GPL2"/>
+</help>

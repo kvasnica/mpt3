@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>computeHRep</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Compute H-representation of a polyhedron.
+	</info>
+	<!-- we can define multiple ways to call the function -->
+	<!-- note that we can freely use the underscore in function names -->
+	<syntax>P = P.computeHRep</syntax>
+
+	<descr>
+	  Computes (possibly redundant) H-representation of the polyhedron:
+	  <latex>
+	    $$P = \{x ~|~ Ax \le b \} \cap \{x ~|~ {A}_{e} x = {b}_{e} \}$$
+	  </latex>
+      This method implements facet enumeration using CDD solver and <tt>nlrs</tt> solver.
+	  Please note that this is computationally demanding problem and the CDD solver 
+      may become irresponsive for large input data.      
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+		<descr>Polyhedron in V-representation</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>        
+		<name>P</name>
+        <descr>Polyhedron in H-representation.</descr>
+		<class name="Polyhedron"/>
+	</output>
+
+	<example>
+		<descr>Create vertex representation of a polyhedron:</descr>
+		<cmd>P = Polyhedron('V', randn(15,3))</cmd>
+		<descr>Compute its H-representation:</descr>
+		<cmd>P.computeHRep</cmd>
+		<descr>Plot the result</descr>
+		<cmd>plot(P);</cmd>
+	</example>
+
+
+	<!-- multiple related function can be defined -->
+    <related>computeVRep</related>
+    <related>minVRep</related>
+    <related>minHRep</related>
+	
+	<!-- multiple literature sources can be given -->
+	<literature macro="Fukuda:PolyFaq"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+    <author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+	<license macro="GPL2"/>
+</help>

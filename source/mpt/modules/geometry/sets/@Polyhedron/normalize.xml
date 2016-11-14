@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>normalize</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Normalizes polyhedron in H-representation.
+	</info>
+	
+	<syntax>P.normalize</syntax>
+    <syntax>normalize(P)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Normalize polyhedron by scaling each inequality <i>a_{i}x\le b</i> 
+        and equality <i>a_{e,i} = b_{e,i} </i> such that each row has unitary
+        norm, i.e. <i>\|a_{i}\|_{2} = 1 </i> and <i>\|a_{e,i}\|_{2} = 1 </i>.
+        The normalization routine is very useful to prevent from numerical problems
+        involved in badly scaled polyhedra.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+        <descr><tt>Polyhedron</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+    
+    <example>
+        <descr> Badly scaled polyhedron </descr>
+        <cmd> P = Polyhedron([1000, 0.4, -351; -0.1, -1e4, 89.1],[780; 0.067]); </cmd>
+        <descr> The values are stored inside the polyhedron as they are provided. </descr>
+        <cmd> P.H </cmd>
+        <descr> Normalize the polyhedron. </descr>
+        <cmd> P.normalize </cmd>
+        <descr> The values of H-representation have changed: </descr>
+        <cmd> P.H </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>Polyhedron</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>triangulate</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Triangulation of a polyhedron.
+	</info>
+	
+	<syntax>T = P.triangulate;</syntax>
+    <syntax>T = triangulate(P)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The polyhedron <i>P</i> is split into an array of triangular <i>T_i</i> polyhedra that built a partition
+        <i>{P} = {\cup {T}_{i}} </i>. The <tt>triangulate</tt> function works over full-dimensional polyhedra,
+        that are bounded and not empty. 
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+        <descr><tt>Polyhedron</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+    
+    <example>
+        <descr> Create V-polyhedron</descr>
+        <cmd> P = 10*Polyhedron(randn(5,2)); </cmd>
+        <descr> Generate the triangular partition</descr>
+        <cmd> T = P.triangulate; </cmd>
+        <descr> Plot the triangulation. </descr>
+        <cmd> T.plot </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>minVRep</related>
+    <related>computeVRep</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

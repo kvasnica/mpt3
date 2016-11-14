@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isBounded</function>
+	
+	<info>Test if the union is built from bounded polyhedra.</info>
+	<syntax>ts = U.isBounded</syntax>
+	<syntax>ts = isBounded(U)</syntax>
+
+	<descr>
+	  Return true if all polyhedra in the union <tt>U</tt> are bounded and false otherwise.
+      Once this method has been called, the information about the boundedness can be retrieved
+        from <tt>U.Internal.Bounded</tt> property.
+	</descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if all polyhedra in the union are bounded and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+    <example>
+        <descr>Union of bounded and unbounded:</descr>
+        <cmd>P(1) = Polyhedron('V',randn(5,2));</cmd>
+        <cmd>P(2) = Polyhedron('V',randn(5,2),'R',[0 1]); </cmd>
+        <descr> Create union </descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr>Check if the union is bounded</descr>
+        <cmd> U.isBounded </cmd>
+        <descr> The boundedness property can be retrieved from </descr>
+        <cmd> U.Internal.Bounded </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isConvex</related>
+    <related>isOverlapping</related>
+    <related>isConnected</related>
+    <related>isFullDim</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

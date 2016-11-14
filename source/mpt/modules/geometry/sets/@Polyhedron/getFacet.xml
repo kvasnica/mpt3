@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>getFacet</function>
+	
+	<info>Extract facet of the polyhedron specified by the inequality index.</info>
+	<syntax>Q  = P.getFacet()</syntax>
+	<syntax>Q  = P.getFacet(index)</syntax>
+   
+	<descr>
+        Extract the facet of the polyhedron <i>P</i> specified by the inequality <tt>index</tt>. The returned
+        polyhedron <i>Q</i> is formed by rewriting this ineqality as equality constraint.                
+        The polyhedron <i>P</i> is given as
+        <latex>
+            \[
+            P =  \left\{ x ~ \vline ~ {a}^{T}_{i}x\le {b}_{i}, ~i=1,\ldots, m, ~ {a}^{T}_{e,j}x= {b}_{e,j}, j=1,\ldots, {m}_{e}  \right\}            
+            \]
+        </latex>
+        Given the <tt>index</tt>, the polyhedron <i>Q</i> is built as
+        <latex>
+            \[
+            Q =  \left\{ x ~ \vline ~ {a}^{T}_{i}x\le {b}_{i}, \forall i \neq \text{index}, ~
+            {a}^{T}_{i}x = {b}_{i}, i \in \text{index},
+            ~ {a}^{T}_{e,j}x = {b}_{e,j}, j=1,\ldots, {m}_{e},   \right\}            
+            \]
+        </latex>
+        The polyhedron <i>P</i>  must be given in its minimal representation (irredundant) H-representation, 
+        otherwise an error is thrown. 
+        
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>index</name>
+      <descr>Index of a facet from polyhedron <i>P</i> which is less or equal than the number of hyperplanes defining <i>P</i>.
+	  If omited, all facets will be returned as a polyhedron array.</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>Q</name> 
+      <descr>Polyhedron <i>Q</i> that represents lower-dimensional facet of the Polyhedron <i>P</i>.</descr>
+	  <class name="Polyhedron"/>
+	</output>
+
+	<example>
+       <descr>Create random polyhedron <i>P</i> and make it irredundant.</descr>
+       <cmd> P = ExamplePoly.randHrep; </cmd>
+       <cmd> P.minHRep(); </cmd>
+       <descr> Extract the third facet of the polyhedron. </descr>
+       <cmd> Q = P.getFacet(3); </cmd>
+       <descr> Plot the polyhedra.</descr>
+       <cmd> P.plot; hold on; Q.plot('LineWidth',3,'LineStyle','-.'); </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>isAdjacent</related>	
+
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+	<license macro="GPL2"/>
+</help>

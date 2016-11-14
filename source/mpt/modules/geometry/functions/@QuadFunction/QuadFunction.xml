@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>QuadFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Representation of quadratic functions in the form x'*H*x + F*x + g
+	</info>
+	
+	<syntax>Q = QuadFunction(H,F,g)</syntax>
+	<syntax>Q = QuadFunction(H,F)</syntax>
+    <syntax>Q = QuadFunction(H)</syntax>
+    <syntax>Q = QuadFunction(H,F,g,Data)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>QuadFunction</tt> class represents quadratic functions of the form <i>f(x) = x'*H*x + F*x + g </i> 
+        where <i>H</i> is a real matrix, <i>F</i> is a real matrix and <i>g</i>
+        is a real column vector. Dimensions of <i>H</i>, <i>F</i> and <i>g</i> must coincide such that the output 
+        is a scalar. 
+        <!-- For vectorized output, <i>H</i> must comprise of three dimensions, where the third 
+        dimension corresponds to function range. -->
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>H</name>
+        <descr>Real matrix representing the coefficients in the quadratic term <i>H</i> in  <i>f(x) = x'*H*x + F*x + g </i>.
+        </descr>
+        <class name="double"/>
+	</input>
+    <input required="true">
+		<name>F</name>
+        <descr>Real matrix representing the coefficients in the linear term <i>F</i> in  <i>f(x) = F*x + g </i>.
+        </descr>
+        <class name="double"/>
+	</input>
+	<input required="true">
+		<name>g</name>
+        <descr>Real vector representing the affine terms <i>g</i> in  <i>f(x) = F*x + g </i>.
+        </descr>
+        <class name="double"/>
+	</input>
+	<input required="false">
+		<name>Data</name>
+        <descr>Any data related to the function.
+        </descr>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>Q</name>
+		<descr> <tt>QuadFunction</tt> object. </descr>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+            <!-- each example is a combination of descriptions and commands -->
+            <descr>Construct a quadratic function <i>q_1(x) = x^2 + 1</i> </descr>		
+            <cmd>q1 = QuadFunction(1,0,1)</cmd>
+            <descr>Construct a quadratic function <i>q_2(x) = 0.5x^2 + 3x -1</i> </descr>
+            <cmd>q2 = QuadFunction(0.5,3,-1)</cmd>
+    </example>
+    <example>
+            <descr>Construct a quadratic function <i>f(x) = x'*H*x + F*x + g </i>  where
+                <i>H</i>, <i>F</i>, <i>g</i> will be randomly generated and <i>x</i> is a vector in dimension 2.
+            </descr>
+            <cmd> f = QuadFunction(randn(2),randn(1,2),randn(1)) </cmd>       
+    </example>
+    <!--
+    <example>
+            <descr>Construct vectorized quadratic function <i>f(x) = x'*H*x + F*x + g </i>  where
+                the function maps from <i>\mathbb{R}^5</i> to <i>\mathbb{R}^2</i>. Therefore, 
+                <i>x</i> must a vector in dimension 5, <i>H</i> will be a 3D matrix in dimensions 5x5x2,
+                <i>F</i> will be in dimension 2x5 and <i>g</i> will be a 2x1 vector, i.e.                
+            </descr>
+            <cmd> f = QuadFunction(randn(5,5,2),randn(2,5),randn(2,1)) </cmd>       
+    </example>
+    -->
+    <example>
+        <descr> Construct quadratic function <i>x'*H*x+Fx+g</i> where <i>H</i>, <i>F</i> and <i>g</i> are regression coefficients from
+        the data <i>x</i> and <i>y</i>. </descr>
+        <descr> The data we want to store </descr>
+        <cmd> data.x = 0:0.01:0.5;</cmd>
+        <cmd> data.y = cos(data.x);</cmd>
+        <cmd> data.file= 'DSCa002';</cmd>
+        <descr> Compute the regression coefficients and store them in <tt>h</tt></descr>
+        <cmd> h = polyfit(data.x,data.y,2); </cmd>
+        <descr> We can store the data from which the function was obtained under <tt>Data</tt> property </descr>
+        <cmd> QuadFunction(h(1),h(2),h(3),data)</cmd>
+	</example>
+
+
+	<!-- multiple related function can be defined -->
+    <related>Function</related>
+    <related>AffFunction</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

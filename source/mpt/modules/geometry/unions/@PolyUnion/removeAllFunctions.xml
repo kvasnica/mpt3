@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>removeAllFunctions</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Remove all functions that are associated to this union of polyhedra.
+	</info>
+	
+	<syntax>U = U.removeAllFunctions</syntax>
+	<syntax>U = removeAllFunctions(U)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Removes all <tt>Function</tt> objects associated to this union of polyhedra. 
+    </descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Object of the <tt>PolyUnion</tt> class that holds polyhedra in the same dimension.</descr>
+		<class name="PolyUnion"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>Modified object of <tt>PolyUnion</tt> class without the function handles.</descr>
+		<class name="PolyUnion"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> Create three polyhedra and two functions to each one of them.</descr>
+        <cmd> for i=1:3, P(i)=ExamplePoly.randHrep; end</cmd>
+        <cmd> P.addFunction(AffFunction([-1,5],-1/8),'affine_function'); </cmd>
+        <cmd> P.addFunction(QuadFunction(eye(2),[-2,4],0.6),'quadratic_function'); </cmd>
+        <descr> Create the union of polyhedra </descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr> Remove all functions handles from the union</descr>
+        <cmd> U.removeAllFunctions </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>addFunction</related>
+    <related>removeFunction</related>
+    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

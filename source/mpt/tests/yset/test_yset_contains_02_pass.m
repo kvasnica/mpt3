@@ -1,0 +1,22 @@
+function test_yset_contains_02_pass
+%
+% 2D test containment, no lifting variables
+%
+
+
+x = sdpvar(2,1);
+
+F = [( -2*x(2) <= x(1)), ( -1<= x <= 1)];
+
+% if we leave default solver it throws an unknown error
+%S = YSet(x,F,sdpsettings('solver','sedumi','verbose',0));
+S = YSet(x,F);
+
+z = [0.5;0.5];
+
+if ~S.contains(z)
+    error('The point must be inside of the set.');
+end
+
+
+end

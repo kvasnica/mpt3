@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mptopt</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Global option handler for MPT.
+	</info>
+	
+	<syntax>mptopt('Parameter1',Value1,'Parameter2',Value2,...)</syntax>
+    
+	<!-- long description of the function -->
+	<descr>
+        The function/class <tt>mptopt</tt> plays the role of global option handler throughout MPT.
+        Any specific option should be changed using <tt>mptopt</tt> function. The syntax follows
+        the "parameter-value" scheme where the <tt>parameter</tt> is the desired option and <tt>value</tt>
+        is the assignment to this option. The changes take effect immediatelly and are valid globally
+        through the whole MPT toolbox. Global options are kept in memory after initialization and 
+        any changes in the option are preserved between sessions.
+        
+	</descr>
+	<!-- now describe input arguments -->
+    <input>
+        <name>Parameter1</name>
+        <descr>The name of the desired option to be changed provided as string. The list of available options can be 
+        obtained by typing <tt>properties('mptopt')</tt> at the Matlab prompt.</descr>
+        <class name="char"/>
+    </input>
+    <input>
+        <name>Value1</name>
+        <descr>The value to be assigned to <tt>Parameter1</tt>. </descr>
+        <class name="double or char"/>
+    </input>
+    <example>
+        <descr>This example shows how to change LP solver to "CDD". </descr>
+        <descr>To list which solvers are installed, invoke <tt>solvers_list</tt> option from <tt>mptopt</tt> class.</descr>
+        <descr>This is achieved by assigning the output from <tt>mptopt</tt> class to some variable and referring to <tt>solvers_list</tt> field as follows:</descr>
+        <cmd> s = mptopt </cmd>
+        <cmd> s.solvers_list.LP </cmd>
+        <descr> If CDD solver is present in the list, it means that it exist on the Matlab path. To change CDD solver as default for solving LP, it can be 
+        done twofold. </descr>
+        <descr> Assignment with the help of the output variable <tt>s</tt>:</descr>
+        <cmd> s.lpsolver = 'CDD'; </cmd>
+        <descr> or calling <tt>mptopt</tt> via standard syntax </descr>
+        <cmd> mptopt('lpsolver','CDD'); </cmd>
+    </example>
+    <example>
+        <descr>Options for any module are stored here as well. For instance, the geometry module of MPT that contains operations
+        on polyhedra has the options stored under </descr>
+        <cmd> s = mptopt; </cmd>
+        <cmd> s.modules.geometry </cmd>
+        <descr> These options can be changed from any instance of the script and take effect globally. To reset to default options
+        use the function </descr>
+        <cmd> mpt_init </cmd>
+    </example>
+	
+	<!-- multiple related function can be defined -->
+    <related>mpt_init</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

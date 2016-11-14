@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_lti4</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Construction of explicit controller for LTI system
+	</info>
+	
+    <syntax>mpt_demo_lti4</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Construction of explicit controller for LTI system
+	</descr>
+
+    <example>
+        <descr>Define an LTI prediction model <i>x^+ = A x + B u</i></descr>
+        <cmd>A = [1 1; 0 1]; B = [1; 0.5];</cmd>
+        <cmd> lti = LTISystem('A', A, 'B', B); </cmd>
+
+        <descr>Define an MPC controller</descr>
+		<cmd>
+			horizon = 5;
+			ctrl = MPCController(lti);
+			ctrl.N = horizon;
+			ctrl.model.x.min = [-5; -5];
+			ctrl.model.x.max = [5; 5];
+			ctrl.model.u.min = -1;
+			ctrl.model.u.max = 1;
+			ctrl.model.x.penalty = QuadFunction(eye(ctrl.model.nx));
+			ctrl.model.u.penalty = QuadFunction(eye(ctrl.model.nu));
+		</cmd>
+        <descr>Compute the explicit solution</descr>
+		<cmd> exp_ctrl = ctrl.toExplicit()</cmd>
+
+        <descr> Plot the explicit feedback law </descr>
+        <cmd> exp_ctrl.feedback.fplot() </cmd>
+
+        <descr>Plot the explicit value function</descr>
+        <cmd>exp_ctrl.cost.fplot() </cmd>
+
+        <descr>Plot the polyhedral partition</descr>
+        <cmd>exp_ctrl.partition.plot()</cmd>
+
+        <descr> Compare the optimal control inputs </descr>
+        <cmd>
+			x0 = [-4; 0];
+			Uonl = ctrl.evaluate(x0),
+			Uexp = exp_ctrl.evaluate(x0)
+		</cmd>
+        
+    </example>
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_lti1</related>
+    <related>mpt_demo_lti2</related>
+    <related>mpt_demo_lti3</related>
+    <related>mpt_demo_lti5</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

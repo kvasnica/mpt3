@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>deltaPenalty</function>
+  
+  <info>
+    Penalizes the increment of a signal
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter penalizes the difference of a signal defined as <i>\Delta s_{k} = s_{k} - s_{k-1} </i>
+    where <i>s</i> is the system signal and <i>k</i> is the time instant.    
+    The filter is activated by calling <tt>s.with('deltaPenalty')</tt>. <br/>
+    
+    Any signal can have this filter, e.g. we can without problems
+    enable slew-rate constraints on states, outputs, or even on binary
+    variables. Non-state signals, however, require that the previous value
+    is specified when calling <tt>MPCController/evaluate</tt>, e.g.
+    <tt>ctrl.evaluate(x0, 'u.previous')</tt>.
+    
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

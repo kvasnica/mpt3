@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<help>
+  <descr title="Installation steps">
+    <ol>
+      <li>Remove any previous installations of MPT2 and YALMIP from your path: <br />
+            <tt>rmpath(genpath(fileparts(which('mpt_init'))))</tt><br />
+            <tt>rmpath(genpath(fileparts(which('yalmipdemo'))))</tt><br />
+        </li>
+        <li>Create a directory where MPT and accompanying toolboxes will be installed to. Call the directory <tt>tbxmanager</tt> for instance.</li>
+      <li>Go to that directory in Matlab.</li>
+      <li>Install tbxmanager, our new mechanism for installing and updating free Matlab toolboxes:<br />
+            <tt>urlwrite('http://control.ee.ethz.ch/~mpt/tbx/tbxmanager.m', 'tbxmanager.m');</tt><br />
+            <tt>savepath</tt><br />
+      </li>      
+      <li>Install MPT and required toolboxes <br />
+          <tt>tbxmanager install mpt mptdoc cddmex fourier glpkmex hysdel lcp sedumi yalmip </tt><br />
+      </li>
+      <li>Edit startup.m and put these lines there:<br/>
+          <tt>tbxmanager restorepath</tt><br />
+          <tt>mpt_init</tt><br />
+      </li>
+      <li>Type <tt>mpt_init</tt> to initialize MPT3.</li>
+    </ol>
+  </descr>
+  
+  <descr title="First steps">
+    Start by exploring MPT demos which can be found in the
+    <tt>demos</tt> directory.
+  </descr>
+  
+    <descr title="Update">
+        The MPT package is continuously updated with new algorithms and bug fixes. It is recommended to keep updated 
+        with the latest version not just for main MPT module but for all submodules. This is achieved via<br />
+        <tt>tbxmanager update</tt><br />
+        command that verifies if there is new version of any module available for download and if yes, then the module will
+        be updated. The process also updates the Matlab path such that no additional steps are required. The new versions are
+        available immediately after update.<br />
+        Note that some modules may require clearing the cached variables for the update to work correctly (if there was any change
+        in the objects and classes). This has to be done by the user issuing the command<br />        
+        <tt>clear all</tt><br />
+        or<br />
+        <tt>clear classes</tt><br />
+        that clears all the cached variables and updates to new classes.        
+    </descr>
+
+    <descr title="Uninstallation">
+        To figure out what is installed on the computer, use the syntax<br />
+        <tt>tbxmanager show installed</tt><br />
+        that returns a list of installed modules. To uninstall the module, type
+        <tt>tbxmanager uninstall</tt> followed by the name of the module. For instance, the command <br />
+        <tt>tbxmanager uninstall mptdoc</tt><br /> will uninstall the module <tt>mptdoc</tt>. If the module has been uninstalled,
+        it is no longer present in the list of installed modules.        
+    </descr>
+</help>

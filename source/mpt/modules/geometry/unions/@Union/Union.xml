@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>Union</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Represents a general union of convex sets in MPT
+	</info>
+	
+	<syntax>U = Union(Set)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>Union</tt> object represent collection of various convex sets. The 
+        only restriction for the sets is to be convex, i.e. they have to be derived from
+        the <tt>ConvexSet</tt> class.
+        
+        You can associate functions to any of the set via <tt>addFunction</tt> method of the 
+        <tt>ConvexSet</tt> class. Function handles and all properties of the sets can be
+        accessed via <tt>Union.Set</tt> property based on the index.
+         
+        For a list of available methods type "methods('Union')".
+    </descr>
+    <input required="true">
+        <name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class. </descr>
+        <class name="ConvexSet"/>
+    </input>
+    <output>
+        <name>U</name>
+        <descr>Object of the <tt>Union</tt> class. </descr>
+        <class name="Union"/>
+    </output>
+
+    <example>
+        <descr> Construct union of two <tt>YSet</tt> objects. </descr>
+        <descr> Define the objects in YALMIP </descr>
+        <cmd> x = sdpvar(2,1); </cmd>
+        <cmd> F1 = [0&lt;= x &lt;=1]; </cmd>
+        <cmd> F2 = [ norm(x-[1;1]) &lt;= 1]; </cmd>
+        <cmd> Y(1) = YSet(x,F1); </cmd>
+        <cmd> Y(2) = YSet(x,F2); </cmd>
+        <descr> Create the union </descr>
+        <cmd> U=Union(Y) </cmd>
+        <descr> Plot the union </descr>
+        <cmd> U.plot </cmd>
+    </example>
+    <example>
+        <descr> Construt the union of two polyhedra in 1D.</descr>
+        <descr> Define the polyhedra </descr>
+        <cmd> P(1) = Polyhedron('lb',-5,'ub',1); </cmd>
+        <cmd> P(2) = Polyhedron('lb',0); </cmd>
+        <descr> Create the union </descr>
+        <cmd> U = Union(P) </cmd>
+        <descr> Plot the polyhedra </descr>
+        <cmd> U.plot('linewidth',3) </cmd>
+    </example>
+    
+	<!-- multiple related function can be defined -->
+	<related>YSet</related>
+	<related>Polyhedron</related>
+    <related>PolyUnion</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

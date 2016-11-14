@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>minus</function>
+  
+  <info>Subtract a Polyhedron or a vector from a Polyhedron.</info>
+  <syntax>Q = P - S</syntax>
+  <syntax>Q = minus(P,S)</syntax>
+  <syntax>Q = P - x</syntax>
+  <syntax>Q = minus(P, x)</syntax>
+  
+  <descr>
+    Compute the Pontryagin difference of <i>P</i> and <i>S</i>, or <i>P</i> and <i>x</i>.
+    <latex>
+      <!-- put spaces between \in and variables to properly parse it to TXT output -->
+      $$Q=P-S=\{ x \in P ~|~ x+w \in P\ \forall w \in S \}$$
+    </latex>
+    or
+    <latex>
+      $$P-x = \{ y-x ~|~ y \in P\}$$
+    </latex>
+  </descr>
+
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>S</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>x</name>
+    <descr>Column vector of length <tt>P.Dim</tt></descr>
+    <class name="Polyhedron"/>
+  </input>
+  
+  <output>
+    <name>Q</name> 
+    <descr>Polyhedron <tt>Q = P-S</tt> or <tt>Q = P-x</tt>.</descr>
+    <class name="Polyhedron"/>
+  </output>
+
+  <example>
+    <descr>Subtract one polytope from another</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+    <cmd>S = Polyhedron('lb',[-1;-1]*0.1,'ub',[1;1]*0.1);</cmd>
+    <cmd>Q = P-S;</cmd>
+    <cmd>P.plot('color','b'); hold on;
+	Q.plot('color','g');
+	S.plot('color','r');</cmd>
+  </example>
+
+  <example>
+    <descr>Subtract a line segment from a polytope</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+    <cmd>S = Polyhedron('V', 0.1*[-1 1;1 -1]);</cmd>
+    <cmd>Q = P-S;</cmd>
+    <cmd>P.plot('color','b'); hold on;
+	 Q.plot('color','r');
+	 S.plot('color','g','linewidth',2);</cmd>
+  </example>
+
+  <example>
+    <descr>Unbounded polyhedron minus lower-dimensional polytope</descr>
+    <cmd>P = Polyhedron('lb',-[1;1;1]*0.5,'ub',[1;1;1]*0.5,'He',[randn(1,3) 0.1]); </cmd>
+    <cmd>S = Polyhedron('V',randn(10,3),'R',[1 1 1])+[1;1;1]; </cmd>
+    <cmd>Q = S-P; </cmd>
+    <cmd>P.plot('color', 'g'); hold on;
+	 S.plot('color', 'b');
+	 Q.plot('color','r');
+    </cmd>
+  </example>
+
+
+
+<!--
+
+  <example>
+    <descr>Sum of a polytope and a cone</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);
+      S = Polyhedron('R', [1 1;1 0.5]);
+    Q = P + S;
+    S.plot('color','b','alpha',0.5); hold on;
+    P.plot('color','g','alpha',0.5); 
+    Q.plot('color','r','alpha',0.2);</cmd>
+  </example>
+
+  <example>
+    <descr>Sum of lower dimensional polytopes</descr>
+    <cmd>P = Polyhedron('lb',-ones(3,1),'ub',ones(3,1),'He',[1 1 1 0.2]);
+      S = Polyhedron('lb',-ones(3,1),'ub',ones(3,1),'He',[-1 1 1 0.4]);
+    Q = P + S;
+    S.plot('color','b','alpha',0.5); hold on;
+    P.plot('color','g','alpha',0.5); 
+    Q.plot('color','r','alpha',0.2);</cmd>
+  </example>
+
+  <example>
+    <descr>Build a zonotope by adding line segments.</descr>
+    <cmd>Z = Polyhedron;
+      for(i=1:5)Z = Z + Polyhedron('V',[0 0 0;randn(1,3)]);end;
+      Z.plot('color','b','alpha',0.7);
+    </cmd>
+  </example>
+-->
+  <related>plus</related>
+  <!-- multiple related function can be defined -->
+  
+  <!-- multiple literature sources can be given -->
+  <!-- <literature>Fukuda : PolyFaq</literature> -->
+  
+  <!-- multiple authors can be defined -->
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>simulate</function>
+  
+  <info>
+    Simulates evolution of the system
+  </info>
+  <syntax>data = system.simulate(U)</syntax>
+
+  <descr> 
+    <tt>data = system.simulate(U)</tt> computes evolution of system's
+    states and outputs, starting from the system's internal state and
+    using a sequence of inputs <tt>U</tt>.<br/>
+
+    Each column of <tt>U</tt> is interpreted as the control action to
+    use at the m-th step of the simulation. The total number of
+    simulation steps is given by the number of columns
+    of <tt>U</tt>. To simulate an autonomous system over <tt>M</tt>
+    steps, you need to define <tt>U=zeros(0, M)</tt>.<br/>
+
+    This function returns a structure <tt>data</tt>, which contains
+    the simulated evolution of system's states (in <tt>data.X</tt>)
+    and the outputs (in <tt>data.Y</tt>), respectively.<br/>
+    
+    Note that you should always run <tt>system.initialize(x0)</tt> to
+    set the initial condition prior to running the simulation.<br/>
+
+    Also note that the <tt>simulate</tt> method updates the internal
+    system's state. Therefore once the function completes, the
+    internal state will be set to the final value obtained at the end
+    of the simulation.
+  </descr>
+
+  <input required="true">
+    <name>U</name>
+    <descr>Matrix of control inputs stored column-wise for each
+    simulation step.</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>data</name>
+    <descr>Structure with simulated state and output profiles.</descr>
+    <class name="struct"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

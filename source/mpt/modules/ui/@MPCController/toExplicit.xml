@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>toExplicit</function>
+  
+  <info>
+    Computes the explicit solution to the MPC optimization problem
+  </info>
+  <syntax>expctrl = controller.toExplicit()</syntax>
+
+  <descr> 
+    <tt>expctrl = controller.toExplicit()</tt> computes the explicit
+    solution to the MPC optimization problem defined by the
+    <tt>controller</tt> object and returns an instance of a class
+    representing explicit MPC controllers.<br/>
+
+    The generated explicit controller inherits all methods and
+    properties of the input object.
+  </descr>
+  
+  <related>EMPCController</related>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_lti5</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demostration of problem formulation using additional properties.
+	</info>
+	
+    <syntax>mpt_demo_lti5</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Formulation of MPC problem using terminal cost, terminal set constraints, and move blocking constraint.
+	</descr>
+
+    <example>
+        <descr> Define an LTI prediction model </descr>
+        <cmd> lti = LTISystem('A', [1 1; 0 1], 'B', [1; 0.5]); </cmd>
+        
+        <descr> Define the MPC controller </descr>
+        <cmd> horizon = 5; </cmd>
+        <cmd> ctrl = MPCController(lti, horizon); </cmd>
+        
+        <descr> Define quadratic penalties </descr>
+        <cmd> ctrl.model.x.penalty = QuadFunction(eye(2)); </cmd>
+        <cmd> ctrl.model.u.penalty = QuadFunction(1); </cmd>
+        <cmd> onl_ctrl.model.x.terminalPenalty = QuadFunction(10*eye(2)); </cmd>
+        
+        <descr> Add a terminal set constraint (see <tt>help SystemSignal/filter_terminalSet</tt>) </descr>
+        <cmd>ctrl.model.x.with('terminalSet');</cmd>
+        <cmd>ctrl.model.x.terminalSet = Polyhedron('lb', [-1; -1], 'ub', [1; 1]);</cmd>
+        
+        <descr> Add an LQR terminal penalty (see <tt>help SystemSignal/filter_terminalPenalty</tt>) </descr>
+        <cmd>lqr_penalty = ctrl.model.LQRPenalty(); </cmd>
+        <cmd>ctrl.model.x.with('terminalPenalty');</cmd>
+        <cmd>ctrl.model.x.terminalPenalty = lqr_penalty;</cmd>
+        
+        <descr> Add a move-blocking constraint (the last 3 moves are to be constant) </descr>
+        <cmd>ctrl.model.u.with('block');</cmd>
+        <cmd>ctrl.model.u.block.from = ctrl.N-2;</cmd>
+        <cmd>ctrl.model.u.block.to = ctrl.N; </cmd>
+        
+        <descr> Obtain the optimal control input </descr>
+        <cmd>x0 = [-4; 0];</cmd>
+        <cmd>[Uonl, feasible] = ctrl.evaluate(x0)</cmd>
+        
+        <descr> We can also ask for full open-loop predictions: </descr>
+        <cmd>[~, ~, openloop] = ctrl.evaluate(x0) </cmd>
+        
+        <descr> Plot the open-loop predictions </descr>
+        <cmd> ctrl.model.plot </cmd>
+    </example>
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_lti1</related>
+    <related>mpt_demo_lti2</related>
+    <related>mpt_demo_lti3</related>
+    <related>mpt_demo_lti4</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

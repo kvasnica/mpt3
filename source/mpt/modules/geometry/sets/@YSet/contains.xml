@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>contains</function>
+  
+  <info>
+      Test if the point is contained inside convex set <tt>YSet</tt>.
+  </info>
+  <syntax>ts = S.contains(x)</syntax>
+  <syntax>ts = contains(S, x)</syntax>
+  
+  <descr>
+    Returns true if <i>x \in S </i> and false otherwise.
+  </descr>
+  
+  <input required="true">
+    <name>S</name>
+    <descr>A convex set described as <tt>YSet</tt> object.</descr>
+    <class name="YSet"/>
+  </input>
+  <input required="true">
+    <name>x</name>
+    <descr>A point given as vector. Note that for <tt>YSet</tt> with symmetric matrix variable,
+    the point <tt>x</tt> must be given as vector with symmetric terms.</descr>
+    <class name="double"/>
+  </input>
+  
+  <output>
+    <name>ts</name>
+    <descr>True if the point <tt>x</tt> is contained inside <tt>YSet</tt></descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  
+  <example>
+      <descr>Create two sets: polytope <tt>P</tt> and circle <tt>C</tt> in 2D.</descr>
+    <cmd>x = sdpvar(2,1);</cmd>
+    <cmd>F1 = [ [1 -2;-0.4 1;0.6 -5]*x&lt;=[1;1.2;1.7] ];</cmd>
+    <cmd>F2 = [ 0.3*x'*x-4*x(1)+2*x(2)&lt;=0.1 ];</cmd>
+    <cmd>P = YSet(x,F1);</cmd>
+    <cmd>C = YSet(x,F2);</cmd>
+    <descr>It is obvious that the point <tt>x=[0;0]</tt> must lie inside both sets.</descr>
+    <descr> Define the point <tt>v</tt> and the array <tt>S</tt>. </descr>
+    <cmd>v = [0;0];</cmd>
+    <cmd>S = [P;C];</cmd>
+    <descr> Check if the point is contained in both sets. </descr>
+    <cmd> S.contains(v) </cmd>
+    <descr> We can plot the sets and the point <tt>x</tt>. </descr>
+    <cmd> S.plot; hold on; text(v(1),v(2),'\bf x'); </cmd>
+    <descr> For instance, the point <tt>z=[5;-5]</tt> lies only in the set <tt>C</tt>. </descr>
+    <cmd> z = [5;-5]; </cmd>
+    <cmd> S.contains(z) </cmd>
+  </example>
+   
+  <related>YSet</related>
+  
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+  
+</help>

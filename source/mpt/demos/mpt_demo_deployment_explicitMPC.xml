@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_deployment_explicitMPC</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Application of explicit MPC controller with the help of Simulink interface
+	</info>
+	
+    <syntax>mpt_demo_deployment_explicitMPC</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Demonstration of real-time control using explicit MPC controller. 
+       This demo shows how to design an explicit controller for usage in 
+       real-time control in Real-Time Workshop. 
+       The code generation and compilation for real-time has been tested 
+       under Real-Time Windows target on Windows 32-bit and 64-bit platforms.<br />
+        
+        Deployment steps:
+        <ol>
+            <li> Generate the explicit controller that has the desired properties. </li>
+            <li> Export the explicit controller to C-code using <tt>mpt_exportToC</tt> function. </li>
+            <li> Create a Simulink scheme with the S-Function block that represents generated controller. </li>
+            <li> In the Simulink scheme, choose code generation options and pick <bf>rtwin.tlc</bf> as the
+                system target file (e.g. for Real-Time Windows target). </li>
+            <li> In the code generation options, go to "Custom Code" tab and put in "Source files" the absolute path to generated files.</li>
+            <li> Press "CTRL+B" that executes the code generation and compiles the code. </li>
+            <li> In the Simulink scheme choose "Simulation-&gt;External" option and press "Connect To Target". </li>
+            <li> Start the simulation to verify the controller. </li>
+        </ol>
+        
+	</descr>    
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_deployment_onlineMPC</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

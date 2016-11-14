@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>eliminateEquations</function>
+	
+	<info>
+		Transforms LP/QP/MPLP/MPQP to LPC/PLCP
+	</info>
+
+    <syntax>problem.qp2lcp</syntax>
+    <syntax>qp2lcp(problem)</syntax>    
+
+    <descr>
+        Transformation of LP, QP, MPLP, and MPQP to LCP/PLCP formulation.
+        Consider the following MPQP format that is accepted by <tt>Opt</tt> class:
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {x}^{T}Hx+{(F\theta+f)}^{T}x \label{eq:qp2lcp:QP0-obj} \\
+				\text{s.t.} &amp;&amp; Ax \le  b + B\theta  \label{eq:qp2lcp:QP0-ineq}\\
+				&amp;&amp; {A}_{e}x = {b}_{e} + E\theta \label{eq:qp2lcp:QP0-eq} \\
+                &amp;&amp; {A}_{\theta}\theta = {b}_{\theta} \label{eq:qp2lcp:QP0-theta} \\
+            \end{eqnarray} 
+        </latex>
+        which contains <i>m</i>inequality constrains and <i>m_{e}</i> equality constraints and constraints on the
+        parameter <i>\theta</i>. If there are lower and upper bounds on the variables <i>x</i> present, i.e. 
+        <tt>lb</tt> and <tt>ub</tt>, these can be merged to inequalities <i>\eqref{eq:qp2lcp:QP0-ineq}</i>.
+        This format is not appropriate for transformation to LCP form because it contains
+        equality constraints and the inequalities are not nonnegative.
+        
+        To get appropriate LCP representation, the equality constrains of the problem 
+        <i>\eqref{eq:qp2lcp:QP0-obj}-\eqref{eq:qp2lcp:QP0-theta}</i> are removed using <tt>eliminateEquations</tt> method
+        of the <tt>Opt</tt> class. The intermediate form of the optimization problem is given as
+        <latex>          
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {{x}_{Nc}}^{T}\tilde{H}{x}_{Nc}+{(\tilde{F}\theta + \tilde{f})}^{T}{x}_{Nc} \label{eq:qp2lcp:QP1-obj} \\
+				\text{s.t.} &amp;&amp; \tilde{A}{x}_{Nc} \le  \tilde{b} + \tilde{B}\theta \label{eq:qp2lcp:QP1-ineq} \\		
+                &amp;&amp; {A}_{\theta}\theta = {b}_{\theta} \label{eq:qp2lcp:QP1-theta} \\                
+            \end{eqnarray}             
+        </latex>
+        with <i>x_{Nc}</i> as the non-basic variables that map to <i>x</i> affinely.
+        
+               
+        Problem <i>\eqref{eq:qp2lcp:QP1-obj}-\eqref{eq:qp2lcp:QP1-ineq}</i> can be transformed effectively when 
+        considering the rank of the matrix <i>\tilde{A}</i>.
+        If the rank of matrix <i>\tilde{A}</i> is less than the number of inequalities in <i>\eqref{eq:qp2lcp:QP1-ineq}</i>, then
+        vector <i>x_{N}</i> can be expressed as a difference of two positive numbers, i.e.
+        <latex>
+            \begin{eqnarray}
+            {x}_{Nc} &amp; = &amp; {{x}_{Nc}}^{+} - {{x}_{Nc}}^{-} \\
+            {{x}_{Nc}}^{+} &amp; \ge &amp; 0 \\
+            {{x}_{Nc}}^{-} &amp; \ge &amp; 0
+            \end{eqnarray}
+        </latex>
+        Using the substitution
+        <latex>
+            \begin{equation}
+                v = \begin{pmatrix} {{x}_{Nc}}^{+} \\ {{x}_{Nc}}^{-} \end{pmatrix}
+            \end{equation}
+        </latex>
+        and putting back to <i>\eqref{eq:qp2lcp:QP1-obj}-\eqref{eq:qp2lcp:QP1-ineq}</i> we get
+        <latex>
+			\begin{eqnarray}
+  				\min &amp;&amp;  {\frac{1}{2}} {v}^{T} \begin{pmatrix} \tilde{H} &amp; -\tilde{H} \\ -\tilde{H} &amp; \tilde{H} \end{pmatrix} v
+                + {\left( \begin{pmatrix} {\tilde{F}} &amp; -{\tilde{F}} \end{pmatrix}\theta
+                \begin{pmatrix} {\tilde{f}} &amp; -{\tilde{f}} \end{pmatrix} \right)}^{T} {v}   \label{eq:qp2lcp:QP2-obj}\\
+				\text{s.t.} &amp;&amp; \begin{pmatrix}-\tilde{A} &amp; \tilde{A} \end{pmatrix} {v} \ge  -\tilde{b}
+                -\tilde{B}\theta \label{eq:qp2lcp:QP2-ineq}\\
+                &amp;&amp; v \ge 0
+			\end{eqnarray} 
+        </latex>        
+        which is a form suitable for PLCP formulation.
+        
+        
+        If the rank of matrix <i>\tilde{A}</i> is greater or equal than the number of inequalities in <i>\eqref{eq:qp2lcp:QP1-ineq}</i>, 
+        we can factorize the matrix <i>\tilde{A}</i> rowwise
+        <latex>
+		   \[
+            \tilde{A} = 
+            \begin{pmatrix} 
+            {\tilde{A}}_{B} \\ {\tilde{A}}_{N}
+            \end{pmatrix}            
+            \]
+		</latex>
+        where <i>B</i>, <i>N</i> are index sets corresponding to rows from which submatrices are built. The factored system
+        can be written as
+        <latex>
+            \begin{eqnarray}
+            -{\tilde{A}}_{B}{x} &amp;= &amp; -\tilde{b}_{B} -\tilde{B}\theta  + y\\
+            -{\tilde{A}}_{N}{x} &amp;\ge &amp; -\tilde{b}_{N} -\tilde{B}\theta \\
+                                y &amp; \ge &amp; 0
+            \end{eqnarray}
+        </latex>
+        where the matrix <i>{\tilde{A}}_{B}</i> form by rows in the set <i>B</i> must be invertible.                
+        Using this substitution the system <i>\eqref{eq:qp2lcp:QP1-obj}\eqref{eq:qp2lcp:QP1-theta}</i> can be rewritten in variable <i>y</i>
+        <latex>
+            \begin{eqnarray}
+            	\min &amp;&amp;  {\frac{1}{2}} {y}^{T} \hat{H} y + {(\hat{F}\theta+\hat{f})}^{T} y \label{eq:qp2lcp:QP3-obj}\\
+				\text{s.t.} &amp;&amp; \hat{A} \ge \hat{b} + \hat{B}\theta  \label{eq:qp2lcp:QP3-ineq1} \\
+                            &amp;&amp;  y \ge 0 \label{eq:qp2lcp:QP3-ineq2}
+            \end{eqnarray}
+        </latex>
+        which is suitable for PLCP formulation where
+        <latex>
+            \begin{eqnarray}
+             \hat{H} &amp; = &amp; {{\tilde{A}}_{B}}^{-T}\tilde{H}{{\tilde{A}}_{B}}^{-1} \\
+             \hat{F} &amp; = &amp; -({\tilde{A}_{B}}^{-T}\tilde{H}{{\tilde{A}}_{B}}^{-1}{\tilde{B}}_{B} -{{\tilde{A}}_{B}}^{-T}\tilde{F} \\
+             \hat{f} &amp; = &amp; -{{\tilde{A}}_{B}}^{-T}\tilde{H}{{\tilde{A}}_{B}}^{-1}{b}_{B}-{{\tilde{A}}_{B}}^{-T}\tilde{f}  \\
+             \hat{A} &amp; = &amp;  {\tilde{A}}_{N}{{\tilde{A}}_{B}}^{-1} \\
+             \hat{b} &amp; = &amp; {\tilde{A}}_{N}{{\tilde{A}}_{B}}^{-1}{b}_{B}-{b}_{N} \\
+             \hat{B} &amp; = &amp; {\tilde{A}}_{N}{{\tilde{A}}_{B}}^{-1}{B}_{B}-{b}_{N} -{B}_{N} 
+            \end{eqnarray}
+        </latex>
+        
+        The corresponding PLCP can be written as follows:       
+        <latex>
+            \begin{eqnarray}
+            w - Mz &amp;= &amp; q + Q\theta \\ 
+            w &amp; \ge &amp; 0 \\
+            z &amp; \ge &amp; 0 \\
+            {w}^{T}z &amp; = &amp; 0        
+            \end{eqnarray}                        
+        </latex>
+        where the problem data are built from MPQP <i>\eqref{eq:qp2lcp:QP3-obj}-\eqref{eq:qp2lcp:QP3-ineq2}</i>
+        <latex>
+            \begin{eqnarray}
+                M &amp; = &amp; \begin{pmatrix} \hat{H} &amp; -{\hat{A}}^{T} \\ \hat{A} &amp; 0  \end{pmatrix} \\
+                q &amp; = &amp; \begin{pmatrix} \hat{f} \\ -\hat{b} \end{pmatrix} \\
+                Q &amp; = &amp; \begin{pmatrix} \hat{F} \\ -\hat{B} \end{pmatrix}
+            \end{eqnarray}
+        </latex>
+
+        Original solution to MPQP problem <i>\eqref{eq:qp2lcp:QP0-obj}-\eqref{eq:qp2lcp:QP0-eq}</i> can be obtained 
+        by affine map from the variables <i>w(\theta)</i> and <i>z(\theta)</i> to <i>x</i>. The matrices of the backward map are stored inside
+        <tt>recover</tt> property of the <tt>Opt</tt> class as follows
+        <latex>
+            \[
+            {x} = \text{uX}\begin{pmatrix} w \\ z \end{pmatrix} + \text{uTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} 
+            \]
+        </latex>
+        If the problem was formulated using YALMIP, it is possible that some variables are in the different order. The original
+        order of variables is stored in <tt>problem.varOrder.requested_variables</tt> and the map to original variables is given by
+        <latex>
+            \[
+            {x} = \text{primalX}\begin{pmatrix} w \\ z \end{pmatrix} + \text{primalTh}\begin{pmatrix} \theta \\ 1 \end{pmatrix} 
+            \]
+        </latex>        
+                
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+        <name>problem</name>
+        <descr> LP/QP/MPLP/MPQP optimization problem given as <tt>Opt</tt> class. </descr>
+        <class name="Opt"/>
+    </input>
+	
+    <example>
+        <descr>Consider MPQP in the following form
+        <latex>
+            \begin{eqnarray}\label{eq:ex:mpQP}
+            \underset{x}{\text{min}} &amp;  x^2  \\
+            \text{s.t.} &amp; \theta_1-\theta_2-x \le 0.2 \notag\\
+            &amp; -0.5\theta_1+\theta_2-x\le 0.4  \notag \\
+            &amp; -1 \le x \le 1 \notag \\
+            &amp; 0 \le \theta_1 \le 1 \notag \\
+            &amp; 0 \le \theta_2 \le 1 \notag
+            \end{eqnarray}
+        </latex>
+            with one decision variables <i>x</i> and two parameters <i>{\theta}_1</i>, <i>{\theta}_2</i>.            
+        </descr>
+        <descr> Construct MPQP optimization problem </descr>
+        <cmd> H = 1; </cmd>
+        <cmd> A = [-1; -1]; b = [0.2; 0.4]; pB = [-1, 1; 0.5, -1]; </cmd>
+        <cmd> lb = -1; ub = 1; </cmd>
+        <cmd> Ath = [1 0;-1 0;0 1;0 -1]; bth = [1;1;1;1]; </cmd>
+        <cmd> problem = Opt('H',H,'A',A,'b',b,'pB',pB,'lb',lb,'ub',ub,'Ath',Ath,'bth',bth) </cmd>
+        <descr> Transform <tt>problem</tt> to PLCP form </descr>
+        <cmd> problem.qp2lcp </cmd>
+        <descr> Solve the appropriate PLCP </descr>
+        <cmd> solution = problem.solve </cmd>
+        <descr> Plot the optimizer, for instance the variables <i>z</i>. </descr>
+        <cmd> solution.xopt.fplot('z') </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>solve</related>
+    <related>mpt_call_lcp</related>
+
+	<!-- multiple literature sources can be given -->
+    <literature macro="boyd_cvxbook"/>
+    <literature macro="lcp_book"/>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

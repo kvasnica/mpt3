@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>invAffineMap</function>
+  
+  <!-- one-line description of the function -->
+  <info>
+    Compute the inverse affine map of the Polyhedron.
+  </info>
+  <!-- we can define multiple ways to call the function -->
+  <!-- note that we can freely use the underscore in function names -->
+  <syntax>Q = P.invAffineMap(T)</syntax>
+  <syntax>Q = P.invAffineMap(T, t)</syntax>
+  
+  <descr>
+	  Computes an inverse affine map <tt>Q</tt> of polyhedron <tt>P</tt>
+	  based on the transformation matrix <i>T</i> and vector <i>t</i>. The polyhedron <tt>Q</tt> is given by
+    <latex>
+      \begin{equation}
+	    Q = \{ x \in \mathbb{R}^n ~|~ Tx+t \in P \}
+      \end{equation}
+    </latex>    
+	The matrix <tt>T</tt> must be a square real matrix. The vector <tt>t</tt>, if omitted,
+	defaults to a zero vector of corresponding dimension.
+  </descr>
+  <!-- now describe input arguments -->
+  
+  <!-- mark inputs as mandatory by providing the "required" attribute -->
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="Polyhedron"/>
+  </input>
+  <input required="true">
+    <name>T</name>
+    <descr>Transformation matrix.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+  </input>
+  <input required="false">
+    <name>t</name>
+    <descr>Transformation vector.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+  </input>
+
+  
+  <!-- now describe output arguments -->
+  <output>
+    <name>Q</name>
+    <descr>Polyhedron representing the affine map in H-representation.</descr>
+    <class name="Polyhedron"/>
+  </output>
+  
+  <example>
+    <descr>Inverse affine map of a unit box.</descr>
+    <cmd>P = Polyhedron('lb', [-1; -1], 'ub', [1; 1]);</cmd>
+    <descr>Inverse affine map with the matrix [1 1; 0 1] </descr>
+    <cmd>Q = P.invAffineMap([1 1; 0 1]) </cmd>
+	<descr>Plot P and Q.</descr>
+    <cmd>plot([P, Q]);</cmd>
+  </example>
+  
+  <related>affineHull</related>
+  
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>support</function>
+	
+	<info>Compute the support of the set in the specified direction.</info>
+	<syntax>s = support(S,x)</syntax>
+	<syntax>s = S.support(x)</syntax>
+
+	<descr>
+        Compute the support of the set in the direction given by the point <tt>x</tt>. 
+        The underlying optimization problem to be solved is as follows
+        <latex>
+            \begin{align*}
+            \underset{y}{\text{max}} \; {x'y}  \\
+                \text{s.t.} \quad  y \in \texttt{Set}
+            \end{align*}
+        </latex>        
+        where <i>x</i> is the point with the desired direction and <i>y</i> is the point lying inside the
+        convex <tt>Set</tt>. The support is returned as the optimal value of the objective function <i> x'y</i>.
+        The dimension of <tt>x</tt> must be the same as the <tt>Set</tt>. If an
+        error occurs during by solving the above optimization problem, the support is empty.
+	</descr>
+
+	<input required="true">
+	  <name>S</name>
+      <descr>Any set derived from <tt>ConvexSet</tt> class, e.g. <tt>YSet</tt> or <tt>Polyhedron</tt>.</descr>
+	  <class name="ConvexSet"/>
+	</input>
+    <input required="true">
+	  <name>x</name>
+      <descr>The point given as real vector in the same dimension as the <tt>ConvexSet</tt>.</descr>
+	  <class name="double"/>
+	</input>
+
+
+	<output>
+	  <name>s</name> 
+      <descr>The support is returned as the optimal value of the cost function.
+      </descr>
+	  <class name="double"/>
+	</output>
+
+    <example>
+        <descr>Describe a convex using YALMIP</descr>
+        <cmd>x = sdpvar(2,1);</cmd>
+        <cmd>F = set(0.3*x'*x -0.7*x(1)&lt;=1) + set(-x(1)+2.3*x(2)&lt;=0.5);</cmd>
+        <cmd>S = YSet(x,F); </cmd>
+        <descr> Compute the support in the direction of the point <tt>v=[1,1]</tt> </descr>
+        <cmd> v = [1;1]; </cmd>
+        <cmd> s = S.support(v) </cmd>
+        <descr> Check if the support was computed properly by computing the point <i>y</i> </descr>
+        <cmd> r = S.extreme(v) </cmd>
+        <descr> Check the objective value</descr>
+        <cmd> r.x'*v </cmd>
+        <descr> Plot the set with the points <tt>x</tt>, <tt>y</tt></descr>
+        <cmd> S.plot; hold on; text(v(1),v(2),'\bf x'); text(r.x(1),r.x(2),'\bf y');</cmd>
+    </example>
+	
+	<!-- multiple related function can be defined -->
+	<related>separate</related>
+    <related>distance</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+	
+	<license macro="GPL2"/>
+</help>

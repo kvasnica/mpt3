@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>getFunction</function>
+	
+	<info>Extract function from PolyUnion object.</info>
+	<syntax>Un = U.getFunction(name)</syntax>
+	<syntax>Un = getFunction(U,name)</syntax>
+
+	<descr>
+        Extract single function from the <tt>PolyUnion</tt> object, if it has some functions associated to the sets.
+        The extraction is based on the string under which the functions are stored.
+        This method is useful for retrieving particular data from the result returned by parametric solver which contains
+        typically functions such as "primal", "obj" corresponding to primal solution and objective function.
+    </descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+	<input required="true">
+	  <name>name</name>
+	  <descr>Name of the function to extract given as string.</descr>
+	  <class name="string"/>
+	</input>
+
+    
+    <example>
+        <descr>Create a partition by triangulation of polyhedron <i>P</i>.</descr>        
+        <cmd>P = 5*ExamplePoly.randVrep;</cmd>
+        <descr> Triangulate the polyhedron </descr>
+        <cmd> T = P.triangulate; </cmd>
+        <descr> Assign two functions to each polyhedron and give them names "a" and "b".</descr>
+        <cmd> for i=1:numel(T),
+                 T(i).addFunction(AffFunction(randn(1,2)),'a');
+                 T(i).addFunction(Function(@(x)norm(x,Inf)),'b');
+              end
+        </cmd>
+        <descr>Create the union of polyhedra by specifying some properties.</descr>
+        <cmd> U = PolyUnion('Set',T,'convex',true,'overlaps',false,'fulldim',true,'bounded',true) </cmd>
+        <descr> Extract only function "b" from the union.</descr>
+        <cmd> Un = U.getFunction('b')</cmd>
+        <descr> We can plot the function over partition <tt>Un</tt>.</descr>
+        <cmd> Un.fplot </cmd>
+    </example>
+
+	<!-- multiple authors can be defined -->
+    <author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

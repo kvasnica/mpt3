@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>chebyCenter</function>
+  
+  <!-- one-line description of the function -->
+  <info>
+    Compute the Chebyshev centre of the Polyhedron.
+  </info>
+  <!-- we can define multiple ways to call the function -->
+  <!-- note that we can freely use the underscore in function names -->
+  <syntax>s = P.chebyCenter</syntax>
+  <syntax>s = P.chebyCenter(facet)</syntax>
+  <syntax>s = P.chebyCenter(facet,bound)</syntax>
+  <syntax>s = chebyCenter(P,facet,bound)</syntax>
+  
+  <descr>
+      Computes the Chebyshev centre of a polyhedron via solving the following optimization problem
+        <latex>
+            \begin{align*}
+            &amp;\quad \underset{{x,r}}{ ~\text{max}} \; {r}  \\
+                \text{s.t.} &amp;\quad  {{a}_{i}}^{T}x + {\|{a}_{i}\|}_{2}r \le {b}_{i}, \quad i=1,\ldots,m \\
+                &amp; \quad {A}_{e}x = {b}_{e}
+            \end{align*}
+        </latex>
+        where <i>x</i> is the centre of the ball inscribed inside the H-representation of the polyhedron <tt>P</tt>
+        and <i>r</i> is the radius of the ball. The polyhedron is given as
+        <i>P = \{ x ~|~ Ax \le b, {A}_{e}x={b}_{e} \}</i> with <i>m</i> inequalities and <i>m_e</i> equalities.
+
+        It is possible to compute the Chebyshev centre restricted to one or more facets of polyhedron by providing
+        vector of indices <tt>facet</tt>. Note that the polyhedron must be in its minimal representation in order
+        to have facets. If the facet indices are provided, the inequalities in the above optimization problem
+        belonging to these indices change to equality constraints.
+        
+        It is also possible to upper bound the radius <tt>r</tt> by specifying <tt>bound</tt> input. In this case
+        the constraint <i> r&lt;=\text{bound}</i> is added.
+
+</descr>
+  <!-- now describe input arguments -->
+  
+  <!-- mark inputs as mandatory by providing the "required" attribute -->
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in H-representation.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="Polyhedron"/>
+  </input>
+  <input required="false">
+    <name>facet</name>
+    <descr>Vector of indices specifying a subset of facets for computing the Chebyshev centre.</descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+    <default>[]</default>
+  </input>
+  <input required="false">
+    <name>bound</name>
+    <descr>Upper bound on the radius of the inscribed ball. </descr>
+    <!-- any class name can be used, it can even be omitted -->
+    <class name="double"/>
+    <default>Inf</default>
+  </input>
+
+  
+  <!-- now describe output arguments -->
+  <output>
+    <name>s</name>
+    <descr>Structure with outputs from the Chebyshev centre optimization problem.</descr>
+    <class name="struct">
+        <field>
+            <name>exitflag</name>
+            <descr>Informs if the optimization problem was terminated properly.</descr>
+            <class name="double"/>
+        </field>
+        <field>
+            <name>x</name>
+            <descr>Centre of the ball inscribed in polyhedron <tt>P</tt>.</descr>
+            <class name="double"/>
+        </field>
+        <field>
+            <name>r</name>
+            <descr>Radius of the ball inscribed in polyhedron <tt>P</tt>.</descr>
+            <class name="double"/>
+        </field>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Chebyshev centre for 2D polyhedron.</descr>
+    <descr>Define the polyhedron <tt>P</tt> 2D.</descr>
+    <cmd> P = ExamplePoly.randHrep; </cmd>
+    <descr>Compute the centre of the ball inscribed ball </descr>
+    <cmd>s = P.chebyCenter </cmd>
+    <descr>Construct the circle out of the result.</descr>
+    <cmd>x = sdpvar(2,1); </cmd>
+    <cmd>F = [norm(x-s.x)&lt;=s.r]; </cmd>
+    <cmd> circle = YSet(x,F); </cmd>
+    <descr> plot the sets </descr>
+    <cmd> plot(P); hold on; plot(circle); </cmd>
+  </example>
+  
+  <author macro="author_cnj"/>
+  <author macro="author_herceg"/>
+  <license macro="GPL2"/>
+</help>

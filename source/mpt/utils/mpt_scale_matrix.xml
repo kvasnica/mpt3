@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_scale_matrix</function>
+	
+	<info>
+		Scales matrix row-wise and column-wise
+	</info>
+
+    <syntax>[An,D1,D2] = mpt_scale_matrix(A)</syntax>
+
+    <descr>
+        Scales matrix <i>A</i> by finding diagonal matrices <i>D_1</i> and <i>D_2</i>
+        in <i>A_{n} = D_{1}AD_{2}</i> such that infinity
+        norm of each row and column approaches 1.
+
+        The problem is given as
+        <latex>
+            \begin{eqnarray*}
+            \text{min} \quad \|D_{1}AD_{2}\| ) \\
+            ~ \text{s.t.} ~~ A_{n} = D_{1}AD_{2}
+            \end{eqnarray*}
+        </latex>
+        
+        Scaling matrix is used in solving linear equations of the type <i>Ax=b</i>
+        for badly scaled matrix <i>A</i> as follows:
+        <latex>
+            \begin{eqnarray}
+            Ax= b  &amp;  \\
+            {D}_{1}Ax = {D}_{1}b  &amp; ~ \text{multiply from left by} ~ {D}_{1} \\
+            {D}_{1}AD_{2}D_{2}^{-1}x = {D}_{1}b   &amp; ~ \text{insert} ~ {D}_{2}{D}_{2}^{-1}  \\
+            {D}_{1}AD_{2}y = D_{1}b &amp; ~  \text{substitute} ~ y = {D}_{2}^{-1}x \\
+            {A}_{n}y = {b}_{n}  &amp; ~   \text{substitute} ~ {A}_{n} = {D}_{1}AD_{2},~ {b}_{n} = D_{1}b \\
+            \end{eqnarray}
+        </latex>
+        First solve <i>A_{n}y = b_{n}</i>, then obtain <i>x = D_{2}y</i>.
+        
+	</descr>
+	
+    <input>
+        <name>A</name>
+        <descr> Input matrix do be scaled. The matrix can be also rectangular. </descr>
+        <class name="double"/>
+    </input>
+	
+	<!-- now describe output arguments -->
+	<output>
+        <name>An</name>
+        <descr> Scaled matrix <i>A</i> such that <i>A_{n}=D_{1}AD_{2}</i>.</descr>
+        <class name="double"/>        
+	</output>
+	<output>
+        <name>D1</name>
+        <descr> Diagonal matrix <i>D_1</i> such that <i>A_{n}=D_{1}AD_{2}</i>.</descr>
+        <class name="double"/>        
+	</output>
+	<output>
+        <name>D2</name>
+        <descr> Diagonal matrix <i>D_2</i> such that <i>A_{n}=D_{1}AD_{2}</i>.</descr>
+        <class name="double"/>        
+	</output>
+
+    
+	<!-- multiple related function can be defined -->
+    <related>mptopt</related>    
+    <related>mpt_solve</related>        
+		
+    <literature macro="scaling1"/>
+    <literature macro="scaling2"/>
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

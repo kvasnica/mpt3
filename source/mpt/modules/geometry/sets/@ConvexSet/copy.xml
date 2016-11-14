@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>copy</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Create a copy of an object derived from the <tt>ConvexSet</tt> class.
+	</info>
+	
+	<syntax>Snew = S.copy</syntax>
+    <syntax>Snew = copy(S)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Create a copy of a set <tt>S</tt> and return a new object <tt>Snew</tt> with same properties as the original set.
+        Changing one object does not affect the second one because the objects are not connected by reference. <br />        
+        Note that this method is different versus the equality assignment <tt>Snew = S</tt> which points to the same object.
+        See the example for explanation.
+    </descr>
+
+	<input required="true">
+		<name>S</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>   
+    <output>
+		<name>Snew</name>
+        <descr>New object which is an exact copy of the set <tt>S</tt>.</descr>
+		<class name="ConvexSet"/>       
+    </output>
+    
+    <example>
+        <descr> Create a random polyhedron in V-representation. </descr>
+        <cmd> P=ExamplePoly.randVrep </cmd>
+        <descr> Create a new object <tt>Pnew</tt> that is a copy of the set <tt>P</tt>. </descr>
+        <cmd> Pnew = P.copy </cmd>
+        <descr> If we do any change on the new polyhedron <tt>Pnew</tt>, this will not affect the original polyhedron. </descr>
+        <descr> For instance, we can convert it to H-representation: </descr>
+        <cmd> Pnew.H; </cmd>
+        <cmd> Pnew.hasHRep </cmd>
+        <descr> The original polyhedron <tt>P</tt> remains in V-representation </descr>
+        <cmd> P.hasHRep </cmd>
+        <descr> The different story is when a new object is a reference of the original set. </descr>
+        <descr> This is achieved by equality assignment: </descr>
+        <cmd> Q = P; </cmd>
+        <descr> When the polyhedron <tt>Q</tt> is changed, this also affects the original polyhedron </descr>
+        <cmd> Q.H; </cmd>
+        <cmd> Q.hasHRep </cmd>
+        <cmd> P.hasHRep </cmd>      
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>YSet</related>
+	<related>Polyhedron</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_kvasnica"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

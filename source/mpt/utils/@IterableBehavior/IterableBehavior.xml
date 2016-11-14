@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>IterableBehavior</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Basic class which provides <tt>forEach</tt> method to iterate over an array.
+	</info>
+	
+	<syntax>S = IterableBehavior(arg)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>IterableBehavior</tt> class has been introduced to deal with arrays of sets.
+        The only purpose of this class is to have defined <tt>forEach</tt> method that
+        executes a particular method for each element in the array.
+        The <tt>IterableBehavior</tt> class cannot be instantiated or subclasses.
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="false">
+		<name>arg</name>
+        <descr> Any input argument is accepted but has no influence on the object creation.
+        </descr>
+        <class name=""/>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>S</name>
+        <descr> Object of the <tt>IterableBehavior</tt> class. </descr>
+        <class name="IterableBehavior"/>
+	</output>
+
+	<!-- multiple related function can be defined -->
+	<related>Polyhedron</related>
+    <related>ConvexSet</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+    <author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>incidenceMap</function>
+  
+  <info>
+    Compute the incidence map of this polyhedron.
+  </info>
+  <syntax>iMap = P.incidenceMap</syntax>
+  <syntax>iMap = incidenceMap(P)</syntax>
+
+  <descr>
+    Computes map describing containment of vertices in facets.
+ 
+    Note: This function computes both irredundant V and H-representations of the
+    polyhedron and can be time consuming.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+
+  <output>
+    <name>iMap</name>
+    <descr>Incidence map or [] is <i>P</i> is empty.</descr>
+    <class name="struct">
+      <field><name>V</name>
+	<descr>Vertices of <i>P</i></descr>
+      </field>
+      <field><name>R</name>
+	<descr>Rays of <i>P</i></descr>
+      </field>
+      <field><name>H</name>
+	<descr>Inequalities of <i>P</i></descr>
+      </field>
+      <field><name>He</name>
+	<descr>Equalities of <i>P</i></descr>
+      </field>
+      <field><name>incVH</name>
+	<descr>Incidence of <i>V</i> in <tt>H. incVH(i,j) = 1</tt> if <tt>[V(i,:);-1]*H(j,:)' = 0</tt></descr>
+	<class name="sparse logical"/>
+      </field>
+      <field><name>incRH</name>
+	<descr>Incidence of <i>R</i> in <tt>H. incRH(i,j) = 1</tt> if <tt>[R(i,:);0]*H(j,:)' = 0</tt></descr>
+	<class name="sparse logical"/>
+      </field>
+    </class>
+  </output>
+  
+  <example>
+    <descr>Create a polytope:</descr>
+    <cmd>P = ExamplePoly.poly3d_sin</cmd>
+    <descr>Compute the incidence map</descr>
+    <cmd>iMap = P.incidenceMap;
+	 full(iMap.incVH)
+    </cmd>
+  </example>
+
+  <related>minVRep</related>
+  <related>minHRep</related>
+  
+  <author macro="author_cnj"/>  
+  <license macro="GPL2"/>
+</help>

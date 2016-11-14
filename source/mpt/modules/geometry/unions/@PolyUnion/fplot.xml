@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>fplot</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Plot function over the union of polyhedra.
+	</info>
+	
+    <syntax>h = Set.fplot()</syntax>
+    <syntax>h = Set.fplot('name', 'Prop1', value1, 'Prop2', value2)</syntax>
+	<syntax>h = fplot(Set, 'name', 'Prop1', value1, 'Prop2', value2)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Plot function over the union of polyhedra. If there are more functions, then the string <tt>name</tt> indicates
+        the function to be plotted. If the function is vector valued, i.e. its range is greater than 1, 
+        than the first element of the function is plotted by default. For vector valued functions 
+        the <tt>position</tt> property indicates which element of the function value to plot.
+
+        Figure properties, such as color, line width, etc, can be specified with "Property" - "Value" pairs. 
+	</descr>
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr><tt>PolyUnion</tt> object that contains polyhedra in the same dimension with associated functions.</descr>
+		<class name="PolyUnion"/>
+	</input>
+	<input>
+		<name>name</name>
+        <descr>If there are more functions over one set, the string <tt>name</tt> identifies
+        the function to be plotted. This argument can be omitted if only one function is attached to a set.
+        </descr>
+		<class name="char"/>
+	</input>
+	<input>
+		<name>Prop1</name>
+        <descr>Specification of figure properties.</descr>
+		<class name="char">
+                <option>position</option><descr>For vector valued functions, the <tt>position</tt> indicates which element of the function value to plot.</descr>
+                <option>Grid</option><descr>With how many gridpoints to grid the circle/sphere. Default is 20.</descr>
+                <option>Color</option><descr>The color of the plot specified by real RGB vector or a string name of the color (e.g. 'gray');</descr>
+                <option>Wire</option><descr>Highlight the edges of the set. Default is false.</descr>
+                <option>LineStyle</option><descr>Specify the type of the line to plot edges of the set. Accepted values are '-',':','-.','--', and'none'.</descr>
+                <option>LineWidth</option><descr>Specify the width of the line. Default is 1.</descr>
+                <option>Alpha</option><descr>Transparency of the color. The value must be inside [0,1] interval. Default is 1.</descr>
+                <option>Contour</option><descr>Add contour graph. Default is false.</descr>
+                <option>ContourGrid</option><descr>With how many grid points to plot the contour graph. Default is 30.</descr>
+                <option>show_set</option><descr>Plot the domain of the function. Default is false.</descr>
+                <option>showgrid</option><descr>Show the grid inside the set. Default is false.</descr>
+                <option>colormap</option><descr>Color map to use given as a string or a function handle. Default is 'mpt'.</descr>
+                <option>colororder</option><descr>Either 'fixed' or 'random'. Default is 'fixed'.</descr>
+		</class>
+	</input>
+    <input>
+        <name>value1</name>
+        <descr>Assigns value to <tt>Prop1</tt>.</descr>
+    </input>
+
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>h</name>
+        <descr>Handle related to graphics object.</descr>
+		<class name="handle"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <descr> We have piecewise affine function defined over a union of convex sets.</descr>
+        <descr> Construct the set of four polyhedra in 1D. </descr>
+        <cmd> P(1) = Polyhedron('lb',-5,'ub',-1); </cmd>
+        <cmd> P(2) = Polyhedron('lb',-1,'ub',1); </cmd>
+        <cmd> P(3) = Polyhedron('lb',1,'ub',4); </cmd>
+        <cmd> P(4) = Polyhedron('lb',4,'ub',5); </cmd>
+        <descr> Add affine functions to these sets </descr>
+        <cmd> P(1).addFunction(AffFunction(-2,1),'a'); </cmd>
+        <cmd> P(2).addFunction(AffFunction(0.1,3.1),'a'); </cmd>
+        <cmd> P(3).addFunction(AffFunction(-0.2,3.4),'a'); </cmd>
+        <cmd> P(4).addFunction(AffFunction(2,-5.4),'a'); </cmd>
+        <descr> Construct the union saying that it is convex, non-overlapping, bounded, and full-dimensional. </descr>
+        <cmd> U = PolyUnion('Set',P,'convex',true,'overlaps',false,'bounded',true,'fulldim',true) </cmd>
+        <descr> Plot the functions over the union with the line width equal 3 and by showing the polyhedra as well. </descr>
+        <cmd> U.fplot('a','LineWidth',3,'show_set',true); </cmd>
+    </example>
+    <example>
+        <descr> Plot piecewise-quadratic function </descr>
+        <descr> Generate a polygon.  </descr>
+        <cmd> v = [-1, 1.7; 1.1, 0.5; 0, 2.3; 1, -1.7; 0, -2.3; -1.1 -0.5]; </cmd>
+        <cmd> Q = Polyhedron(v);  </cmd>
+        <descr> Triangulate the polygon and create an union of polyhedra.</descr>
+        <cmd> T = PolyUnion('Set',Q.triangulate,'Convex',true,'overlaps',false) </cmd>
+        <descr> Attach a quadratic function over this union and name it "power". </descr>
+        <cmd> T.addFunction(QuadFunction(diag([1,2.3]),[-3,0.5],5),'power') </cmd>
+        <descr> Plot the function over the union with random color, transparency equal 0.4, and show grid.</descr>
+        <cmd> T.fplot('colororder','random','show_set',true,'alpha',0.4,'showgrid',true) </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>plot</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>minVRep</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Compute an irredundant V-representation of a polyhedron.
+	</info>
+	<!-- we can define multiple ways to call the function -->
+	<!-- note that we can freely use the underscore in function names -->
+	<syntax>P.minVRep()</syntax>
+
+	<descr>
+	  Computes an irredundant V-representation of the polyhedron.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+		<descr>Polyhedron in any format</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+
+	<example>
+		<descr>Create redundant description of a polyhedron:</descr>
+		<cmd>V = [1 1; 1 1; 1 1; 1 0];</cmd>
+		<cmd>P = Polyhedron(V)</cmd>
+		<cmd>P.V</cmd>
+		<descr>Remove redundancies:</descr>
+		<cmd>P.minVRep()</cmd>
+		<cmd>P.V</cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>minHRep</related>
+	
+	<!-- multiple literature sources can be given -->
+	<literature macro="Fukuda:PolyFaq"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+    <author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+	<license macro="GPL2"/>
+</help>

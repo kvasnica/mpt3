@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isOverlapping</function>
+	
+	<info>Test if the union of polyhedra contains overlaps.</info>
+	<syntax>ts = U.isConnected</syntax>
+	<syntax>ts = isConnected(U)</syntax>
+
+	<descr>
+	  Return true if the union <tt>U</tt> of polyhedra contains overlaps and false otherwise.
+      Once this method has been called, the information about the overlaps can be retrieved
+      from <tt>U.Internal.Overlaps</tt> property. 
+      
+      This function considers following two cases to detect overlaps:
+      <ol>
+          <li> If two full-dimensional polyhedra overlap, then the intersection of these polyhedra
+                must be full-dimensional. </li>
+          <li> If low-dimensional and full-dimensional polyhedra overlap, then the intersection
+                of these polyhedra must not be empty.
+          </li>
+      </ol>     
+        
+        <bf>Note that this function is computationally demanding and is suitable for
+        unions with small number of polyhedra. </bf>
+	</descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if union of polyhedra has overlaps and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+    <example>
+        <descr>Create three full-dimensional polyhedra that overlap.</descr>
+        <cmd>P(1) = ExamplePoly.randHrep;</cmd>
+        <cmd>P(2) = ExamplePoly.randHrep;</cmd>
+        <cmd>P(3) = ExamplePoly.randHrep;</cmd>
+        <descr> Create union out of these polyhedra without specifying the properties</descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr> Plot the polyhedra to see that they overlap. </descr>
+        <cmd> P.plot; </cmd>        
+        <descr>Check if the union is overlapping</descr>
+        <cmd> U.isOverlapping</cmd>
+        <descr> The information about the overlaps can be accessed in</descr>
+        <cmd> U.Internal.Overlaps </cmd>
+    </example>
+    <example>
+        <descr> Full-dimensional and low-dimensional polyhedra that overlap. </descr>
+        <descr> Generate affine set in dimension 3. </descr>
+        <cmd> A = Polyhedron('Ae',[1 -0.5 2; -1 -4 0],'be',[-1;0.8]); </cmd>
+        <descr> Generate box in 3D </descr>
+        <cmd> B = Polyhedron('lb',[-1;-1;-1],'ub',[1;1;1]); </cmd>
+        <descr> Create union out of these polyhedra </descr>
+        <cmd> U = PolyUnion([A,B]); </cmd>
+        <descr> Plot to see the sets if they overlap </descr>
+        <cmd> U.plot('LineWidth',2,'alpha',0.1) </cmd>
+        <descr> Check if the union is overlapping </descr>
+        <cmd> U.isOverlapping </cmd>
+        <descr> The result of the operation is stored under </descr>
+        <cmd> U.Internal.Overlaps </cmd>       
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isConvex</related>
+    <related>isConnected</related>
+    <related>isFullDim</related>
+    <related>isBounded</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

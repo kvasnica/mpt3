@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>plus</function>
+  
+  <info>Add a Polyhedron and a vector or Polyhedron.</info>
+  <syntax>Q = P + S</syntax>
+  <syntax>Q = plus(P,S,method)</syntax>
+  <syntax>Q = P + x</syntax>
+  <syntax>Q = plus(P, x)</syntax>
+  
+  <descr>
+    Compute the Minkowski sum of <i>P</i> and <i>S</i>, or <i>P</i> and <i>x</i>.
+    <latex>
+      $$P+S = \{ x+y ~|~ x \in P, y \in S\}$$
+    </latex>
+    or
+    <latex>
+      $$P+y = \{ x+y ~| x \in P \}$$
+    </latex>
+  </descr>
+
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  <input>
+    <name>S</name>
+    <descr>Polyhedron in any format or a point given as column real vector of the length <tt>P.Dim</tt></descr>
+    <class name="Polyhedron or double"/>
+  </input>
+  <input>
+    <name>method</name>
+    <descr>String selecting the projection method to be used. Can be 'vrep', 'fourier', or 'mplp'.</descr>
+    <class name="string"/>
+  </input>
+  
+  <output>
+    <name>Q</name> 
+    <descr>Polyhedron <tt>Q = P+S</tt>.</descr>
+    <class name="Polyhedron"/>
+  </output>
+ 
+  <example>
+    <descr>Sum of Polyhedron and vector</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+    <cmd>Q = P + [2;2];</cmd>
+    <cmd>plot([P;Q],'alpha',0.1);</cmd>
+  </example>
+
+  <example>
+    <descr>Sum of two Polytopes</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+    <cmd>S = Polyhedron('lb',[-1;-1],'ub',[1;1]);</cmd>
+    <cmd>Q = P + S;</cmd>
+    <cmd>Q.plot('color','r','alpha',0.2); hold on;
+	 S.plot('color','b','alpha',0.5);
+	 P.plot('color','g','alpha',0.5);
+    </cmd>
+  </example>
+
+  <example>
+    <descr>Sum of a polytope and a cone</descr>
+    <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+    <cmd>S = Polyhedron('R', [1 1;1 0.5]); </cmd>
+    <cmd>Q = P + S; </cmd>
+    <cmd>Q.plot('color','r','alpha',0.5); hold on;
+	 S.minus([5;0]).plot('color','b','alpha',0.5);
+	 P.minus([2.5;0]).plot('color','g','alpha',0.5);</cmd>
+  </example>
+
+  <example>
+    <descr>Sum of lower dimensional polytopes</descr>
+    <cmd>P = Polyhedron('lb',-ones(3,1),'ub',ones(3,1),'He',[1 1 1 0.2]);</cmd>
+    <cmd>S = Polyhedron('lb',-ones(3,1),'ub',ones(3,1),'He',[-1 1 1 0.4]);</cmd>
+    <cmd>Q = P + S;</cmd>
+    <cmd>P.plot('color','g','alpha',0.5); hold on;
+	 S.plot('color','b','alpha',0.5);
+	 Q.plot('color','r','alpha',0.2);</cmd>
+  </example>
+
+  <example>
+    <descr>Build a zonotope by adding 5 line segments.</descr>
+    <cmd>Z = Polyhedron;</cmd>
+    <cmd>for (i=1:5) Z = Z + Polyhedron('V',[0 0 0;randn(1,3)]); end; </cmd>
+    <cmd>Z.plot('color','b','alpha',0.7);</cmd>
+  </example>
+
+  
+  <related>minus</related>
+  <!-- multiple related function can be defined -->
+  
+  <!-- multiple literature sources can be given -->
+  <!-- <literature>Fukuda : PolyFaq</literature> -->
+  
+  <!-- multiple authors can be defined -->
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

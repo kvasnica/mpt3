@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isConnected</function>
+	
+	<info>Test if the union of polyhedra form a connected union.</info>
+	<syntax>ts = U.isConnected</syntax>
+	<syntax>ts = isConnected(U)</syntax>
+
+	<descr>
+	  Return true if the union <tt>U</tt> of polyhedra is connected and false otherwise.
+      Once this method has been called, the information about the connectivity can be retrieved
+      from <tt>U.Internal.Connected</tt> property. Note tha if the union <tt>U</tt> is convex,
+      it implies that the union is connected.
+        
+        <bf>Note that this function is computationally demanding and is suitable for
+        unions with small number of polyhedra. </bf>
+	</descr>
+
+	<input required="true">
+	  <name>U</name>
+	  <descr>Union of polyhedra in the same dimension.</descr>
+	  <class name="PolyUnion"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+	  <descr>True if union of polyhedra is connected and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+
+    <example>
+        <descr>Create three polyhedra that are not connected.</descr>
+        <cmd>P(1) = Polyhedron('lb',[-1;0],'ub',[-1;1]);</cmd>
+        <descr> Shift the polyhedron <tt>P(1)</tt> </descr>
+        <cmd>P(2) = P(1) + [1;0];</cmd>
+        <cmd>P(3) = P(1) + [2;0];</cmd>
+        <descr> Plot the polyhedra to see that they are not connected. </descr>
+        <cmd> P.plot('LineWidth',3); axis([-2 2 -1 2]); </cmd>
+        <descr> Create union out of these polyhedra without specifying the properties</descr>
+        <cmd> U = PolyUnion(P) </cmd>
+        <descr>Check if the union is connected</descr>
+        <cmd> U.isConnected </cmd>
+        <descr> The information about the connectivity can be accessed in</descr>
+        <cmd> U.Internal.Connected </cmd>
+    </example>
+
+	
+	<!-- multiple related function can be defined -->
+	<related>isConvex</related>
+    <related>isOverlapping</related>
+    <related>isFullDim</related>
+    <related>isBounded</related>
+	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+   
+    <license macro="GPL2"/>
+</help>

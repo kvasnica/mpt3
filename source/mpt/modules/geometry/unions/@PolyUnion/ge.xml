@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>ge</function>
+  
+  <info>
+    Test if a union of polyhedra contains another union.
+  </info>
+  <syntax>U1 &gt;= U2</syntax>
+  
+  <descr>
+      Check if the union of polyhedra <tt>U1</tt> is a non-strict superset of another union <tt>U2</tt>.
+      The result it the logical statement if <tt>U1 &gt;= U2</tt> and false otherwise.
+  </descr>
+  
+  <input required="true">
+    <name>U1</name>
+    <descr>Union of polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  <input required="true">
+    <name>U2</name>
+    <descr>Union of polyhedra in the same dimension.</descr>
+    <class name="PolyUnion"/>
+  </input>
+  
+  <output>
+    <name>tf</name>
+    <descr>True if <tt>U1 &gt;= U2</tt> and false otherwise.</descr>
+    <class name="logical">
+      <option>true</option>
+      <option>false</option>
+    </class>
+  </output>
+  
+  <example>
+      <descr> Consider an union of a rectangle and a triangle. </descr>
+      <cmd> rectangle = Polyhedron('lb',[0;0],'ub',[2;1]); </cmd>
+      <cmd> triangle = Polyhedron([3,0;4,4; 6,2]); </cmd>
+      <cmd> U1 = PolyUnion([rectangle, triangle]); </cmd>
+      <cmd> U1.plot </cmd>
+      <descr> The union <tt>U1</tt> is located in the positive orthant, so we check if this is true. </descr>
+      <cmd> U2 = PolyUnion(Polyhedron('lb',[0;0])); </cmd>
+      <cmd> U2 &gt;= U1 </cmd>
+  </example>
+    
+  <related>le</related>
+  
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

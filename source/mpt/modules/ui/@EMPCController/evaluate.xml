@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>evaluate</function>
+  
+  <info>
+    Returns the optimal control action
+  </info>
+  <syntax>u = controller.evaluate(x0)</syntax>
+  <syntax>[u, feasible] = controller.evaluate(x0)</syntax>
+  <syntax>[U, feasible, openloop] = controller.evaluate(x0)</syntax>
+
+  <descr> 
+    <tt>u = controller.evaluate(x0)</tt> evaluates the explicit MPC
+	solution for the initial condition <tt>x0</tt> and returns the
+	first element of the optimal sequence of control inputs. If
+	<tt>x0</tt> is outside of the controller's domain,
+	<tt>u</tt> will be <tt>NaN</tt>.<br/>
+
+    <tt>[u, feasible] = controller.evaluate(x0)</tt> also returns the
+	boolean flag indicating whether <tt>x0</tt> is inside of the controller's
+	domain.<br/>
+
+    <tt>[u, feasible, openloop] = controller.evaluate(x0)</tt> also returns
+	the open-loop predictions of states, inputs and outputs in 
+	<tt>openloop.X</tt>, <tt>openloop.Y</tt>, and <tt>openloop.Y</tt>,
+	respectively. Value of the optimal cost is returned in
+	<tt>openloop.cost</tt>.
+  </descr>
+
+  <input required="true">
+    <name>x0</name>
+    <descr>Initial state.</descr>
+    <class name="double"/>
+  </input>
+
+  <output>
+    <name>u</name>
+    <descr>Optimal control action.</descr>
+    <class name="double"/>
+  </output>
+
+  <output>
+    <name>feasible</name>
+	<descr>True if a feasible control actions exists for <tt>x0</tt>, false otherwise.</descr>
+    <class name="logical"/>
+  </output>
+
+  <output>
+    <name>openloop</name>
+	<descr>Structure containing open-loop predictions and value of the optimal cost.</descr>
+    <class name="struct"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>separate</function>
+	
+	<info>Computes separating hyperplane between the set and given point.</info>
+	<syntax>h = separate(S,x)</syntax>
+	<syntax>h = S.separate(x)</syntax>
+
+	<descr>
+        Compute a separating hyperplane between the convex <tt>Set</tt> and the given point <tt>x</tt>.
+        If <tt>Set</tt> is an array, the hyperplanes are returned as a cell array.
+	</descr>
+
+	<input required="true">
+	  <name>S</name>
+      <descr>Any set derived from <tt>ConvexSet</tt> class, e.g. <tt>YSet</tt> or <tt>Polyhedron</tt>.</descr>
+	  <class name="ConvexSet"/>
+	</input>
+	<input required="true">
+	  <name>x</name>
+      <descr>The point given as vector in the same dimension as <tt>ConvexSet</tt>.</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>h</name> 
+      <descr>Separating hyperplane defined as <i>\Big\{~ x ~ \vline ~ h\begin{pmatrix}x \\ -1\end{pmatrix}=0 \Big\}</i>.
+      </descr>
+	  <class name="double"/>
+	</output>
+
+    <example>
+        <descr>Describe a convex using YALMIP</descr>
+        <cmd>x = sdpvar(2,1);</cmd>
+        <cmd>F = set(0.3*x'*x -0.7*x(1)&lt;=1) + set(-x(1)+2.3*x(2)&lt;=0.5);</cmd>
+        <cmd>S = YSet(x,F); </cmd>
+        <descr> Compute the separating hyperplane from the point <tt>v=[-2,2]</tt> </descr>
+        <cmd> v = [-3;2]; </cmd>
+        <cmd> h = S.separate(v) </cmd>
+        <descr> Construct a new polyhedron out of the hyperplane and plot the sets </descr>
+        <cmd> P = Polyhedron('He',h); </cmd>
+        <cmd> S.plot; hold on; axis([-4 4 -3 3]); text(v(1),v(2),'x'); P.plot; </cmd>
+    </example>
+	
+	<!-- multiple related function can be defined -->
+	<related>distance</related>
+    <related>support</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+	
+	<license macro="GPL2"/>
+</help>

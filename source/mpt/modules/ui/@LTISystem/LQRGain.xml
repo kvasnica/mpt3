@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>LQRGain</function>
+  
+  <info>
+    Linear-quadratic regulator design for LTI systems
+  </info>
+
+  <syntax>K = system.LQRGain()</syntax>
+
+  <descr> 
+    <tt>K = system.LQRGain()</tt> calculates the optimal gain matrix
+    <tt>K</tt> such that the state-feedback law <i>u = K x</i>
+    minimizes the LQR cost function.<br/>
+
+    Note that this function requires that penalties on states and
+    inputs are defined in <tt>system.x.penalty</tt> and
+    <tt>system.u.penalty</tt> (see "<tt>help SystemSignal</tt>" and
+    "<tt>help Penalty</tt>").
+  </descr>
+
+  <output>
+    <name>K</name>
+    <descr>Optimal gain matrix of the state-feedback law <i>u=Kx</i></descr>
+    <class name="double"/>
+  </output>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

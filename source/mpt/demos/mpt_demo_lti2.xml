@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_lti2</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstrates online MPC for LTI system
+	</info>
+	
+    <syntax>mpt_demo_lti2</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+       Demonstrates online MPC for LTI system.
+	</descr>
+
+    <example>
+        <descr>Define an LTI prediction model <i>x^+ = A x + B u</i></descr>
+        <cmd>A = [1 1; 0 1]; B = [1; 0.5];</cmd>
+        <cmd> lti = LTISystem('A', A, 'B', B); </cmd>
+
+        <descr> Alternativelly, we can import from state-space objects: </descr>
+        <descr><tt> s = ss(tf(1, [1 0 0])); </tt> </descr>
+        <descr><tt> d = c2d(s, 1); </tt> </descr>
+        <descr><tt> lti = LTISystem(d); </tt> </descr>
+
+        <descr> Define the MPC controller </descr>
+        <cmd> horizon = 5; </cmd>
+        <cmd> ctrl = MPCController(lti, horizon); </cmd>
+
+        <descr> Add state constraints </descr>
+        <cmd> ctrl.model.x.min = [-5; -5]; </cmd>
+        <cmd> ctrl.model.x.max = [5; 5]; </cmd>
+
+        <descr> Add input constraints </descr>
+        <cmd> ctrl.model.u.min = -1; </cmd>
+        <cmd> ctrl.model.u.max = 1; </cmd>
+
+        <descr> Set quadratic state penalty </descr>
+        <cmd> ctrl.model.x.penalty = QuadFunction(eye(2)); </cmd>
+
+        <descr> Set quadratic input penalty </descr>
+        <cmd> ctrl.model.u.penalty = QuadFunction(1); </cmd>
+
+        <descr> Obtain the optimal control input for a given initial condition.</descr>
+        <cmd> x0 = [-4; 0]; Uonl = ctrl.evaluate(x0)</cmd>
+    </example>
+    
+	<!-- multiple related function can be defined -->
+    <related>mpt_demo_lti1</related>
+    <related>mpt_demo_lti3</related>
+    <related>mpt_demo_lti4</related>
+    <related>mpt_demo_lti5</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

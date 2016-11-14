@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>copy</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Creates a copy of the optimization problem given as <tt>Opt</tt> object.
+	</info>
+	
+    <syntax>new_problem = problem.copy</syntax>
+	<syntax>new_problem = copy(problem)</syntax>
+    
+	<!-- long description of the function -->
+	<descr>
+        Creates a copy <tt>new_problem</tt> of the given optimization <tt>problem</tt>. The new object
+        is an exact copy of the optimization problem. Changing the original <tt>problem</tt> does not
+        affect the <tt>new_problem</tt>.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>problem</name>
+        <descr>Object of the <tt>Opt</tt> class that defines optimization problem.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Opt"/>
+	</input>
+	<output>
+		<name>new_problem</name>
+        <descr>Object of the <tt>Opt</tt> that is an exact copy of <tt>problem</tt>.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Opt"/>
+	</output>
+    
+    <example>
+        <descr> Create LP optimization problem as <i> \text{min}~ x_1 - x_2, ~ \text{s.t.} ~ x_1+2x_2&lt;=3, -x_1-0.3x_2&lt;= 1, -3x_1+x_2&lt;= 4 </i>. </descr>
+        <descr> Get the data of the optimization problem written as matrices. </descr>
+        <descr> The cost function <i>f^{T}x</i> </descr>
+        <cmd> f = [1; -1]; </cmd>
+        <descr> The linear inequality constraints <i>Ax&lt;=b</i></descr>
+        <cmd> A = [1 2;-1 -0.3;-3 1]; b = [3; 1; 4]; </cmd>
+        <descr> Create the optimization problem </descr>
+        <cmd> problem = Opt('f',f,'A',A,'b',b) </cmd>
+        <descr> We want to have a new copy of <tt>problem</tt>. </descr>
+        <cmd> LPproblem = problem.copy </cmd>
+        <descr> The new <tt>LPproblem</tt> is exactly the same as <tt>problem</tt>. </descr>
+        <descr> If we transform <tt>problem</tt> to LCP, its representation will change </descr>
+        <cmd> problem.qp2lcp </cmd>
+        <descr> But we keep the original problem stored as <tt>LPproblem</tt>.</descr>        
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>Opt</related>
+	 
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

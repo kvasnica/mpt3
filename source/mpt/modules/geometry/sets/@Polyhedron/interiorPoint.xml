@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>interiorPoint</function>
+	
+	<info>Compute a point in the relative interior of the Polyhedron.</info>
+	<syntax>sol = P.interiorPoint</syntax>
+	<syntax>sol = P.interiorPoint(facetIndex)</syntax>
+
+	<descr>
+	  Compute a point in the relative interior of the polyhedron. 
+
+	  If <i>{\tt facetIndex} \in \{1,\dots,{\tt P.size(P.A,1)}\}</i> is specified, then a point
+	  in the relative interior of <i>P \cap \{x\,|\, P.A({\tt facetIndex},:)x \le
+	  P.b({\tt facetIndex})\}</i> is returned.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input>
+	  <name>facetIndex</name>
+	  <descr>Index of an inequality of <i>P</i> (row of <tt>P.H</tt>).</descr>
+	  <class name="integer"/>
+	</input>
+
+	<output>
+	  <name>sol</name> <descr/>
+        <class name="struct">
+            <field>
+                <name>x</name>
+                <descr>The interior point</descr> <class name="double vector"/>
+            </field>
+            <field>
+                <name>isStrict</name>
+                <descr>The output is true if <i>x</i> is in the strict relative interior, false
+                otherwise.</descr> 
+                <class name="logical"/>
+            </field>
+            <field>
+                <name>r</name>
+                <descr>Radius of the largest ball centered at <i>x</i> that is still within <i>P</i>
+                    
+                    <latex>
+                        $$y - x \in P,\,\forall \|y\| \le r$$
+                    </latex>
+                    
+                Note : <i>r</i> is empty if <i>P</i> is empty or only has a V-rep.</descr>
+                <class name="double"/>
+            </field>
+        </class>
+    </output>
+
+	<example>
+	  <descr>Compute interior point in unbounded polyhedra</descr>
+	  <cmd>P = Polyhedron('V', randn(20,3), 'R', -[1 0 0]);</cmd>
+	  <cmd>sol = P.interiorPoint</cmd>
+	</example>
+
+	<example>
+	  <descr>Compute a point in the relative interior of the fourth facet</descr>
+	  <cmd>P = Polyhedron('H',[sin([0:0.5:2*pi])' cos([0:0.5:2*pi])' ones(13,1)]);</cmd>
+      <descr> Polyhedron must be in its minimal representation to compute facets. Perform redundancy elimination.</descr>
+      <cmd> P.minHRep(); </cmd>
+      <descr> Compute the center of the fourth facet </descr>
+      <cmd>sol = P.interiorPoint(4)</cmd>
+	  <cmd>plot(P); hold on;
+		pplot(sol.x, 'ro', 'markerfacecolor', 'r', 'markersize', 10); </cmd>
+	</example>
+
+	<example>
+	  <descr>Compute a point in the relative interior of a lower-dimensional polyhedron.</descr>
+	  <cmd>P = Polyhedron('H',[randn(20,3) ones(20,1)], 'He', [0 0 1 0]);</cmd>
+	  <cmd>sol = P.interiorPoint</cmd>
+	  <cmd>plot(P); hold on;
+		pplot(sol.x, 'ro', 'markerfacecolor', 'r', 'markersize', 10); </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+    <related>chebyCenter</related>
+    <related>facetInteriorPoints</related>
+		
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	<license macro="GPL2"/>
+</help>

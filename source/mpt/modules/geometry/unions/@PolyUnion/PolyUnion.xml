@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>PolyUnion</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Represents a union of polyhedra in the same dimension
+	</info>
+	
+	<syntax>PU = PolyUnion(P)</syntax>
+    <syntax>PU = PolyUnion('Set',P,'Domain',D,'Convex',true,'Overlaps',false,...)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The <tt>PolyUnion</tt> object represent collection of polyhedra in the same dimension. The 
+        only restriction to construct the <tt>PolyUnion</tt> object is that the sets have a 
+        common dimension. The union thus can contain bounded, unbounded, and lower-dimensional 
+        polyhedra. Empty sets are removed from at the time of construction of <tt>PolyUnion</tt> 
+        object.
+        
+        You can associate various properties with the <tt>PolyUnion</tt> object:
+        <ul>
+			<li>Domain of the union can be set via the <tt>Domain</tt> property. If not provided,
+			the domain will be equal to the underlying set of the union.</li>
+			<li>To mark the union as <bf>convex</bf>, you can set the <tt>Convex</tt> property <tt>true</tt> or <tt>false</tt>.
+            If you specify that the union is convex, the remaining algorithms will rely on this information which will can 
+            speed up the computations significantly.
+            </li>
+            <li>To mark that there are <bf>overlaps</bf> in the union, you can set the <tt>Overlaps</tt> property as <tt>true</tt>
+                or <tt>false</tt>. If the union contains non-overlapping polyhedra, the union forms a <bf>partition</bf>.
+            </li>
+            <li>To mark that the union is <bf>connected</bf> in the union, you can set the <tt>Connected</tt> property as <tt>true</tt>
+            or <tt>false</tt>. If the union is convex, if implies that the union is also connected.
+            </li>
+            <li>To mark that the union comprises only of <bf>bounded</bf> polyhedra, you can set the <tt>Bounded</tt> property as <tt>true</tt>
+            or <tt>false</tt>. 
+            </li>
+            <li>To mark that the union contains only <bf>full-dimensional</bf> polyhedra, you can set the <tt>FullDim</tt> property as <tt>true</tt>
+            or <tt>false</tt>. 
+            </li>            
+        </ul>
+        By specifying any of the above properties you promise that these properties are automatically satisfied by the provided set, otherwise
+        unexpected results may occur. These properties can be accessed via <tt>PU.Internal</tt> field.
+        
+        You can associate functions to any of the set via <tt>addFunction</tt> method of the 
+        <tt>ConvexSet</tt> class. Function handles and all properties of the sets can be
+        accessed via <tt>PolyUnion.Set</tt> property based on the index.
+         
+        For a list of available methods type "methods('PolyUnion')".
+    </descr>
+	<input required="true">
+        <name>P</name>
+        <descr>Non-empty polyhedra in the same dimension. </descr>
+        <class name="Polyhedron"/>
+    </input>
+	<input>
+        <name>Domain</name>
+        <descr>Specifies domains of the union.</descr>
+        <class name="Polyhedron"/>
+    </input>
+	<input>
+        <name>Convex</name>
+        <descr>Set this property to <tt>true</tt> if you are sure that the union of the polyhedra is convex.</descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+    </input>
+	<input>
+        <name>Overlaps</name>
+        <descr>Set this property to <tt>false</tt> if you are sure that the union of the polyhedra is non-overlapping.</descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+    </input>
+	<input>
+        <name>Connected</name>
+        <descr>Set this property to <tt>true</tt> if you are sure that the union of the polyhedra is connected.
+            If the union is convex, then this property is automatically set as <tt>true</tt>.
+        </descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+    </input>
+	<input>
+        <name>Bounded</name>
+        <descr>Set this property to <tt>true</tt> if you are sure that all the polyhedra in the union are bounded.</descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+    </input>
+	<input>
+        <name>FullDim</name>
+        <descr>Set this property to <tt>true</tt> if you are sure that all the polyhedra in the union are full-dimensional.</descr>
+        <class name="logical">
+            <option>true</option>
+            <option>false</option>
+        </class>
+    </input>
+    
+    <output>
+        <name>PU</name>
+        <descr>Object of the <tt>PolyUnion</tt> class. </descr>
+        <class name="PolyUnion"/>
+    </output>
+
+    <example>
+        <descr> Construt the convex and non-overlapping union of two polyhedra in 2D.</descr>
+        <descr> Define the polyhedra </descr>
+        <cmd> P(1) = Polyhedron('lb',[-1;0],'ub',[0;1]); </cmd>
+        <cmd> P(2) = Polyhedron('lb',[0;0],'ub',[1;1]); </cmd>
+        <descr> Assign linear functions to these sets </descr>
+        <cmd> P(1).addFunction(AffFunction(eye(2),[1;0]),'f'); </cmd>
+        <cmd> P(2).addFunction(AffFunction(-eye(2),[1;0]),'f'); </cmd>
+        <descr> Create the union and set convexity and overlaps properties because these are known.</descr>
+        <cmd> U = PolyUnion('Set',P,'Convex',true,'Overlaps',false); </cmd>
+        <descr> Plot the polyhedra </descr>
+        <cmd> U.plot </cmd>
+        <descr> We can plot also functions over the union </descr>
+        <cmd> U.fplot </cmd>
+    </example>
+    <example>
+        <descr> Create three random polyhedra and merge them to <tt>PolyUnion</tt> object. </descr>
+        <cmd> P(1) = ExamplePoly.randVrep; </cmd>
+        <cmd> P(2) = ExamplePoly.randVrep; </cmd>
+        <cmd> P(3) = ExamplePoly.randVrep; </cmd>
+        <descr> We don't know any of the particular properties of the union, we can call the short syntax:</descr>
+        <cmd> U = PolyUnion(P)</cmd>
+        <descr> Plot the sets </descr>
+        <cmd> U.plot </cmd>
+        <descr> We can access the sets via <tt>U.Set</tt> property and add eventually function handles to each set.</descr>
+        <cmd> U.Set(1).addFunction(AffFunction(eye(2)),'g'); </cmd>
+        <cmd> U.Set(2).addFunction(AffFunction(2*eye(2)),'g'); </cmd>
+        <cmd> U.Set(3).addFunction(AffFunction(3*eye(2)),'g'); </cmd>
+        <descr> Plot the function over the sets </descr>
+        <cmd> U.fplot </cmd>
+    </example>
+    
+
+	<!-- multiple related function can be defined -->
+	<related>Polyhedron</related>
+    <related>Union</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

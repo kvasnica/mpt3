@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demonstration of basic usage of the geometric library
+	</info>
+	
+    <syntax>mpt_demo1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Basic usage of the new interface to geometric library
+	</descr>
+
+        <example>
+            <descr>Create polytope:</descr>
+            <cmd>P = Polyhedron('V', randn(10,2)); </cmd>
+            
+            <descr> Plot the polytope </descr>
+            <cmd> P.plot('color','b','alpha',0.3,'linewidth',1,'linestyle','--'); axis off; </cmd>
+            
+            
+            <descr> Double description created and stored automatically </descr>
+            <cmd> P </cmd>
+        </example>
+        <example>
+            <descr> Create Polyhedron </descr>
+            <cmd>P = Polyhedron('V', randn(10,2), 'R', randn(1,2)); </cmd>
+            <cmd>P.plot;</cmd>
+        
+            <descr> Create another Polyhedron </descr>
+            <cmd> P = Polyhedron('V', randn(50,3), 'R', randn(1,3)); </cmd>
+            <cmd> P.plot;  axis vis3d; figure(1); </cmd>
+        </example>
+        <example>
+            <descr> Lower-dimensional polyhedra </descr>
+            <cmd> P = Polyhedron('H', [randn(30,3) ones(30,1)], 'He', [randn(1,3) 0]); </cmd>
+            <cmd> P.plot('alpha',0.3); </cmd>
+        </example>
+
+        <example> 
+            <descr> Boxes  </descr>
+            <cmd> P = Polyhedron('lb', -rand(3,1), 'ub', rand(3,1), 'H', [randn(10,3) 1.5*ones(10,1)]); </cmd>
+            <cmd> P.plot('alpha',0.3); </cmd>
+        </example>
+
+        <example>
+            <descr> Polyhedron queries </descr>
+            <descr> Project onto polyhedron: </descr>
+            <cmd> P = Polyhedron(randn(10,2), ones(10,1)); </cmd>
+            <cmd> P.plot('color','g'); 
+                  hold on;
+                  axis square;            
+                  x = 5*randn(2,1);
+                  sol = P.project(x); 
+                  pplot([x sol.x]','bo');
+                  sep = P.separate(x);
+                  v = axis; 
+                  s = Polyhedron('He', sep, 'lb', [v(1);v(3)],'ub',[v(2);v(4)]); 
+                  s.plot; 
+                  sol = P.interiorPoint; 
+                  pplot(sol.x, 'ro'); 
+            </cmd>
+            
+            <descr> Addition </descr>
+            <cmd> P = Polyhedron(3*randn(10,2)); </cmd>
+            <cmd> Q = Polyhedron('H', [randn(10,2) ones(10,1)]); </cmd>
+            <cmd> P.plot; hold on; Q.plot; </cmd>
+            
+            <cmd> PQ = P+Q; </cmd>
+            <cmd> PQ.plot('alpha',0.1,'color','r'); </cmd>
+            
+            <descr>Lower-dimensional addition </descr>
+            <cmd>
+                for i=1:5
+                    P(i) = Polyhedron('V', [0 0 0;randn(1,3)]);
+                end
+            </cmd>
+            <cmd> plot(P,'linewidth',2); hold on;
+                Q = Polyhedron;
+                for i=1:5
+                Q = Q + P(i);
+                end
+                Q.plot('alpha',0.1,'color','b');
+                axis vis3d
+            </cmd>
+        </example>
+        <example>
+            <descr> Operations with convex sets </descr>
+            <cmd> x = sdpvar(2,1); </cmd>
+            <cmd> T = eye(2); </cmd>
+            <cmd> F = [x &lt;= 0.1 ; x'*T'*T*x &lt;= 1]; </cmd>
+            <cmd> Y = YSet(x, F); </cmd>
+            <cmd> Y.plot('alpha',0.3,'color','b','grid',50); 
+                hold on;
+                x = [-2;-2];
+                sol = Y.project(x);
+                pplot([x sol.x]','bo');
+                sol = Y.separate(x); 
+                v = axis;
+                s = Polyhedron('He', sol, 'lb', [v(1);v(3)],'ub',[v(2);v(4)]);
+                s.plot('alpha',0.2);
+                O = Y.outerApprox;
+                O.plot('alpha',0.1,'color','b'); axis(axis*1.1);
+            </cmd>
+        </example>
+        <example>
+            <descr>Create set of polytopes</descr>
+            <cmd>Ps = PolyUnion; </cmd>
+            <cmd>
+                for i=1:5
+                  Ps.add(Polyhedron(randn(10,2)) + 5*randn(2,1));
+                end
+            </cmd>
+            <cmd>
+                for i=1:5
+                   Ps.add(Polyhedron('H', [randn(10,2) ones(10,1)], 'He', [randn(1,2) 0]) + 5*randn(2,1));
+                end
+            </cmd>
+            <cmd>
+                for i=1:5
+                   Z = Polyhedron;
+                   for j=1:3,
+                      Z = Z + Polyhedron([0 0;randn(1,2)]);
+                   end
+                   Ps.add(Z+5*randn(2,1));
+                end
+            </cmd>
+            <cmd> Ps.plot; </cmd>
+            <descr> Create complex </descr>
+            <cmd> T = Polyhedron('H', [randn(30,2) ones(30,1)]); </cmd>
+            <cmd> T = triangulate(T); </cmd>
+            <cmd> T.plot; </cmd>
+        </example>
+        <example>
+            <descr> Polyhedral functions </descr>
+            <cmd> F = Polyhedron('V', 2*randn(10,2))</cmd>
+            <cmd> F.addFunction(Function(@(x) sin(x(1))*cos(x(2))),'func1'); </cmd>
+            <cmd> F.fplot; </cmd>
+            
+            <descr> PolyUnion </descr>
+            <cmd> func = @(x) sin(x(1))*cos(x(2)); </cmd>
+            <cmd> 
+                for i=1:5
+                  F(i) = Polyhedron('V', 2*randn(10,2)) + 5*randn(2,1);
+                end
+                F.addFunction(Function(@(x) sin(x(1))*cos(x(2))),'wave');
+            </cmd>
+            <cmd> Ps = PolyUnion(F); </cmd>            
+
+            <descr> Plot the function over the set </descr>
+            <cmd> Ps.fplot; </cmd>
+        </example>
+
+        <example>
+            <descr> Parametric solutions </descr>
+            <descr> Formulate MPC problem with the following dimensions </descr>
+            <cmd> n = 2; m = 1; N = 5; </cmd>
+            <descr> Setup the process model and constraints </descr>
+            <cmd> A = [1 1; 0 1]; </cmd>
+            <cmd> B = [1; 0.5]; </cmd>
+            <cmd> xlb = -10*ones(n,1); </cmd>
+            <cmd> xub = 10*ones(n,1); </cmd>
+            <cmd> ulb = -5*ones(m,1); </cmd>
+            <cmd> uub = 5*ones(m,1); </cmd>
+            <cmd> R = 2*eye(m); </cmd>
+            <cmd> Q = 0.2*eye(n); </cmd>
+
+            <descr>Formulate MPQP using Yalmip </descr>
+            <cmd> x = sdpvar(n,N,'full'); </cmd>
+            <cmd> u = sdpvar(m,N-1,'full'); </cmd>
+            <cmd> cost = 0; </cmd>
+            <cmd> F = []; </cmd>
+                <cmd> 
+                    for i=1:N-1
+                        F = F + (x(:,i+1) == A*x(:,i) + B*u(:,i));
+                        F = F + (xlb &lt;= x(:,i) &lt;= xub);
+                        F = F + (ulb &lt;= u(:,i) &lt;= uub);  
+                        if i &gt; 1
+                            cost = cost + x(:,i)'*Q*x(:,i);
+                        end
+                        cost = cost + u(:,i)'*R*u(:,i);
+                    end
+                </cmd>
+            <cmd> F = F + [xlb &lt;= x(:,end) &lt;= xub]; </cmd>
+            <cmd> cost = cost + x(:,end)'*Q*x(:,end);</cmd>
+            
+            <descr> Solve using MPQP solver </descr>
+            <descr> Change globally the parametric QP solver </descr>
+            <cmd> mptopt('pqpsolver','MPQP'); </cmd>
+
+            <descr> Construct the problem </descr>
+            <cmd> problem1 = Opt(F, cost, x(:,1), u(:)); </cmd>
+
+            <descr> Solve </descr>
+            <cmd> res1 = problem1.solve; </cmd>
+
+            <descr> Solve using PLCP solver </descr>
+            <descr> Change globally the parametric QP solver </descr>
+            <cmd> mptopt('pqpsolver','PLCP'); </cmd>
+
+            <descr> Call problem constructor </descr>
+            <cmd> problem2 = Opt(F, cost, x(:,1), u(:)); </cmd>
+
+            <descr> Solve </descr>
+            <cmd> res2 = problem2.solve; </cmd>
+
+            <descr> Plot the partitions </descr>
+            <cmd> plot(res1.xopt);  title('PLCP'); axis tight; </cmd>
+            <cmd> plot(res2.xopt);  title('MPQP'); axis tight; </cmd>
+
+            <descr> Formulate MPLP problem in YALMIP</descr>
+            <cmd>cost = 0; </cmd>
+            <cmd> F = []; </cmd>
+            <cmd>
+                for i=1:N-1
+                    F = F + (x(:,i+1) == A*x(:,i) + B*u(:,i));
+                    F = F + (xlb &lt;= x(:,i) &lt;= xub);
+                    F = F + (ulb &lt;= u(:,i) &lt;= uub);    
+                    if i &gt; 1
+                        cost = cost + norm(Q*x(:,i),1);
+                    end
+                    cost = cost + norm(R*u(:,i),1);
+                end
+            </cmd>
+            <cmd> F = F + [xlb &lt;= x(:,end) &lt;= xub]; </cmd>
+            <cmd> cost = cost + norm(Q*x(:,end),1); </cmd>
+
+            <descr> Solve using MPLP solver </descr>
+            <cmd> mptopt('plpsolver','MPLP'); </cmd>
+            <cmd> problem3 = Opt(F, cost, x(:,1), u(:)); </cmd>
+            <cmd> res3 = problem3.solve; </cmd>
+    
+            <descr> Solve using PLCP solver </descr>
+            <cmd> mptopt('plpsolver','PLCP'); </cmd> 
+            <cmd> problem4 = Opt(F, cost, x(:,1), u(:)); </cmd>
+
+            <cmd> res4 = problem4.solve; </cmd>
+            <descr> Plot the partitions </descr>
+            <cmd> plot(res3.xopt);  title('MPLP'); axis tight; </cmd>
+            <cmd> plot(res4.xopt);  title('PLCP'); axis tight; </cmd>
+    </example>
+
+    <related>mpt_demo_sets1</related>
+    <related>mpt_demo_functions1</related>
+    <related>mpt_demo_unions1</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

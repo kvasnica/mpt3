@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_init</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Initializes MPT toolbox for the first time after installation.
+	</info>
+	
+	<syntax>mpt_init</syntax>
+    
+	<!-- long description of the function -->
+	<descr>
+        The function <tt>mpt_init</tt> sets default options for MPT toolbox and 
+        adds all required directories to Matlab path. It is recommended to store
+        the Matlab path for future such that this script does not need to be run again.
+        The options will be stored internally by Matlab and it is no longer needed to
+        initiaze them using <tt>mpt_init</tt> function everytime
+        the toolbox is started. The options can be later changed using <tt>mptopt</tt>
+        function. Note that any changes in the options will be replaced by default
+        options whenever <tt>mpt_init</tt> is invoked.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- multiple related function can be defined -->
+    <related>mptopt</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

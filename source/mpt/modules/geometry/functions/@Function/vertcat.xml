@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>horzcat</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Vertical concatenation for <tt>Function</tt> class.
+	</info>
+	
+	<syntax>F = vertcat(F1,F2)</syntax>
+    <syntax>F = [F1;F2]</syntax>
+    <syntax>F = [F1;F2;F3]</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        The objects of <tt>Function</tt> class are concatenated into arrays only, no matrix concatenation is allowed.
+        Note that only the objects of the same class can be concatenated into the same array.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>F1</name>
+        <descr><tt>Function</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Function"/>
+	</input>
+	<input required="false">
+		<name>F2</name>
+        <descr><tt>Function</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Function"/>
+	</input>
+	<output>
+		<name>F</name>
+        <descr>An array of <tt>Function</tt> objects.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Function"/>
+	</output>
+
+    
+	<!-- multiple related function can be defined -->
+    <related>Function</related>	
+    <related>horzcat</related>	
+    <related>disp</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

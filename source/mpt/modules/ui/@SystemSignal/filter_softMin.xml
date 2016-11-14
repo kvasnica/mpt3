@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>softMin</function>
+  
+  <info>
+    Soft lower bound constraint
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+    This filter will soften the lower bound constraint on a selected
+    signal in the MPC setup. Without this filter, lower bounds are
+    hard, i.e., the signal has to satisfy <i>z_{min} \leq
+    z_k</i>. With this filter added, the lower bound is soft and can
+    be violated by some positive margin <i>d_k</i>, i.e., the new
+    constraint becomes <i>z_{min} - d_k \leq z_k</i>. The slack
+    variables <i>d_k</i> are then penalized in the MPC cost function
+    by adding the term <i>\| Q d_k\|_p</i>.<br/>
+
+    To enable this filter, first call
+    <tt>model.signal.with('softMin')</tt>, where you replace
+    <tt>signal</tt> by the actual system's signal (typically by
+    <tt>x</tt> for state variables, <tt>u</tt> for inputs, and
+    <tt>y</tt> for outputs).<br/>
+
+    With the filter enabled, you can set the maximal allowed
+    violation of the constraint in
+    <tt>model.signal.softMin.maximalViolation</tt>, and specify
+    penalization of the slack variables by setting
+    <tt>model.signal.softMin.penalty</tt>.<br/>
+
+    To remove this filter, call
+    <tt>model.signal.without('softMin')</tt>.
+  </descr>
+
+  <example>
+    <descr>Specify an LTI system <i>x^+ = 0.9 x + u</i>, <i>y = x</i></descr>
+    <cmd>sys = LTISystem('A', 0.9, 'B', 1, 'C', 1);</cmd>
+
+    <descr>Add unity quadratic penalties on states and inputs (but not
+    on the terminal state)</descr>
+
+	<cmd>
+		sys.x.penalty = QuadFunction(1);
+		sys.u.penalty = QuadFunction(1);
+	</cmd>
+
+    <descr>Define hard state constraints</descr>
+    <cmd>sys.x.min = -1; sys.x.max = 1;</cmd>
+	
+	<descr>Make the lower bound soft with maximal violation of <i>3</i></descr>
+    <cmd>
+		sys.x.with('softMin');
+		sys.x.softMin.maximalViolation = 3;
+		M = MPCController(sys, 4);
+		x0 = -3.5;
+		[u, feasible, openloop] = M.evaluate(x0)
+	</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

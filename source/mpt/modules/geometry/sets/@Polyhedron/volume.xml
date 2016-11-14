@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>volume</function>
+  
+  <info>
+    Compute the volume of the polyhedron.
+  </info>
+  <syntax>vol = P.volume</syntax>
+  <syntax>vol = volume(P)</syntax>
+  
+  <descr>
+    Computes the volume of the polyhedron <i>P</i> using V-representation. If the polyhedron is not 
+    in V-representation, it will be converted automatically.
+
+    Volume is <tt>inf</tt> if <i>P</i> is unbounded, and zero if <i>P</i> is not full-dimensional.
+  </descr>
+  
+  <input required="true">
+    <name>P</name>
+    <descr>Polyhedron in any format</descr>
+    <class name="Polyhedron"/>
+  </input>
+  
+  <output>
+    <name>vol</name>
+    <descr>Volume of P.</descr>
+    <class name="double"/>
+  </output>
+  
+  <example>
+    <descr>Create polytope and compute volume:</descr>
+    <cmd>P = ExamplePoly.randHrep('d',5,'n',40); disp(P.volume);</cmd>
+  </example>
+ 
+  <related>minVRep</related>
+  
+  <author macro="author_cnj"/>
+  <license macro="GPL2"/>
+</help>

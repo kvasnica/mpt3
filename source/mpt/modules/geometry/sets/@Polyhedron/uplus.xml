@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>uplus</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+        Unitary plus for a polyhedron.
+	</info>
+	
+	<syntax>Q = +P;</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Creates a new copy <tt>Q</tt> of the polyhedron <tt>P</tt> by copying all fields.
+    </descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>P</name>
+        <descr><tt>Polyhedron</tt> object.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Polyhedron"/>
+	</input>
+    
+    <example>
+        <descr> Create H-polyhedron</descr>
+        <cmd> P = ExamplePoly.randHrep; </cmd>
+        <descr> Copy the polyhedron</descr>
+        <cmd> Q = +P; </cmd>
+        <descr> <tt>P</tt> and <tt>Q</tt> are the same.</descr>
+        <cmd> P==Q </cmd>
+        <descr> <tt>Q</tt> will not change if <tt>P</tt> is modified. </descr>
+        <cmd> P.normalize </cmd>
+        <descr> The H-description is different because <tt>P</tt> was changed. </descr>
+        <cmd> [P.H, Q.H] </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>uminus</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

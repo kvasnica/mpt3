@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>min</function>
+  
+  <info>
+    Lower bound on a signal
+  </info>
+
+  <syntax></syntax>
+
+  <descr> 
+      This filter introduces the lower bound <i>\text{lb}</i> on the 
+      signal <i>s</i>, i.e. <i>\text{lb} \le s_{k} </i>. 
+  </descr>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

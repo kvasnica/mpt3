@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_sets2</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Construction and basic properties of sets created in Yalmip
+	</info>
+	
+    <syntax>mpt_demo_sets2</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Slideshow on how to construct and work with <tt>YSet</tt> objects.
+        In particular, it is demonstrated how to:
+        <ul>
+            <li>Create Yalmip <tt>YSet</tt> objects. </li>
+            <li>Access internal information stored in the <tt>YSet</tt> object. </li>
+            <li>Query basic properties of the <tt>YSet</tt> object. </li>
+        </ul>
+	</descr>
+
+    <related>mpt_demo_sets1</related>
+    <related>mpt_demo_sets3</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

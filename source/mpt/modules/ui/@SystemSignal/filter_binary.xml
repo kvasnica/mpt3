@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+  <function>binary</function>
+  
+  <info>
+    Constraints variable to be binary (0/1)
+  </info>
+
+  <syntax></syntax>
+
+  <descr>
+    Adding this filter will constraint some (or all) elements of a given
+    variable to take only binary values. To enable the filter, use
+    <tt>model.signal.with('binary')</tt>.<br/>
+
+    To impose binary on all elements of a given variable
+    (say, <tt>model.u</tt>), use <tt>model.u.binary = true</tt>. To
+    add binary only to elements indexed by <tt>idx</tt>, call
+    <tt>model.u.binary = idx</tt>. To mark all elements of
+    <tt>model.u</tt> as real variables, use <tt>model.u.binary =
+    []</tt>.<br/>
+    
+    To remove this filter, call
+    <tt>model.signal.without('binary')</tt>, in which case all
+    elements of <tt>signal</tt> will be considered as real-valued
+    variables. 
+  </descr>
+
+  <example>
+    <descr>Create a 1D LTI system <i>x^+ = 0.9x + u</i>.</descr>
+    <cmd>model = LTISystem('A', 0.9, 'B', 1);</cmd>
+
+	<descr>Add constraints and penalties</descr>
+    <cmd>
+		model.x.min = -4; model.x.max = 4;
+		model.x.penalty = OneNormFunction(1);
+		model.u.penalty = OneNormFunction(0.1);
+	</cmd>
+    <descr>Create an MPC controller with prediction horizon 3</descr>
+    <cmd>M = MPCController(model, 3);</cmd>
+
+	<descr>Constraint the control action to be binary and compute
+		the open-loop optimizer for <tt>x0=-4</tt>
+	</descr>
+	<cmd>
+		M.model.u.with('binary'); 
+		M.model.u.binary = true;
+		[~, ~, openloop] = M.evaluate(-4);
+		openloop.U
+	</cmd>
+  </example>
+
+  <author macro="author_kvasnica"/>
+  <license macro="GPL2"/>
+</help>

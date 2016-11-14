@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>remove</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Remove set from Union object.
+	</info>
+	
+	<syntax>U = remove(U,index)</syntax>
+	<syntax>U.remove(index)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Removes the <tt>Set</tt> from the union based on the <tt>index</tt>. The elements of the
+        <tt>Union</tt> object are stored under <tt>U.Set</tt> property as a cell array.
+        The <tt>index</tt> must correspond to elements in this array to remove.
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>The object of the <tt>Union</tt> class.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="Union"/>
+	</input>
+
+    <input required="true">
+		<name>index</name>
+        <descr>An index set derived that specifies which sets to remove from the union.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="double"/>
+	</input>   
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>U</name>
+        <descr>Union of the sets.</descr>
+		<class name="Union"/>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example>
+        <!-- each example is a combination of descriptions and commands -->
+        <descr>Construct <tt>Union</tt> object from 3 polyhedra.</descr>		
+        <cmd>P(1) = Polyhedron('ub',-2);</cmd>
+        <cmd>P(2) = Polyhedron('lb',-1,'ub',1);</cmd>
+        <cmd>P(3) = Polyhedron('lb',2);</cmd>
+        <descr>Create union out of these polyhedra.</descr> 
+        <cmd> U = Union(P) </cmd>		
+        <descr> Remove the second polyhedron from the union.</descr>
+        <cmd> U.remove(2) </cmd>
+	</example>
+
+	<!-- multiple related function can be defined -->
+	<related>Union</related>
+    <related>add</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

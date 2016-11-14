@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isNeighbor</function>
+	
+	<info>Test if a polyhedron touches another polyhedron along a given facet.</info>
+	<syntax>ts  = P.isNeighbor(Q)</syntax>
+	<syntax>ts  = isNeighbor(P,Q)</syntax>
+    <syntax>[ts, iP, iQ] = isNeighbor(P,Q,fP,fQ)</syntax>
+
+	<descr>
+        Return true if the polyhedron <i>P</i> shares with the polyhedron <i>Q</i> a part of a common facet.
+        Both polyhedrons must be in H-representation. If they are not, the irredundant
+        H-representation will be computed.
+        
+        The function tests if the intersection of two polyhedra <i>P</i> and <i>S</i> in dimension <i>d</i> 
+        is nonempty and is of dimension <i>d-1</i>. If this holds, then the two polyhedra are touching themself
+        along one facet. For closer explanation, see the example below.        
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="true">
+	  <name>Q</name>
+	  <descr>Polyhedron in H-representation</descr>
+	  <class name="Polyhedron"/>
+	</input>
+	<input required="false">
+	  <name>fP</name>
+      <descr>Index of a facet to test from polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</input>
+	<input required="false">
+	  <name>fQ</name>
+      <descr>Index of a facet to test from polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</input>
+
+	<output>
+	  <name>ts</name> 
+      <descr>Logical statement if the polyhedron <i>P</i> touches <i>Q</i> along the facet.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+	<output>
+	  <name>iP</name> 
+      <descr>Index of a facet from polyhedron <i>P</i> that touches the polyhedron <i>Q</i>.</descr>
+	  <class name="double"/>
+	</output>
+	<output>
+	  <name>iQ</name> 
+      <descr>Index of a facet from polyhedron <i>Q</i> that touches the polyhedron <i>P</i>.</descr>
+	  <class name="double"/>
+	</output>
+
+	<example>
+        <descr>Create three neighboring polyhedra <tt>R1</tt>, <tt>R2</tt>, and <tt>R3</tt>.</descr>
+        <cmd> R1 = Polyhedron([0 0; 2 0; 0 1; 2 1]); </cmd>
+        <cmd> R2 = Polyhedron([1 0; 2 0; 1 -1; 2 -1]); </cmd>
+        <cmd> R3 = Polyhedron([2 0; 3 0; 2 -1; 3 -1]); </cmd>
+       <descr> Plot the polyhedrons to see that they are touching themself.</descr>
+       <cmd> plot([R1 R2 R3], 'showindex', true) </cmd>
+       <descr> Check that polyhedron R1 touches polyhedron R2. </descr>
+       <cmd> R1.isNeighbor(R2) </cmd>
+       <descr> Check that the fourth facet of the polyhedron R2 touches the second facet of polyhedron R3.</descr>
+       <cmd> [ts, iR2, iR3] = R2.isNeighbor(R3) </cmd> 
+        <descr> Actually, the facets of <tt>R2</tt> and <tt>R3</tt> are the same, so these polyhedra have face to face property
+        that can be checked using <tt>isAdjacent</tt> method. </descr>
+        <cmd> R2.isAdjacent(R3) </cmd>
+	</example>
+
+
+	<!-- multiple related function can be defined -->
+	<related>isAdjacent</related>	
+
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+	<license macro="GPL2"/>
+</help>

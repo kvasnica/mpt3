@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>solve</function>
+	
+	<info>
+		The main routine for solving optimization problems
+	</info>
+
+    <syntax>result = problem.solve</syntax>
+    <syntax>result = problem.solve(th)</syntax>
+    <syntax>result = solve(problem)</syntax>
+
+    <descr>
+        The main routine for solving non-parametric (LP, QP, MILP, MIQP) and parametric problems (MPLP, MPQP, PLCP).
+        The result is returned in the appropriate format depending on the problem.
+        
+        The <tt>Opt</tt> class serves as general wrapper for preprocessing the data 
+        involved in optimization, including necessary error checks. Once the data are valid, 
+        then are passed to <tt>mpt_solve</tt> or <tt>mpt_solvemp</tt> function that calls the appropriate solver without
+        any errorchecks. <br />
+        For parametric problems it is possible to solve the problem for a particular value of the parameters <i>\theta</i>        
+        if provided as an argument <tt>th</tt>.
+
+        
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+        <name>problem</name>
+        <descr> Object of the <tt>Opt</tt> class that defines the optimization problem to be solved. </descr>
+        <class name="Opt"/>
+	</input>
+	
+	<!-- now describe output arguments -->
+	<output>
+		<name>result</name>
+		<descr>Structure with the date that represents the solution to given problem. For non-parametric problems the solution is returned with
+        the following fields.
+       </descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+				<descr>Optimal solution for primal variables.</descr>
+				<class name="double"/>
+			</field>
+			<field>
+				<name>obj</name>
+				<descr>Objective value.</descr>
+				<class name="double"/>
+			</field>            
+			<field>
+				<name>lambda</name>
+				<descr>Lagrangian multipliers</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1)</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization</descr>
+				<class name="char"/>
+			</field>
+		</class>
+	</output>
+	<output>
+		<name>result</name>
+		<descr>Structure with the date that represents the solution to given problem. For parametric problems the solution is returned with
+        the following fields.
+       </descr>
+		<class name="struct">
+			<field>
+				<name>xopt</name>
+                <descr>Optimal solution for variables <i>w</i>, <i>z</i> from PLCP reformulation if the problem was solved using PLCP solver.
+                    If the original problem was given as MPLP/MPQP, then this field returns also primal, dual variables, and the objective value
+                    for given problem.
+                    The solution is given as a collection of polyhedra in the same dimension with certain properties and is given as 
+                    <tt>PolyUnion</tt> class. The function data associated to each variable is stored under <tt>Function</tt>, in particular
+                    in <tt>res.Set(i).Func{j}</tt> where the index <i>i</i> corresponds to <tt>i</tt>-th region and index <i>j</i> to <tt>j</tt>-th 
+                    function. 
+                </descr>
+				<class name="PolyUnion"/>
+			</field>
+            <field>
+				<name>exitflag</name>
+				<descr>An integer value that informs if the result was feasible (1), or otherwise (different from 1)</descr>
+				<class name="double"/>
+			</field>
+            <field>
+				<name>how</name>
+				<descr>A string that informs if the result was feasible ('ok'), or if any problem appeared through optimization</descr>
+				<class name="char"/>
+			</field>
+            <field>
+				<name>stats</name>
+				<descr>Other details from the computation that might be of interest, such as the number of pivots, elapsed time, etc.</descr>
+				<class name="struct"/>
+			</field>            
+		</class>
+	</output>
+    
+    <example>
+        <descr> Solve an LP stored in file <tt>sc50b</tt>.</descr>
+        <descr> Load the data</descr>
+        <cmd> load sc50b </cmd>
+        <descr> Create the optimization problem using <tt>Opt</tt> class</descr>
+        <cmd> problem = Opt('A',A,'b',b,'Ae',Aeq,'be',beq,'lb',lb,'f',f) </cmd>
+        <descr> Solve the problem </descr>
+        <cmd> result = problem.solve </cmd>
+    </example>
+    <example> 
+        <descr> Create random PLCP problem and solve it</descr>
+        <descr> Generate data </descr>
+        <cmd> H = randn(5); M = sqrt(2)*H'*H; q=randn(5,1); Q = randn(5,2); </cmd>
+        <descr> Provide bounds on the parameters </descr>
+        <cmd> Ath = randn(8,2); bth = 5*ones(8,1); </cmd>
+        <descr> Construct the problem </descr>
+        <cmd> problem = Opt('M',M,'q',q,'Q',Q,'Ath',Ath,'bth',bth); </cmd>
+        <descr> Solve the problem </descr>
+        <cmd> result = problem.solve </cmd>
+        <descr> We can plot the solution </descr>
+        <cmd> result.xopt.plot </cmd>        
+    </example>
+    <example>
+        <descr> Formulate linear parametric problem <i>\min x_1-2x_2\theta+\theta \text{s.t.} x_1-x_2\ge\theta, x_1\ge 0, x_2\ge 0, -1\le\theta\le 1  </i>
+            with the help of YALMIP.
+        </descr>
+        <cmd> sdpvar x1 x2 th </cmd>
+        <descr> Objective function: </descr>
+        <cmd>  obj = x1-2*x2*th+th; </cmd>
+        <descr> Constraints: </descr>
+        <cmd>  F = [ x1-x2 &gt;= th; x1&gt;=0; x2&gt;=0; -1&lt;= th &lt;= 1]; </cmd>
+        <descr> Construct an instance of <tt>Opt</tt> class that represents parametric linear program </descr>
+        <cmd> problem=Opt(F,obj,th,[x1;x2]) </cmd>
+        <descr> Solve the above problem quickly for the point <tt>th=0.5</tt> without generating explicit solution
+        </descr>
+        <cmd> problem.solve(0.5) </cmd>        
+        <descr> Verify this result by solving the problem parametrically</descr>
+        <cmd> res=problem.solve; </cmd>
+        <descr>  Plot the optimal cost function </descr>
+        <cmd> res.xopt.fplot('obj','linewidth',3); </cmd>
+        <descr> Evaluate the explicit solution for the point <tt>th=0.5</tt> </descr>
+        <cmd> res.xopt.feval(0.5,'obj') </cmd>        
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>Opt</related>    
+    <related>mpt_solve</related>    
+    <related>mpt_solvemp</related>    
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

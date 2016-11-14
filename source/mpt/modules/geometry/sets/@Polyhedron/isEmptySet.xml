@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>isEmptySet</function>
+	
+	<info>Test if a polyhedron has a non-empty interior.</info>
+	<syntax>tf = P.isEmptySet</syntax>
+	<syntax>tf = isEmptySet(P)</syntax>
+
+	<descr>
+	  Return true if the polyhedron <i>P</i> is empty or false otherwise.
+
+	  A polyhedron is considered as empty if the diameter of the inscribed ball is 
+      less than <tt>region_tol</tt> or if there exist no feasible point inside the set.
+	</descr>
+
+	<input required="true">
+	  <name>P</name>
+	  <descr>Polyhedron in any format</descr>
+	  <class name="Polyhedron"/>
+	</input>
+
+	<output>
+	  <name>tf</name> 
+	  <descr>True if the polyhedron <i>P</i> is empty and false otherwise.</descr>
+	  <class name="logical">
+	    <option>true</option>
+	    <option>false</option>
+	  </class>
+	</output>
+ 
+    <example>
+        <descr>Non-empty polyhedron</descr>
+        <cmd>P = ExamplePoly.randHrep;</cmd>
+        <cmd> P.isEmptySet </cmd>
+        <descr>Empty polyhedron is created at the time of construction.</descr>
+        <cmd>Q = Polyhedron</cmd>
+        <cmd> Q.isEmptySet </cmd>
+        <descr> Array of 3 empty polyhedra </descr>
+        <cmd> R(1,3) = Polyhedron </cmd>
+        <cmd> R.isEmptySet </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+	<related>isEmptySet</related>
+	<related>isBounded</related>
+    <related>isFullDim</related>
+	
+	<!-- multiple literature sources can be given -->
+	<!-- <literature>Fukuda : PolyFaq</literature> -->
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	<license macro="GPL2"/>
+</help>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>extreme</function>
+	
+	<info>Compute extremal point of a polyhedron in a given direction.</info>
+	<syntax>sol = P.extreme(y)</syntax>
+
+    <descr>
+      <tt>P.extreme(y)</tt> solves the following problem:
+        <latex>$$J(y) = \max_{x} ~ \{y'x\,|\, x \in P\}$$</latex> and returns the optimizer /
+        extreme point <i>x</i>.
+    </descr>
+
+	<input required="true">
+		<name>P</name>
+		<descr>Polyhedron in any format.</descr>
+		<class name="Polyhedron"/>
+	</input>
+    <input required="true">
+		<name>y</name>
+		<descr>Direction to compute the extreme point.</descr>
+		<class name="double"/>
+	</input>
+
+	<output>
+	  <name>sol</name>
+	  <descr>Support of <i>y</i> in <i>P</i>.</descr>
+	  <class name="struct">
+          <field>
+              <name>exitflag</name>
+              <descr>Integer value informing about the termination status of the optimization. </descr>
+              <class name="double"/>
+          </field>
+	    <field>
+	      <name>x</name>
+	      <descr>An optimizer of <i>\max_{x} ~ \{y'x\,|\, x \in P\}</i></descr>
+	      <class name="double"/>
+	    </field>
+	    <field>
+	      <name>supp</name>
+	      <descr>Optimal value of <i>\max_{x} ~ \{y'x\,|\, x \in P\}</i></descr>
+	      <class name="double"/>
+	    </field>
+	  </class>
+	</output>
+
+	<example>
+		<descr>Create random polytope:</descr>
+		<cmd>P = Polyhedron('H', [randn(20,2) ones(20,1)])</cmd>
+		<descr>Compute extreme point in random direction</descr>
+		<cmd>y = randn(2,1); sol = P.extreme(y);</cmd>
+		<descr>Plot the point <tt>sol.x</tt> and the supporting hyperplane </descr>
+		<cmd>plot(P, 'alpha', 0.2);  hold on;
+		plot(sol.x(1),sol.x(2),'ro','markersize',10);
+		Polyhedron('He', [y' sol.supp], 'lb', -[1;1], 'ub', [1;1]).plot;
+		</cmd>
+	</example>
+
+	<!-- multiple literature sources can be given -->
+	<literature macro="Fukuda:PolyFaq"/>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_cnj"/>
+	
+	<license macro="GPL2"/>
+</help>

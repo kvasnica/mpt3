@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>mpt_demo_unions1</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+       Demo that illustrates working with unions of convex sets
+	</info>
+	
+    <syntax>mpt_demo_unions1</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Demo that illustrates working with unions of convex sets.
+        It will be shown how to
+        <ul>
+            <li> construct Union objects and </li>
+            <li> add and remove sets from the Union object. </li>
+        </ul>
+    
+	</descr>
+
+    <related>mpt_demo_unions2</related>
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

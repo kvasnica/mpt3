@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>distance</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Computes the closest distance between the convex set and given point.
+	</info>
+	
+	<syntax>ret = distance(Set,x)</syntax>
+	<syntax>ret = Set.distance(x)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Compute the closest distance between the convex <tt>Set</tt> and given point <tt>x</tt>
+        The approach is based on solving the optimization problem
+        <latex>
+            \begin{align*}
+            \underset{y}{\text{min}} \; {\|x-y\|}_{2}  \\
+                \text{s.t.} \quad  y \in \texttt{Set}
+            \end{align*}
+        </latex>
+        where <i>x</i> is the given point in the same dimension as the set and <i>y</i> is the 
+        point inside the <tt>Set</tt>. If the optimization terminated successfully, the output 
+        contains the distance <tt>ret.d</tt> and the points <tt>ret.y</tt>, <tt>ret.x</tt>.
+        Otherwise, the output is empty. 
+        If the <tt>Set</tt> is an array of convex sets, the distance and the point <tt>y</tt> are
+        returned in a cell arrays.
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>Set</name>
+        <descr>Any object derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="ConvexSet"/>
+	</input>
+	<input required="true">
+		<name>x</name>
+        <descr>A point given as a real vector with the same dimension as the convex set.</descr>
+		<class name="double"/>
+	</input>
+    
+	<!-- now describe output arguments -->
+	<output>
+		<name>ret</name>
+        <descr>Structure that contains the information about the computed distance and the points <i>x</i>, <i>y</i>.</descr>
+        <class name="struct">
+            <field>
+                <name>exitflag</name>
+                <descr>Termination status from the related optimization problem.</descr>
+                <class name="double"/>
+            </field>
+            <field>
+                <name>dist</name>                
+                <descr>Distance between the point <tt>x</tt> and the convex <tt>Set</tt>.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>y</name>
+                <descr>The point that is contained in the convex <tt>Set</tt> and is closest to <tt>x</tt>.</descr>
+                <class name="double"/>
+            </field>            
+            <field>
+                <name>x</name>                
+                <descr>The point <tt>x</tt> that was provided.</descr>
+                <class name="double"/>            
+            </field>          
+        </class>
+	</output>
+
+	<!-- we can provide multiple code examples -->
+    <example> 
+        <descr> Construct a convex set by intersecting a circle and random linear inequalities. </descr>
+        <descr> Define variable first</descr>
+        <cmd> z = sdpvar(2,1); </cmd>
+        <descr> Define a set <tt>S</tt> using <tt>YSet</tt> class  </descr>
+        <cmd> options = sdpsettings('solver','sedumi','verbose',0); </cmd>
+        <cmd> S = YSet(z, [norm(z)&lt;=1; randn(2)*z&lt;=0.5*ones(2,1)], options); </cmd>
+        <descr> Compute the distance to a point [-5;8] </descr>
+        <cmd> x = [-5; 8];</cmd>
+        <cmd> d = S.distance(x)</cmd>
+        <descr> We can plot the set and the points <tt>x</tt>, <tt>y</tt> </descr>
+        <cmd> S.plot('alpha',0.5,'color','green'); 
+              hold on;  text(x(1),x(2),'x');
+              axis([-3 2 -2 3]); text(d.y(1),d.y(2),'x');
+        </cmd>
+    </example>
+
+	<!-- multiple related function can be defined -->
+    <related>outerApprox</related>
+    <related>support</related>
+    <related>separate</related>
+	
+	<!-- multiple authors can be defined -->
+    <author macro="author_cnj"/>
+	<author macro="author_herceg"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>

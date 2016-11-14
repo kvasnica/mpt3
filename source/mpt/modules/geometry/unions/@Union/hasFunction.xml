@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<help>
+	<function>hasFunction</function>
+	
+	<!-- one-line description of the function -->
+	<info>
+		Returns true if the union contains given function names.
+	</info>
+	
+	<syntax>ts = hasFunction(U, FuncName)</syntax>
+	<syntax>ts = U.hasFunction(FuncName)</syntax>
+
+	<!-- long description of the function -->
+	<descr>
+        Returns true or false if the function stored under <tt>FuncName</tt> is attached to union <tt>U</tt>. 
+	</descr>
+	<!-- now describe input arguments -->
+	
+	<!-- mark inputs as mandatory by providing the "required" attribute -->
+	<input required="true">
+		<name>U</name>
+        <descr>Union of sets derived from the <tt>ConvexSet</tt> class, e.g. <tt>Polyhedron</tt>, <tt>YSet</tt>, ...</descr>
+		<class name="Union"/>
+	</input>
+
+    <input required="true">
+		<name>FuncName</name>
+        <descr>Name of the function to test.</descr>
+		<!-- any class name can be used, it can even be omitted -->
+		<class name="char"/>
+	</input>
+
+	<!-- now describe output arguments -->
+	<output>
+		<name>ts</name>
+        <descr>Logical statement if the set contains the function <tt>FuncName</tt> or not.</descr>
+		<class name="logical"/>
+	</output>
+
+	<!-- multiple related function can be defined -->
+    <related>listFunctions</related>
+    <related>addFunction</related>
+    <related>removeFunction</related>	
+	
+	<!-- multiple authors can be defined -->
+	<author macro="author_herceg"/>
+    <author macro="author_kvasnica"/>
+
+	<!-- finally, the text of the license -->
+	<license macro="GPL2"/>
+</help>
