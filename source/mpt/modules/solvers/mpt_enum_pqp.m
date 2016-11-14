@@ -33,7 +33,9 @@ function sol = mpt_enum_pqp(pqp, options)
 %                        If 'outerbox', the feasible set is costructed as the
 %                        outer box approximation of the union of critical
 %                        regions. (default='regions')
-%     .verbose: if >=0, progress will be displayed (default=0)
+%     .remove_redundant: if true, redundant inequalities will be detected
+%                        and removed from the pQP (default=true)
+%              .verbose: if >=0, progress will be displayed (default=0)
 %
 % Outputs:
 % --------
@@ -88,6 +90,7 @@ options = mpt_defaultOptions(options, ...
     'prune_infeasible', MPTOPTIONS.modules.solvers.enum_pqp.prune_infeasible, ...
     'feasible_set', MPTOPTIONS.modules.solvers.enum_pqp.feasible_set, ...
     'regions', true, ...
+    'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
     'exclude', {});
 
 if ~isa(pqp, 'Opt')
@@ -106,6 +109,11 @@ pqp_orig = pqp.copy();
 if pqp.me>0
     pqp = pqp.copy();
     pqp.eliminateEquations();
+end
+
+if options.remove_redundant
+    % remove redundant inequalities
+    pqp.minHRep();
 end
 
 if min(eig(pqp.H)) < MPTOPTIONS.rel_tol

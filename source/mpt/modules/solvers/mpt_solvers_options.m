@@ -702,3 +702,6 @@ options.enum_pqp.prune_infeasible = true;
 %                        regions. (default='projection')
 options.enum_pqp.feasible_set = 'regions';
 
+% if .remove_redundant=true, redundant inequalities will be removed from
+% the pQP problem (improves runtime, but can be slow for large problems)
+options.enum_pqp.remove_redundant = true;
