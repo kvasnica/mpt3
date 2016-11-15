@@ -335,7 +335,29 @@ classdef LTISystem < AbstractSystem
 		
 		function [S, SN] = reachableSet(obj, varargin)
 			% Computes the forward/backwards reachable N-step set
-
+            %
+            % 	sys.reachableSet()
+            %
+            % By default, this method computes the 1-step forward reachable
+            % set. It can be customized by 
+            %
+            % 	R = sys.reachableSet('X', X, 'U', U, 'N', N, ...
+            %                        'direction', 'forward' or 'backward')
+            %
+            % where "X", "U" are polyhedra, and "N" is the number of steps.
+            % Then for the 'forward' direction and N=1: 
+            %
+            % 	R = { A*x+B*u | x \in X, u \in U }
+            %
+            % and for 'backward':
+            %
+            % 	R = { x | A*x+B*u \in X, u \in U }
+            %
+            % If "X" or "U" is not provided, X = { x | xmin <= x <= xmax }
+            % and U = { u | umin <= u <= umax } and the constraints are
+            % extracted from "sys.x.min", "sys.x.max", "sys.u.min", and
+            % "sys.u.max", respectively.
+            
 			ip = inputParser;
 			ip.KeepUnmatched = false;
 			ip.addParamValue('direction', 'forward', @ischar);
