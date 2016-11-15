@@ -112,6 +112,7 @@ if pqp.me>0
     pqp.eliminateEquations();
 end
 
+m_before = pqp.m;
 if options.remove_redundant
     % remove redundant inequalities
     pqp.minHRep();
@@ -123,8 +124,12 @@ if min(eig(pqp.H)) < MPTOPTIONS.rel_tol
 end
 
 if options.verbose>=0
-    fprintf('Parameters: %d, variables: %d, constraints: %d\n', ...
+    fprintf('Parameters: %d, variables: %d, constraints: %d', ...
         pqp.d, pqp.n, pqp.m);
+    if options.remove_redundant
+        fprintf(' (reduced from %d)', m_before);
+    end
+    fprintf('\n');
     upperbound = 0;
     for i = 0:pqp.n
         upperbound = upperbound + nchoosek(pqp.m, i);
