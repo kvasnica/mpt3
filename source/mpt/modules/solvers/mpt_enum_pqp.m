@@ -92,7 +92,6 @@ options = mpt_defaultOptions(options, ...
     'feasible_set', MPTOPTIONS.modules.solvers.enum_pqp.feasible_set, ...
     'regions', true, ...
     'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
-    'generator', MPTOPTIONS.modules.solvers.enum_pqp.generator, ...
     'exclude', {});
 
 if ~isa(pqp, 'Opt')
@@ -140,13 +139,17 @@ start_t = clock;
 if options.verbose>=0
     fprintf('Exploring active constraints...\n');
 end
-[Aopt, Adeg, ~, nlps] = getActiveSets(pqp, options);
+[Aopt, Adeg, Afeas, Ainfeas, nlps] = getActiveSets(pqp, options);
 if options.verbose>0
     fprintf('...done (%.1f seconds, number of LPs: %d)\n', ...
         etime(clock, start_t), nlps);
 end
 % merge optimal and degenerate active sets
-AS = {Aopt{:}, Adeg{:}};
+AS = [Aopt, Adeg];
+n_total = 0;
+for i = 1:length(AS)
+    n_total = n_total + size(AS{i}, 1);
+end
 
 %% recover regions, optimizers and the cost function
 regions = [];
@@ -161,18 +164,20 @@ if options.verbose>=0
 end
 t = tic;
 for i = 1:length(AS)
-    if options.verbose>=0 && toc(t) > MPTOPTIONS.report_period
-        fprintf('progress: %d/%d\n', i, length(AS));
-        t = tic;
-    end
-    R = getRegion(pqp, pqp_orig, AS{i}, options);
-    if isempty(R)
-        n_lowdim = n_lowdim + 1;
-    end
-    if isempty(regions)
-        regions = R;
-    else
-        regions(end+1) = R;
+    for j = 1:size(AS{i}, 1)
+        if options.verbose>=0 && toc(t) > MPTOPTIONS.report_period
+            fprintf('progress: %d/%d\n', i, n_total);
+            t = tic;
+        end
+        R = getRegion(pqp, pqp_orig, AS{i}(j, :), options);
+        if isempty(R)
+            n_lowdim = n_lowdim + 1;
+        end
+        if isempty(regions)
+            regions = R;
+        else
+            regions(end+1) = R;
+        end
     end
     %regions = [regions, R];
 end
@@ -189,10 +194,6 @@ if isempty(AS)
     sol.xopt = PolyUnion;
     sol.exitflag = MPTOPTIONS.INFEASIBLE;
     sol.how = 'infeasible';
-    sol.stats.solveTime = etime(clock, start_time);
-    sol.stats.nLPs = nlps;
-    sol.stats.Aoptimal = Aopt;
-    sol.stats.Adegenerate = Adeg;
 
 else
     % compute the set of feasible parameters
@@ -241,11 +242,13 @@ else
     
     sol.exitflag = MPTOPTIONS.OK;
     sol.how = 'ok';
-    sol.stats.solveTime = etime(clock, start_time);
-    sol.stats.nLPs = nlps;
-    sol.stats.Aoptimal = Aopt;
-    sol.stats.Adegenerate = Adeg;
 end
+sol.stats.solveTime = etime(clock, start_time);
+sol.stats.nLPs = nlps;
+sol.stats.Aoptimal = Aopt;
+sol.stats.Adegenerate = Adeg;
+sol.stats.Afeasible = Afeas;
+sol.stats.Ainfeasible = Ainfeas;
 
 %% display final statistics
 if options.verbose>=0
@@ -278,7 +281,14 @@ function CR = getRegion(pqp, opt, A, options)
 %     R: critical region as a Polyhedron object with functions "primal"
 %        and "obj"
 
-% Author: Martin Klauco, STU Bratislava, martin.klauco@stuba.sk
+% Authors: 
+% Michal Kvasnica, STU Bratislava, michal.kvasnica@stuba.sk
+% Martin Klauco, STU Bratislava, martin.klauco@stuba.sk
+
+% special notion for no active constraints
+if isequal(A, 0)
+    A = [];
+end
 
 % extract active sets
 Ga = pqp.A(A, :);
@@ -361,7 +371,7 @@ end
 
 %%
 %--------------------------------------------------------------
-function [Aopt, Adeg, AllFeas, nlps] = getActiveSets(pqp, options)
+function [Aopt, Adeg, Afeas, Ainfeas, nlps] = getActiveSets(pqp, options)
 % Enumerates all optimal combinations of active sets
 %
 % Syntax:
@@ -385,21 +395,21 @@ function [Aopt, Adeg, AllFeas, nlps] = getActiveSets(pqp, options)
 %     Afeas: vector of indices of feasible constraints
 %      nLPs: number of LPs solved
 
+start_t = clock;
+
 % is the case with no active constraints optimal?
 [feasible, nlps] = checkActiveSet(pqp, []);
 if feasible
     % yep, include the case into list of non-degenerate optimal active sets
-    Aopt = {[]};
+    Aopt = {0};
+    Afeas = {0};
 else
     % nope, start with an empty list
-    Aopt = {};
+    Aopt = {[]};
+    Afeas = {-1};
 end
-Adeg = {}; % initial list of degenerate active sets
-
-Af = []; % initial list of feasible active sets
-Ai = []; % initial list of infeasible active sets
-AllFeas = []; % vector of unique indices of feasible constraints
-AllInfeas = options.exclude;
+Adeg = {[]};
+Ainfeas = {[]};
 
 if options.verbose>=0
     fprintf('Level    Total Candidates Optimal Degenerate Feasible Infeasible Rankdef       LPs\n');
@@ -411,30 +421,16 @@ for i = 1:pqp.n
     if options.verbose>=0
         fprintf('%2d/%2d', i, pqp.n);
     end
-    
     % explore all nodes in this level, provide unique list of feasible
     % constraints and all previously discovered infeasible combinations
-    [Ao, Ad, Af, Ai, n] = exploreLevel(pqp, i, AllFeas, AllInfeas, options);
-    nlps = nlps + n;
-    
-    % keep track of which constraints were feasible (remember that AllFeas
-    % is a vector of indices of constraints that were feasible at any level
-    % of the tree)
-    AllFeas = unique([AllFeas; Af(:)]);
-    
-    % keep track of infeasible active sets at each level
-    AllInfeas{end+1} = Ai;
-
-    % record non-degenerate optimal active sets
-    for j = 1:size(Ao, 1)
-        Aopt{end+1} = Ao(j, :);
-    end
-    
-    % record degenerate optimal active sets
-    for j = 1:size(Ad, 1)
-        Adeg{end+1} = Ad(j, :);
-    end
+    [Ao, Ad, Af, Ai, nlp] = exploreLevel(pqp, i, Afeas{end}, Ainfeas, options);
+    nlps = nlps + nlp;
+    Aopt{i+1} = Ao;    % optimal active sets
+    Adeg{i+1} = Ad;    % degenerate active sets
+    Afeas{i+1} = Af;   % feasible active sets
+    Ainfeas{i+1} = Ai; % infeasible active sets
 end
+fprintf('...done (%.1f seconds, %d LPs)\n', etime(clock, start_t), nlps);
 
 end
 
@@ -450,12 +446,11 @@ function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevel(pqp, level, f
 %
 % Inputs:
 % -------
-%          pqp: matrices of the pQP formulation
-%        level: index of the level (integer)
-%     feasible: vector of unique indices of feasible constraints
-%   infeasible: cell array of infeasible combinations of active constraints
-%      options: structure of options (see help generateLevel)
-%        .verbose: if >=0, progress will be displayed
+%             pqp: matrices of the pQP formulation
+%           level: index of the level (integer)
+%        feasible: cell array of feasible active sets at the previous level
+%      infeasible: cell array of infeasible active sets at each level
+% options.verbose: if >=0, progress will be displayed
 %
 % Outputs:
 % --------
@@ -466,228 +461,86 @@ function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevel(pqp, level, f
 %               (includes rank-defficient active sets)
 %         nlps: number of LPs solved on this level
 
-switch lower(options.generator)
-    case 'iterative'
-        [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelIterative(pqp, level, feasible, infeasible, options);
-    case 'batch'
-        [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelBatch(pqp, level, feasible, infeasible, options);
-    otherwise
-        error('Unknown generator "%s".', options.generator);
-end
-
-end
-
-%%
-%--------------------------------------------------------------
-function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelIterative(pqp, level, feasible, infeasible, options)
-% Iterative generation of active sets
-
-% initial list of active constraints for the first level of the tree
-if level==1 && isempty(feasible)
-    feasible = 1:pqp.m;
-    % remove infeasible constraints
-    for j = 1:length(infeasible)
-        feasible = setdiff(feasible, infeasible{j});
-    end
-end
-pruned = 0;
-nlps = 0;
-results = [];
-Afeasible = [];
-Ainfeasible = [];
 Aopt = [];
 Adeg = [];
-n_nodes = 0;
+Afeasible = [];
+Ainfeasible = [];
+n_rankdef = 0;
 n_candidates = 0;
-
-% iterative version of nchoosek
-% http://stackoverflow.com/questions/4844513/iterative-algorithm-for-combination-generation
-%
-n=length(feasible); k=level;
-com = 1:k;
-while (level==1 && n_nodes<n) || (level>1 && com(k-1)<n)
-    n_nodes = n_nodes + 1;
-    node = feasible(com(1:k));
-    node = node(:)';
-    candidate = true;
-    % remove previously known infeasible combinations
-    %
-    % we only need to do this from the 3rd level upwards, since on the 2nd
-    % level the lists of feasible and infeasible constraints are mutually
-    % exclusive, hence nodes are not poluted by any infeasible constraints
-    if level>2 && options.prune_infeasible
-        % check if the i-th node contains any sequence listed in
-        % "infeasible"
-        for j = 1:length(infeasible)
-            m = ismembc(infeasible{j}, node); % fastest implementation
-            if any(sum(m, 2)==size(infeasible{j}, 2))
-                % the i-th row contains all entries from at least one row of
-                % "infeasible", therefore the i-th row can be removed
-                candidate = false;
-                pruned = pruned+1;
-                break
+nlps = 0;
+n_pruned = 0;
+AllFeasible = unique(feasible(:));
+for i = 1:size(feasible, 1)
+    if level==1
+        candidates = 1:pqp.m;
+    else
+        candidates = AllFeasible(AllFeasible>max(feasible(i, :)));
+    end
+    for j = candidates(:)'
+        if level==1
+            Atry = j;
+        else
+            Atry = [feasible(i, :), j];
+        end
+        
+        % remove previously known infeasible combinations
+        %
+        % we only need to do this from the 3rd level upwards, since on the 2nd
+        % level the lists of feasible and infeasible constraints are mutually
+        % exclusive, hence nodes are not poluted by any infeasible constraints
+        do_check = true;
+        if level>2 && options.prune_infeasible
+            % check if Atry contains any sequence listed in "infeasible"
+            for j = 2:length(infeasible)
+                m = ismembc(infeasible{j}, Atry); % fastest implementation
+                if any(sum(m, 2)==size(infeasible{j}, 2))
+                    % Atry contains all entries from at least one row of
+                    % "infeasible", therefore it can be removed
+                    do_check = false;
+                    n_pruned = n_pruned+1;
+                    break
+                end
             end
         end
-    end
-    if candidate
-        n_candidates = n_candidates + 1;
-        [res, nlp] = checkActiveSet(pqp, node);
-        results = [results; res];
-        nlps = nlps+nlp;
-        %  2: optimal, no LICQ violation
-        %  1: optimal, LICQ violated
-        %  0: feasible, but not optimal
-        % -1: infeasible
-        % -2: rank defficient
-        % -3: undecided
-        % split active sets into feasible/infeasible/optimal/degenerate
-        if res>=0
-            Afeasible = union(Afeasible(:), node);
-            if res==1
-                Adeg = [Adeg; node];
-            elseif res==2
-                Aopt = [Aopt; node];
+        if do_check
+            n_candidates = n_candidates + 1;
+            [result, nlp] = checkActiveSet(pqp, Atry);
+            nlps = nlps+nlp;
+            %  2: optimal, no LICQ violation
+            %  1: optimal, LICQ violated
+            %  0: feasible, but not optimal
+            % -1: infeasible
+            % -2: rank defficient
+            % -3: undecided
+            % split active sets into feasible/infeasible/optimal/degenerate
+            if result>=0
+                Afeasible = [Afeasible; Atry];
+                if result==1
+                    Adeg = [Adeg; Atry];
+                elseif result==2
+                    Aopt = [Aopt; Atry];
+                end
+            end
+            if result<0
+                Ainfeasible = [Ainfeasible; Atry];
+                if result==-2
+                    n_rankdef = n_rankdef + 1;
+                end
             end
         end
-        if res<0
-            Ainfeasible = [Ainfeasible; node];
-        end
-    end
-
-    t = k;
-    while (t~=1 && com(t)==n-k+t)
-        t = t-1;
-    end
-    com(t) = com(t)+1;
-    for i = t+1:k
-        com(i) = com(i-1)+1;
     end
 end
 
 if options.verbose>=0
     % display progress
-    fprintf('%9d   %8d', n_nodes, n_candidates);
-end
-
-if options.verbose>=0
-    % display progress
+    fprintf('%9d   %8d', n_candidates+n_pruned, n_candidates);
     fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
-        length(find(results==2)), ...
-        length(find(results==1)), ...
-        length(find(results==0)), ...
-        length(find(results==-1)), ...
-        length(find(results==-2)), ...
+        size(Aopt, 1), ...
+        size(Adeg, 1), ...
+        size(Afeasible, 1)-size(Aopt, 1)-size(Adeg, 1), ...
+        size(Ainfeasible, 1)-n_rankdef, ...
+        n_rankdef, ...
         nlps);
-end
-
-end
-
-%%
-%--------------------------------------------------------------
-function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelBatch(pqp, level, feasible, infeasible, options)
-% Batch generation of active sets via generateLevel
-
-% initial list of active constraints for the first level of the tree
-if level==1 && isempty(feasible)
-    feasible = 1:pqp.m;
-    % remove infeasible constraints
-    for j = 1:length(infeasible)
-        feasible = setdiff(feasible, infeasible{j});
-    end
-end
-
-% generate nodes for this level
-[nodes, pruned] = generateLevel(level, feasible, infeasible, options);
-
-if options.verbose>=0
-    % display progress
-    fprintf('%9d   %8d', size(nodes, 1)+pruned, size(nodes, 1));
-end
-
-% kick out infeasible nodes
-result = zeros(size(nodes, 1), 1);
-nlps = zeros(size(nodes, 1), 1);
-for i = 1:size(nodes, 1)
-    [result(i), nlps(i)] = checkActiveSet(pqp, nodes(i, :));
-    %  2: optimal, no LICQ violation
-    %  1: optimal, LICQ violated
-    %  0: feasible, but not optimal
-    % -1: infeasible
-    % -2: rank defficient
-    % -3: undecided
-end
-
-% split active sets into feasible/infeasible/optimal/degenerate
-Afeasible = nodes(result>=0, :); % feasible/degenerate/optimal
-Ainfeasible = nodes(result<0, :); % infeasible/rank defficient
-Aopt = nodes(result==2, :);
-Adeg = nodes(result==1, :);
-nlps = sum(nlps);
-
-if options.verbose>=0
-    % display progress
-    fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
-        length(find(result==2)), ...
-        length(find(result==1)), ...
-        length(find(result==0)), ...
-        length(find(result==-1)), ...
-        length(find(result==-2)), ...
-        nlps);
-end
-
-end
-
-%%
-%--------------------------------------------------------------
-function [nodes, pruned] = generateLevel(level, feasible, infeasible, options)
-% Generates all n-combinations of active constraints
-%
-% Syntax:
-% -------
-%
-% [nodes, pruned] = generateLevel(level, feasible, infeasible, options)
-%
-% Inputs:
-% -------
-%        level: index of the level (integer)
-%     feasible: vector of unique indices of feasible constraints
-%   infeasible: cell array of infeasible combinations of active constraints
-%      options: structure of options
-%        .prune_infeasible: if true, the list of nodes will be pruned by
-%                           removing entries that contain any row listed in
-%                           "infeasible"
-% Outputs:
-% --------
-%        nodes: m-by-n matrix of candidate active sets (n=level)
-%       pruned: number of combinations removed by pruning
-
-% generate all combinations of previously feasible active constraints
-nodes = nchoosek(feasible, level);
-
-if level>2 && options.prune_infeasible
-    % remove previously known infeasible combinations
-    %
-    % we only need to do this from the 3rd level upwards, since on the 2nd
-    % level the lists of feasible and infeasible constraints are mutually
-    % exclusive, hence nodes are not poluted by any infeasible constraints
-    keep = true(size(nodes, 1), 1);
-    for i = 1:size(nodes, 1)
-        % check if the i-th node contains any sequence listed in
-        % "infeasible"
-        for j = 1:length(infeasible)
-            m = ismembc(infeasible{j}, nodes(i, :)); % fastest implementation
-            if any(sum(m, 2)==size(infeasible{j}, 2))
-                % the i-th row contains all entries from at least one row of
-                % "infeasible", therefore the i-th row can be removed
-                keep(i) = false;
-                break
-            end
-        end
-    end
-    nodes = nodes(keep, :);
-    pruned = length(find(~keep));
-else
-    pruned = 0;
 end
 
 end
