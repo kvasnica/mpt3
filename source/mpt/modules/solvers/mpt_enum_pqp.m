@@ -35,6 +35,7 @@ function sol = mpt_enum_pqp(pqp, options)
 %                        regions. (default='regions')
 %     .remove_redundant: if true, redundant inequalities will be detected
 %                        and removed from the pQP (default=true)
+%            .generator: 'iterative' or 'batch' (default='iterative')
 %              .verbose: if >=0, progress will be displayed (default=0)
 %
 % Outputs:
@@ -91,6 +92,7 @@ options = mpt_defaultOptions(options, ...
     'feasible_set', MPTOPTIONS.modules.solvers.enum_pqp.feasible_set, ...
     'regions', true, ...
     'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
+    'generator', MPTOPTIONS.modules.solvers.enum_pqp.generator, ...
     'exclude', {});
 
 if ~isa(pqp, 'Opt')
@@ -464,6 +466,127 @@ function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevel(pqp, level, f
 %               (includes rank-defficient active sets)
 %         nlps: number of LPs solved on this level
 
+switch lower(options.generator)
+    case 'iterative'
+        [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelIterative(pqp, level, feasible, infeasible, options);
+    case 'batch'
+        [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelBatch(pqp, level, feasible, infeasible, options);
+    otherwise
+        error('Unknown generator "%s".', options.generator);
+end
+
+end
+
+%%
+%--------------------------------------------------------------
+function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelIterative(pqp, level, feasible, infeasible, options)
+% Iterative generation of active sets
+
+% initial list of active constraints for the first level of the tree
+if level==1 && isempty(feasible)
+    feasible = 1:pqp.m;
+    % remove infeasible constraints
+    for j = 1:length(infeasible)
+        feasible = setdiff(feasible, infeasible{j});
+    end
+end
+pruned = 0;
+nlps = 0;
+results = [];
+Afeasible = [];
+Ainfeasible = [];
+Aopt = [];
+Adeg = [];
+n_nodes = 0;
+n_candidates = 0;
+
+% iterative version of nchoosek
+% http://stackoverflow.com/questions/4844513/iterative-algorithm-for-combination-generation
+%
+n=length(feasible); k=level;
+com = 1:k;
+while (level==1 && n_nodes<n) || (level>1 && com(k-1)<n)
+    n_nodes = n_nodes + 1;
+    node = feasible(com(1:k));
+    node = node(:)';
+    candidate = true;
+    % remove previously known infeasible combinations
+    %
+    % we only need to do this from the 3rd level upwards, since on the 2nd
+    % level the lists of feasible and infeasible constraints are mutually
+    % exclusive, hence nodes are not poluted by any infeasible constraints
+    if level>2 && options.prune_infeasible
+        % check if the i-th node contains any sequence listed in
+        % "infeasible"
+        for j = 1:length(infeasible)
+            m = ismembc(infeasible{j}, node); % fastest implementation
+            if any(sum(m, 2)==size(infeasible{j}, 2))
+                % the i-th row contains all entries from at least one row of
+                % "infeasible", therefore the i-th row can be removed
+                candidate = false;
+                pruned = pruned+1;
+                break
+            end
+        end
+    end
+    if candidate
+        n_candidates = n_candidates + 1;
+        [res, nlp] = checkActiveSet(pqp, node);
+        results = [results; res];
+        nlps = nlps+nlp;
+        %  2: optimal, no LICQ violation
+        %  1: optimal, LICQ violated
+        %  0: feasible, but not optimal
+        % -1: infeasible
+        % -2: rank defficient
+        % -3: undecided
+        % split active sets into feasible/infeasible/optimal/degenerate
+        if res>=0
+            Afeasible = union(Afeasible(:), node);
+            if res==1
+                Adeg = [Adeg; node];
+            elseif res==2
+                Aopt = [Aopt; node];
+            end
+        end
+        if res<0
+            Ainfeasible = [Ainfeasible; node];
+        end
+    end
+
+    t = k;
+    while (t~=1 && com(t)==n-k+t)
+        t = t-1;
+    end
+    com(t) = com(t)+1;
+    for i = t+1:k
+        com(i) = com(i-1)+1;
+    end
+end
+
+if options.verbose>=0
+    % display progress
+    fprintf('%9d   %8d', n_nodes, n_candidates);
+end
+
+if options.verbose>=0
+    % display progress
+    fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
+        length(find(results==2)), ...
+        length(find(results==1)), ...
+        length(find(results==0)), ...
+        length(find(results==-1)), ...
+        length(find(results==-2)), ...
+        nlps);
+end
+
+end
+
+%%
+%--------------------------------------------------------------
+function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevelBatch(pqp, level, feasible, infeasible, options)
+% Batch generation of active sets via generateLevel
+
 % initial list of active constraints for the first level of the tree
 if level==1 && isempty(feasible)
     feasible = 1:pqp.m;
@@ -540,26 +663,6 @@ function [nodes, pruned] = generateLevel(level, feasible, infeasible, options)
 
 % generate all combinations of previously feasible active constraints
 nodes = nchoosek(feasible, level);
-
-% TODO: iterative version of nchoosek
-% http://stackoverflow.com/questions/4844513/iterative-algorithm-for-combination-generation
-%
-% n=5; k=2;
-% com = 1:k;
-% while (com(k-1)<n)
-%     for i=1:k
-%         fprintf('%d ', com(i));
-%     end
-%     fprintf('\n');
-%     t = k;
-%     while (t~=1 && com(t)==n-k+t)
-%         t = t-1;
-%     end
-%     com(t) = com(t)+1;
-%     for i = t+1:k
-%         com(i) = com(i-1)+1;
-%     end
-% end
 
 if level>2 && options.prune_infeasible
     % remove previously known infeasible combinations
