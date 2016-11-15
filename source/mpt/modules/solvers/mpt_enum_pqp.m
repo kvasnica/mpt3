@@ -92,6 +92,7 @@ options = mpt_defaultOptions(options, ...
     'feasible_set', MPTOPTIONS.modules.solvers.enum_pqp.feasible_set, ...
     'regions', true, ...
     'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
+    'report_period', MPTOPTIONS.report_period, ...
     'exclude', {});
 
 if ~isa(pqp, 'Opt')
@@ -170,7 +171,7 @@ end
 t = tic;
 for i = 1:length(AS)
     for j = 1:size(AS{i}, 1)
-        if options.verbose>=0 && toc(t) > MPTOPTIONS.report_period
+        if options.verbose>=0 && toc(t) > options.report_period
             fprintf('progress: %d/%d\n', i, n_total);
             t = tic;
         end
@@ -475,6 +476,8 @@ n_candidates = 0;
 nlps = 0;
 n_pruned = 0;
 AllFeasible = unique(feasible(:));
+t=tic;
+first = true;
 for i = 1:size(feasible, 1)
     if level==1
         candidates = 1:pqp.m;
@@ -534,9 +537,21 @@ for i = 1:size(feasible, 1)
             end
         end
     end
+    if options.verbose>=0 && toc(t)>options.report_period
+        if ~first
+            fprintf(repmat('\b', 1, 9));
+        end
+        fprintf('%8d%%', min(100, ceil(100*i/size(feasible, 1))));
+        t=tic;
+        first = false;
+    end
 end
 
 if options.verbose>=0
+    % delete progress meter
+    if ~first
+        fprintf(repmat('\b', 1, 9));
+    end
     % display progress
     fprintf('%9d   %8d', n_candidates+n_pruned, n_candidates);
     fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
