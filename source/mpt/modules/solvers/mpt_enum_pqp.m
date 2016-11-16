@@ -35,7 +35,6 @@ function sol = mpt_enum_pqp(pqp, options)
 %                        regions. (default='regions')
 %     .remove_redundant: if true, redundant inequalities will be detected
 %                        and removed from the pQP (default=true)
-%            .generator: 'iterative' or 'batch' (default='iterative')
 %              .verbose: if >=0, progress will be displayed (default=0)
 %
 % Outputs:
@@ -467,17 +466,22 @@ function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = exploreLevel(pqp, level, f
 %               (includes rank-defficient active sets)
 %         nlps: number of LPs solved on this level
 
-Aopt = [];
-Adeg = [];
-Afeasible = [];
-Ainfeasible = [];
+AllFeasible = unique(feasible(:));
+% pre-alocate arrays
+Aopt = zeros(size(feasible, 1)*length(AllFeasible), level);
+Adeg = zeros(size(feasible, 1)*length(AllFeasible), level);
+Afeasible = zeros(size(feasible, 1)*length(AllFeasible), level);
+Ainfeasible = zeros(size(feasible, 1)*length(AllFeasible), level);
+n_feasible = 0; 
+n_opt = 0;
+n_deg = 0;
+n_infeasible = 0;
 n_rankdef = 0;
 n_candidates = 0;
 nlps = 0;
 n_pruned = 0;
-AllFeasible = unique(feasible(:));
 t=tic;
-first = true;
+first_display = true;
 for i = 1:size(feasible, 1)
     if level==1
         candidates = 1:pqp.m;
@@ -522,15 +526,19 @@ for i = 1:size(feasible, 1)
             % -3: undecided
             % split active sets into feasible/infeasible/optimal/degenerate
             if result>=0
-                Afeasible = [Afeasible; Atry];
+                n_feasible = n_feasible+1;
+                Afeasible(n_feasible, :) = Atry;
                 if result==1
-                    Adeg = [Adeg; Atry];
+                    n_deg = n_deg + 1;
+                    Adeg(n_deg, :) = Atry;
                 elseif result==2
-                    Aopt = [Aopt; Atry];
+                    n_opt = n_opt + 1;
+                    Aopt(n_opt, :) = Atry;
                 end
             end
             if result<0
-                Ainfeasible = [Ainfeasible; Atry];
+                n_infeasible = n_infeasible + 1;
+                Ainfeasible(n_infeasible, :) = Atry;
                 if result==-2
                     n_rankdef = n_rankdef + 1;
                 end
@@ -538,29 +546,29 @@ for i = 1:size(feasible, 1)
         end
     end
     if options.verbose>=0 && toc(t)>options.report_period
-        if ~first
+        if ~first_display
             fprintf(repmat('\b', 1, 9));
         end
         fprintf('%8d%%', min(100, ceil(100*i/size(feasible, 1))));
         t=tic;
-        first = false;
+        first_display = false;
     end
 end
+Afeasible = Afeasible(1:n_feasible, :);
+Ainfeasible = Ainfeasible(1:n_infeasible, :);
+Aopt = Aopt(1:n_opt, :);
+Adeg = Adeg(1:n_deg, :);
 
 if options.verbose>=0
     % delete progress meter
-    if ~first
+    if ~first_display
         fprintf(repmat('\b', 1, 9));
     end
     % display progress
     fprintf('%9d   %8d', n_candidates+n_pruned, n_candidates);
     fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
-        size(Aopt, 1), ...
-        size(Adeg, 1), ...
-        size(Afeasible, 1)-size(Aopt, 1)-size(Adeg, 1), ...
-        size(Ainfeasible, 1)-n_rankdef, ...
-        n_rankdef, ...
-        nlps);
+        n_opt, n_deg, n_feasible-n_opt-n_deg, n_infeasible-n_rankdef, ...
+        n_rankdef, nlps);
 end
 
 end
