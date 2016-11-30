@@ -22,7 +22,14 @@ options.cplexint.lic_rel = 1e3; % after how many runs to release the license
 
 % cplex interface by IBM 
 if exist('Cplex','file')==6
-    options.cplex = cplexoptimset('cplex'); 
+    matlab_version = version('-release');
+    if str2double(matlab_version(1:4))>=2016
+        % for CPLEX 12.7
+        options.cplex = cplexoptimset;
+    else
+        options.cplex = cplexoptimset('cplex');
+    end
+    options.cplex.Display = 'off';
     c=Cplex;
     if strcmp(c.Version,'12.2.0.0')
         % for version 12.2 we need to add this option to disable verbosity,

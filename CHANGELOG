@@ -1,0 +1,6 @@
+MPT 3.1.6
+=========
+
+Fixed bugs
+----------
+* PWASystem/reachableSet() now correctly deals with intermediate empty sets

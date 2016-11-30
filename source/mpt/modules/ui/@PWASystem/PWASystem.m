@@ -350,17 +350,14 @@ classdef PWASystem < AbstractSystem
                 dyn = 0;
                 return
             end
-			X = X*options.U;
-            %X = options.X*options.U;
 			SN = {}; dynN = {0};
 			for n = 1:options.N
-				Xp = []; dyn = [];
+                Xp = []; dyn = [];
 				for j = 1:obj.ndyn
 					lti = obj.toLTI(j);
-					XD = X.projection(1:obj.nx);
 					R = lti.reachableSet('N', 1, ...
 						'direction', options.direction, ...
-						'X', XD, 'U', options.U);
+						'X', X, 'U', options.U);
 					% is the union of "R" convex?
 					if numel(R)>1
 						H = PolyUnion(R);
@@ -373,10 +370,12 @@ classdef PWASystem < AbstractSystem
 					Xp = [Xp, R];
 					dyn = [dyn j*ones(1, numel(R))];
                 end
-                if ~Xp.isEmptySet,
-                    X = Xp*options.U;
-                    SN{n} = Xp;
-                    dynN{n} = dyn;
+                keep = find(~Xp.isEmptySet());
+                SN{n} = Xp(keep);
+                dynN{n} = dyn(keep);
+                X = SN{end};
+                if isempty(X)
+                    break
                 end
             end
             if isempty(SN)

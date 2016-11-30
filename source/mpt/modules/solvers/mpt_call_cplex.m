@@ -25,7 +25,14 @@ if exist('Cplex','file')==6
     % prefer dual-simplex method because with automatic method some tests
     % fail (mostly polyhedron_extreme)
     if S.test
-        options=cplexoptimset(cplexoptimset('cplex'),'lpmethod',2,'qpmethod',2);
+        matlab_version = version('-release');
+        if str2double(matlab_version(1:4))>=2016
+            % for CPLEX 12.7
+            options=cplexoptimset;
+            options.Display = 'off';
+        else
+            options=cplexoptimset('cplex');
+        end
     else
         options = MPTOPTIONS.modules.solvers.cplex;
     end
