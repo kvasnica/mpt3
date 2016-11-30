@@ -304,7 +304,17 @@ classdef EMPCController < AbstractController
 			
 			if obj.nx~=2
 				error('Only 2D partitions can be plotted.');
-			end
+            end
+            
+            % R2016b specific: inputParser does not accept 'x.something'
+            inputs = varargin;
+            for i = 1:2:length(inputs)
+                % 'x.something' -> 'x_something'
+                % but we only use "inputs" for option parsing and we still
+                % feed the original "varargin" to ClosedLoop/simulate()
+                inputs{i} = strrep(inputs{i}, '.', '_');
+            end
+            
 			ip = inputParser;
 			% important: use keepUnmatched=true to propage free references
 			% to ctrl.simulate()
@@ -318,7 +328,7 @@ classdef EMPCController < AbstractController
 			ip.addParamValue('markersize', 20);
 			ip.addParamValue('model', obj.model);
             ip.addParamValue('openloop', false);
-			ip.parse(varargin{:});
+			ip.parse(inputs{:});
 			options = ip.Results;
 
 			% closed-loop system
