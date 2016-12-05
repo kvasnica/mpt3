@@ -108,7 +108,9 @@ end
 % eliminate equalities, keep the original setup
 pqp_orig = pqp.copy();
 if pqp.me>0
-    error('Equalities are not allowed, use problem.eliminateEquations().');
+    fprintf('Eliminating equalities... ');
+    pqp.eliminateEquations();
+    fprintf('done\n');
 end
 if options.regions
     region_options = [];
@@ -129,7 +131,7 @@ if min(eig(pqp.H)) < MPTOPTIONS.rel_tol
 end
 
 if options.verbose>=0
-    fprintf('Parameters: %d, variables: %d, constraints: %d', ...
+    fprintf('Parameters: %d, variables: %d, inequalities: %d', ...
         pqp.d, pqp.n, pqp.m);
     if options.remove_redundant
         fprintf(' (reduced from %d)', m_before);
