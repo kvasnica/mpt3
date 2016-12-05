@@ -106,10 +106,8 @@ if ~options.regions && ~isequal(options.feasible_set, 'Rn')
 end
 
 % eliminate equalities, keep the original setup
-pqp_orig = pqp.copy();
 if pqp.me>0
-    pqp = pqp.copy();
-    pqp.eliminateEquations();
+    error('Equalities are not allowed, use problem.eliminateEquations().');
 end
 
 m_before = pqp.m;
@@ -174,7 +172,7 @@ for i = 1:length(AS)
             fprintf('progress: %d/%d\n', i, n_total);
             t = tic;
         end
-        R = getRegion(pqp, pqp_orig, AS{i}(j, :), options);
+        R = getRegion(pqp, AS{i}(j, :), options);
         if isempty(R)
             n_lowdim = n_lowdim + 1;
         end
@@ -271,7 +269,7 @@ end
 
 %%
 %--------------------------------------------------------------
-function CR = getRegion(pqp, opt, A, options)
+function CR = getRegion(pqp, A, options)
 % Constructs the region, the optimizer, and the cost function
 %
 % Syntax:
@@ -331,33 +329,21 @@ if options.regions
         return
     end
 else
-    CR = IPDPolyhedron(size(crH, 2), opt);
+    CR = IPDPolyhedron(size(crH, 2), pqp);
     CR.setInternal('Empty', false);
 end
-
-% project the optimizer and the cost function back on equalities
-
-% lifted primal optimizer
-if ~isempty(pqp.recover)
-    % Compute affine mapping from parameter to primal
-    Lprimal = pqp.recover.Y*[alpha_x, beta_x] + pqp.recover.th;
-else
-    Lprimal = [alpha_x, beta_x];
-end
-% lifted cost
-Y = Lprimal(:, 1:end-1);
-R = Lprimal(:, end);
-Q = 0.5*Y'*opt.H*Y + opt.pF'*Y + opt.Y;
-q = R'*opt.H*Y + R'*opt.pF + opt.f'*Y + opt.C;
-r = 0.5*R'*opt.H*R + opt.f'*R + opt.c;
 
 if options.regions
     % remove redundant constraints
     CR.minHRep();
 end
 
-% construct explicit representation of the functions
-z = AffFunction(Lprimal(:, 1:end-1), Lprimal(:, end));
+% primal optimizer
+z = AffFunction(alpha_x, beta_x);
+% cost function
+Q = 0.5*alpha_x'*pqp.H*alpha_x + pqp.pF'*alpha_x + pqp.Y;
+q = beta_x'*pqp.H*alpha_x + beta_x'*pqp.pF + pqp.f'*alpha_x + pqp.C;
+r = 0.5*beta_x'*pqp.H*beta_x + pqp.f'*beta_x + pqp.c;
 J = QuadFunction(Q, q, r);
 % lagrange multipliers: aL*x+bL
 aL = zeros(size(pqp.pB));
