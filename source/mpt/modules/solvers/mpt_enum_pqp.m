@@ -106,8 +106,15 @@ if ~options.regions && ~isequal(options.feasible_set, 'Rn')
 end
 
 % eliminate equalities, keep the original setup
+pqp_orig = pqp.copy();
 if pqp.me>0
     error('Equalities are not allowed, use problem.eliminateEquations().');
+end
+if options.regions
+    region_options = [];
+else
+    region_options.regionless = true;
+    region_options.pqp_with_equalities = pqp_orig;
 end
 
 m_before = pqp.m;
@@ -172,7 +179,7 @@ for i = 1:length(AS)
             fprintf('progress: %d/%d\n', i, n_total);
             t = tic;
         end
-        R = getRegion(pqp, AS{i}(j, :), options);
+        R = pqp.getRegion(AS{i}(j, :), region_options);
         if isempty(R)
             n_lowdim = n_lowdim + 1;
         end
@@ -264,99 +271,6 @@ if options.verbose>=0
     fprintf(' Number of regions: %d (non-degenerate: %d, degenerate: %d)\n', ...
         nr, length(Aopt), length(Adeg));
 end
-
-end
-
-%%
-%--------------------------------------------------------------
-function CR = getRegion(pqp, A, options)
-% Constructs the region, the optimizer, and the cost function
-%
-% Syntax:
-%   CR = getRegion(pqp, opt, A)
-%
-% Inputs:
-%   pqp: matrices of the pQP problem without equality constraints
-%   opt: matrices of the pQP problem with equalities
-%     A: combination of active constraints
-%
-% Output:
-%     R: critical region as a Polyhedron object with functions "primal"
-%        and "obj"
-
-% Authors: 
-% Michal Kvasnica, STU Bratislava, michal.kvasnica@stuba.sk
-% Martin Klauco, STU Bratislava, martin.klauco@stuba.sk
-
-% special notion for no active constraints
-if isequal(A, 0)
-    A = [];
-end
-
-% extract active sets
-Ga = pqp.A(A, :);
-Ea = pqp.pB(A, :);
-wa = pqp.b(A, :);
-
-% extract non-active sets
-all = 1:pqp.m;
-N  = all(~ismembc(all, A));
-Gn = pqp.A(N, :);
-En = pqp.pB(N, :);
-wn = pqp.b(N, :);
-
-% optimal dual variables
-alpha_1 = -Ga/pqp.H*pqp.pF - Ea;
-alpha_2 = -Ga/pqp.H*Ga';
-beta    = -Ga/pqp.H*pqp.f - wa;
-
-% dual variables are an affine function of the parameters
-alpha_L = -inv(alpha_2)*alpha_1;
-beta_L  = -inv(alpha_2)*beta;
-
-% optimizer is an affine function of the parameters
-alpha_x = -pqp.H\pqp.pF - pqp.H\Ga'*alpha_L;
-beta_x  = -pqp.H\pqp.f - pqp.H\Ga'*beta_L;
-
-% Critical region
-crH = [Gn*alpha_x - En; -alpha_L];
-crh = [-Gn*beta_x + wn; beta_L];
-if options.regions
-    CR = Polyhedron(crH, crh);
-    if ~CR.isFullDim()
-        % lower-dimensional region
-        CR = [];
-        return
-    end
-else
-    CR = IPDPolyhedron(size(crH, 2), pqp);
-    CR.setInternal('Empty', false);
-end
-
-if options.regions
-    % remove redundant constraints
-    CR.minHRep();
-end
-
-% primal optimizer
-z = AffFunction(alpha_x, beta_x);
-% cost function
-Q = 0.5*alpha_x'*pqp.H*alpha_x + pqp.pF'*alpha_x + pqp.Y;
-q = beta_x'*pqp.H*alpha_x + beta_x'*pqp.pF + pqp.f'*alpha_x + pqp.C;
-r = 0.5*beta_x'*pqp.H*beta_x + pqp.f'*beta_x + pqp.c;
-J = QuadFunction(Q, q, r);
-% lagrange multipliers: aL*x+bL
-aL = zeros(size(pqp.pB));
-bL = zeros(size(pqp.b));
-aL(A, :) = alpha_L;
-bL(A) = beta_L;
-L = AffFunction(aL, bL);
-
-% attach functions
-CR.addFunction(z, 'primal');
-CR.addFunction(J, 'obj');
-CR.addFunction(L, 'dual-ineqlin');
-CR.Data.Active = A;
 
 end
 
