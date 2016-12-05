@@ -292,6 +292,119 @@ classdef Opt < handle & matlab.mixin.Copyable
             obj.b = P.b;
             obj.m = length(obj.b);
         end
+        
+        function CR = getRegion(obj, A, options)
+            % Constructs a critical region, the optimizers, and the cost function
+            %
+            % Syntax:
+            %   CR = pqp.getRegion(A)
+            %   CR = pqp.getRegion(A)
+            %
+            % Inputs:
+            %   pqp: pqp problem as an instance of the Opt class
+            %     A: incides of the active inequalities
+            %
+            % Output:
+            %     R: critical region as a Polyhedron object with functions "primal"
+            %        and "obj"
+
+            narginchk(2, 3);
+            assert(isequal(obj.problem_type, 'QP'), 'Only pQPs are supported.');
+            assert(obj.d>0, 'The problem must have parameters.');
+            assert(obj.me==0, 'Equalities are not supported.');
+            if nargin<3
+                options = [];
+            end
+            options = mpt_defaultOptions(options, 'regionless', false, 'pqp_with_equalities', obj);
+            
+            % special notion for no active constraints
+            if isequal(A, 0)
+                A = [];
+            end
+            
+            % extract active sets
+            Ga = obj.A(A, :);
+            Ea = obj.pB(A, :);
+            wa = obj.b(A, :);
+            
+            % extract non-active sets
+            all = 1:obj.m;
+            N  = all(~ismembc(all, A));
+            Gn = obj.A(N, :);
+            En = obj.pB(N, :);
+            wn = obj.b(N, :);
+            
+            % optimal dual variables
+            alpha_1 = -Ga/obj.H*obj.pF - Ea;
+            alpha_2 = -Ga/obj.H*Ga';
+            beta    = -Ga/obj.H*obj.f - wa;
+            
+            % dual variables are an affine function of the parameters
+            alpha_L = -inv(alpha_2)*alpha_1;
+            beta_L  = -inv(alpha_2)*beta;
+            
+            % optimizer is an affine function of the parameters
+            alpha_x = -obj.H\obj.pF - obj.H\Ga'*alpha_L;
+            beta_x  = -obj.H\obj.f - obj.H\Ga'*beta_L;
+            
+            % Critical region
+            crH = [Gn*alpha_x - En; -alpha_L];
+            crh = [-Gn*beta_x + wn; beta_L];
+            if ~options.regionless
+                CR = Polyhedron(crH, crh);
+                if ~CR.isFullDim()
+                    % lower-dimensional region
+                    CR = [];
+                    return
+                end
+            else
+                % FIXME: IPDPolyhedron must either take the object with
+                % equalities, or optimizer must be projected on them
+                %CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
+                CR = IPDPolyhedron(size(crH, 2), obj);
+                CR.setInternal('Empty', false);
+            end
+            
+            if ~options.regionless
+                % remove redundant constraints
+                CR.minHRep();
+            end
+
+            % cost function
+            % TODO: check this
+            Jquad = 0.5*alpha_x'*obj.H*alpha_x + obj.pF'*alpha_x + obj.Y;
+            Jaff = beta_x'*obj.H*alpha_x + beta_x'*obj.pF + obj.f'*alpha_x + obj.C;
+            Jconst = 0.5*beta_x'*obj.H*beta_x + obj.f'*beta_x + obj.c;
+            J = QuadFunction(Jquad, Jaff, Jconst);
+            
+            if ~isempty(obj.recover)
+                % Project primal optimizer back on equalities
+                Lprimal = obj.recover.Y*[alpha_x, beta_x] + obj.recover.th;
+                alpha_x = Lprimal(:, 1:end-1);
+                beta_x = Lprimal(:, end);
+            end
+            % primal optimizer
+            if ~isempty(obj.varOrder) && ~isempty(obj.varOrder.requested_variables)
+                % extract only requested variables from the primal
+                % optimizer
+                alpha_x = alpha_x(obj.varOrder.requested_variables, :);
+                beta_x = beta_x(obj.varOrder.requested_variables);
+            end
+            z = AffFunction(alpha_x, beta_x);
+            % lagrange multipliers: aL*x+bL
+            aL = zeros(size(obj.pB));
+            bL = zeros(size(obj.b));
+            aL(A, :) = alpha_L;
+            bL(A) = beta_L;
+            L = AffFunction(aL, bL);
+            
+            % attach functions
+            CR.addFunction(z, 'primal');
+            CR.addFunction(J, 'obj');
+            CR.addFunction(L, 'dual-ineqlin');
+            CR.Data.Active = A;
+        end
+
     end
     
 %     methods
