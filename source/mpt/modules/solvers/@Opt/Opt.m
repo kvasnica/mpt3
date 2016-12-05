@@ -275,6 +275,23 @@ classdef Opt < handle & matlab.mixin.Copyable
                 end
             end
         end
+        
+        function obj = minHRep(obj)
+            % Removes redundant inequalities
+            %
+            % Given a parametric optimization problem with constraints
+            %      A*z <= b + pB*theta
+            % this method removes the redundant inequalities.
+            
+            assert(obj.d>0, 'The problem is not parametric.');
+            
+            P = Polyhedron([obj.A, -obj.pB], obj.b);
+            P.minHRep();
+            obj.A = P.A(:, 1:obj.n);
+            obj.pB = -P.A(:, obj.n+1:end);
+            obj.b = P.b;
+            obj.m = length(obj.b);
+        end
     end
     
 %     methods
