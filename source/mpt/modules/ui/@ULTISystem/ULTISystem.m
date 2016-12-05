@@ -541,31 +541,43 @@ classdef ULTISystem < LTISystem
                 B = { B };
             end
             
-            % first step is common for parametric/non-parametric unc.
-            if backwards,
-                Z = preset(A{1}, B{1});
+            if backwards
+                % preset as the intersection of all presets
+                % important: must project the final intersection, not
+                % intermediate results
+                H = []; K = [];
+                D = (options.X-(obj.E*options.D));
+                if obj.nu>0
+                    D = D*options.U;
+                end
+                for i = 1:numel(A)
+                    for j = 1:numel(B)
+                        if obj.nu>0
+                            Acl = [A{i}, B{j}; zeros(obj.nu, obj.nx), eye(obj.nu)];
+                        else
+                            Acl = A{i};
+                        end
+                        H = [H; D.A*Acl];
+                        K = [K; D.b];
+                    end
+                end
+                Z = Polyhedron(H, K);
+                if obj.nu>0
+                    Z = Z.projection(1:obj.nx);
+                end
             else
                 Z = reachset(A{1}, B{1});
-            end
-            
-            if param_unc
-                % explore all combinations
+                % union of all combinations
                 for i = 1:numel(A)
                     for j = 1:numel(B)
                         if i==1 && j==1
                             % this was already covered above
                             continue
                         end
-                        if backwards,
-                            Q = preset(A{i}, B{j});
-                            % pre-set is the intersection of all
-                            Z = Z & Q;
-                        else
-                            Q = reachset(A{i}, B{j});
-                            % reach set is the union
-                            if ~Q.isEmptySet()
-                                Z = [Z, Q];
-                            end
+                        Q = reachset(A{i}, B{j});
+                        % reach set is the union
+                        if ~Q.isEmptySet()
+                            Z = [Z, Q];
                         end
                     end
                 end
