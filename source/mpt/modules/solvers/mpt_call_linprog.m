@@ -13,7 +13,14 @@ end
 
 % overwrite default settings
 if S.test
-    options=optimset(optimset('linprog'),'Display','off');
+    try
+        % MOSEK
+        % I really hate doing this. Hey, MOSEK, stop messing with linprog!
+        options = mskoptimset('linprog');
+        options.Display = 'off';
+    catch
+        options=optimset(optimset('linprog'),'Display','off');
+    end
 else
     options=MPTOPTIONS.modules.solvers.linprog;
 end
