@@ -19,7 +19,7 @@ if S.test
         options = mskoptimset('linprog');
         options.Display = 'off';
     catch
-        options=optimset(optimset('quadprog'),'Display','off','LargeScale','off','Algorithm','active-set');
+        options=optimset(optimset('quadprog'),'Display','off');
     end
 else
     options=MPTOPTIONS.modules.solvers.quadprog;
