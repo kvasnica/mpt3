@@ -6,8 +6,14 @@ function ts = eq(U1,U2)
 %  ts = U1.eq(U2)
 %
 
-if ~isa(U2,'PolyUnion')
-    error('The input argument must be "PolyUnion" object.');
+if isa(U1, 'Polyhedron')
+	U1 = PolyUnion(U1);
+end
+if isa(U2, 'Polyhedron')
+	U2 = PolyUnion(U2);
+end
+if ~isa(U1,'PolyUnion') || ~isa(U2,'PolyUnion')
+    error('All inputs must be PolyUnion objects.');
 end
 
 % both polyhedra are empty arrays
