@@ -12,6 +12,7 @@ model = mpt_import(sysStruct, probStruct);
 N = 4;
 ctrl = MPCController(model, N);
 d = ctrl.toYALMIP();
+close all
 
 %% direct call via mpt_constructMatrices
 probStruct.N = N;
@@ -25,8 +26,12 @@ for i = 1:sol.xopt.Num
     % primal optimizer must yield u_0, u_1, u_2, u_3
     assert(sol.xopt.Set(i).Functions('primal').R==N);
     assert(sol.xopt.Set(i).Functions('primal').D==2);
+    % check range of primal-original
+%     assert(sol.xopt.Set(i).Functions('primal-original').R==sol.xopt.Set(i).Data.OptProb.n);
 end
 check_primal(sol);
+figure; sol.xopt.plot(); drawnow
+assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
 assert(iscell(sol.stats.Aoptimal));
 assert(length(sol.stats.Aoptimal)==5);
 assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
@@ -45,8 +50,12 @@ for i = 1:sol.xopt.Num
     % primal optimizer must yield u_0, u_1, u_2, u_3
     assert(sol.xopt.Set(i).Functions('primal').R==N);
     assert(sol.xopt.Set(i).Functions('primal').D==2);
+    % check range of primal-original
+%     assert(sol.xopt.Set(i).Functions('primal-original').R==sol.xopt.Set(i).Data.OptProb.n);
 end
 check_primal(sol);
+figure; sol.xopt.plot(); drawnow
+assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
 assert(iscell(sol.stats.Aoptimal));
 assert(length(sol.stats.Aoptimal)==5);
 assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
@@ -55,7 +64,7 @@ assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
 
-% direct call to mpt_enum_pqp with eliminateEquations
+%% direct call to mpt_enum_pqp with eliminateEquations
 pqp = Opt(d.constraints, d.objective, d.internal.parameters, d.variables.u(:));
 pqp.eliminateEquations();
 sol = mpt_enum_pqp(pqp, struct('regions', false));
@@ -66,8 +75,12 @@ for i = 1:sol.xopt.Num
     % primal optimizer must yield u_0, u_1, u_2, u_3
     assert(sol.xopt.Set(i).Functions('primal').R==N);
     assert(sol.xopt.Set(i).Functions('primal').D==2);
+    % check range of primal-original
+%     assert(sol.xopt.Set(i).Functions('primal-original').R==sol.xopt.Set(i).Data.OptProb.n);
 end
 check_primal(sol);
+figure; sol.xopt.plot(); drawnow
+assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
 assert(iscell(sol.stats.Aoptimal));
 assert(length(sol.stats.Aoptimal)==5);
 assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
@@ -76,7 +89,7 @@ assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
 
-% now via Opt/solve - does not require manual elimination of equalities
+%% now via Opt/solve - does not require manual elimination of equalities
 pqp = Opt(d.constraints, d.objective, d.internal.parameters, d.variables.u(:));
 sol = solve(pqp);
 assert(isequal(sol.how, 'ok'));
@@ -86,7 +99,11 @@ for i = 1:sol.xopt.Num
     % primal optimizer must yield u_0, u_1, u_2, u_3
     assert(sol.xopt.Set(i).Functions('primal').R==N);
     assert(sol.xopt.Set(i).Functions('primal').D==2);
+    % check range of primal-original
+%     assert(sol.xopt.Set(i).Functions('primal-original').R==sol.xopt.Set(i).Data.OptProb.n);
 end
+figure; sol.xopt.plot(); drawnow
+assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
 check_primal(sol);
 assert(iscell(sol.stats.Aoptimal));
 assert(length(sol.stats.Aoptimal)==5);
