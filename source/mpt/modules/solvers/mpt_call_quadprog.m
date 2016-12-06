@@ -16,7 +16,7 @@ if S.test
     try
         % MOSEK
         % I really hate doing this. Hey, MOSEK, stop messing with linprog!
-        options = mskoptimset('linprog');
+        options = mskoptimset('quadprog');
         options.Display = 'off';
     catch
         options=optimset(optimset('quadprog'),'Display','off');
