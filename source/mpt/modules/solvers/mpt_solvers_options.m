@@ -566,7 +566,11 @@ options.qpspline.verbose = 0;
 % show the iteration progress
 
 %% QUADPROG
-if exist('quadprog','file')==2
+if exist('mskoptimset', 'file')
+    % MOSEK
+    % I really hate doing this. Hey, MOSEK, stop messing with quadprog!
+    options.quadprog = mskoptimset('quadprog');
+elseif exist('quadprog','file')==2
     options.quadprog = optimset('quadprog');
 end
 options.quadprog.Display = 'off';
@@ -589,7 +593,11 @@ options.quadprog.LargeScale='off';
 % do not use largescale algorithm
 
 %% LINPROG
-if exist('linprog','file')==2
+if exist('mskoptimset', 'file')
+    % MOSEK
+    % I really hate doing this. Hey, MOSEK, stop messing with linprog!
+    options.linprog = mskoptimset('linprog');
+elseif exist('linprog','file')==2
     options.linprog = optimset('linprog');
 end
 
