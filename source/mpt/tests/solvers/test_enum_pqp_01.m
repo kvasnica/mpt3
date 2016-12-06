@@ -109,6 +109,18 @@ end
 check_primal(sol);
 assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
 
+%% solvemp with many optimized variables
+mpsol = solvemp(d.constraints, d.objective, [], d.internal.parameters, [d.variables.u(:); d.variables.x(:)]);
+clear sol
+sol.xopt = mpt_mpsol2pu(mpsol);
+assert(sol.xopt.Num==23);
+for i = 1:sol.xopt.Num
+    % primal optimizer must yield u_0, u_1, u_2, u_3 and x_0...x_4
+    assert(sol.xopt.Set(i).Functions('primal').R==12);
+    assert(sol.xopt.Set(i).Functions('primal').D==2);
+end
+assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
+
 end
 
 function check_primal(sol)
