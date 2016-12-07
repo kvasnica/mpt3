@@ -401,6 +401,28 @@ classdef Opt < handle & matlab.mixin.Copyable
             CR.addFunction(L, 'dual-ineqlin');
             CR.Data.Active = A;
         end
+        
+        function [A, sol] = getActiveSetForPoint(obj, theta)
+            % Returns constraints that are active for a given parameter
+            %
+            % [A, SOL] = prob.getActiveSetForPoint(THETA) returns the
+            % indices A of inequality constraints that are active at the
+            % optimum for the given parameter THETA. The SOL output
+            % determines feasibility in SOL.how and the primal optimizer
+            % in SOL.xopt.
+            
+            global MPTOPTIONS
+            assert(~isequal(obj.problem_type, 'LCP'), 'LCP problems are not supported.');
+            assert(obj.isParametric, 'The problem must have parameters.');
+            assert(isequal(size(theta), [obj.d 1]), 'The parameter must be %dx1.', obj.d);
+            sol = obj.solve(theta);
+            if sol.exitflag==MPTOPTIONS.OK
+                A = find(abs(obj.A*sol.xopt-obj.b-obj.pB*theta)<MPTOPTIONS.abs_tol);
+            else
+                % infeasible
+                A = NaN;
+            end
+        end
 
     end
     
