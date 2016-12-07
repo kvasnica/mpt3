@@ -368,11 +368,6 @@ classdef Opt < handle & matlab.mixin.Copyable
                 CR.setInternal('Empty', false);
             end
             
-            if ~options.regionless
-                % remove redundant constraints
-                CR.minHRep();
-            end
-
             % cost function
             % TODO: check this
             Jquad = 0.5*alpha_x'*obj.H*alpha_x + obj.pF'*alpha_x + obj.Y;
