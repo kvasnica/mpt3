@@ -182,13 +182,14 @@ for i = 1:length(AS)
             t = tic;
         end
         R = pqp.getRegion(AS{i}(j, :), region_options);
-        if isempty(R)
+        if R.isEmptySet()
             n_lowdim = n_lowdim + 1;
-        end
-        if isempty(regions)
-            regions = R;
         else
-            regions(end+1) = R;
+            if isempty(regions)
+                regions = R;
+            else
+                regions(end+1) = R;
+            end
         end
     end
     %regions = [regions, R];
