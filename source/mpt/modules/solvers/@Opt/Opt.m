@@ -355,17 +355,12 @@ classdef Opt < handle & matlab.mixin.Copyable
             crh = [-Gn*beta_x + wn; beta_L];
             if ~options.regionless
                 CR = Polyhedron(crH, crh);
-                if ~CR.isFullDim()
-                    % lower-dimensional region
-                    CR = [];
-                    return
-                end
             else
                 % FIXME: IPDPolyhedron must either take the object with
                 % equalities, or optimizer must be projected on them
                 %CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
                 CR = IPDPolyhedron(size(crH, 2), obj);
-                CR.setInternal('Empty', false);
+                %CR.setInternal('Empty', false);
             end
             
             % cost function
