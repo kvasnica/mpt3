@@ -317,6 +317,9 @@ classdef Opt < handle & matlab.mixin.Copyable
             end
             options = mpt_defaultOptions(options, 'regionless', false, 'pqp_with_equalities', obj);
             
+            % TODO: resolve primal degeneracy
+            assert(numel(A)<=obj.n, 'Primal degenerate active set.');
+            
             % special notion for no active constraints
             if isequal(A, 0)
                 A = [];
