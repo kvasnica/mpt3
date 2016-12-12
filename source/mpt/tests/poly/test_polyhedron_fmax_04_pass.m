@@ -17,14 +17,14 @@ P.addFunction(f, 'f');
 [~, msg] = run_in_caller('P.fmax()');
 asserterrmsg(msg, 'The function to minimize must be scalar.');
 
-% maximizing convex quadratic function is not a convex problem
-P = Polyhedron.unitBox(1);
-P.addFunction(QuadFunction(1), 'q');
-sol = P.fmax();
-Jexp = 1;
-assert(norm(sol.obj-Jexp, Inf)<1e-5);
-assert(isfield(sol, 'info')); % indicates yalmip was used
-assert(isequal(sol.how, 'ok'));
+% % maximizing convex quadratic function is not a convex problem
+% P = Polyhedron.unitBox(1);
+% P.addFunction(QuadFunction(1), 'q');
+% sol = P.fmax();
+% Jexp = 1;
+% assert(norm(sol.obj-Jexp, Inf)<1e-5);
+% assert(isfield(sol, 'info')); % indicates yalmip was used
+% assert(isequal(sol.how, 'ok'));
 
 % -cos(x+1)+2
 P = Polyhedron.unitBox(1)*3;
