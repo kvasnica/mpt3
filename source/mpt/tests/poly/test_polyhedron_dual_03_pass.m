@@ -7,6 +7,14 @@ D = P.dual();
 Q = D.dual();
 assert(P==Q);
 
+% origin at the boundary, edge case with no vertices
+P = Polyhedron([1 0], 0);
+D = P.dual();
+Q = D.dual();
+assert(isequal(D.V, [0 0]));
+assert(isequal(D.R, [1 0]));
+assert(P==Q);
+
 % origin at the boundary
 % http://www-bcf.usc.edu/~shaddin/cs599fa13/slides/lec7.pdf
 P = Polyhedron([1 -1; 1 -2], [0; 0]);

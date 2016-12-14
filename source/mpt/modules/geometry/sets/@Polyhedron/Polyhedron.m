@@ -766,7 +766,9 @@ classdef Polyhedron < ConvexSet
                     b1 = b(~iz);
                     A2 = A(iz, :);
                     % normalize A1*x<=b1 to A1*x<=1
-                    A1 = A1./repmat(b1, 1, obj.Dim);
+                    if ~isempty(A1)
+                        A1 = A1./repmat(b1, 1, obj.Dim);
+                    end
                     A1 = [A1; origin']; % add the origin
                     
                     % compute minimal affine set of rays?
