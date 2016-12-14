@@ -25,15 +25,13 @@ R = P.dual();
 assert(R.isEmptySet());
 assert(R.Dim==P.Dim);
 
-% the polyhedron must be full-dimensional
-P = Polyhedron('He', [1 0 0]);
+% the polyhedron must contain the origin in its interior
+P = Polyhedron('H', [-1 0 -1;0 -1 -1;1 0 2;0 1 2]);
 [~, msg] = run_in_caller('P.dual()');
-asserterrmsg(msg, 'The polyhedron must be bounded and be fully dimensional.');
-
-% the polyhedron must be bounded
-P = Polyhedron(eye(2), zeros(2, 1));
+asserterrmsg(msg, 'The polyhedron must contain the origin in its interior.');
+P = Polyhedron([2 1;1 1;1 2;2 2]);
 [~, msg] = run_in_caller('P.dual()');
-asserterrmsg(msg, 'The polyhedron must be bounded and be fully dimensional.');
+asserterrmsg(msg, 'The polyhedron must contain the origin in its interior.');
 
 % element-wise operation for arrays
 P = [Polyhedron.emptySet(2), Polyhedron.fullSpace(3)];
