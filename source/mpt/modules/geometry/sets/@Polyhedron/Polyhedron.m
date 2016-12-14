@@ -771,9 +771,6 @@ classdef Polyhedron < ConvexSet
                     end
                     A1 = [A1; origin']; % add the origin
                     
-                    % compute minimal affine set of rays?
-                    %A2 = mpt_minAffineRep(A2);
-                    
                     % compute the dual D = { A1'*y + A2'*z | y >= 0, sum(y)=1, z >= 0 }
                     D = Polyhedron('V', A1, 'R', A2);
                     
