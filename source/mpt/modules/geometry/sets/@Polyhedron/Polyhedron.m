@@ -723,7 +723,7 @@ classdef Polyhedron < ConvexSet
             % then the polar dual is D = { x | V*x \le 1, R*x \le 0 }.
             %
             % Special cases: the dual of an empty set is R^n and the dual
-            % of R^n is an empty set.
+            % of R^n is the origin.
             %
             % Literature:
             % http://www.cis.upenn.edu/~cis610/polytope.ps
@@ -736,8 +736,8 @@ classdef Polyhedron < ConvexSet
             end
             
             if obj.isFullSpace()
-                % polar dual of R^n is an empty set in R^n
-                D = Polyhedron.emptySet(obj.Dim);
+                % polar dual of R^n is the origin
+                D = Polyhedron(zeros(1, obj.Dim));
                 
             elseif obj.isEmptySet()
                 % polar dual of an empty set is the whole euclidian space
