@@ -84,7 +84,7 @@ classdef mptopt < handle
         % arguments, do that in set.methods
         
     end
-    
+
     %% METHODS
     methods
         
@@ -120,24 +120,6 @@ classdef mptopt < handle
                             else
                                 error('mptopt: There is no field with name "%s" in "mptopt" class.',f{ii});
                             end
-                        end
-                    else
-                        %check if input arguments consist of pairs PropertyName, PropertyValue
-                        if rem(nargin, 2)~=0,
-                            error(['mptopt: Input arguments following the object name must be pairs', ...
-                                ' of the form PropertyName, PropertyValue']);
-                        end
-                        
-                        %set the appropriate fields based on input arguments
-                        for ii=1:2:nargin
-                            if ~ischar(varargin{ii})
-                                error('mptopt: Property name is a string.');
-                            end
-                            if ~any(strcmp(varargin{ii},p))
-                                error(['mptopt: Non-existing property "' varargin{ii} '".']);
-                            end
-                            % assignment checking is done in set methods
-                            options.(varargin{ii}) = varargin{ii+1};
                         end
                     end
 
@@ -194,7 +176,62 @@ classdef mptopt < handle
                 MPTOPTIONS = options;
 
             end
+            %check if input arguments consist of pairs PropertyName, PropertyValue
+            if nargin>=1 && ~isstruct(varargin{1}) 
+                if rem(nargin, 2)~=0
+                    error(['mptopt: Input arguments following the object name must be pairs', ...
+                        ' of the form PropertyName, PropertyValue']);
+                end
+                %set the appropriate fields based on input arguments
+                for ii=1:2:nargin
+                    if ~ischar(varargin{ii})
+                        error('mptopt: Property name is a string.');
+                    end
+                    set(options, varargin{ii}, varargin{ii+1});
+                end
+            end
             
+        end
+
+        function value = get(obj, prop)
+            % returns the given property
+            %
+            %   get(mptopt, 'modules.solvers')
+            
+            narginchk(2, 2);
+            value = obj;
+            while ~isempty(prop)
+                [token, prop] = strtok(prop, '.');
+                value = value.(token);
+            end
+        end
+        function set(obj, prop, value)
+            % sets the given property to given value
+            %
+            %   set(mptopt, 'modules.ui.invariantSet.maxIterations', 1000)
+            
+            narginchk(3, 3);
+            if isa(value, 'double')
+                value = num2str(value);
+            elseif ischar(value)
+                value = ['''' value ''''];
+            else
+                error('The value must be a double or a string.');
+            end
+            accessor = 'obj';
+            f = obj;
+            up_till_now = '';
+            while ~isempty(prop)
+                [token, prop] = strtok(prop, '.');
+                up_till_now = [up_till_now '.' token];
+                if ~(isprop(f, token) || (isstruct(f) && isfield(f, token)))
+                    error('No such property "%s".', up_till_now(2:end));
+                end
+                accessor = [accessor, '.(', '''', token, '''', ')'];
+                f = f.(token);
+            end
+            accessor = [accessor '=' value ';'];
+            eval(accessor);
         end
         
         %% SET methods
