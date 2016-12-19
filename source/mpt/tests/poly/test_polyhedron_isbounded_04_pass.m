@@ -10,3 +10,5 @@ P = Polyhedron(randn(41,5),ones(41,1));
 if ~isBounded(P)
     error('Given polyhedron object should be bounded.');
 end
+
+end

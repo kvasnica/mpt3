@@ -17,3 +17,5 @@ P.minHRep();
  if size(P.H,1)~=3
      error('Here should be only 15 inequalities left.');
  end
+
+end

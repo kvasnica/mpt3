@@ -10,3 +10,5 @@ P = Polyhedron([1 0 0 0 0; 0 -1 0 0 0],[0.5; 2]);
 if isBounded(P)
     error('Given polyhedron object should be unbounded.');
 end
+
+end

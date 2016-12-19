@@ -8,3 +8,5 @@ P = Polyhedron;
 if ~isEmptySet(P+2*P-0*P)
     error('Given polyhedron object should be empty');
 end
+
+end

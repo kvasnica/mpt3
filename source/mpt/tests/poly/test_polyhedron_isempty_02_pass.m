@@ -9,3 +9,5 @@ P = 2*Q;
 if ~all(isEmptySet([P;Q]))
     error('Given polyhedron object should be empty');
 end
+
+end

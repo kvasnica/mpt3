@@ -6,3 +6,5 @@ function test_polyhedron_03_pass
 
 % try random matrix 
 Polyhedron(randn(randi(50,1),randi(50,1)));
+
+end

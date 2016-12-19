@@ -11,3 +11,5 @@ assert(E.nr==3);
 [worked, msg] = run_in_caller('E.optimizer.Set.uniqueFunctions(''nofunction'')');
 assert(~worked);
 assert(~isempty(strfind(msg, 'No such function "nofunction".')));
+
+end

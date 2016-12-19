@@ -21,3 +21,5 @@ for i = 1:F.Num
 		assert(f~=funs(j));
 	end
 end
+
+end

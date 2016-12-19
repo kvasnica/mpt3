@@ -11,3 +11,5 @@ R = Polyhedron('V',randn(14,3),'R',randn(4,3));
 if ~all(isFullDim([P Q 0.5*R]))
     error('Given polyhedron objects should not full-dimensional.');
 end
+
+end

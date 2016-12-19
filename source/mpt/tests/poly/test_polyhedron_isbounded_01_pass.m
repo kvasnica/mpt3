@@ -7,3 +7,5 @@ function test_polyhedron_isbounded_01_pass
 if ~isBounded(Polyhedron)
     error('Given polyhedron object should be bounded.');
 end
+
+end

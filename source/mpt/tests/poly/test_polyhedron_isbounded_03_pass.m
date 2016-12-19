@@ -10,3 +10,5 @@ P = Polyhedron([1;-1],[1;5]);
 if ~isBounded(P)
     error('Given polyhedron object should be bounded.');
 end
+
+end

@@ -21,3 +21,5 @@ H = [
  if size(P.H,1)~=3
      error('Here should be only 3 inequalities left.');
  end
+
+ end

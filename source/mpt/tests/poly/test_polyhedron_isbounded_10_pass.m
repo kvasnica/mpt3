@@ -12,3 +12,5 @@ R = [2*P +P P+ones(3,1) P-5*ones(3,1)];
 if any(isBounded(R))
    error('Given polyhedron object should be unbounded.');
 end
+
+end

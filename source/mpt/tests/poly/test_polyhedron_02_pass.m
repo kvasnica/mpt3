@@ -5,3 +5,5 @@ function test_polyhedron_02_pass
 % 
 
 Polyhedron('H',[1,1]);
+
+end

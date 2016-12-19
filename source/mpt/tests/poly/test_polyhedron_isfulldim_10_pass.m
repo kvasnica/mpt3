@@ -13,3 +13,5 @@ R = Polyhedron('H',randn(2,3),'He',randn(1,3));
 if isFullDim(intersect(Q,R))
     error('Given polyhedron objects should not be full-dimensional.');
 end
+
+end
