@@ -17,10 +17,10 @@ asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mpl
 [~, msg] = run_in_caller('P+P');
 asserterrmsg(msg, 'Supported methods are "vrep", "fourier", "ifourier", and "mplp".');
 
+end
+
 function restore_settings(default)
 % restore original settings
 m = mptopt;
 m.modules.geometry.sets.Polyhedron.projection.method = default;
-end
-
 end
