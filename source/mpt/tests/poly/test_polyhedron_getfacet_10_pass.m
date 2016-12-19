@@ -11,3 +11,5 @@ P = Polyhedron('V',randn(14,4));
 [worked, msg] = run_in_caller('Q = P.getFacet(1)');
 assert(~worked);
 assert(~isempty(strfind(msg, 'Polyhedron must be in its minimal representation.')));
+
+end

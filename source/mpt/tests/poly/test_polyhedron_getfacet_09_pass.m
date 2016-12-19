@@ -12,3 +12,5 @@ G2 = Polyhedron([-1 1; 1 1]);
 G3 = Polyhedron([1 1; 1 -1]);
 G4 = Polyhedron([1 -1; -1 -1]);
 assert([G1 G2 G3 G4]==F);
+
+end

@@ -24,3 +24,5 @@ assert(~isempty(strfind(msg, 'All polyhedra must be in the same dimension.')));
 [worked, msg] = run_in_caller('R = [P2 P1]\P2');
 assert(~worked);
 assert(~isempty(strfind(msg, 'All polyhedra must be in the same dimension.')));
+
+end
