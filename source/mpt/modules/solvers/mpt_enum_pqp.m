@@ -35,6 +35,7 @@ function sol = mpt_enum_pqp(pqp, options)
 %                        regions. (default='regions')
 %     .remove_redundant: if true, redundant inequalities will be detected
 %                        and removed from the pQP (default=true)
+%              .exclude: array of constraints to exclude (default=[])
 %              .verbose: if >=0, progress will be displayed (default=0)
 %
 % Outputs:
@@ -92,7 +93,7 @@ options = mpt_defaultOptions(options, ...
     'regions', true, ...
     'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
     'report_period', MPTOPTIONS.report_period, ...
-    'exclude', {});
+    'exclude', []);
 
 if ~isa(pqp, 'Opt')
     error('The first input must be an instance of the Opt class.');
@@ -103,6 +104,10 @@ end
 if ~options.regions && ~isequal(options.feasible_set, 'Rn')
     fprintf('Forcing options.feasible_set=''Rn''.\n');
     options.feasible_set = 'Rn';
+end
+if ~isempty(options.exclude) && options.remove_redundant
+    fprintf('Forcing options.remove_redundant=false since options.exclude is not empty.\n');
+    options.remove_redundant = false;
 end
 
 % eliminate equalities, keep the original setup
@@ -262,6 +267,7 @@ sol.stats.Aoptimal = Aopt;
 sol.stats.Adegenerate = Adeg;
 sol.stats.Afeasible = Afeas;
 sol.stats.Ainfeasible = Ainfeas;
+sol.stats.Excluded = options.exclude;
 
 %% display final statistics
 if options.verbose>=0
@@ -390,6 +396,10 @@ for i = 1:size(feasible, 1)
         candidates = 1:pqp.m;
     else
         candidates = AllFeasible(AllFeasible>max(feasible(i, :)));
+    end
+    if ~isempty(options.exclude)
+        % remove user-defined constraints to be excluded
+        candidates = setdiff(candidates, options.exclude);
     end
     for j = candidates(:)'
         if level==1
