@@ -684,6 +684,10 @@ classdef ULTISystem < LTISystem
             
             % robustify state constraints
             Xrob = obj.x.boundsToPolyhedron() - obj.E*obj.d.boundsToPolyhedron();
+            if obj.x.hasFilter('terminalSet')
+                Tset_rob = obj.x.terminalSet - obj.E*obj.d.boundsToPolyhedron();
+                Tset_rob.minHRep();
+            end
 
             % do we have parametric uncertainty?
             param_unc = iscell(obj.A) || iscell(obj.B) || ...
@@ -751,7 +755,7 @@ classdef ULTISystem < LTISystem
                     for i = 1:numel(xprevious)
                         % at this point xprevious contains all possible
                         % realizations of x(:, N+1)
-                        con = con + [ ismember(xprevious{i}, obj.x.terminalSet) ];
+                        con = con + [ ismember(xprevious{i}, Tset_rob) ];
                     end
                 end
                 
