@@ -100,6 +100,10 @@ if test "$RSYNC" = no ; then
 	AC_MSG_ERROR(Cannot find "rsync". Please, install "rsync" package.)
 fi
 
+AC_CHECK_PROG(SSH, ssh, ssh, no)
+if test "$SSH" = no ; then
+	AC_MSG_ERROR(Cannot find "ssh". Please, install the "ssh" package.)
+fi
 
 # Once Matlab has been found, extract some data from it's environment
 AC_CONFIG_COMMANDS_PRE("`which matlab`" -nosplash -nodisplay -nodesktop -r \

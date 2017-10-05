@@ -2,6 +2,11 @@
 # exec_prefix = @exec_prefix@
 # instdir = @datarootdir@/
 # bindir = @bindir@
+
+POOL_URL = "http://www.kirp.chtf.stuba.sk/~kvasnica/tbxpool"
+POOL_SSH_SERVER = "h1"
+POOL_SSH_PATH = "~/public_html/tbxpool"
+
 CWD = `pwd`
 
 # programs
@@ -19,6 +24,7 @@ SCP = @SCP@
 MAXDOC = @MAXDOC@
 RSYNC = @RSYNC@
 CURL = @CURL@
+SSH = @SSH@
 
 # variables from MATLAB
 @MATLAB_INFO@
@@ -30,7 +36,7 @@ FUNC_DIR = $(strip $(shell $(SED) -n 's/.*FUNCTIONS_DIR.*>\(.*\)<\/def>/\1/gp' c
 MPT_DIR = $(XML_DIR)/$(FUNC_DIR)
 
 # version and release names
-VERSION = 
+VERSION =
 ifeq ($(VERSION),)
 	VERSION = $(shell hg tip --template '{node|short}' | cut -c1-6)
 	FULLVERSION = dev-$(VERSION)
@@ -56,12 +62,12 @@ DOC_DIR = $(strip $(shell $(SED) -n 's/.*DESTDIR.*>\(.*\)<\/def>/\1/gp' conf.xml
 TBX_HOST = http://www.tbxmanager.com/api/v1
 TBX_PLATFORM = all
 ifeq ($(UNSTABLE),1)
-	TBX_CODE_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/unstable/$(MPTNAME).tgz
-	TBX_DOC_URL =  http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/unstable/$(MPTDOCNAME).tgz
+	TBX_CODE_URL = $(POOL_URL)/mpt3/unstable/$(MPTNAME).tgz
+	TBX_DOC_URL =  $(POOL_URL)/mpt3doc/unstable/$(MPTDOCNAME).tgz
 	TBX_REPOSITORY = unstable
 else
-	TBX_CODE_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz
-	TBX_DOC_URL = http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/$(MODVERSION)/$(MPTDOCNAME).tgz
+	TBX_CODE_URL = $(POOL_URL)/mpt3/$(MODVERSION)/$(MPTNAME).tgz
+	TBX_DOC_URL = $(POOL_URL)/mpt3doc/$(MODVERSION)/$(MPTDOCNAME).tgz
 	TBX_REPOSITORY = stable
 endif
 TBX_CODE_PACKAGE=mpt
@@ -91,24 +97,24 @@ distcode: txt
 uploadcode:
 	@test -f $(RELEASEDIR)/$(MPTNAME).tgz || $(MAKE) distcode
 ifeq ($(UNSTABLE),1)
-	@echo "Uploading $(MPTNAME).tgz to mpt@autserv01:~/public_html/tbx/pool/mpt3/unstable"
-	@scp $(RELEASEDIR)/$(MPTNAME).tgz mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3/unstable/
-	@ssh mpt@autserv01.ee.ethz.ch "chmod a+r /home/mpt/public_html/tbx/pool/mpt3/unstable/*"
-	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/unstable/$(MPTNAME).tgz"
+	@echo "Uploading $(MPTNAME).tgz to $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3/unstable"
+	@$(SCP) $(RELEASEDIR)/$(MPTNAME).tgz $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3/unstable/
+	@$(SSH) $(POOL_SSH_SERVER) "chmod a+r $(POOL_SSH_PATH)/mpt3/unstable/*"
+	@echo "       URL: $(POOL_URL)/mpt3/unstable/$(MPTNAME).tgz"
 else
-	@echo "Uploading $(MPTNAME).tgz to mpt@autserv01:~/public_html/tbx/pool/mpt3/"$(MODVERSION)
+	@echo "Uploading $(MPTNAME).tgz to $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3/"$(MODVERSION)
 	@# create directory if it does not exist
 	@mkdir -p "$(RELEASEDIR)/$(MODVERSION)"
 	@# move the file to directory
 	@mv $(RELEASEDIR)/$(MPTNAME).tgz "$(RELEASEDIR)/$(MODVERSION)/"
 	@# upload the directory
-	@scp -r $(RELEASEDIR)/$(MODVERSION) mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3/
-	@ssh mpt@autserv01.ee.ethz.ch "chmod a+r /home/mpt/public_html/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
+	@$(SCP) -r $(RELEASEDIR)/$(MODVERSION) $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3/
+	@$(SSH) $(POOL_SSH_SERVER) "chmod a+r $(POOL_SSH_PATH)/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
 	@# move the file back from the directory
 	@mv "$(RELEASEDIR)/$(MODVERSION)/$(MPTNAME).tgz" "$(RELEASEDIR)/"
 	@# remove the auxiliary directory
 	@rm -r "$(RELEASEDIR)/$(MODVERSION)"
-	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
+	@echo "       URL: $(POOL_URL)/mpt3/$(MODVERSION)/$(MPTNAME).tgz"
 endif
 	@echo "Version ID: $(FULLVERSION)"
 
@@ -170,28 +176,28 @@ distdoc: doc
 # uploads documentation on the web
 uploaddoc:
 	@test -f $(RELEASEDIR)/$(MPTDOCNAME).tgz || $(MAKE) distdoc
-	@echo "Uploading $(MPTDOCNAME).tgz to mpt@autserv01"
+	@echo "Uploading $(MPTDOCNAME).tgz to $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3doc/unstable"
 ifeq ($(UNSTABLE),1)
-	@scp $(RELEASEDIR)/$(MPTDOCNAME).tgz mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3doc/unstable/
-	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/unstable/$(MPTDOCNAME).tgz"
+	@$(SCP) $(RELEASEDIR)/$(MPTDOCNAME).tgz $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3doc/unstable/
+	@echo "       URL: $(POOL_URL)/mpt3doc/unstable/$(MPTDOCNAME).tgz"
 else
 	@# create directory if it does not exist
-	@mkdir -p "$(RELEASEDIR)/$(MODVERSION)" 
+	@mkdir -p "$(RELEASEDIR)/$(MODVERSION)"
 	@# move the file to directory
 	@mv $(RELEASEDIR)/$(MPTDOCNAME).tgz "$(RELEASEDIR)/$(MODVERSION)/"
 	@# upload the directory
-	@scp -r $(RELEASEDIR)/$(MODVERSION) mpt@autserv01.ee.ethz.ch:/home/mpt/public_html/tbx/pool/mpt3doc/
+	@$(SCP) -r $(RELEASEDIR)/$(MODVERSION) $(POOL_SSH_SERVER):$(POOL_SSH_PATH)/mpt3doc/
 	@# move the file back from the directory
-	@mv "$(RELEASEDIR)/$(MODVERSION)/$(MPTDOCNAME).tgz" "$(RELEASEDIR)/" 
+	@mv "$(RELEASEDIR)/$(MODVERSION)/$(MPTDOCNAME).tgz" "$(RELEASEDIR)/"
 	@# remove the auxiliary directory
 	@rm -r "$(RELEASEDIR)/$(MODVERSION)"
-	@echo "       URL: http://control.ee.ethz.ch/~mpt/tbx/pool/mpt3doc/$(MODVERSION)/$(MPTDOCNAME).tgz"
+	@echo "       URL: $(POOL_URL)/mpt3doc/$(MODVERSION)/$(MPTDOCNAME).tgz"
 endif
 	@echo "Version ID: $(FULLVERSION)"
 
 
 clean:
-	@-rm config.status config.log matlab_info.tmp 
+	@-rm config.status config.log matlab_info.tmp
 
 # phony targets
 .PHONY: clean doc
