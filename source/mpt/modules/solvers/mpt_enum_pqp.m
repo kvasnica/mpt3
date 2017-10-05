@@ -212,6 +212,9 @@ if isempty(AS)
     sol.xopt = PolyUnion;
     sol.exitflag = MPTOPTIONS.INFEASIBLE;
     sol.how = 'infeasible';
+    
+elseif isempty(regions)
+    error('Sanity check failed: %d non-empty active sets, but all regions are empty.', length(AS));
 
 else
     % compute the set of feasible parameters
