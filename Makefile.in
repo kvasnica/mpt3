@@ -75,7 +75,7 @@ TBX_DOC_PACKAGE=mptdoc
 
 # quick distribution: code with help description
 # package tagged with id of the tip
-distcode: txt
+distcode:
 	@echo "Creating $(RELEASEDIR)/$(MPTNAME).tgz..."
 	@mkdir -p "$(RELEASEDIR)/$(MPTNAME)"
 	@cp -Rf "$(XML_DIR)/$(FUNC_DIR)" "$(RELEASEDIR)/$(MPTNAME)"
