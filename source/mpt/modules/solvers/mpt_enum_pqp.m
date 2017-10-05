@@ -276,9 +276,7 @@ if options.verbose>=0
     fprintf('\n');
     fprintf('           Runtime: %.1f sec (%.1f regions per second)\n', ...
         runtime, nr/runtime);
-        
-    fprintf(' Number of regions: %d (non-degenerate: %d, degenerate: %d)\n', ...
-        nr, length(Aopt), length(Adeg));
+    fprintf(' Number of regions: %d\n', nr);
 end
 
 end
