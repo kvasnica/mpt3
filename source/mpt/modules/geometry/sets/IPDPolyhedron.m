@@ -53,11 +53,8 @@ classdef IPDPolyhedron < Polyhedron
                     % tf(i) = isEmptySet(toPolyhedron(obj(i)));
                     
                     % faster: solve a feasibility LP
-                    [S.A, S.b, S.Ae, S.be] = obj(i).getHalfspaces();
-                    S.f = zeros(size(S.A, 2), 1);
-                    S.lb = []; S.ub = []; S.quicklp = true;
-                    sol = mpt_solve(S);
-                    tf(i) = ~isequal(sol.how, 'ok');
+                    [A, b, Ae, be] = obj(i).getHalfspaces();
+                    tf(i) = fast_isEmptySet([A b], [Ae be]);
                     obj(i).Internal.Empty = tf(i);
                 end
             end
@@ -138,7 +135,7 @@ classdef IPDPolyhedron < Polyhedron
                 Ae = prob.Ae*primal.F-prob.pE;
                 be = prob.be-prob.Ae*primal.g;
             else
-                Ae = []; be = [];
+                Ae = zeros(0, size(A, 2)); be = zeros(0, 1);
             end
         end
 	end
