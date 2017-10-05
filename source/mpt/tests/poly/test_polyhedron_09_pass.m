@@ -6,3 +6,5 @@ function test_polyhedron_09_pass
 
 % lb and ub only
 Polyhedron('lb',[-5; 8],'ub',[10 9999]);
+
+end

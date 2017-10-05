@@ -8,3 +8,5 @@ function test_polyhedron_isfulldim_01_pass
 if isFullDim(Polyhedron)
     error('Given polyhedron object should not be full-dimensional.');
 end
+
+end

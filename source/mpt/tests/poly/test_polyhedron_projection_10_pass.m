@@ -21,3 +21,5 @@ R.minHRep();
 for i = 2:length(R)
 	assert( norm(R(1).He-R(i).He,Inf)<=1e-4 );
 end
+
+end

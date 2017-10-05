@@ -1,4 +1,4 @@
-function test_polyhedron_isadjacent_08_pass
+function test_polyhedron_isadjacent_03_pass
 %
 %  there is an empty region between P and Q -> not adjacent
 %

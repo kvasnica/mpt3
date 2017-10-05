@@ -249,3 +249,5 @@ end
 if ~all(v)
     error('Wrong redundancy elimination!');
 end
+
+end

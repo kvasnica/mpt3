@@ -26,3 +26,5 @@ P.minHRep();
  if size(P.H,1)~=9
      error('Here should be 9 inequalities left.');
  end
+
+end

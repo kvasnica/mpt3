@@ -15,3 +15,5 @@ P = Polyhedron(A,b);
 if isFullDim(P)
     error('Given polyhedron object should not be full-dimensional because it contains only a point.');
 end
+
+end

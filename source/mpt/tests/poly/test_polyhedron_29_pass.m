@@ -8,3 +8,5 @@ function test_polyhedron_29_pass
 [worked, msg] = run_in_caller('Polyhedron(''P'',randn(3)); ');
 assert(~worked);
 asserterrmsg(msg,'Input argument must be a "Polyhedron" class.');
+
+end

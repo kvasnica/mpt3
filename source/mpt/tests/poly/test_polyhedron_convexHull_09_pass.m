@@ -26,3 +26,5 @@ HHe=[-1     0     0     0    -1;
 if norm([P.H;P.He]-HHe,1)>MPTOPTIONS.abs_tol
     error('Wrong computation R-rep -> H-rep!');
 end
+
+end

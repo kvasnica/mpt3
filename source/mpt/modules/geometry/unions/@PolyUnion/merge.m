@@ -34,10 +34,19 @@ end
 
 %% deal with arrays
 if numel(obj)>1
-	for i = 1:numel(obj)
-		U(i) = U(i).merge(function_name, 'optimal', optimal_merging);
-	end
-	return
+    U = [];
+    for i = 1:numel(obj)
+        if nargout==0
+            % modify original object(s)
+            obj(i).merge(function_name, 'optimal', optimal_merging);
+        else
+            U = [U obj(i).merge(function_name, 'optimal', optimal_merging)];
+        end
+    end
+    if nargout==0
+        clear U
+    end
+    return
 end
 
 %% validation

@@ -9,3 +9,5 @@ P = Polyhedron(randn(46,25));
 if isEmptySet(P)
     error('Given polyhedron object should be not empty');
 end
+
+end

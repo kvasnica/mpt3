@@ -9,3 +9,5 @@ Q = P;
 [worked, msg] = run_in_caller('isEmptySet(P,Q); ');
 assert(~worked);
 asserterrmsg(msg,'Too many input arguments.');
+
+end

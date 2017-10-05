@@ -11,3 +11,5 @@ P.minVRep();
 if isEmptySet(P)
     error('Given polyhedron object is not empty!');
 end
+
+end

@@ -13,3 +13,4 @@ elseif size(P,2)~=1
     error('wrong concatenation');
 end
 
+end

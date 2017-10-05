@@ -36,3 +36,5 @@ G = Polyhedron([1 1; 1 -1]);
 for i = 1:numel(F)
 	assert(F(i)==G);
 end
+
+end

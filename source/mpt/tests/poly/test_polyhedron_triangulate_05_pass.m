@@ -10,3 +10,5 @@ for i = 1:length(T)
 	assert(T(i).hasFunction('f1'));
 	assert(T(i).hasFunction('f2'));
 end
+
+end

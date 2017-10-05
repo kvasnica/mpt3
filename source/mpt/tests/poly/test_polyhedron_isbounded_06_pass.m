@@ -10,3 +10,5 @@ P = Polyhedron(randn(3,7));
 if ~isBounded(P)
     error('Given polyhedron object should be bounded.');
 end
+
+end

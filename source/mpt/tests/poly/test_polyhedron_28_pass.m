@@ -10,3 +10,5 @@ V(1) = NaN;
 [worked, msg] = run_in_caller('Polyhedron(''ub'',V); ');
 assert(~worked);
 asserterrmsg(msg,'Input argument must be a real vector.');
+
+end

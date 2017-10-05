@@ -9,3 +9,5 @@ Q = Polyhedron('he',randn(2,6));
 if isFullDim(Q)
     error('Given polyhedron object should not be full-dimensional.');
 end
+
+end

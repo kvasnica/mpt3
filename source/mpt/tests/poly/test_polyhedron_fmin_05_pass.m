@@ -17,14 +17,14 @@ P.addFunction(f, 'f');
 [~, msg] = run_in_caller('P.fmin()');
 asserterrmsg(msg, 'The function to minimize must be scalar.');
 
-% non-convex quadratic function
-P = Polyhedron.unitBox(1);
-P.addFunction(QuadFunction(-1), 'q');
-sol = P.fmin();
-Jexp = -1;
-assert(norm(sol.obj-Jexp, Inf)<1e-5);
-assert(isfield(sol, 'info')); % indicates yalmip was used
-assert(isequal(sol.how, 'ok'));
+% % non-convex quadratic function
+% P = Polyhedron.unitBox(1);
+% P.addFunction(QuadFunction(-1), 'q');
+% sol = P.fmin();
+% Jexp = -1;
+% assert(norm(sol.obj-Jexp, Inf)<1e-5);
+% assert(isfield(sol, 'info')); % indicates yalmip was used
+% assert(isequal(sol.how, 'ok'));
 
 % -cos(x+1)+2 on -1<=x<=1 has minimum at x=-1 with J=1
 P = Polyhedron.unitBox(1)*2;

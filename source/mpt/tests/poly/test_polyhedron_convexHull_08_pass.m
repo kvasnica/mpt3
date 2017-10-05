@@ -19,3 +19,5 @@ P.minHRep();
 if size(P.H,1)~=6
     error('H-rep must have 6 rows.');
 end
+
+end

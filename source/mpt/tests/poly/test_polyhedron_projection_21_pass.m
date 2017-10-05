@@ -21,9 +21,6 @@ end
 
 function restore_settings(default)
 % restore original settings
-
 m = mptopt;
 m.modules.geometry.sets.Polyhedron.projection.method = default;
-
 end
-

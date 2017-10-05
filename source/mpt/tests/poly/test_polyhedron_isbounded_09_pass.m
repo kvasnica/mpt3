@@ -15,3 +15,5 @@ R = [P+Q P-Q 2*P+1/3*Q 2*P-3*Q];
 if any(isBounded(R))
    error('Given polyhedron object should be unbounded.');
 end
+
+end

@@ -709,20 +709,26 @@ classdef Polyhedron < ConvexSet
         function D = dual(obj)
             % Computes the polar dual of a polytope
             %
-            % D = P.dual() computes the dual of a polyhedron P. The
-            % polyhedron must be bounded (i.e., a polytope) and be fully
-            % dimensional. The two exceptions are the dual of an empty set
-            % (whose dual is R^n) and the dual of R^n (which is an empty
-            % set). The input polytope is not required to contain the
-            % origin in its interior.
+            % D = P.dual() computes the dual of the polyhedron P. The
+            % polyhedron must contain the origin in its interior.
             %
-            % The dual of P = { x | Ax \le b } (which contains the origin
-            % in its interior) is D = { A'y | y \ge 0, \sum y=1}.
+            % The dual of P = { x | A1*x \le 1, A2*x \le 0 }
+            % (which contains the origin in its interior) is 
+            % D = { A1'y + A2*z | y \ge 0, \sum y=1, z \ge 0}, i.e.
+            % the dual has the rows of A1 as its vertices (with the origin
+            % included) and the rows of A2 as its rays.
             %
-            % If the polytope is given in the vertex representation, i.e.,
-            % P = { V'y | y \ge 0, \sum y = 1 }, then the polar dual is
-            % D = { x | Vx \le 1 }.
+            % If the polyhedron is given in the vertex representation, i.e.,
+            % P = { V'*y + R'*z | y \ge 0, \sum y = 1, z \ge 0 }, 
+            % then the polar dual is D = { x | V*x \le 1, R*x \le 0 }.
+            %
+            % Special cases: the dual of an empty set is R^n and the dual
+            % of R^n is the origin.
+            %
+            % Literature:
+            % http://www.cis.upenn.edu/~cis610/polytope.ps
             
+            global MPTOPTIONS
             if numel(obj)>1
                 % element-wise operation on arrays
                 D = obj.forEach(@(e) e.dual());
@@ -730,41 +736,43 @@ classdef Polyhedron < ConvexSet
             end
             
             if obj.isFullSpace()
-                % polar dual of R^n is an empty set in R^n
-                D = Polyhedron.emptySet(obj.Dim);
+                % polar dual of R^n is the origin
+                D = Polyhedron(zeros(1, obj.Dim));
                 
             elseif obj.isEmptySet()
                 % polar dual of an empty set is the whole euclidian space
                 D = Polyhedron.fullSpace(obj.Dim);
                 
-            elseif obj.isFullDim() && obj.isBounded()
-                if obj.hasHRep
-                    % find an interior point
-                    int_point = obj.interiorPoint();
-                    % shift the polytope such that it contains the origin
-                    % as an interior point
-                    P = obj + (-int_point.x);
-                    % normalize the shifted polytope to { x | Ax <= 1 }
-                    A = P.A./repmat(P.b, 1, P.Dim);
-                    % compute the dual D = { A'*y | y >= 0, sum(y)=1 }
-                    D = Polyhedron(A);
-                    % shift the dual back by +int_point
-                    D = D + int_point.x;
-                    % compute the H-representation
-                    D.computeHRep();
+            else
+                P = obj;
+                origin = zeros(obj.Dim, 1);
+                if ~obj.contains(origin)
+                    error('The polyhedron must contain the origin in its interior.');
+                end
+                if obj.hasVRep
+                    V = P.V;
+                    D = Polyhedron([V; P.R], [ones(size(V, 1), 1); zeros(size(P.R, 1), 1)]);
+
+                elseif obj.hasHRep
+                    % split the H-rep to A1*x<=b1, A2*x<=0
+                    A = obj.A; b = obj.b;
+                    if ~isempty(obj.Ae)
+                        % embed equalities as double-sided inequalities
+                        A = [A; obj.Ae; -obj.Ae];
+                        b = [b; obj.be; -obj.be];
+                    end
+                    iz = (abs(b)<=MPTOPTIONS.abs_tol);
+                    A1 = A(~iz, :);
+                    b1 = b(~iz);
+                    A2 = A(iz, :);
+                    % normalize A1*x<=b1 to A1*x<=1
+                    if ~isempty(A1)
+                        A1 = A1./repmat(b1, 1, obj.Dim);
+                    end
+                    A1 = [A1; origin']; % add the origin
                     
-                elseif obj.hasVRep
-                    % find an interior point
-                    int_point = obj.interiorPoint();
-                    % shift the polytope by -x_int such that it contains
-                    % the origin as an interior point
-                    P = obj + (-int_point.x);
-                    % compute the dual D = { x | V*x <= 1 }
-                    D = Polyhedron(P.V, ones(size(P.V, 1), 1));
-                    % shift the dual back by +x_int
-                    D = D + int_point.x;
-                    % compute the V-representation
-                    D.computeVRep();
+                    % compute the dual D = { A1'*y + A2'*z | y >= 0, sum(y)=1, z >= 0 }
+                    D = Polyhedron('V', A1, 'R', A2);
                     
                 else
                     % this should not happen, we should have at least one
@@ -772,9 +780,6 @@ classdef Polyhedron < ConvexSet
                     error('Unexpected error, please report to mpt@control.ee.ethz.ch');
                     
                 end
-                
-            else
-                error('The polyhedron must be bounded and be fully dimensional.');
             end
                 
         end

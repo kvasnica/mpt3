@@ -14,3 +14,5 @@ il = cellfun(@isEmptySet,P);
 if ~all(il(3:end))
     error('Given polyhedron object should be empty');
 end
+
+end

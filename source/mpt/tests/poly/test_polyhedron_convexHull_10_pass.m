@@ -64,3 +64,5 @@ end
 if ~all(v)
     error('Wrong computation V&R-rep -> H-rep!');
 end
+
+end

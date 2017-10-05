@@ -6,3 +6,5 @@ function test_polyhedron_05_pass
 
 % call polyhedron on empty array
 Polyhedron([]);
+
+end

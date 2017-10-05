@@ -9,3 +9,5 @@ Q2 = Q*Q;
 if isFullDim(Q2)
     error('Given polyhedron object should not be full-dimensional.');
 end
+
+end

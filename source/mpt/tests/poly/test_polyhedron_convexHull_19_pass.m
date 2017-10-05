@@ -31,3 +31,5 @@ P.minHRep();
 if ~P.isEmptySet
     error('Wrong redundancy elimination!');
 end
+
+end

@@ -10,3 +10,5 @@ t = isEmptySet([Q,P]);
 if ~t(1)
     error('Given polyhedron object should be empty');
 end
+
+end

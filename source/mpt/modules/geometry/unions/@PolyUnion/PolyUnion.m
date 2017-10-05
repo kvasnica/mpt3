@@ -1,4 +1,4 @@
-classdef PolyUnion < Union
+classdef (InferiorClasses={?Polyhedron}) PolyUnion < Union
   %%
   % ConvexSet
   %

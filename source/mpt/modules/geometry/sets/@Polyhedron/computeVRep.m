@@ -34,6 +34,42 @@ elseif obj.isFullSpace()
 	return
 end
 
+if false
+    % vertex enumeration via duality
+    %
+    % see Borrelli, Bemporad, Morari: Predictive control for linear and
+    % hybrid systems, Section 5.4.4, pp. 82-84 
+    shifted = false;
+    if ~obj.contains(zeros(obj.Dim, 1))
+        % shift the polyhedron such that it contains the origin in its
+        % interior
+        if obj.isBounded()
+            xint = obj.interiorPoint().x;
+        else
+            Rmax = 1; % bound the chebyradius for better numerical robustness
+            sol = fast_chebyCenter(obj.H, obj.He, Rmax);
+            xint = sol.x;
+        end
+        P = obj + (-xint);
+        shifted = true;
+    else
+        P = obj;
+    end
+    D = P.dual();
+    D.computeHRep();
+    E = Polyhedron('H', D.H, 'He', D.He);
+    F = E.dual();
+    if shifted
+        % shift back to the original location
+        F = F + xint;
+    end
+    F.minVRep(); % kick out redundant vertices
+    obj.V_int = F.V;
+    obj.R_int = F.R;
+    obj.hasVRep = true;
+    return
+end
+
 done = false;
 backupTried = false;
 
