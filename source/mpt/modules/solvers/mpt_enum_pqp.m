@@ -216,8 +216,12 @@ if isempty(AS)
 else
     % compute the set of feasible parameters
     start_t = clock;
-    if options.verbose>=0
-        fprintf('Constructing the feasible set...\n');
+    if options.verbose>=0 
+        if isequal(lower(options.feasible_set), 'rn')
+            fprintf('The feasible is not available for regionless solutions.\n');
+        else
+            fprintf('Constructing the feasible set...\n');
+        end
     end
 
     switch lower(options.feasible_set)
@@ -235,7 +239,7 @@ else
     end
     % eliminate redundancies
     K.minHRep();
-    if options.verbose>=0
+    if options.verbose>=0 && ~isequal(lower(options.feasible_set), 'rn')
         fprintf('...done (%.1f seconds)\n', etime(clock, start_t));
     end
 
