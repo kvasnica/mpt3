@@ -75,6 +75,9 @@ classdef IPDPolyhedron < Polyhedron
                     [A, b, Ae, be] = obj(i).getHalfspaces();
                     tf(i) = fast_isFullDim([A b], [Ae be]);
                     obj(i).Internal.FullDim = tf(i);
+                    if tf(i)
+                        obj(i).Internal.Empty = false;
+                    end
                 end
             end
         end
