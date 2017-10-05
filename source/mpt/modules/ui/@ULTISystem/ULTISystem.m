@@ -778,6 +778,9 @@ classdef ULTISystem < LTISystem
                     % robust state constraints
                     con = con + [ ismember(x(:, k), Xrob) ];
                 end
+                if obj.x.hasFilter('terminalSet')
+                    con = con + [ ismember(x(:, end), obj.x.terminalSet) ];
+                end
             end
 		end
 	end
