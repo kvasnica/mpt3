@@ -61,8 +61,24 @@ classdef IPDPolyhedron < Polyhedron
         end
         
         function tf = isFullDim(obj)
-            tf = isFullDim(toPolyhedron(obj));
+            % Checks if a given set is fully dimensional
+            
+            tf = true(size(obj));
+            for i = 1:numel(obj)
+                if ~isempty(obj(i).Internal.FullDim)
+                    tf(i) = obj(i).Internal.FullDim;
+                else
+                    % slow but simple:
+                    %tf(i) = isFullDim(toPolyhedron(obj(i)));
+                    
+                    % faster: solve a feasibility LP
+                    [A, b, Ae, be] = obj(i).getHalfspaces();
+                    tf(i) = fast_isFullDim([A b], [Ae be]);
+                    obj(i).Internal.FullDim = tf(i);
+                end
+            end
         end
+        
         function tf = isBounded(obj)
             tf = isBounded(toPolyhedron(obj));
         end
