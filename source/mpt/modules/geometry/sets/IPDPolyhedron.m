@@ -83,10 +83,16 @@ classdef IPDPolyhedron < Polyhedron
             
             tf = false(size(P));
             for i = 1:numel(P)
-                dual = P(i).Functions('dual-ineqlin').feval(x);
+                %dual = P(i).Functions('dual-ineqlin').feval(x);
+                dual_f = P(i).Functions('dual-ineqlin');
+                dual = dual_f.F*x+dual_f.g;
+                
                 % check dual feasibility first
                 if min(dual)>=0
-                    primal = P(i).Functions('primal-kkt').feval(x);
+                    %primal = P(i).Functions('primal-kkt').feval(x);
+                    primal_f = P(i).Functions('primal-kkt');
+                    primal = primal_f.F*x+primal_f.g;
+                    
                     prob = P(i).Data.OptProb;
                     % check primal feasibility
                     if max(prob.A*primal-prob.b-prob.pB*x)<=MPTOPTIONS.abs_tol
