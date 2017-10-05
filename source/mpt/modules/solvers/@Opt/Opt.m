@@ -292,6 +292,140 @@ classdef Opt < handle & matlab.mixin.Copyable
             obj.b = P.b;
             obj.m = length(obj.b);
         end
+        
+        function CR = getRegion(obj, A, options)
+            % Constructs a critical region, the optimizers, and the cost function
+            %
+            % Syntax:
+            %   CR = pqp.getRegion(A)
+            %   CR = pqp.getRegion(A)
+            %
+            % Inputs:
+            %   pqp: pqp problem as an instance of the Opt class
+            %     A: incides of the active inequalities
+            %
+            % Output:
+            %     R: critical region as a Polyhedron object with functions "primal"
+            %        and "obj"
+
+            narginchk(2, 3);
+            assert(isequal(obj.problem_type, 'QP'), 'Only pQPs are supported.');
+            assert(obj.d>0, 'The problem must have parameters.');
+            assert(obj.me==0, 'Equalities are not supported.');
+            if nargin<3
+                options = [];
+            end
+            options = mpt_defaultOptions(options, 'regionless', false, 'pqp_with_equalities', obj);
+            
+            % TODO: resolve primal degeneracy
+            assert(numel(A)<=obj.n, 'Primally degenerate active set.');
+            
+            % special notion for no active constraints
+            if isequal(A, 0)
+                A = [];
+            end
+            
+            % extract active sets
+            Ga = obj.A(A, :);
+            Ea = obj.pB(A, :);
+            wa = obj.b(A, :);
+            
+            if rank(Ga)~=numel(A)
+                error('Primally degenerate active set.');
+            end
+            
+            % extract non-active sets
+            all = 1:obj.m;
+            N  = all(~ismembc(all, A));
+            Gn = obj.A(N, :);
+            En = obj.pB(N, :);
+            wn = obj.b(N, :);
+            
+            % optimal dual variables
+            alpha_1 = -Ga/obj.H*obj.pF - Ea;
+            alpha_2 = -Ga/obj.H*Ga';
+            beta    = -Ga/obj.H*obj.f - wa;
+            
+            % dual variables are an affine function of the parameters
+            alpha_L = -inv(alpha_2)*alpha_1;
+            beta_L  = -inv(alpha_2)*beta;
+            
+            % optimizer is an affine function of the parameters
+            alpha_x = -obj.H\obj.pF - obj.H\Ga'*alpha_L;
+            beta_x  = -obj.H\obj.f - obj.H\Ga'*beta_L;
+
+            % cost function
+            % TODO: check this
+            Jquad = 0.5*alpha_x'*obj.H*alpha_x + obj.pF'*alpha_x + obj.Y;
+            Jaff = beta_x'*obj.H*alpha_x + beta_x'*obj.pF + obj.f'*alpha_x + obj.C;
+            Jconst = 0.5*beta_x'*obj.H*beta_x + obj.f'*beta_x + obj.c;
+            J = QuadFunction(Jquad, Jaff, Jconst);
+
+            % Critical region
+            crH = [Gn*alpha_x - En; -alpha_L];
+            crh = [-Gn*beta_x + wn; beta_L];
+            
+            % Project primal optimizer back on equalities
+            if ~isempty(obj.recover)
+                Lprimal = obj.recover.Y*[alpha_x, beta_x] + obj.recover.th;
+                alpha_x = Lprimal(:, 1:end-1);
+                beta_x = Lprimal(:, end);
+            end
+
+            if ~options.regionless
+                CR = Polyhedron(crH, crh);
+            else
+                CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
+                % we need the primal optimizer with respect to the original
+                % problem, i.e., before condensing
+                z_kkt = AffFunction(alpha_x, beta_x);
+                CR.addFunction(z_kkt, 'primal-kkt');
+            end
+            
+            % primal optimizer
+            if ~isempty(obj.varOrder) && ~isempty(obj.varOrder.requested_variables)
+                % extract only requested variables from the primal
+                % optimizer
+                alpha_x = alpha_x(obj.varOrder.requested_variables, :);
+                beta_x = beta_x(obj.varOrder.requested_variables);
+            end
+            z = AffFunction(alpha_x, beta_x);
+            % lagrange multipliers: aL*x+bL
+            aL = zeros(size(obj.pB));
+            bL = zeros(size(obj.b));
+            aL(A, :) = alpha_L;
+            bL(A) = beta_L;
+            L = AffFunction(aL, bL);
+            
+            % attach functions
+            CR.addFunction(z, 'primal');
+            CR.addFunction(J, 'obj');
+            CR.addFunction(L, 'dual-ineqlin');
+            CR.Data.Active = A;
+        end
+        
+        function [A, sol] = getActiveSetForPoint(obj, theta)
+            % Returns constraints that are active for a given parameter
+            %
+            % [A, SOL] = prob.getActiveSetForPoint(THETA) returns the
+            % indices A of inequality constraints that are active at the
+            % optimum for the given parameter THETA. The SOL output
+            % determines feasibility in SOL.how and the primal optimizer
+            % in SOL.xopt.
+            
+            global MPTOPTIONS
+            assert(~isequal(obj.problem_type, 'LCP'), 'LCP problems are not supported.');
+            assert(obj.isParametric, 'The problem must have parameters.');
+            assert(isequal(size(theta), [obj.d 1]), 'The parameter must be %dx1.', obj.d);
+            sol = obj.solve(theta);
+            if sol.exitflag==MPTOPTIONS.OK
+                A = find(abs(obj.A*sol.xopt-obj.b-obj.pB*theta)<MPTOPTIONS.abs_tol);
+            else
+                % infeasible
+                A = NaN;
+            end
+        end
+
     end
     
 %     methods
