@@ -378,8 +378,8 @@ classdef Opt < handle & matlab.mixin.Copyable
                 CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
                 % we need the primal optimizer with respect to the original
                 % problem, i.e., before condensing
-                z_kkt = AffFunction(alpha_x, beta_x);
-                CR.addFunction(z_kkt, 'primal-kkt');
+                CR.Data.Primal.F = alpha_x;
+                CR.Data.Primal.g = beta_x;
             end
             
             % primal optimizer
@@ -402,6 +402,10 @@ classdef Opt < handle & matlab.mixin.Copyable
             CR.addFunction(J, 'obj');
             CR.addFunction(L, 'dual-ineqlin');
             CR.Data.Active = A;
+            if options.regionless
+                CR.Data.DualIneq.F = aL;
+                CR.Data.DualIneq.g = bL;
+            end
         end
         
         function [A, sol] = getActiveSetForPoint(obj, theta)

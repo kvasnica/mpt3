@@ -100,15 +100,13 @@ classdef IPDPolyhedron < Polyhedron
             tf = false(size(P));
             for i = 1:numel(P)
                 %dual = P(i).Functions('dual-ineqlin').feval(x);
-                dual_f = P(i).Functions('dual-ineqlin');
+                dual_f = P(i).Data.DualIneq;
                 dual = dual_f.F*x+dual_f.g;
                 
                 % check dual feasibility first
                 if min(dual)>=0
-                    %primal = P(i).Functions('primal-kkt').feval(x);
-                    primal_f = P(i).Functions('primal-kkt');
+                    primal_f = P(i).Data.Primal;
                     primal = primal_f.F*x+primal_f.g;
-                    
                     prob = P(i).Data.OptProb;
                     % check primal feasibility
                     if max(prob.A*primal-prob.b-prob.pB*x)<=MPTOPTIONS.abs_tol
@@ -142,8 +140,8 @@ classdef IPDPolyhedron < Polyhedron
             % polyhedron
             
             prob = obj.Data.OptProb;
-            primal = obj.Functions('primal-kkt'); % F*x+g
-            dual = obj.Functions('dual-ineqlin'); % M*x+m
+            primal = obj.Data.Primal;
+            dual = obj.Data.DualIneq;
             % CR = { x | A*primal<=b+pB*x, dual>=0 }
             %    = { x | A*(F*x+g)<=b+pB*x, M*x+m>=0 }
             %    = { x | (A*F-pB)*x<=b-A*g, -M*x<=m }
