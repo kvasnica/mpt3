@@ -353,33 +353,35 @@ classdef Opt < handle & matlab.mixin.Copyable
             % optimizer is an affine function of the parameters
             alpha_x = -obj.H\obj.pF - obj.H\Ga'*alpha_L;
             beta_x  = -obj.H\obj.f - obj.H\Ga'*beta_L;
-            
-            % Critical region
-            crH = [Gn*alpha_x - En; -alpha_L];
-            crh = [-Gn*beta_x + wn; beta_L];
-            if ~options.regionless
-                CR = Polyhedron(crH, crh);
-            else
-                % FIXME: IPDPolyhedron must either take the object with
-                % equalities, or optimizer must be projected on them
-                %CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
-                CR = IPDPolyhedron(size(crH, 2), obj);
-                %CR.setInternal('Empty', false);
-            end
-            
+
             % cost function
             % TODO: check this
             Jquad = 0.5*alpha_x'*obj.H*alpha_x + obj.pF'*alpha_x + obj.Y;
             Jaff = beta_x'*obj.H*alpha_x + beta_x'*obj.pF + obj.f'*alpha_x + obj.C;
             Jconst = 0.5*beta_x'*obj.H*beta_x + obj.f'*beta_x + obj.c;
             J = QuadFunction(Jquad, Jaff, Jconst);
+
+            % Critical region
+            crH = [Gn*alpha_x - En; -alpha_L];
+            crh = [-Gn*beta_x + wn; beta_L];
             
+            % Project primal optimizer back on equalities
             if ~isempty(obj.recover)
-                % Project primal optimizer back on equalities
                 Lprimal = obj.recover.Y*[alpha_x, beta_x] + obj.recover.th;
                 alpha_x = Lprimal(:, 1:end-1);
                 beta_x = Lprimal(:, end);
             end
+
+            if ~options.regionless
+                CR = Polyhedron(crH, crh);
+            else
+                CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
+                % we need the primal optimizer with respect to the original
+                % problem, i.e., before condensing
+                z_kkt = AffFunction(alpha_x, beta_x);
+                CR.addFunction(z_kkt, 'primal-kkt');
+            end
+            
             % primal optimizer
             if ~isempty(obj.varOrder) && ~isempty(obj.varOrder.requested_variables)
                 % extract only requested variables from the primal
