@@ -37,6 +37,9 @@ function sol = mpt_enum_pqp(pqp, options)
 %                        and removed from the pQP (default=true)
 %              .exclude: array of constraints to exclude (default=[])
 %              .verbose: if >=0, progress will be displayed (default=0)
+%       .accept_regions: if 'fulldim', only fully dimensional regions will
+%                        be returned. Otherwise also flat regions will be
+%                        generated
 %
 % Outputs:
 % --------
@@ -93,6 +96,7 @@ options = mpt_defaultOptions(options, ...
     'regions', true, ...
     'remove_redundant', MPTOPTIONS.modules.solvers.enum_pqp.remove_redundant, ...
     'report_period', MPTOPTIONS.report_period, ...
+    'accept_regions', MPTOPTIONS.modules.solvers.enum_pqp.accept_regions, ...
     'exclude', []);
 
 if ~isa(pqp, 'Opt')
@@ -187,7 +191,12 @@ for i = 1:length(AS)
             t = tic;
         end
         R = pqp.getRegion(AS{i}(j, :), region_options);
-        if R.isEmptySet()
+        if isequal(options.accept_regions, 'fulldim')
+            accept = R.isFullDim();
+        else
+            accept = ~R.isEmptySet();
+        end
+        if ~accept
             n_lowdim = n_lowdim + 1;
         else
             if isempty(regions)

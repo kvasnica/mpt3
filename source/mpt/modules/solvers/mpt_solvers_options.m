@@ -705,3 +705,8 @@ options.enum_pqp.feasible_set = 'regions';
 % if .remove_redundant=true, redundant inequalities will be removed from
 % the pQP problem (improves runtime, but can be slow for large problems)
 options.enum_pqp.remove_redundant = true;
+
+% If .accept_regions='fulldim', only fully dimensional regions are returned.
+% If .accept_regions='nonempty', also flat (lower-dimensiona) regions will
+% be returned
+options.enum_pqp.accept_regions = 'fulldim';
