@@ -685,8 +685,12 @@ classdef ULTISystem < LTISystem
             % robustify state constraints
             Xrob = obj.x.boundsToPolyhedron() - obj.E*obj.d.boundsToPolyhedron();
             if obj.x.hasFilter('terminalSet')
-                Tset_rob = obj.x.terminalSet - obj.E*obj.d.boundsToPolyhedron();
-                Tset_rob.minHRep();
+                % We could robustify the terminal set against additive
+                % disturbances, but what if the user has already done that?
+                % Since there is no way of knowing, we don't do it
+                % automatically and rather document the behavior
+                %Tset_rob = obj.x.terminalSet - obj.E*obj.d.boundsToPolyhedron();
+                %Tset_rob.minHRep();
             end
 
             % do we have parametric uncertainty?
@@ -755,7 +759,7 @@ classdef ULTISystem < LTISystem
                     for i = 1:numel(xprevious)
                         % at this point xprevious contains all possible
                         % realizations of x(:, N+1)
-                        con = con + [ ismember(xprevious{i}, Tset_rob) ];
+                        con = con + [ ismember(xprevious{i}, obj.x.terminalSet) ];
                     end
                 end
                 
