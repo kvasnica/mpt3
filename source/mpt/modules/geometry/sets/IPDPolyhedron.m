@@ -7,11 +7,16 @@ classdef IPDPolyhedron < Polyhedron
             obj.Data.OptProb = optprob;
         end
 
-        function P = toPolyhedron(obj)
+        function P = toPolyhedron(obj, reuse)
             % Converts implicit polyhedron to explicit form
             
+            if nargin<2
+                % ugly hack for copying of unions with trimmed functions
+                reuse = true;
+            end
+            
             for i = 1:numel(obj)
-                if isfield(obj(i).Internal, 'Polyhedron') && ...
+                if reuse && isfield(obj(i).Internal, 'Polyhedron') && ...
                         ~isempty(obj(i).Internal.Polyhedron)
                     % extract pre-computed
                     P(i) = obj(i).Internal.Polyhedron;
@@ -48,11 +53,13 @@ classdef IPDPolyhedron < Polyhedron
                     tf(i) = obj(i).Internal.Empty;
                 else
                     % slow but simple:
-                    % tf(i) = isEmptySet(toPolyhedron(obj(i)));
+                    tf(i) = isEmptySet(toPolyhedron(obj(i)));
                     
                     % faster: solve a feasibility LP
-                    [A, b, Ae, be] = obj(i).getHalfspaces();
-                    tf(i) = fast_isEmptySet([A b], [Ae be]);
+                    % NOTE: this fails big time with test_enum_pqp_10
+                    %[A, b, Ae, be] = obj(i).getHalfspaces();
+                    %tf(i) = fast_isEmptySet([A b], [Ae be]);
+                    
                     obj(i).Internal.Empty = tf(i);
                 end
             end
@@ -67,11 +74,13 @@ classdef IPDPolyhedron < Polyhedron
                     tf(i) = obj(i).Internal.FullDim;
                 else
                     % slow but simple:
-                    %tf(i) = isFullDim(toPolyhedron(obj(i)));
+                    tf(i) = isFullDim(toPolyhedron(obj(i)));
                     
                     % faster: solve a feasibility LP
-                    [A, b, Ae, be] = obj(i).getHalfspaces();
-                    tf(i) = fast_isFullDim([A b], [Ae be]);
+                    % NOTE: this fails big time with test_enum_pqp_10
+                    %[A, b, Ae, be] = obj(i).getHalfspaces();
+                    %tf(i) = fast_isFullDim([A b], [Ae be]);
+                    
                     obj(i).Internal.FullDim = tf(i);
                     if tf(i)
                         obj(i).Internal.Empty = false;

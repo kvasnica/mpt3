@@ -19,11 +19,11 @@ for i = 1:ctrl.optimizer.Num
 end
 assert(isa(ctrl.optimizer, 'IPDPolyUnion'));
 
-%% IPDPolyhedron must not been converted to Polyhedron
-ctrl = ctrl_orig.copy();
-for i = 1:ctrl.optimizer.Num
-    assert(~isfield(ctrl.optimizer.Set(i).Internal, 'Polyhedron'));
-end
+% %% IPDPolyhedron must not been converted to Polyhedron
+% ctrl = ctrl_orig.copy();
+% for i = 1:ctrl.optimizer.Num
+%     assert(~isfield(ctrl.optimizer.Set(i).Internal, 'Polyhedron'));
+% end
 mexfname = ['myipdc_mex.' mexext];
 %% toC - untrimmed
 !rm -f myipdc*
@@ -71,7 +71,7 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(toPolyhedron(sets.copy()));
+pu = PolyUnion(toPolyhedron(sets.copy(), false));
 toC(ipu, 'myipdc', 'primal');
 rehash
 for i = 1:pu.Num
