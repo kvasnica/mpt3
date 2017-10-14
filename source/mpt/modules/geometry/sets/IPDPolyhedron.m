@@ -100,6 +100,7 @@ classdef IPDPolyhedron < Polyhedron
             if isempty(MPTOPTIONS)
                 MPTOPTIONS = mptopt;
             end
+            tolerance = MPTOPTIONS.abs_tol;
             
             narginchk(2, 3);
             assert(isnumeric(x), 'The argument must be a real vector.');
@@ -112,15 +113,15 @@ classdef IPDPolyhedron < Polyhedron
                 if isempty(dual), dual=zeros(1, P(i).Dim); end
                 
                 % check dual feasibility first
-                if min(dual)>=0
+                if min(dual)>=-tolerance
                     primal_f = P(i).Data.Primal;
                     primal = primal_f.F*x+primal_f.g;
                     prob = P(i).Data.OptProb;
                     % check primal feasibility
-                    if max(prob.A*primal-prob.b-prob.pB*x)<=MPTOPTIONS.abs_tol
+                    if max(prob.A*primal-prob.b-prob.pB*x)<=tolerance
                         if prob.me>0
                             % also check equalities
-                            if norm(prob.Ae*primal-prob.be-prob.pE*x)<=MPTOPTIONS.abs_tol
+                            if norm(prob.Ae*primal-prob.be-prob.pE*x)<=tolerance
                                 tf(i) = true;
                             end
                         else

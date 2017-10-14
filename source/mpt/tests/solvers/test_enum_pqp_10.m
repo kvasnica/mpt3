@@ -46,4 +46,10 @@ for i = 1:size(X, 1)
 %     assert((all(isnan(u2)) && all(isnan(u3))) || norm(u2-u3)<1e-6);
 end
 
+% patological case
+x = [3.08811233769382;-9.99999654703456;-9.99999654703456;3.32832487514286;9.99999654703456;-2.63154776474646;-9.99999654703456;7.00162237174638;7.75872395167315;-9.99999654703456];
+u1 = c_reg.optimizer.feval(x, 'primal');
+u2 = c_rlenum.optimizer.feval(x, 'primal');
+u3 = c_enum.optimizer.feval(x, 'primal');
+[u1 u2 u3]
 end
