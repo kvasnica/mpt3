@@ -43,7 +43,7 @@ classdef IPDPolyUnion < PolyUnion
             if nargin<4
                 tiebreak = 'first-region';
             end
-            
+            % TODO: tailored C code generation without codegen
             mfname = obj.toMatlab(filename, function_to_export, tiebreak);
             fname = mfname(1:end-2); % strip the '.m' extension
             fprintf('Calling codegen on "%s"...\n', mfname);
@@ -75,10 +75,13 @@ classdef IPDPolyUnion < PolyUnion
             if nargin<4
                 tiebreak = 'first-region';
             end
+            % TODO: support multiple unions
             assert(numel(obj)==1, 'Single union please.');
             assert(obj.hasFunction(function_to_export), 'No such function "%s" in the union.', function_to_export);
             
+            % TODO: support generic tiebreaks
             assert(isequal(tiebreak, 'first-region'), 'Only the "first-region" tiebreak is supported for now.');
+            % TODO: support problems with equalities
             assert(obj.Data.OptProb.me==0, 'Problems with equality constraints not yet supported.');
 
             % get canonical file name
@@ -132,6 +135,7 @@ classdef IPDPolyUnion < PolyUnion
             Z = [];
             for i = 1:obj.Num
                 fun = obj.Set(i).Functions(function_to_export);
+                % TODO: support generic functions
                 assert(isa(fun, 'AffFunction'), 'Only affine functions can be exported for now.');
                 Z = [Z; fun.F, fun.g];
             end
