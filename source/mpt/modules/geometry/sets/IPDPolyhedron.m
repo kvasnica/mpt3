@@ -1,11 +1,9 @@
 classdef IPDPolyhedron < Polyhedron
     methods
-        function obj = IPDPolyhedron(dim, optprob)
+        function obj = IPDPolyhedron(optprob)
             % Polyhedron implicitly defined by primal/dual feasibility conditions
             
-            % store internaly as R^n, i.e., 0'*x<=1
-            %obj = obj@Polyhedron(zeros(1, dim), 1);
-            obj.Dim = dim;
+            obj.Dim = optprob.d;
             obj.Data.OptProb = optprob;
         end
 
