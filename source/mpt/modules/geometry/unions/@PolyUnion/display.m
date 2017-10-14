@@ -3,19 +3,20 @@ function display(obj)
 % display function
 %
 
+name = class(obj);
 if numel(obj) > 1
-    fprintf('Array of %i PolyUnions.\n', numel(obj));
+    fprintf('Array of %i %ss.\n', numel(obj), name);
     return
 elseif numel(obj)==0
-    fprintf('Empty array of PolyUnions.\n');
+    fprintf('Empty array of %ss.\n', name);
     return;
 end    
 if numel(obj.Set)==0
-    fprintf('Empty PolyUnion.\n');
+    fprintf('Empty %s.\n', name);
     return;
 end
 
-fprintf('PolyUnion in the dimension %d with %d polyhedra.\n', obj.Dim, obj.Num);
+fprintf('%s in the dimension %d with %d polyhedra.\n', name, obj.Dim, obj.Num);
 if ~isempty(obj.Internal.Convex) || ...
     ~isempty(obj.Internal.Overlaps) || ...
     ~isempty(obj.Internal.Connected) || ...
