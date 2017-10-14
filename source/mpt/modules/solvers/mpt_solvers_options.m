@@ -712,7 +712,7 @@ options.enum_pqp.prune_infeasible = true;
 %                        computed by projection. If 'regions', the set is
 %                        calculcated by exploring which facets of critical
 %                        regions are at the boundary of the feasible set.
-%                        If 'box', the feasible set is costructed as the
+%                        If 'outerbox', the feasible set is costructed as the
 %                        outer box approximation of the union of critical
 %                        regions. (default='projection')
 options.enum_pqp.feasible_set = 'regions';
