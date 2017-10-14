@@ -100,6 +100,7 @@ classdef IPDPolyhedron < Polyhedron
                 %dual = P(i).Functions('dual-ineqlin').feval(x);
                 dual_f = P(i).Data.DualIneq;
                 dual = dual_f.F*x+dual_f.g;
+                if isempty(dual), dual=zeros(1, P(i).Dim); end
                 
                 % check dual feasibility first
                 if min(dual)>=0

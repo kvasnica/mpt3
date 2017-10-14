@@ -398,8 +398,8 @@ classdef Opt < handle & matlab.mixin.Copyable
             CR.addFunction(L, 'dual-ineqlin');
             CR.Data.ActiveSet = A;
             if options.regionless
-                CR.Data.DualIneq.F = aL;
-                CR.Data.DualIneq.g = bL;
+                CR.Data.DualIneq.F = aL(A, :);
+                CR.Data.DualIneq.g = bL(A);
             end
         end
         
