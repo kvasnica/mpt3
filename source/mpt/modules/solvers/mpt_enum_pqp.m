@@ -218,7 +218,11 @@ end
 %% create the output structure
 if isempty(AS)
     % infeasible problem
-    sol.xopt = PolyUnion;
+    if regions
+        sol.xopt = PolyUnion;
+    else
+        sol.xopt = IPDPolyUnion;
+    end
     sol.exitflag = MPTOPTIONS.INFEASIBLE;
     sol.how = 'infeasible';
     
@@ -258,16 +262,16 @@ else
     % create the polyunion
     if options.regions
         bounded = all(regions.isBounded());
+        sol.xopt = PolyUnion('Set', regions, ...
+            'Domain', K, ...
+            'Convex', true, ...
+            'Overlaps', false, ...
+            'Bounded', bounded, ...
+            'Connected', true, ...
+            'FullDim', true);
     else
-        bounded = true;
+        sol.xopt = IPDPolyUnion(regions);
     end
-    sol.xopt = PolyUnion('Set', regions, ...
-        'Domain', K, ...
-        'Convex', true, ...
-        'Overlaps', false, ...
-        'Bounded', bounded, ...
-        'Connected', true, ...
-        'FullDim', true);
     if (K.isFullSpace() && ~isequal(lower(options.feasible_set), 'rn')) || ~K.isFullDim()
         fprintf('WARNING: construction of the feasible set failed, the solution may contain holes!\n')
     else
@@ -634,6 +638,9 @@ end
 if (result==-3 || result==-1) && numel(A)<pqp.n
     % solve the LP without optimality conditions (not necessary if we are
     % on the last level)
+    
+    % TODO: solve just one LP with soft equality optimality constraint
+    %       H*z + pF*x + f + Ga'*La = s, min Qs*norm(s, 1)
     lp.Ae = lp.Ae(pqp.n+1:end, :);
     lp.be = lp.be(pqp.n+1:end);
     nlps = nlps + 1;
