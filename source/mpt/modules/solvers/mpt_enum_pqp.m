@@ -212,7 +212,12 @@ if options.verbose>=0
     fprintf('...done (%.1f seconds)\n', etime(clock, start_t));
 end
 if options.verbose>=0 && n_lowdim > 0
-    fprintf('WARNING: %d lower-dimensional region(s) discarded\n', n_lowdim);
+    if isequal(options.accept_regions, 'fulldim')
+        reason = 'lower-dimensional';
+    else
+        reason = 'empty';
+    end
+    fprintf('WARNING: %d %s region(s) discarded\n', n_lowdim, reason);
 end
 
 %% create the output structure
