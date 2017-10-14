@@ -365,27 +365,22 @@ classdef Opt < handle & matlab.mixin.Copyable
             crH = [Gn*alpha_x - En; -alpha_L];
             crh = [-Gn*beta_x + wn; beta_L];
             
+            if ~options.regionless
+                CR = Polyhedron(crH, crh);
+            else
+                CR = IPDPolyhedron(obj);
+                CR.Data.Primal.F = alpha_x;
+                CR.Data.Primal.g = beta_x;
+            end
+
             % Project primal optimizer back on equalities
             if ~isempty(obj.recover)
                 Lprimal = obj.recover.Y*[alpha_x, beta_x] + obj.recover.th;
                 alpha_x = Lprimal(:, 1:end-1);
                 beta_x = Lprimal(:, end);
             end
-
-            if ~options.regionless
-                CR = Polyhedron(crH, crh);
-            else
-                CR = IPDPolyhedron(size(crH, 2), options.pqp_with_equalities);
-                % we need the primal optimizer with respect to the original
-                % problem, i.e., before condensing
-                CR.Data.Primal.F = alpha_x;
-                CR.Data.Primal.g = beta_x;
-            end
-            
-            % primal optimizer
+            % Extract only requested variables from the primal optimizer
             if ~isempty(obj.varOrder) && ~isempty(obj.varOrder.requested_variables)
-                % extract only requested variables from the primal
-                % optimizer
                 alpha_x = alpha_x(obj.varOrder.requested_variables, :);
                 beta_x = beta_x(obj.varOrder.requested_variables);
             end
