@@ -184,10 +184,13 @@ if options.verbose>=0
     end
 end
 t = tic;
+counter = 0;
 for i = 1:length(AS)
     for j = 1:size(AS{i}, 1)
+        counter = counter + 1;
         if options.verbose>=0 && toc(t) > options.report_period
-            fprintf('progress: %d/%d\n', i, n_total);
+            % TODO: use a progress bar
+            fprintf('progress: %d/%d\n', counter, n_total);
             t = tic;
         end
         R = pqp.getRegion(AS{i}(j, :), region_options);
