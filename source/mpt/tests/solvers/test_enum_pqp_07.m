@@ -27,7 +27,7 @@ assert(isa(ctrl.optimizer, 'IPDPolyUnion'));
 %% toMatlab - untrimmed
 !rm -f myipd.m
 assert(isempty(dir('myipd.m')));
-toMatlab(ctrl.optimizer, 'myipd.m', 'primal');
+toMatlab(ctrl.optimizer, 'myipd.m', 'primal'); pause(1); rehash
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
@@ -41,7 +41,7 @@ end
 %% toMatlab - untrimmed, directPrimal
 !rm -f myipd.m
 assert(isempty(dir('myipd.m')));
-toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true);
+toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true); pause(1); rehash
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
@@ -63,7 +63,7 @@ assert(isa(ctrl.optimizer, 'IPDPolyUnion'));
 %% toMatlab - trimmed
 !rm -f myipd.m
 assert(isempty(dir('myipd.m')));
-toMatlab(ctrl.optimizer, 'myipd.m', 'primal');
+toMatlab(ctrl.optimizer, 'myipd.m', 'primal'); pause(1); rehash
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
@@ -77,7 +77,7 @@ end
 %% toMatlab - trimmed, directPrimal
 !rm -f myipd.m
 assert(isempty(dir('myipd.m')));
-toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true);
+toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true); pause(1); rehash
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
@@ -98,8 +98,8 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(sets.copy);
-toMatlab(ipu, 'myipd.m', 'primal');
+pu = PolyUnion(toPolyhedron(sets.copy));
+toMatlab(ipu, 'myipd.m', 'primal'); pause(1); rehash
 for i = 1:pu.Num
     ch = pu.Set(i).chebyCenter;
     [u, ~, r1] = pu.feval(ch.x, 'primal');
@@ -130,7 +130,7 @@ assert(isequal(class(ipu.Set(1)), 'IPDPolyhedron'));
 pu = PolyUnion(toPolyhedron(sets));
 assert(isequal(class(pu), 'PolyUnion'));
 assert(isequal(class(pu.Set(1)), 'Polyhedron'));
-toMatlab(ipu, 'myipd.m', 'primal', 'directPrimal', true);
+toMatlab(ipu, 'myipd.m', 'primal', 'directPrimal', true); pause(1); rehash
 for i = 1:pu.Num
     ch = pu.Set(i).chebyCenter;
     [u, ~, r1] = pu.feval(ch.x, 'primal');
