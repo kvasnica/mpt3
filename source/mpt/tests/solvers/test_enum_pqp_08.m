@@ -32,7 +32,7 @@ toC(ctrl.optimizer, 'myipdc', 'primal');
 rehash
 assert(length(dir(mexfname))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipdc_mex(ch.x);
     assert(isequal(size(z), [ctrl.N ctrl.model.nu]));
@@ -46,7 +46,7 @@ toC(ctrl.optimizer, 'myipdc', 'primal', 'directPrimal', true);
 rehash
 assert(length(dir(mexfname))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipdc_mex(ch.x);
     assert(isequal(size(z), [ctrl.N ctrl.model.nu]));
@@ -68,7 +68,7 @@ toC(ctrl.optimizer, 'myipdc', 'primal');
 rehash
 assert(length(dir(mexfname))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipdc_mex(ch.x);
     assert(isequal(size(z), [1 ctrl.model.nu]));
@@ -82,7 +82,7 @@ toC(ctrl.optimizer, 'myipdc', 'primal', 'directPrimal', true);
 rehash
 assert(length(dir(mexfname))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipdc_mex(ch.x);
     assert(isequal(size(z), [1 ctrl.model.nu]));
@@ -99,7 +99,11 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(toPolyhedron(sets.copy(), false));
+assert(isequal(class(ipu), 'IPDPolyUnion'));
+assert(isequal(class(ipu.Set(1)), 'IPDPolyhedron'));
+pu = PolyUnion(toPolyhedron(sets));
+assert(isequal(class(pu), 'PolyUnion'));
+assert(isequal(class(pu.Set(1)), 'Polyhedron'));
 toC(ipu, 'myipdc', 'primal');
 rehash
 for i = 1:pu.Num
@@ -122,7 +126,11 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(toPolyhedron(sets.copy(), false));
+assert(isequal(class(ipu), 'IPDPolyUnion'));
+assert(isequal(class(ipu.Set(1)), 'IPDPolyhedron'));
+pu = PolyUnion(toPolyhedron(sets));
+assert(isequal(class(pu), 'PolyUnion'));
+assert(isequal(class(pu.Set(1)), 'Polyhedron'));
 toC(ipu, 'myipdc', 'primal', 'directPrimal', true);
 rehash
 for i = 1:pu.Num
