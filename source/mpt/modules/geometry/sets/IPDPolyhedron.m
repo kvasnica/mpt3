@@ -1,35 +1,36 @@
 classdef IPDPolyhedron < Polyhedron
     methods
-        function obj = IPDPolyhedron(optprob)
+        function obj = IPDPolyhedron(data)
             % Polyhedron implicitly defined by primal/dual feasibility conditions
-            
-            obj.Dim = optprob.d;
-            obj.Data.OptProb = optprob;
-        end
 
-        function P = toPolyhedron(obj, reuse)
-            % Converts implicit polyhedron to explicit form
-            
-            if nargin<2
-                % ugly hack for copying of unions with trimmed functions
-                reuse = true;
+            % CR = { x | A*primal<=b+pB*x, dual>=0 }
+            %    = { x | A*(F*x+g)<=b+pB*x, M*x+m>=0 }
+            %    = { x | (A*F-pB)*x<=b-A*g, -M*x<=m }
+            %    = { x | H*x<=h }
+            A = [ data.OptProb.A*data.Primal.F-data.OptProb.pB; -data.DualIneq.F ];
+            b = [ data.OptProb.b-data.OptProb.A*data.Primal.g; data.DualIneq.g ];
+            if data.OptProb.me>0
+                Ae = data.OptProb.Ae*data.Primal.F-data.OptProb.pE;
+                be = data.OptProb.be-data.OptProb.Ae*data.Primal.g;
+                args = {'H', [A, b], 'He', [Ae, be]};
+            else
+                % cheaper construction via Polyhedron(A, b)
+                args = {A, b};
             end
-            
+            obj = obj@Polyhedron(args{:}); % must be a top-level command!
+            obj.Data = data;
+        end
+        
+        function P = toPolyhedron(obj)
+            % converts the set to Polyhedron object
+            P = [];
             for i = 1:numel(obj)
-                if reuse && isfield(obj(i).Internal, 'Polyhedron') && ...
-                        ~isempty(obj(i).Internal.Polyhedron)
-                    % extract pre-computed
-                    P(i) = obj(i).Internal.Polyhedron;
+                p = Polyhedron('H', obj(i).H, 'He', obj(i).He);
+                p.copyFunctionsFrom(obj(i));
+                if numel(P)==0
+                    P = p;
                 else
-                    % compute anew
-                    [A, b, Ae, be] = obj(i).getHalfspaces();
-                    if isempty(be)
-                        P(i) = Polyhedron(A, b);
-                    else
-                        P(i) = Polyhedron('H', [A b], 'He', [Ae be]);
-                    end
-                    P(i).copyFunctionsFrom(obj(i));
-                    obj(i).Internal.Polyhedron = P(i);
+                    P(i) = p;
                 end
             end
         end
@@ -42,55 +43,6 @@ classdef IPDPolyhedron < Polyhedron
             else
                 fprintf('Implicit polyhedron in %dD.\n', obj.Dim);
             end
-        end
-        
-        function tf = isEmptySet(obj)
-            % Checks if a given set is empty
-
-            tf = true(size(obj));
-            for i = 1:numel(obj)
-                if ~isempty(obj(i).Internal.Empty)
-                    tf(i) = obj(i).Internal.Empty;
-                else
-                    % slow but simple:
-                    tf(i) = isEmptySet(toPolyhedron(obj(i)));
-                    
-                    % faster: solve a feasibility LP
-                    % NOTE: this fails big time with test_enum_pqp_10
-                    %[A, b, Ae, be] = obj(i).getHalfspaces();
-                    %tf(i) = fast_isEmptySet([A b], [Ae be]);
-                    
-                    obj(i).Internal.Empty = tf(i);
-                end
-            end
-        end
-        
-        function tf = isFullDim(obj)
-            % Checks if a given set is fully dimensional
-            
-            tf = true(size(obj));
-            for i = 1:numel(obj)
-                if ~isempty(obj(i).Internal.FullDim)
-                    tf(i) = obj(i).Internal.FullDim;
-                else
-                    % slow but simple:
-                    tf(i) = isFullDim(toPolyhedron(obj(i)));
-                    
-                    % faster: solve a feasibility LP
-                    % NOTE: this fails big time with test_enum_pqp_10
-                    %[A, b, Ae, be] = obj(i).getHalfspaces();
-                    %tf(i) = fast_isFullDim([A b], [Ae be]);
-                    
-                    obj(i).Internal.FullDim = tf(i);
-                    if tf(i)
-                        obj(i).Internal.Empty = false;
-                    end
-                end
-            end
-        end
-        
-        function tf = isBounded(obj)
-            tf = isBounded(toPolyhedron(obj));
         end
         
         function tf = contains(P, x, varargin)
@@ -107,7 +59,6 @@ classdef IPDPolyhedron < Polyhedron
             
             tf = false(size(P));
             for i = 1:numel(P)
-                %dual = P(i).Functions('dual-ineqlin').feval(x);
                 dual_f = P(i).Data.DualIneq;
                 dual = dual_f.F*x+dual_f.g;
                 if isempty(dual), dual=zeros(1, P(i).Dim); end
@@ -132,38 +83,5 @@ classdef IPDPolyhedron < Polyhedron
             end
         end
     end
-    
-	methods (Access=protected)
-		
-		% function prototypes (plotting methods must remain protected)
-        function h = fplot_internal(obj, varargin)
-            h = fplot_internal(toPolyhedron(obj), varargin{:});
-        end
-        
-        function h = plot_internal(obj, varargin)
-            h = plot_internal(toPolyhedron(obj), varargin{:});
-        end
-        
-        function [A, b, Ae, be] = getHalfspaces(obj)
-            % Returns the half-space representation of the implicit
-            % polyhedron
-            
-            prob = obj.Data.OptProb;
-            primal = obj.Data.Primal;
-            dual = obj.Data.DualIneq;
-            % CR = { x | A*primal<=b+pB*x, dual>=0 }
-            %    = { x | A*(F*x+g)<=b+pB*x, M*x+m>=0 }
-            %    = { x | (A*F-pB)*x<=b-A*g, -M*x<=m }
-            %    = { x | H*x<=h }
-            A = [ prob.A*primal.F-prob.pB; -dual.F ];
-            b = [ prob.b-prob.A*primal.g; dual.g ];
-            if prob.me>0
-                Ae = prob.Ae*primal.F-prob.pE;
-                be = prob.be-prob.Ae*primal.g;
-            else
-                Ae = zeros(0, size(A, 2)); be = zeros(0, 1);
-            end
-        end
-	end
-    
+       
 end

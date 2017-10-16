@@ -368,9 +368,13 @@ classdef Opt < handle & matlab.mixin.Copyable
             if ~options.regionless
                 CR = Polyhedron(crH, crh);
             else
-                CR = IPDPolyhedron(obj);
-                CR.Data.Primal.F = alpha_x;
-                CR.Data.Primal.g = beta_x;
+                data.ActiveSet = A;
+                data.OptProb = obj;
+                data.Primal.F = alpha_x;
+                data.Primal.g = beta_x;
+                data.DualIneq.F = alpha_L;
+                data.DualIneq.g = beta_L;
+                CR = IPDPolyhedron(data);
             end
 
             % Project primal optimizer back on equalities
@@ -396,11 +400,6 @@ classdef Opt < handle & matlab.mixin.Copyable
             CR.addFunction(z, 'primal');
             CR.addFunction(J, 'obj');
             CR.addFunction(L, 'dual-ineqlin');
-            CR.Data.ActiveSet = A;
-            if options.regionless
-                CR.Data.DualIneq.F = aL(A, :);
-                CR.Data.DualIneq.g = bL(A);
-            end
         end
         
         function [A, sol] = getActiveSetForPoint(obj, theta)

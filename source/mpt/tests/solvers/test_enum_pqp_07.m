@@ -31,7 +31,7 @@ toMatlab(ctrl.optimizer, 'myipd.m', 'primal');
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipd(ch.x);
     assert(isequal(size(z), [ctrl.N ctrl.model.nu]));
@@ -45,7 +45,7 @@ toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true);
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipd(ch.x);
     assert(isequal(size(z), [ctrl.N ctrl.model.nu]));
@@ -67,7 +67,7 @@ toMatlab(ctrl.optimizer, 'myipd.m', 'primal');
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipd(ch.x);
     assert(isequal(size(z), [1 ctrl.model.nu]));
@@ -81,7 +81,7 @@ toMatlab(ctrl.optimizer, 'myipd.m', 'primal', 'directPrimal', true);
 rehash
 assert(length(dir('myipd.m'))==1); % the file was created
 for i = 1:ctrl.optimizer.Num
-    ch=ctrl.optimizer.Set(i).toPolyhedron().chebyCenter;
+    ch=ctrl.optimizer.Set(i).chebyCenter;
     u = ctrl.optimizer.feval(ch.x, 'primal');
     [z, r] = myipd(ch.x);
     assert(isequal(size(z), [1 ctrl.model.nu]));
@@ -98,7 +98,7 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(toPolyhedron(sets.copy(), false));
+pu = PolyUnion(sets.copy);
 toMatlab(ipu, 'myipd.m', 'primal');
 for i = 1:pu.Num
     ch = pu.Set(i).chebyCenter;
@@ -125,7 +125,11 @@ end
 idx = randperm(ctrl.optimizer.Num);
 sets = ctrl.optimizer.Set(idx);
 ipu = IPDPolyUnion(sets);
-pu = PolyUnion(toPolyhedron(sets.copy(), false));
+assert(isequal(class(ipu), 'IPDPolyUnion'));
+assert(isequal(class(ipu.Set(1)), 'IPDPolyhedron'));
+pu = PolyUnion(toPolyhedron(sets));
+assert(isequal(class(pu), 'PolyUnion'));
+assert(isequal(class(pu.Set(1)), 'Polyhedron'));
 toMatlab(ipu, 'myipd.m', 'primal', 'directPrimal', true);
 for i = 1:pu.Num
     ch = pu.Set(i).chebyCenter;
