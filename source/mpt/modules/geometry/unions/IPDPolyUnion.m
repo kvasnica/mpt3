@@ -19,7 +19,7 @@ classdef IPDPolyUnion < PolyUnion
             obj.Data.OptProb = sets(1).Data.OptProb;
         end
         
-        function toC(obj, filename, function_to_export, tiebreak)
+        function toC(obj, filename, function_to_export, varargin)
             % Exports evaluation of a given function to a C code
             %
             %   obj.toC(filename, function_to_export)
@@ -39,12 +39,9 @@ classdef IPDPolyUnion < PolyUnion
             % (in fact, the compiled mex) is obtained by running codegen
             % on the Matlab export obtained via obj.toMatlab().
 
-            narginchk(3, 4);
-            if nargin<4
-                tiebreak = 'first-region';
-            end
+            narginchk(3, Inf);
             % TODO: tailored C code generation without codegen
-            mfname = obj.toMatlab(filename, function_to_export, tiebreak);
+            mfname = obj.toMatlab(filename, function_to_export, varargin{:});
             fname = mfname(1:end-2); % strip the '.m' extension
             fprintf('Calling codegen on "%s"...\n', mfname);
             cmd = sprintf('codegen %s -args {zeros(%d,1)}', mfname, obj.Dim);
@@ -52,7 +49,7 @@ classdef IPDPolyUnion < PolyUnion
             fprintf('Function "%s" exported to "%s_mex.%s"\n', function_to_export, fname, mexext);
         end
         
-        function f_name = toMatlab(obj, filename, function_to_export, tiebreak)
+        function f_name = toMatlab(obj, filename, function_to_export, varargin)
             % Exports evaluation of a given function to a matlab code
             %
             %   obj.toMatlab(filename, function_to_export)
@@ -67,20 +64,29 @@ classdef IPDPolyUnion < PolyUnion
             %
             % The function value Z is obtained by sequentially checking all
             % optimal active sets.
+            %
+            % If obj.toMatlab(fname, fun2export, 'directPrimal', false) is
+            % used, which is the default, then primal variables are
+            % computed from the duals. This leads to less data being
+            % stored, but more on-line computations performed. If
+            % directPrimal=true, we store the parametric primal optimizer.
             
             global MPTOPTIONS
             
-            tolerance = MPTOPTIONS.abs_tol;
-            narginchk(3, 4);
-            if nargin<4
-                tiebreak = 'first-region';
-            end
+            narginchk(2, Inf);
+            p = inputParser;
+            p.addOptional('tiebreak', 'first-region');
+            p.addParameter('tolerance', MPTOPTIONS.abs_tol);
+            p.addParameter('directPrimal', false);
+            p.parse(varargin{:});
+            options = p.Results;
+            
             % TODO: support multiple unions
             assert(numel(obj)==1, 'Single union please.');
             assert(obj.hasFunction(function_to_export), 'No such function "%s" in the union.', function_to_export);
             
             % TODO: support generic tiebreaks
-            assert(isequal(tiebreak, 'first-region'), 'Only the "first-region" tiebreak is supported for now.');
+            assert(isequal(options.tiebreak, 'first-region'), 'Only the "first-region" tiebreak is supported for now.');
             % TODO: support problems with equalities
             assert(obj.Data.OptProb.me==0, 'Problems with equality constraints not yet supported.');
 
@@ -95,6 +101,7 @@ classdef IPDPolyUnion < PolyUnion
             
             fprintf(fid, 'function [z,i] = %s(x) %%#codegen\n', fun_name);
             fprintf(fid, '%% [zopt, region] = %s(x)\n', fun_name);
+            fprintf(fid, '%%\n');
             fprintf(fid, '%% codegen %s -args {zeros(%d,1)}\n', f_name, obj.Dim);
             fprintf(fid, 'assert(isreal(x));\n');
             fprintf(fid, 'assert(size(x,1)==%d);\n', obj.Dim);
@@ -102,9 +109,10 @@ classdef IPDPolyUnion < PolyUnion
             fprintf(fid, 'xh=[x;1];\n');
             
             % constraints G*z<=w+E*x+tol
+            fprintf(fid, '%% primal constraints: G*z<=w+E*x+tol\n');
             fprintf(fid, 'G=%s;\n', mat2str(obj.Data.OptProb.A));
             fprintf(fid, 'Ew=%s;\n', mat2str([obj.Data.OptProb.pB obj.Data.OptProb.b]));
-            fprintf(fid, 'Ewxt=Ew*xh+%g;\n', tolerance);
+            fprintf(fid, 'Ewxt=Ew*xh+%g;\n', options.tolerance);
             
             % duals and number of duals
             D = []; nD = [];
@@ -119,17 +127,43 @@ classdef IPDPolyUnion < PolyUnion
                 D = [D; duals];
             end
             nD = cumsum([1; nD]); % because we have a variable number of duals
+            fprintf(fid, '%% duals d=D*[x;1] and number of duals\n');
             fprintf(fid, 'D=%s;\n', mat2str(D));
             fprintf(fid, 'nD=%s;\n', mat2str(nD));
             
-            % primals for KKT conditions
-            P = [];
-            for i = 1:obj.Num
-                primal_fun = obj.Set(i).Data.Primal;
-                P = [P; primal_fun.F, primal_fun.g];
+            if options.directPrimal
+                % primals for KKT conditions
+                P = [];
+                for i = 1:obj.Num
+                    primal_fun = obj.Set(i).Data.Primal;
+                    P = [P; primal_fun.F, primal_fun.g];
+                end
+                nP = length(obj.Set(1).Data.Primal.g);
+                fprintf(fid, '%% primals p=P*[x;1]\n');
+                fprintf(fid, 'P=%s;\n', mat2str(P));
+            else
+                % recover primal via duals:
+                % From optimality condition: H*z + pF*x + f + Ga'*La =  0
+                % it follows that z = -inv(H)*(pF*x + f + Ga'*La).
+                % But we store directly the inverse of the Hessian
+                H = inv(obj.Data.OptProb.H);
+                pFf=[obj.Data.OptProb.pF obj.Data.OptProb.f];
+                fprintf(fid, '%% inverted Hessian\n');
+                fprintf(fid, 'Hi=%s;\n', mat2str(H));
+                fprintf(fid, '%% pF*x+f\n');
+                fprintf(fid, 'pFf=%s;\n', mat2str(pFf));
+                % need to store active sets
+                AS = [];
+                for i = 1:obj.Num
+                    as = obj.Set(i).Data.ActiveSet;
+                    if isempty(as), as = 0; end
+                    AS = [AS; as(:)];
+                end
+                fprintf(fid, '%% active sets (indexed via nD)\n');
+                fprintf(fid, 'A=%s;\n', mat2str(AS)); % the active set
+                fprintf(fid, '%% inv(H)*(pF*x+f)\n');
+                fprintf(fid, 'HpFfx=Hi*(pFf*xh);\n');
             end
-            nP = length(obj.Set(1).Data.Primal.g);
-            fprintf(fid, 'P=%s;\n', mat2str(P));
             
             % function to be evaluated
             Z = [];
@@ -140,14 +174,30 @@ classdef IPDPolyUnion < PolyUnion
                 Z = [Z; fun.F, fun.g];
             end
             nZ = length(fun.g);
+            fprintf(fid, '%% function to evaluate z=Z*[x;1]\n');
             fprintf(fid, 'Z=%s;\n', mat2str(Z));
             
             % sequential search
             fprintf(fid, 'for i=1:%d\n', obj.Num);
+            fprintf(fid, '\t%% compute duals\n');
             fprintf(fid, '\td=D(nD(i):nD(i+1)-1,:)*xh;\n');
-            fprintf(fid, '\tif all(d>=%g)\n', -tolerance); % if all duals non-negative
-            fprintf(fid, '\t\tp=P((i-1)*%d+1:i*%d,:)*xh;\n', nP, nP); % evaluate primals
+            fprintf(fid, '\tif all(d>=%g)\n', -options.tolerance); % if all duals non-negative
+            fprintf(fid, '\t\t%% all duals non-negative, compute primals\n');
+            if options.directPrimal
+                fprintf(fid, '\t\tp=P((i-1)*%d+1:i*%d,:)*xh;\n', nP, nP); % evaluate primals
+            else
+                fprintf(fid, '\t\ta=A(nD(i):nD(i+1)-1);\n');
+                fprintf(fid, '\t\tif a(1)==0\n');
+                %fprintf(fid, '\t\t\tp=-Hi*(pFfx);\n');
+                fprintf(fid, '\t\t\tp=-HpFfx;\n');
+                fprintf(fid, '\t\telse\n');
+                %fprintf(fid, '\t\t\tp=-Hi*(pFfx+G(a,:)''*d);\n');
+                fprintf(fid, '\t\t\tp=-HpFfx-Hi*(G(a,:)''*d);\n');
+                fprintf(fid, '\t\tend\n');
+                % recover primal from dual
+            end
             fprintf(fid, '\t\tif all(G*p<=Ewxt)\n'); % if all primals feasible
+            fprintf(fid, '\t\t\t%% all primals feasible\n');
             fprintf(fid, '\t\t\tz=Z((i-1)*%d+1:i*%d,:)*xh;\n', nZ, nZ); % evaluate function + return
             fprintf(fid, '\t\t\treturn\n');
             fprintf(fid, '\t\tend\n'); % endif all primals feasible
