@@ -26,13 +26,13 @@ function sol = mpt_enum_pqp(pqp, options)
 %     .prune_infeasible: if true, list of candidate active sets is pruned
 %                        by removing entries that were previously
 %                        discovered as infeasible (default=true)
-%         .feasible_set: if 'projection', the set of feasible parameters is
-%                        computed by projection. If 'regions', the set is
-%                        calculcated by exploring which facets of critical
-%                        regions are at the boundary of the feasible set.
-%                        If 'outerbox', the feasible set is costructed as the
-%                        outer box approximation of the union of critical
-%                        regions. (default='regions')
+%         .feasible_set: if 'regions' (default), the feasible set is
+%                        identical to critical regions. If 'projection', 
+%                        the set of feasible parameters is computed by
+%                        projection. If 'outerbox', the feasible set is
+%                        costructed as the outer box approximation of the
+%                        union of critical regions. If 'rn', the feasible
+%                        set is returned as R^n. (default='regions')
 %     .remove_redundant: if true, redundant inequalities will be detected
 %                        and removed from the pQP (default=true)
 %              .exclude: array of constraints to exclude (default=[])
@@ -105,10 +105,6 @@ elseif ~isequal(lower(pqp.problem_type), 'qp') || ~pqp.isParametric
     error('The first input must be a parametric QP.');
 end
 
-if ~options.regions && ~isequal(options.feasible_set, 'Rn')
-    fprintf('Forcing options.feasible_set=''Rn''.\n');
-    options.feasible_set = 'Rn';
-end
 if ~isempty(options.exclude) && options.remove_redundant
     fprintf('Forcing options.remove_redundant=false since options.exclude is not empty.\n');
     options.remove_redundant = false;
@@ -247,12 +243,12 @@ else
             fprintf('Constructing the feasible set...\n');
         end
     end
-
+    % TODO: use IPDXUPolyhedron as the implicit feasible set
     switch lower(options.feasible_set)
         case 'projection'
             K = pqp.feasibleSet();
         case 'regions'
-            K = pqp.feasibleSet(regions);
+            K = regions;
         case 'outerbox'
             K = PolyUnion(regions).outerApprox();
         case 'rn'
@@ -261,31 +257,27 @@ else
             error('Unknown settings "%s" for options.feasible_set.', ...
                 options.feasible_set)
     end
-    % eliminate redundancies
-    K.minHRep();
     if options.verbose>=0 && ~isequal(lower(options.feasible_set), 'rn')
         fprintf('...done (%.1f seconds)\n', etime(clock, start_t));
     end
 
     % create the polyunion
     if options.regions
-        bounded = all(regions.isBounded());
         sol.xopt = PolyUnion('Set', regions, ...
-            'Domain', K, ...
             'Convex', true, ...
             'Overlaps', false, ...
-            'Bounded', bounded, ...
-            'Connected', true, ...
-            'FullDim', true);
+            'FullDim', true, ...
+            'Domain', K);
     else
         sol.xopt = IPDPolyUnion(regions);
     end
-    if (K.isFullSpace() && ~isequal(lower(options.feasible_set), 'rn')) || ~K.isFullDim()
-        fprintf('WARNING: construction of the feasible set failed, the solution may contain holes!\n')
-    else
-        sol.xopt.setInternal('convexHull', K);
+    if numel(K)==1
+        if (K.isFullSpace() && ~isequal(lower(options.feasible_set), 'rn')) || ~K.isFullDim()
+            fprintf('WARNING: construction of the feasible set failed, the solution may contain holes!\n')
+        else
+            sol.xopt.setInternal('convexHull', K);
+        end
     end
-    
     sol.exitflag = MPTOPTIONS.OK;
     sol.how = 'ok';
 end

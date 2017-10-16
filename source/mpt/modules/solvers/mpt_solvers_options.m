@@ -708,13 +708,13 @@ options.sedumi.errors = 0;
 %                        discovered as infeasible (default=true)
 options.enum_pqp.prune_infeasible = true;
 
-%         .feasible_set: if 'projection', the set of feasible parameters is
-%                        computed by projection. If 'regions', the set is
-%                        calculcated by exploring which facets of critical
-%                        regions are at the boundary of the feasible set.
-%                        If 'outerbox', the feasible set is costructed as the
-%                        outer box approximation of the union of critical
-%                        regions. (default='projection')
+%         .feasible_set: if 'regions' (default), the feasible set is
+%                        identical to critical regions. If 'projection', 
+%                        the set of feasible parameters is computed by
+%                        projection. If 'outerbox', the feasible set is
+%                        costructed as the outer box approximation of the
+%                        union of critical regions. If 'rn', the feasible
+%                        set is returned as R^n. (default='regions')
 options.enum_pqp.feasible_set = 'regions';
 
 % if .remove_redundant=true, redundant inequalities will be removed from
