@@ -163,10 +163,7 @@ if options.verbose>0
 end
 % merge optimal and degenerate active sets
 AS = [Aopt, Adeg];
-n_total = 0;
-for i = 1:length(AS)
-    n_total = n_total + size(AS{i}, 1);
-end
+n_total=sum(cellfun('length', AS));
 
 %% recover regions, optimizers and the cost function
 regions = [];
@@ -176,18 +173,22 @@ if options.verbose>=0
     if options.regions
         fprintf('Constructing regions and parametric optimizers...\n');
     else
-        fprintf('Constructing parametric optimizers...\n');
+        fprintf('Constructing parametric optimizers: ');
     end
 end
 t = tic;
 counter = 0;
+first_display = true;
 for i = 1:length(AS)
     for j = 1:size(AS{i}, 1)
         counter = counter + 1;
-        if options.verbose>=0 && toc(t) > options.report_period
-            % TODO: use a progress bar
-            fprintf('progress: %d/%d\n', counter, n_total);
-            t = tic;
+        if options.verbose>=0 && (toc(t)>options.report_period || counter==n_total)
+            if ~first_display
+                fprintf(repmat('\b', 1, 4));
+            end
+            fprintf('%3d%%', min(100, ceil(100*counter/n_total)));
+            t=tic;
+            first_display = false;
         end
         R = pqp.getRegion(AS{i}(j, :), region_options);
         if isequal(options.accept_regions, 'fulldim')
@@ -208,7 +209,7 @@ for i = 1:length(AS)
     %regions = [regions, R];
 end
 if options.verbose>=0
-    fprintf('...done (%.1f seconds)\n', etime(clock, start_t));
+    fprintf(' done (%.1f seconds)\n', etime(clock, start_t));
 end
 if options.verbose>=0 && n_lowdim > 0
     if isequal(options.accept_regions, 'fulldim')
