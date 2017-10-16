@@ -3,12 +3,14 @@ classdef IPDPolyhedron < Polyhedron
         function obj = IPDPolyhedron(data)
             % Polyhedron implicitly defined by primal/dual feasibility conditions
 
+            global MPTOPTIONS
             % CR = { x | A*primal<=b+pB*x, dual>=0 }
             %    = { x | A*(F*x+g)<=b+pB*x, M*x+m>=0 }
             %    = { x | (A*F-pB)*x<=b-A*g, -M*x<=m }
             %    = { x | H*x<=h }
             A = [ data.OptProb.A*data.Primal.F-data.OptProb.pB; -data.DualIneq.F ];
             b = [ data.OptProb.b-data.OptProb.A*data.Primal.g; data.DualIneq.g ];
+            b = b + MPTOPTIONS.modules.solvers.enum_pqp.ineq_backoff; % backoff tuned w.r.t. test_enum_pqp_10
             if data.OptProb.me>0
                 Ae = data.OptProb.Ae*data.Primal.F-data.OptProb.pE;
                 be = data.OptProb.be-data.OptProb.Ae*data.Primal.g;

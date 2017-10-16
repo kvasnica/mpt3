@@ -725,3 +725,6 @@ options.enum_pqp.remove_redundant = true;
 % If .accept_regions='nonempty', also flat (lower-dimensiona) regions will
 % be returned
 options.enum_pqp.accept_regions = 'fulldim';
+
+% Backoff for inequality constraints in IPDPolyhedron
+options.enum_pqp.ineq_backoff = 1e-9;
