@@ -57,7 +57,11 @@ classdef IPDPolyhedron < Polyhedron
             tolerance = MPTOPTIONS.abs_tol;
             
             narginchk(2, 3);
-            assert(isnumeric(x), 'The argument must be a real vector.');
+            if ~isnumeric(x)
+                % containment of sets
+                tf = contains@Polyhedron(P, x, varargin{:});
+                return
+            end
             
             tf = false(size(P));
             for i = 1:numel(P)

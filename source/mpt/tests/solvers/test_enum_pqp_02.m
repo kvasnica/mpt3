@@ -113,6 +113,14 @@ assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
 
+%% test IPDPolyhedron/contains
+assert(isa(sol.xopt.Set(1), 'IPDPolyhedron'));
+assert(~(sol.xopt.Set(1)==sol.xopt.Set(2)));
+assert((sol.xopt.Set(1)==sol.xopt.Set(1)));
+assert((sol.xopt.Set(1)~=sol.xopt.Set(2)));
+assert(sol.xopt.Set(1).contains(sol.xopt.Set(1)));
+
+
 end
 
 function check_primal(sol)
