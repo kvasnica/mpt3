@@ -32,13 +32,12 @@ end
 check_primal(sol);
 figure; sol.xopt.plot(); drawnow
 assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
-assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
+assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-based
 
 %% direct call to mpt_enum_pqp without eliminateEquations
 pqp = Opt(d.constraints, d.objective, d.internal.parameters, d.variables.u(:));
@@ -56,13 +55,12 @@ end
 check_primal(sol);
 figure; sol.xopt.plot(); drawnow
 assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
-assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
+assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-based
 
 % %% FIXME: direct call to mpt_enum_pqp with eliminateEquations
 % pqp = Opt(d.constraints, d.objective, d.internal.parameters, d.variables.u(:));
@@ -105,13 +103,12 @@ end
 figure; sol.xopt.plot(); drawnow
 assert(any(sol.xopt.Set.contains([4.5; 0]))); % [4.5; 0] must be covered
 check_primal(sol);
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
-assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-less
+assert(isa(sol.xopt.Set(1), 'IPDPolyhedron')); % must be region-based
 
 %% test IPDPolyhedron/contains
 assert(isa(sol.xopt.Set(1), 'IPDPolyhedron'));

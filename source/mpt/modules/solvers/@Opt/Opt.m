@@ -315,7 +315,10 @@ classdef Opt < handle & matlab.mixin.Copyable
             if nargin<3
                 options = [];
             end
+            % TODO: use inputParser
             options = mpt_defaultOptions(options, 'regionless', false, 'pqp_with_equalities', obj);
+            
+            A(A==0) = []; % depad zeros
             
             % TODO: resolve primal degeneracy
             assert(numel(A)<=obj.n, 'Primally degenerate active set.');
@@ -485,6 +488,8 @@ classdef Opt < handle & matlab.mixin.Copyable
             
             % TODO: support pLPs, pLCPs, QPs, LPs, LCPs
             assert(isequal(lower(obj.problem_type), 'qp'), 'Only (p)QPs are supported for now.');
+            
+            A(A==0) = []; % depad zeros
             
             nlps = 0;
             Ga = obj.A(A, :);
@@ -695,7 +700,15 @@ classdef Opt < handle & matlab.mixin.Copyable
                 fprintf('...done (%.1f seconds, %d LPs)\n', etime(clock, start_t), nlps);
             end
             
-            % TODO: return results as zero-padded matrices
+            % convert cells to zero-padded matrices
+            Aopt = sub_cell2mat_pad(Aopt, obj.n);
+            Adeg = sub_cell2mat_pad(Adeg, obj.n);
+            Afeas = sub_cell2mat_pad(Afeas, obj.n);
+            Ainfeas = sub_cell2mat_pad(Ainfeas, obj.n);
+            if Afeas(1, 1)==-1
+                % remove a dummy row
+                Afeas = Afeas(2:end, :);
+            end
         end
 
     end
@@ -773,6 +786,22 @@ classdef Opt < handle & matlab.mixin.Copyable
         end
  
     end
+end
+
+function M = sub_cell2mat_pad(A, n)
+
+n_elements = 0;
+for i = 1:numel(A)
+    n_elements = n_elements + size(A{i}, 1);
+end
+M = zeros(n_elements, n);
+start_idx = 1;
+for i = 1:numel(A)
+    end_idx = start_idx+size(A{i}, 1);
+    M(start_idx:end_idx-1, 1:size(A{i}, 2)) = A{i};
+    start_idx = end_idx;
+end
+
 end
 
 function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = sub_exploreLevel(pqp, level, feasible, infeasible, options)

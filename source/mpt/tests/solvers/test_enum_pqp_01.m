@@ -27,11 +27,10 @@ for i = 1:sol.xopt.Num
     assert(sol.xopt.Set(i).Functions('primal').D==2);
 end
 check_primal(sol);
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
 
@@ -47,11 +46,10 @@ for i = 1:sol.xopt.Num
     assert(sol.xopt.Set(i).Functions('primal').D==2);
 end
 check_primal(sol);
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
 
@@ -68,11 +66,10 @@ for i = 1:sol.xopt.Num
     assert(sol.xopt.Set(i).Functions('primal').D==2);
 end
 check_primal(sol);
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
 
@@ -88,11 +85,10 @@ for i = 1:sol.xopt.Num
     assert(sol.xopt.Set(i).Functions('primal').D==2);
 end
 check_primal(sol);
-assert(iscell(sol.stats.Aoptimal));
-assert(length(sol.stats.Aoptimal)==5);
-assert(isequal(cellfun('length', sol.stats.Aoptimal), [1 6 8 4 4]));
-assert(isequal(cellfun('length', sol.stats.Afeasible), [1 14 68 140 4]));
-assert(isequal(cellfun('length', sol.stats.Ainfeasible), [0 2 23 10 128]));
+assert(isequal(size(sol.stats.Aoptimal), [23 4]));
+assert(isequal(size(sol.stats.Adegenerate), [0 4]));
+assert(isequal(size(sol.stats.Afeasible), [227 4]));
+assert(isequal(size(sol.stats.Ainfeasible), [163 4]));
 assert(sol.stats.nLPs==595);
 assert(isa(sol.xopt.Set(1), 'Polyhedron')); % must be region-based
 

@@ -167,8 +167,8 @@ if options.verbose>0
         etime(clock, start_t), nlps);
 end
 % merge optimal and degenerate active sets
-AS = [Aopt, Adeg];
-n_total=sum(cellfun('length', AS));
+AS = [Aopt; Adeg];
+n_total = size(AS, 1);
 
 %% recover regions, optimizers and the cost function
 regions = [];
@@ -182,36 +182,31 @@ if options.verbose>=0
     end
 end
 t = tic;
-counter = 0;
 first_display = true;
-for i = 1:length(AS)
-    for j = 1:size(AS{i}, 1)
-        counter = counter + 1;
-        if options.verbose>=0 && (toc(t)>options.report_period || counter==n_total)
-            if ~first_display
-                fprintf(repmat('\b', 1, 4));
-            end
-            fprintf('%3d%%', min(100, ceil(100*counter/n_total)));
-            t=tic;
-            first_display = false;
+for i = 1:size(AS, 1)
+    if options.verbose>=0 && (toc(t)>options.report_period || i==n_total)
+        if ~first_display
+            fprintf(repmat('\b', 1, 4));
         end
-        R = pqp.getRegion(AS{i}(j, :), region_options);
-        if isequal(options.accept_regions, 'fulldim')
-            accept = R.isFullDim();
+        fprintf('%3d%%', min(100, ceil(100*i/n_total)));
+        t=tic;
+        first_display = false;
+    end
+    R = pqp.getRegion(AS(i, :), region_options);
+    if isequal(options.accept_regions, 'fulldim')
+        accept = R.isFullDim();
+    else
+        accept = ~R.isEmptySet();
+    end
+    if ~accept
+        n_lowdim = n_lowdim + 1;
+    else
+        if isempty(regions)
+            regions = R;
         else
-            accept = ~R.isEmptySet();
-        end
-        if ~accept
-            n_lowdim = n_lowdim + 1;
-        else
-            if isempty(regions)
-                regions = R;
-            else
-                regions(end+1) = R;
-            end
+            regions(end+1) = R;
         end
     end
-    %regions = [regions, R];
 end
 if options.verbose>=0
     fprintf(' done (%.1f seconds)\n', etime(clock, start_t));
