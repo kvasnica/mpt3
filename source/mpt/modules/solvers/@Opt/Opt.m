@@ -620,6 +620,84 @@ classdef Opt < handle & matlab.mixin.Copyable
                 end
             end
         end
+        
+        function [Aopt, Adeg, Afeas, Ainfeas, nlps] = enumerateActiveSets(obj, varargin)
+            % Enumerates all optimal combinations of active sets
+            %
+            %   [Aopt, Adeg, Afeas, Ainfeas, nLPs] = obj.enumerateActiveSets()
+            %
+            % Aopt: optimal active sets
+            % Adeg: degenerate active sets
+            % Afeas: feasible active sets
+            % Ainfeas: infeasible active sets
+            % nLPs: number of LPs needed to find the sets
+            %
+            %    obj.enumerateActiveSets('opt1', value1, 'opt2', value2, ...)
+            %
+            % Supported options:
+            %    'verbose': level of verbosity
+            %    'prune_infeasible': if true (default), infeasible active
+            %                        sets are not followed
+            %    'exclude': list of indices of constraints to exclude
+            
+            global MPTOPTIONS
+            if isempty(MPTOPTIONS)
+                MPTOPTIONS=mptopt;
+            end
+            p = inputParser;
+            p.addParamValue('verbose', MPTOPTIONS.verbose);
+            p.addParamValue('report_period', MPTOPTIONS.report_period);
+            p.addParamValue('prune_infeasible', true);
+            p.addParamValue('exclude', []);
+            p.KeepUnmatched = true;
+            p.parse(varargin{:});
+            options = p.Results;
+
+            % TODO: support pLPs, pLCPs, LPs, LCPs
+            assert(isequal(lower(obj.problem_type), 'qp'), 'Only (p)QPs are supported for now.');
+            
+            start_t = clock;
+            
+            % is the case with no active constraints optimal?
+            [feasible, nlps] = obj.checkActiveSet([]);
+            if feasible
+                % yep, include the case into list of non-degenerate optimal active sets
+                Aopt = {0};
+                Afeas = {0};
+            else
+                % nope, start with an empty list
+                Aopt = {[]};
+                Afeas = {-1};
+            end
+            Adeg = {[]};
+            Ainfeas = {[]};
+            
+            if options.verbose>=0
+                fprintf('Level    Total Candidates Optimal Degenerate Feasible Infeasible Rankdef       LPs\n');
+            end
+            
+            % since we have "nz" optimization variables and a strictly convex QP, at
+            % most "nz" constraints will be active at the optimum
+            for i = 1:obj.n
+                if options.verbose>=0
+                    fprintf('%2d/%2d', i, obj.n);
+                end
+                % explore all nodes in this level, provide unique list of feasible
+                % constraints and all previously discovered infeasible combinations
+                [Ao, Ad, Af, Ai, nlp] = sub_exploreLevel(obj, i, Afeas{end}, Ainfeas, options);
+                nlps = nlps + nlp;
+                Aopt{i+1} = Ao;    % optimal active sets
+                Adeg{i+1} = Ad;    % degenerate active sets
+                Afeas{i+1} = Af;   % feasible active sets
+                Ainfeas{i+1} = Ai; % infeasible active sets
+            end
+            if options.verbose>=0
+                fprintf('...done (%.1f seconds, %d LPs)\n', etime(clock, start_t), nlps);
+            end
+            
+            % TODO: return results as zero-padded matrices
+        end
+
     end
     
 %     methods
@@ -695,4 +773,140 @@ classdef Opt < handle & matlab.mixin.Copyable
         end
  
     end
+end
+
+function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = sub_exploreLevel(pqp, level, feasible, infeasible, options)
+% Checks feasibility/optimality of each n-combination of active constraints
+%
+% Syntax:
+% -------
+%
+% [Ao, Ad, Af, Ai] = exploreLevel(pqp, level, feasible, infeasible, options)
+%
+% Inputs:
+% -------
+%             pqp: matrices of the pQP formulation
+%           level: index of the level (integer)
+%        feasible: cell array of feasible active sets at the previous level
+%      infeasible: cell array of infeasible active sets at each level
+% options.verbose: if >=0, progress will be displayed
+%
+% Outputs:
+% --------
+%           Ao: m-by-n matrix of optimal active sets (n=level)
+%           Ad: m-by-n matrix of degenerate optimal active sets
+%           Af: m-by-n matrix of non-optimal feasible active sets
+%           Ai: m-by-n matrix of infeasible active sets
+%               (includes rank-defficient active sets)
+%         nlps: number of LPs solved on this level
+
+AllFeasible = unique(feasible(:));
+% pre-alocate arrays
+Aopt = zeros(size(feasible, 1)*length(AllFeasible), level);
+Adeg = zeros(size(feasible, 1)*length(AllFeasible), level);
+Afeasible = zeros(size(feasible, 1)*length(AllFeasible), level);
+Ainfeasible = zeros(size(feasible, 1)*length(AllFeasible), level);
+n_feasible = 0;
+n_opt = 0;
+n_deg = 0;
+n_infeasible = 0;
+n_rankdef = 0;
+n_candidates = 0;
+nlps = 0;
+n_pruned = 0;
+t=tic;
+first_display = true;
+for i = 1:size(feasible, 1)
+    if level==1
+        candidates = 1:pqp.m;
+    else
+        candidates = AllFeasible(AllFeasible>max(feasible(i, :)));
+    end
+    if ~isempty(options.exclude)
+        % remove user-defined constraints to be excluded
+        candidates = setdiff(candidates, options.exclude);
+    end
+    for j = candidates(:)'
+        if level==1
+            Atry = j;
+        else
+            Atry = [feasible(i, :), j];
+        end
+        
+        % remove previously known infeasible combinations
+        %
+        % we only need to do this from the 3rd level upwards, since on the 2nd
+        % level the lists of feasible and infeasible constraints are mutually
+        % exclusive, hence nodes are not poluted by any infeasible constraints
+        do_check = true;
+        if level>2 && options.prune_infeasible
+            % check if Atry contains any sequence listed in "infeasible"
+            for j = 2:length(infeasible)
+                m = ismembc(infeasible{j}, Atry); % fastest implementation
+                if any(sum(m, 2)==size(infeasible{j}, 2))
+                    % Atry contains all entries from at least one row of
+                    % "infeasible", therefore it can be removed
+                    do_check = false;
+                    n_pruned = n_pruned+1;
+                    break
+                end
+            end
+        end
+        if do_check
+            n_candidates = n_candidates + 1;
+            [result, nlp] = pqp.checkActiveSet(Atry);
+            nlps = nlps+nlp;
+            %  2: optimal, no LICQ violation
+            %  1: optimal, LICQ violated
+            %  0: feasible, but not optimal
+            % -1: infeasible
+            % -2: rank defficient
+            % -3: undecided
+            % split active sets into feasible/infeasible/optimal/degenerate
+            if result>=0
+                n_feasible = n_feasible+1;
+                Afeasible(n_feasible, :) = Atry;
+                if result==1
+                    n_deg = n_deg + 1;
+                    Adeg(n_deg, :) = Atry;
+                elseif result==2
+                    n_opt = n_opt + 1;
+                    Aopt(n_opt, :) = Atry;
+                end
+            end
+            if result<0
+                n_infeasible = n_infeasible + 1;
+                Ainfeasible(n_infeasible, :) = Atry;
+                if result==-2
+                    n_rankdef = n_rankdef + 1;
+                end
+            end
+        end
+    end
+    if options.verbose>=0 && toc(t)>options.report_period
+        if ~first_display
+            fprintf(repmat('\b', 1, 9));
+        end
+        fprintf('%8d%%', min(100, ceil(100*i/size(feasible, 1))));
+        t=tic;
+        first_display = false;
+    end
+end
+Afeasible = Afeasible(1:n_feasible, :);
+Ainfeasible = Ainfeasible(1:n_infeasible, :);
+Aopt = Aopt(1:n_opt, :);
+Adeg = Adeg(1:n_deg, :);
+
+if options.verbose>=0
+    % delete progress meter
+    if ~first_display
+        fprintf(repmat('\b', 1, 9));
+    end
+    % display progress
+    fprintf('%9d   %8d', n_candidates+n_pruned, n_candidates);
+    fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
+        n_opt, n_deg, n_feasible-n_opt-n_deg, n_infeasible-n_rankdef, ...
+        n_rankdef, nlps);
+end
+
 end
