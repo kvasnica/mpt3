@@ -1,4 +1,5 @@
 function test_opt_checkActiveSet_01
+% for pQPs
 
 Double_Integrator
 M = mpt_constructMatrices(sysStruct, probStruct);

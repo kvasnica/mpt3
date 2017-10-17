@@ -62,4 +62,9 @@ if ~isempty(p.vartype)
     opt.vartype = upper(p.vartype);
 end
 
+% make sure we have at least the correct number of rows
+if isempty(opt.pB)
+    opt.pB = zeros(length(opt.b), 0);
+end
+
 end

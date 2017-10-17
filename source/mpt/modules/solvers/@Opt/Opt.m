@@ -484,7 +484,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             global MPTOPTIONS
             
             % TODO: support pLPs, pLCPs, QPs, LPs, LCPs
-            assert(isequal(lower(obj.problem_type), 'qp') && obj.isParametric, 'Only pQPs are supported for now.');
+            assert(isequal(lower(obj.problem_type), 'qp'), 'Only (p)QPs are supported for now.');
             
             nlps = 0;
             Ga = obj.A(A, :);
