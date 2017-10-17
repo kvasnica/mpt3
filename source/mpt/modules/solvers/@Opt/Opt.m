@@ -366,6 +366,9 @@ classdef Opt < handle & matlab.mixin.Copyable
             crh = [-Gn*beta_x + wn; beta_L];
             
             if ~options.regionless
+                % include Ath*x<=bth bounds
+                crH = [crH; obj.Ath];
+                crh = [crh; obj.bth];
                 CR = Polyhedron(crH, crh);
             else
                 data.ActiveSet = A;

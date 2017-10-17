@@ -11,6 +11,9 @@ classdef IPDPolyhedron < Polyhedron
             A = [ data.OptProb.A*data.Primal.F-data.OptProb.pB; -data.DualIneq.F ];
             b = [ data.OptProb.b-data.OptProb.A*data.Primal.g; data.DualIneq.g ];
             b = b + MPTOPTIONS.modules.solvers.enum_pqp.ineq_backoff; % backoff tuned w.r.t. test_enum_pqp_10
+            % include Ath*x<=bth bounds
+            A = [A; data.OptProb.Ath];
+            b = [b; data.OptProb.bth];
             if data.OptProb.me>0
                 Ae = data.OptProb.Ae*data.Primal.F-data.OptProb.pE;
                 be = data.OptProb.be-data.OptProb.Ae*data.Primal.g;
