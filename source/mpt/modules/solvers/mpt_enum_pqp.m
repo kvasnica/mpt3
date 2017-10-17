@@ -105,6 +105,11 @@ elseif ~isequal(lower(pqp.problem_type), 'qp') || ~pqp.isParametric
     error('The first input must be a parametric QP.');
 end
 
+% TODOs: 
+% * add options.dualize - if true, solve the dual (which should not be
+%   degenerate even if the primal is).
+% * add Opt/dualize()
+
 if ~isempty(options.exclude) && options.remove_redundant
     fprintf('Forcing options.remove_redundant=false since options.exclude is not empty.\n');
     options.remove_redundant = false;
@@ -560,6 +565,8 @@ function [result, nlps] = checkActiveSet(pqp, A)
 %     -2: rank defficient
 %     -3: undecided
 %   nlps: number of LPs solved
+
+% TODO: move this method to the Opt class
 
 global MPTOPTIONS
 
