@@ -293,12 +293,12 @@ classdef Opt < handle & matlab.mixin.Copyable
             obj.m = length(obj.b);
         end
         
-        function CR = getRegion(obj, A, options)
+        function CR = getRegion(obj, A, implicit_string)
             % Constructs a critical region, the optimizers, and the cost function
             %
             % Syntax:
             %   CR = pqp.getRegion(A)
-            %   CR = pqp.getRegion(A)
+            %   CR = pqp.getRegion(A, 'implicit') - for implicit representation
             %
             % Inputs:
             %   pqp: pqp problem as an instance of the Opt class
@@ -313,10 +313,9 @@ classdef Opt < handle & matlab.mixin.Copyable
             assert(obj.d>0, 'The problem must have parameters.');
             assert(obj.me==0, 'Equalities are not supported.');
             if nargin<3
-                options = [];
+                implicit_string = '';
             end
-            % TODO: use inputParser
-            options = mpt_defaultOptions(options, 'regionless', false, 'pqp_with_equalities', obj);
+            implicit = ~isempty(implicit_string);
             
             A(A==0) = []; % depad zeros
             
@@ -368,7 +367,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             crH = [Gn*alpha_x - En; -alpha_L];
             crh = [-Gn*beta_x + wn; beta_L];
             
-            if ~options.regionless
+            if ~implicit
                 % include Ath*x<=bth bounds
                 crH = [crH; obj.Ath];
                 crh = [crh; obj.bth];

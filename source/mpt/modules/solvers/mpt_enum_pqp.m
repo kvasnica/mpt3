@@ -123,10 +123,9 @@ if pqp.me>0
     fprintf('done\n');
 end
 if options.regions
-    region_options = [];
+    region_options = '';
 else
-    region_options.regionless = true;
-    region_options.pqp_with_equalities = pqp_orig;
+    region_options = 'implicit';
 end
 
 m_before = pqp.m;
