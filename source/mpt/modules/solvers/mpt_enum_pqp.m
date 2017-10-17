@@ -336,7 +336,7 @@ function [Aopt, Adeg, Afeas, Ainfeas, nlps] = getActiveSets(pqp, options)
 start_t = clock;
 
 % is the case with no active constraints optimal?
-[feasible, nlps] = checkActiveSet(pqp, []);
+[feasible, nlps] = pqp.checkActiveSet([]);
 if feasible
     % yep, include the case into list of non-degenerate optimal active sets
     Aopt = {0};
@@ -453,7 +453,7 @@ for i = 1:size(feasible, 1)
         end
         if do_check
             n_candidates = n_candidates + 1;
-            [result, nlp] = checkActiveSet(pqp, Atry);
+            [result, nlp] = pqp.checkActiveSet(Atry);
             nlps = nlps+nlp;
             %  2: optimal, no LICQ violation
             %  1: optimal, LICQ violated
@@ -506,196 +506,6 @@ if options.verbose>=0
     fprintf('%8d   %8d %8d   %8d%8d  %8d\n', ...
         n_opt, n_deg, n_feasible-n_opt-n_deg, n_infeasible-n_rankdef, ...
         n_rankdef, nlps);
-end
-
-end
-
-%%
-%--------------------------------------------------------------
-function [result, nlps] = checkActiveSet(pqp, A)
-% Checks optimality/fesibility of a given active set
-%
-% pQP formulation:
-%
-%    min_z 0.5*z'*H*z + (pF*x+f)'*z + x'*Y*x + C'*x + c
-%     s.t.   A*z <=  b + pB*x 
-%           Ae*z == be + pE*x
-%          Ath*x <= bth
-%             lb <= z <= ub
-%
-% KKT conditions:
-%         stanionarity: H*z + pF*x + f + Ga'*La = 0
-%     compl. slackness: Aa*z - ba - pBa*x = 0
-%   primal feasibility: An*z - bn - pBn*x < 0
-%                       Ae*z - be - pE*x  = 0
-%     dual feasibility: La > 0
-%
-% where Aa, ba, pBa are matrices formed by taking rows indexed by A from
-% the corresponding matrix; An, bn, pBn contain only the inactive rows.
-%
-% To certify that A is an optimal active set, we solve an LP:
-%
-%    max  t
-%    s.t. H*z + pF*x + f + Ga'*La  =  0  (optimality)
-%                     Aa*z - pBa*x = ba (complementarity slackness)
-%                     Ae*z -  pE*x = be (primal feasibility, equalities)
-%                An*z - pBn*x + t <= bn  (primal feasibility, inequalities)
-%                              La >= t   (dual feasibility)
-%
-% * if the LP is feasible with t>0, the active set is feasible and optimal
-% * if the LP is feasible with t=0, the active set is degenerate
-% * if the LP is feasible without the optimality constraints, the active
-%   set is feasible but not optimal (not checked if card(A)=nz)
-% * otherwise the active set is infeasible
-% * t>0 is checked by t>=-MPTOPTIONS.zero_tol
-%
-% Before solving the LP we first check whether A(A, :) has full row rank.
-% If not, we exit quickly.
-%
-% Inputs:
-%   pqp: matrices of the pQP problem as an Opt object
-%     A: active set to investigate (=indices of active constraints)
-%
-% Outputs:
-%   result: flag indicating status of the active set
-%      2: optimal, no LICQ violation
-%      1: optimal, LICQ violated
-%      0: feasible, but not optimal
-%     -1: infeasible
-%     -2: rank defficient
-%     -3: undecided
-%   nlps: number of LPs solved
-
-% TODO: move this method to the Opt class
-
-global MPTOPTIONS
-
-nlps = 0;
-Ga = pqp.A(A, :);
-% check rank of Ga first
-rGa = rank(Ga'*Ga);
-if rGa < length(A)
-    % Ga is rank deficient
-    result = -2;
-    return
-end
-
-% determine the index set of inactive constraints
-all = 1:pqp.m;
-%N = setdiff(1:pqp.ni, A);
-N = all(~ismembc(all, A)); % much faster version of setdiff for sorted arrays
-
-Gn = pqp.A(N, :);
-Sa = pqp.pB(A, :);
-Sn = pqp.pB(N, :);
-wa = pqp.b(A, :);
-wn = pqp.b(N, :);
-nA = length(A);
-nN = length(N);
-
-% optimization variables: [t; z; x; La]
-
-% max t
-lp.f = [-1 zeros(1, pqp.n+pqp.d+nA)];
-
-% equality constraints:
-%   H*z + pF*x + f + Ga'*La =  0  (optimality)
-%               Ga*z - Sa*x = wa  (complementarity slackness)
-%               Ge*z - Se*x = we  (primal feasibility, equalities)
-lp.Ae = [ zeros(pqp.n, 1), pqp.H, pqp.pF, Ga'; ...
-    zeros(nA, 1), Ga, -Sa, zeros(nA); ...
-    zeros(pqp.me, 1), pqp.Ae, -pqp.pE, zeros(pqp.me, nA)];
-lp.be = [ -pqp.f; wa; pqp.be ];
-
-% inequality constraints:
-%   Gn*z - Sn*x + t  <= wn  (primal feasibility, inequalities)
-%                 La >= t   (dual feasibility)
-%              Ath*x <= bth
-nb = length(pqp.bth);
-lp.A = [ ones(nN, 1), Gn, -Sn, zeros(nN, nA); ...
-    ones(nA, 1), zeros(nA, pqp.n), zeros(nA, pqp.d), -eye(nA); ...
-    zeros(nb, 1+pqp.n), pqp.Ath, zeros(nb, nA)];
-lp.b = [ wn; zeros(nA, 1); pqp.bth];
-
-% lower/upper bounds on [t; z; x; La]
-% (includes lb <= z <= ub)
-lp.lb = [-Inf; pqp.lb; -Inf(pqp.d, 1); zeros(nA, 1)];
-lp.ub = [Inf; pqp.ub; Inf(pqp.d, 1); Inf(nA, 1)];
-
-% avoid sanity checks in mpt_solve()
-lp.quicklp = true;
-
-nlps = nlps + 1;
-sol = mpt_solve(lp);
-if isequal(sol.how, 'ok')
-    if sol.xopt(1) > MPTOPTIONS.rel_tol
-        % feasible, optimal, LICQ holds
-        result = 2;
-    elseif sol.xopt(1) > -MPTOPTIONS.zero_tol
-        % feasible, optimal, LICQ does not hold
-        result = 1;
-    else
-        % undecided
-        result = -3;
-    end
-else
-    % undecided
-    result = -3;
-end
-
-if (result==-3 || result==-1) && numel(A)<pqp.n
-    % solve the LP without optimality conditions (not necessary if we are
-    % on the last level)
-    
-    % TODO: solve just one LP with soft equality optimality constraint
-    %       H*z + pF*x + f + Ga'*La = s, min Qs*norm(s, 1)
-    lp.Ae = lp.Ae(pqp.n+1:end, :);
-    lp.be = lp.be(pqp.n+1:end);
-    nlps = nlps + 1;
-    sol = mpt_solve(lp);
-    if isequal(sol.how, 'ok') && sol.xopt(1)>-MPTOPTIONS.zero_tol
-        % feasible, but not optimal
-        result = 0;
-        
-        if false
-            % EXPERIMENTAL CODE
-            %
-            % how far away are we from optimality?
-            q = 0;
-            z=sdpvar(pqp.nz, 1);
-            x=sdpvar(pqp.nx, 1);
-            La=sdpvar(nA, 1);
-            t=sdpvar(1, 1);
-            e=sdpvar(1, 1);
-            
-            % min e - q*t
-            %
-            % -e <= H*z + Ga'*La <= e (weak optimality)
-            % Ga*z - Sa*x - wa =   0  (complementarity slackness)
-            % Gn*z - Sn*x + t <= wn   (primal feasibility)
-            % La >= t                 (dual feasibility)
-            % t <= 1
-            F = [ -e <= pqp.H*z+Ga'*La <= e; ...
-                Ga*z - Sa*x - wa == 0; ...
-                Gn*z - Sn*x + t <= wn; ...
-                La >= t; ...
-                0 <= t <= 1; e >= 0 ];
-            obj = e-q*t;
-            info = solvesdp(F, obj, sdpsettings('verbose', 0));
-            z=double(z);
-            x=double(x);
-            La=double(La);
-            t=double(t);
-            e=double(e);
-            if e>500
-                result = -1;
-            end
-            %OPTGAP{end+1} = struct('A', A, 'e', e, 't', t);
-        end
-    else
-        % infeasible
-        result = -1;
-    end
 end
 
 end
