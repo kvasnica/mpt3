@@ -90,6 +90,8 @@ classdef IPDPolyUnion < PolyUnion
             % TODO: support problems with equalities
             assert(obj.Data.OptProb.me==0, 'Problems with equality constraints not yet supported.');
 
+            % TODO: also export and check parametric bounds (Ath*x<=bth)
+            
             % get canonical file name
             [~, f_name, ~] = fileparts(filename);
             % replace invalid characters by an underscore
