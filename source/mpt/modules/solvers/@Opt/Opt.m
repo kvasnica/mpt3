@@ -445,7 +445,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             %     compl. slackness: Aa*z - ba - pBa*x = 0
             %   primal feasibility: An*z - bn - pBn*x < 0
             %                       Ae*z - be - pE*x  = 0
-            %     dual feasibility: La > 0
+            %     dual feasibility: La >= 0
             %
             % where Aa, ba, pBa are matrices formed by taking rows indexed by A from
             % the corresponding matrix; An, bn, pBn contain only the inactive rows.
