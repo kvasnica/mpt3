@@ -430,7 +430,7 @@ classdef Opt < handle & matlab.mixin.Copyable
         end
         
         function [result, nlps] = checkActiveSet(obj, A)
-            % Checks optimality/fesibility of a given active set
+            % Checks optimality/fesibility of a given active set W
             %
             % pQP formulation:
             %
@@ -441,47 +441,58 @@ classdef Opt < handle & matlab.mixin.Copyable
             %             lb <= z <= ub
             %
             % KKT conditions:
-            %         stanionarity: H*z + pF*x + f + Ga'*La = 0
+            %         stanionarity: H*z + pF*x + f + Aa'*La = 0
             %     compl. slackness: Aa*z - ba - pBa*x = 0
             %   primal feasibility: An*z - bn - pBn*x < 0
             %                       Ae*z - be - pE*x  = 0
             %     dual feasibility: La >= 0
             %
-            % where Aa, ba, pBa are matrices formed by taking rows indexed by A from
+            % where Aa, ba, pBa are matrices formed by taking rows indexed by W from
             % the corresponding matrix; An, bn, pBn contain only the inactive rows.
             %
-            % To certify that A is an optimal active set, we solve an LP:
+            % To certify that W is an optimal active set, we solve an LP:
             %
             %    max  t
-            %    s.t. H*z + pF*x + f + Ga'*La  =  0  (optimality)
+            %    s.t. H*z + pF*x + f + Aa'*La  =  0  (optimality)
             %                     Aa*z - pBa*x = ba (complementarity slackness)
             %                     Ae*z -  pE*x = be (primal feasibility, equalities)
             %                An*z - pBn*x + t <= bn  (primal feasibility, inequalities)
             %                              La >= t   (dual feasibility)
             %
-            % * if the LP is feasible with t>0, the active set is feasible and optimal
-            % * if the LP is feasible with t=0, the active set is degenerate
-            % * if the LP is feasible without the optimality constraints, the active
-            %   set is feasible but not optimal (not checked if card(A)=nz)
+            % * if the LP is feasible with t>0, the active set is optimal,
+            %   and the dual variables satisfy the strict complementarity
+            %   slackness condition (i.e., La>0) 
+            % * if the LP is feasible with t=0, the active set if optimal,
+            %   but the dual variables violate the strict complementarity
+            %   slackness condition (i.e., La>=0)
+            % * if the LP is feasible without the optimality constraints,
+            %   the active set is feasible but not optimal 
+            %   (not checked if card(W)=nz)
             % * otherwise the active set is infeasible
-            % * t>0 is checked by t>=-MPTOPTIONS.zero_tol
+            % * t>0 is checked as t>=-MPTOPTIONS.zero_tol
             %
-            % Before solving the LP we first check whether A(A, :) has full row rank.
-            % If not, we exit quickly.
+            % Before solving the LP we first check whether A(W, :) has full
+            % row rank. If not, the active set violates the linear
+            % independence constraint qualification condition, i.e., some
+            % rows of A(W, :) are linearly dependent. In that case we exit
+            % immediately with result=-2
+            %
+            % Usage:
+            %   [status, nlps] = obj.checkActiveSet(W)
             %
             % Inputs:
-            %   pqp: matrices of the pQP problem as an Opt object
-            %     A: active set to investigate (=indices of active constraints)
+            %   obj: matrices of the (p)QP problem as an Opt object
+            %     W: active set to investigate (=indices of active constraints)
             %
             % Outputs:
-            %   result: flag indicating status of the active set
-            %      2: optimal, no LICQ violation
-            %      1: optimal, LICQ violated
-            %      0: feasible, but not optimal
-            %     -1: infeasible
-            %     -2: rank defficient
-            %     -3: undecided
-            %   nlps: number of LPs solved
+            %   result: flag indicating the status of the active set
+            %          2: optimal, strict complementary slackness holds
+            %          1: optimal, strict complementary slackness violated
+            %          0: feasible, but not optimal
+            %         -1: infeasible
+            %         -2: rank defficient (LICQ violation)
+            %         -3: undecided
+            %       nlps: number of LPs solved
             
             % TODO:
             %   3: optimal, primal full dim, L>0
@@ -830,8 +841,8 @@ function [Aopt, Adeg, Afeasible, Ainfeasible, nlps] = sub_exploreLevel(pqp, leve
 %
 % Outputs:
 % --------
-%           Ao: m-by-n matrix of optimal active sets (n=level)
-%           Ad: m-by-n matrix of degenerate optimal active sets
+%           Ao: m-by-n matrix of optimal active sets without SCS violation (n=level)
+%           Ad: m-by-n matrix of optimal active sets with SCS violation
 %           Af: m-by-n matrix of non-optimal feasible active sets
 %           Ai: m-by-n matrix of infeasible active sets
 %               (includes rank-defficient active sets)
@@ -893,11 +904,11 @@ for i = 1:size(feasible, 1)
             n_candidates = n_candidates + 1;
             [result, nlp] = pqp.checkActiveSet(Atry);
             nlps = nlps+nlp;
-            %  2: optimal, no LICQ violation
-            %  1: optimal, LICQ violated
+            %  2: optimal, no SCS violation
+            %  1: optimal, SCS violated
             %  0: feasible, but not optimal
             % -1: infeasible
-            % -2: rank defficient
+            % -2: rank defficient, LICQ violated
             % -3: undecided
             % split active sets into feasible/infeasible/optimal/degenerate
             if result>=0
