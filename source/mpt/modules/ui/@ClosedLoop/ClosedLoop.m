@@ -164,20 +164,20 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 
                 % 1) domain of the closed-loop system
                 A = []; b = [];
-                % umin <= F*x+g <= umax
-                A = [A; F; -F];
-                b = [b; obj.system.u.max-g; -obj.system.u.min+g];
-                % xmin <= x <= xmax
-                A = [A; eye(obj.system.nx); -eye(obj.system.nx)];
-                b = [b; obj.system.x.max; -obj.system.x.min];
+                % umin <= F*x+g <= umax + set constraints
+                Bu = obj.system.u.boundsToPolyhedron();
+                A = [A; Bu.A*F];
+                b = [b; Bu.b-Bu.A*g];
+                % xmin <= x <= xmax + set constraints
+                Bx = obj.system.x.boundsToPolyhedron();
+                A = [A; Bx.A];
+                b = [b; Bx.b];
                 % ymin <= (C*x+D*u) <= ymax
+                By = obj.system.y.boundsToPolyhedron();
                 for ic = 1:numel(unc.C)
                     for id = 1:numel(unc.D)
-                        A = [A; ...
-                            (unc.C{ic}+unc.D{id}*F); ...
-                            -(unc.C{ic}+unc.D{id}*F)];
-                        b = [b; obj.system.y.max-unc.D{id}*g; ...
-                            unc.D{id}*g-obj.system.y.min];
+                        A = [A; By.A*(unc.C{ic}+unc.D{id}*F)];
+                        b = [b; By.b-By.A*unc.D{id}*g];
                     end
                 end
                 D = Polyhedron('A', A, 'b', sanitize_inf(b));
@@ -214,17 +214,20 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				% 1) domain of the closed-loop system
 				A = []; b = [];
 				
-				% umin <= F*x+g <= umax
-				A = [A; F; -F];
-				b = [b; obj.system.u.max-g; -obj.system.u.min+g];
-				
-				% xmin <= x <= xmax
-				A = [A; eye(obj.system.nx); -eye(obj.system.nx)];
-				b = [b; obj.system.x.max; -obj.system.x.min];
-				
-				% ymin <= y <= ymax
-				A = [A; (obj.system.C+obj.system.D*F); -(obj.system.C+obj.system.D*F)];
-				b = [b; obj.system.y.max-obj.system.D*g; obj.system.D*g-obj.system.y.min];
+                % umin <= F*x+g <= umax + set constraints
+                Bu = obj.system.u.boundsToPolyhedron();
+                A = [A; Bu.A*F];
+                b = [b; Bu.b-Bu.A*g];
+                
+                % xmin <= x <= xmax + set constraints
+                Bx = obj.system.x.boundsToPolyhedron();
+                A = [A; Bx.A];
+                b = [b; Bx.b];
+                
+				% ymin <= y <= ymax + set constraints
+                By = obj.system.y.boundsToPolyhedron();
+                A = [A; By.A*(obj.system.C+obj.system.D*F)];
+                b = [b; By.b-By.A*obj.system.D*g];
 				
 				D = Polyhedron('A', A, 'b', sanitize_inf(b));
 				D = D.intersect(obj.system.domainx);
