@@ -483,6 +483,15 @@ classdef Opt < handle & matlab.mixin.Copyable
             %     -3: undecided
             %   nlps: number of LPs solved
             
+            % TODO:
+            %   3: optimal, primal full dim, L>0
+            %   2: optimal, primal full dim, L>=0
+            %   1: optimal, primal low dim, L>=0
+            %   0: feasible
+            %  -1: infeasible
+            %  -2: rank defficient
+            %  -3: undecided
+            
             global MPTOPTIONS
             
             % TODO: support pLPs, pLCPs, QPs, LPs, LCPs
@@ -664,7 +673,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             
             % is the case with no active constraints optimal?
             [feasible, nlps] = obj.checkActiveSet([]);
-            if feasible
+            if feasible>=2
                 % yep, include the case into list of non-degenerate optimal active sets
                 Aopt = {0};
                 Afeas = {0};
