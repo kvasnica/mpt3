@@ -917,7 +917,7 @@ for i = 1:size(feasible, 1)
                 if result==1
                     n_deg = n_deg + 1;
                     Adeg(n_deg, :) = Atry;
-                elseif result==2
+                elseif result>=2
                     n_opt = n_opt + 1;
                     Aopt(n_opt, :) = Atry;
                 end
