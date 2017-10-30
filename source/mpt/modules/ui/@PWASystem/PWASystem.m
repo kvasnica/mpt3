@@ -404,15 +404,20 @@ classdef PWASystem < AbstractSystem
 			ip.KeepUnmatched = false;
             ip.addParamValue('maxIterations', ...
 				options.maxIterations, @isscalar);
-            ip.addParamValue('X', ...
-				obj.domainx, ...
-				@validate_polyhedron);
+            ip.addParamValue('X', [], @validate_polyhedron);
             ip.addParamValue('U', ...
 				obj.u.boundsToPolyhedron(), ...
 				@validate_polyhedron);
 			ip.addParamValue('merge', true, @islogical);
 			ip.parse(varargin{:});
 			options = ip.Results;
+            if isempty(options.X)
+                if isfield(obj.Internal, 'Domain')
+                    options.X = obj.Internal.Domain;
+                else
+                    options.X = obj.domainx;
+                end
+            end
 
 			if numel(options.U)~=1
 				error('Input constraints must be a single polyhedron.');
@@ -423,20 +428,31 @@ classdef PWASystem < AbstractSystem
 			if any(arrayfun(@(x) x.Dim~=obj.nx, options.X))
 				error('State constraints must be a polyhedron in %dD.', obj.nx);
 			end
-			if obj.nu>0 && options.U.Dim~=obj.nu
-				error('Input constraints must be a polyhedron in %dD.', obj.nu);
-			end
+            if obj.nu>0 && options.U.Dim~=obj.nu
+                error('Input constraints must be a polyhedron in %dD.', obj.nu);
+            end
 
 			Xo = options.X;
 			U = options.U;
+            Xb = Xo & obj.x.boundsToPolyhedron();
+            Xb = Xb(~Xb.isEmptySet());
 			converged = false;
 			for i = 1:options.maxIterations
 				fprintf('Iteration %d...\n', i);
 				[X, ~, dyn] = obj.reachableSet('X', Xo, 'U', U, ...
 					'direction', 'backward', ...
 					'merge', true);
-				X = X.intersect(obj.x.boundsToPolyhedron);
-				if all(X.isEmptySet()) || X==Xo
+                X = X(~X.isEmptySet());
+                Z = [];
+                for i = 1:numel(X)
+                    Z = [Z, Xb & X(i)];
+                end
+                if numel(Z)>0
+                    X = Z(~Z.isEmptySet());
+                else
+                    X = Z;
+                end
+				if isempty(X) || X==Xo
 					converged = true;
 					break
 				else
@@ -445,9 +461,13 @@ classdef PWASystem < AbstractSystem
 			end
 			if ~converged
 				warning('Computation finished without convergence.');
-			end
+            end
+            if isempty(X) || all(X.isEmptySet())
+                X = Polyhedron.emptySet(obj.nx);
+            end
 		end
 
+        
         function C = constraints(obj, k)
             % Convert LTI model into YALMIP constraints
             

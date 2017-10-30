@@ -9,8 +9,9 @@ pwa.x.min = -1;
 pwa.x.max = 1;
 
 S = pwa.invariantSet();
+assert(numel(S)==1);
 assert(isa(S, 'Polyhedron'));
-assert(isequal([S.Dim], [1 1]));
+assert(S.Dim==1);
 assert(all(S.isEmptySet()));
 
 end
