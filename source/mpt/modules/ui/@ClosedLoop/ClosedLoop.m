@@ -272,6 +272,7 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				end
 				out = PWASystem('A', A, 'B', B, 'C', C, 'D', D, ...
 					'f', f, 'g', g, 'domain', Rn, 'Ts', obj.system.Ts);
+                out.Internal.Domain = obj.controller.optimizer.Domain;
 			else
 				error('Unsupported system.');
 			end
