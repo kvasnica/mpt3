@@ -76,8 +76,8 @@ classdef IPDPolyUnion < PolyUnion
             narginchk(2, Inf);
             p = inputParser;
             p.addOptional('tiebreak', 'first-region');
-            p.addParameter('tolerance', MPTOPTIONS.abs_tol);
-            p.addParameter('directPrimal', false);
+            p.addParamValue('tolerance', MPTOPTIONS.abs_tol);
+            p.addParamValue('directPrimal', false);
             p.parse(varargin{:});
             options = p.Results;
             
