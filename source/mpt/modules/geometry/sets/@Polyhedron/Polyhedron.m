@@ -993,6 +993,138 @@ classdef Polyhedron < ConvexSet
             sol.obj = sol.obj*direction;
         end
         
+        function [b, bi, wi] = barycentricCoordinates(P)
+            % Computes barycentric coordinate functions for a polytope P
+            %
+            % Given a polytope P = convh({v1, ..., vm}), this function computes the
+            % barycentric coordinate functions bi(x), i=1,...,m such that:
+            %   bi(x) >= 0           (non-negativity)
+            %   \sum_i bi(x) = 1     (partition of unity)
+            %   \sum vi*bi(x) = vi   (linear precision)
+            %
+            % Usage: [b, bi, wi] = barycentricCoordinates(P)
+            %
+            % Outputs:
+            %    b: function handle that takes a point "x" as an input, and
+            %       returns a vector of values bi(x)
+            %   bi: cell array of barycentric functions, one for each
+            %       vertex (each function takes "x" as an input)
+            %   wi: cell array of weighting functions, one for each vertex
+            %
+            % Limitation: each vertex of P must be simple, i.e., it must have exactly D
+            % incident facets where D is the dimension of P.
+            %
+            % Literature:
+            %   J. Warren, S. Schaefer, A. Hirani, and M. Desbrun:
+            %   Barycentric coordinates for convex sets.
+            %   Advances in Computational Mathematics, 27(3):319-338, Aug 2007.
+            
+            global MPTOPTIONS
+            
+            assert(numel(P)==1, 'Single polytope please.');
+            assert(P.isBounded(), 'The polytope must be bounded');
+            
+            P.normalize();
+            imap = P.incidenceMap();
+            V = imap.V';
+            nv = size(V, 2);
+            nx = P.Dim;
+            % shift to origin, enlarge and shift back to guarantee
+            % partition of unity at the vertices
+            xc = repmat(P.chebyCenter().x, 1, nv);
+            V = (1+MPTOPTIONS.rel_tol)*(V - xc) + xc;
+            
+            % Compute weight functions wi(x), see Section 2 of the paper
+            wi = {};
+            for i = 1:nv
+                % indices of incident facets
+                v = V(:, i);
+                ind_v = find(imap.incVH(i, :));
+                assert(length(ind_v)==nx, sprintf('Vertex no. %d is not simple.', i));
+                % facets incident to the vertex
+                nind_v = P.A(ind_v, :);
+                % volume of the parallelepiped span by the normals to the facets
+                % incident to the vertex
+                kappa = abs(det(nind_v));
+                % numerator of (4)
+                z = '@(x) kappa/((nind_v(1, :)*(v-x))';
+                for j = 2:size(nind_v, 2)
+                    z = [z, sprintf('*(nind_v(%d, :)*(v-x))', j)];
+                end
+                z = [z, ')'];
+                wi{i} = eval(z);
+            end
+            
+            bi = cell(1, nv);
+            for i = 1:nv
+                bi{i} = @(x) (wi{i}(x))/sum(cellfun(@(e) e(x), wi));
+            end
+            b = @(x) cellfun(@(e) e(x), bi);
+        end
+        
+        function gi = interpolate(P, g)
+            % Interpolates values or functions at vertices over a polytope
+            %
+            % If G is a matrix with "nv" columns where "nv" is the number
+            % of vertices of a polytope P, then Gi=interpolate(P, G)
+            % returns an interpolation function Gi(X) that interpolates
+            % the values at vertices (represented by the columns of G) at
+            % a point X of the polytope P using its barycentric
+            % coordinates.
+            %
+            % If G is a cell array of function handles, Gi(X) is a function
+            % which interpolates the values of G at individual vertices at
+            % a point X of P.
+            %
+            % Example:
+            %   P = Polyhedron.unitBox(2); % box with 4 vertices
+            %   G = [1, 2, 3, 4];          % values at vertices
+            %   Gi = P.interpolate(G);     % obtain the interpolation
+            %   x = [0.2; 0.6];            % point in P
+            %   Gix = Gi(x)                % 2.36 as the interpolated value
+            %
+            % Interpolation with functions defined over vertices:
+            %   G = { @(z) z+1, @(z) sin(z), @(z) z^2, @(z) z };
+            %   Gi = P.interpolate(G);
+            %   z0 = 0.4;
+            %   x = [0.2; 0.6];
+            %   Gix = Gi(x, z0)   % 0.4381 as the interpolated value
+            %
+            % See also Polyhedron/barycentricCoordinates
+            
+            assert(numel(P)==1, 'Single polyhedron please.');
+            
+            function gi = baryinterp(x, barycoords, g, varargin)
+                f = cellfun(@(e) e(varargin{:}), g, 'UniformOutput', false);
+                gi = sum(barycoords(x).*cat(2, f{:}), 2);
+            end
+
+            barycoords = P.barycentricCoordinates();
+            nv = size(P.V, 1);
+            if iscell(g)
+                % interpolate functions
+                assert(numel(g)==nv, 'The cell array must have %d elements.', nv);
+                na = nargin(g{1});
+                if na==0
+                    % functions with no inputs
+                    gi = @(x) baryinterp(x, barycoords, g);
+                else
+                    % functions with inputs
+                    args = 'z1';
+                    for i = 2:na
+                        args = [args, sprintf(', z%d', i)];
+                    end
+                    gi = eval(sprintf('@(x, %s) baryinterp(x, barycoords, g, %s)', args, args));
+                end
+            elseif isnumeric(g)
+                % interpolate values at vertices
+                assert(size(g, 2)==nv, 'The matrix must have %d columns.', nv);
+                gi = @(x) sum(barycoords(x).*g, 2);
+            else
+                error('The second input can be only a cell array of function handles, or a matrix.');
+            end
+        end
+        
 	end
 	
 	methods(Hidden)
