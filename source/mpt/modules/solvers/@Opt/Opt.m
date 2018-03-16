@@ -349,8 +349,8 @@ classdef Opt < handle & matlab.mixin.Copyable
             beta    = -Ga/obj.H*obj.f - wa;
             
             % dual variables are an affine function of the parameters
-            alpha_L = -inv(alpha_2)*alpha_1;
-            beta_L  = -inv(alpha_2)*beta;
+            alpha_L = -alpha_2\alpha_1;
+            beta_L  = -alpha_2\beta;
             
             % optimizer is an affine function of the parameters
             alpha_x = -obj.H\obj.pF - obj.H\Ga'*alpha_L;
