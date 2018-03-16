@@ -135,8 +135,8 @@ if options.remove_redundant
 end
 
 if min(eig(pqp.H)) < MPTOPTIONS.rel_tol
-    error('The pQP must be strictly positive definite. mineig(H)=%g must be >%g.', ...
-        min(eig(pqp.H)), MPTOPTIONS.rel_tol);
+    warning('The pQP is not positive definite, mineig(H)=%g. Expect numerical issues.', ...
+        min(eig(pqp.H)));
 end
 
 if options.verbose>=0
