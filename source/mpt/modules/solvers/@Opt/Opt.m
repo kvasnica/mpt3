@@ -513,7 +513,7 @@ classdef Opt < handle & matlab.mixin.Copyable
             nlps = 0;
             Ga = obj.A(A, :);
             % check rank of Ga first
-            rGa = rank(Ga'*Ga);
+            rGa = rank(Ga'*Ga, MPTOPTIONS.abs_tol);
             if rGa < length(A)
                 % Ga is rank deficient
                 result = -2;
