@@ -26,7 +26,12 @@ else
 end
 
 % direct call to linprog
-[R.xopt,R.obj,exitflag,OUTPUT,R.lambda]=linprog(S.f,S.A,S.b,S.Ae,S.be,S.lb,S.ub,S.x0,options);
+try
+    [R.xopt,R.obj,exitflag,OUTPUT,R.lambda]=linprog(S.f,S.A,S.b,S.Ae,S.be,S.lb,S.ub,S.x0,options);
+catch
+    % sometimes linprog fails with an infeasibility error
+    exitflag = 0;
+end
 
 if exitflag>0 
     R.how = 'ok';
