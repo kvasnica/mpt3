@@ -372,6 +372,7 @@ classdef Opt < handle & matlab.mixin.Copyable
                 crH = [crH; obj.Ath];
                 crh = [crh; obj.bth];
                 CR = Polyhedron(crH, crh);
+                CR.Data.ActiveSet = A;
             else
                 data.ActiveSet = A;
                 data.OptProb = obj;
