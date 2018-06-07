@@ -248,18 +248,20 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				% LTI or PWA system + PWA controller = PWA system
 				
 				R = obj.controller.feedback.Set;
-				% TODO: deal with guardU
-				Dom = obj.system.domainx;
+				Dom = obj.system.domain;
 				
 				A = {}; B = {}; C = {}; D = {}; f = {}; g = {};
 				Rn = [];
 				for i = 1:length(R)
 					% extract parameters of the affine control law u=F*x+G
 					for j = 1:length(Dom)
-						P = R(i).intersect(Dom(j));
+                        F = R(i).Func{1}.F(1:obj.system.nu, :);
+                        G = R(i).Func{1}.g(1:obj.system.nu);
+                        Hx = Dom(j).A(:, 1:obj.system.nx);
+                        Hu = Dom(j).A(:, obj.system.nx+1:end);
+                        Dom_j = Polyhedron(Hx+Hu*F, Dom(j).b-Hu*G);
+						P = R(i).intersect(Dom_j);
 						if P.isFullDim
-							F = R(i).Func{1}.F(1:obj.system.nu, :);
-							G = R(i).Func{1}.g(1:obj.system.nu);
 							A{end+1} = obj.system.A + obj.system.B*F;
 							B{end+1} = zeros(obj.system.nx, 0);
 							f{end+1} = obj.system.B*G;
