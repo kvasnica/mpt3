@@ -253,21 +253,38 @@ classdef ClosedLoop < MPTUIHandle & IterableBehavior
 				A = {}; B = {}; C = {}; D = {}; f = {}; g = {};
 				Rn = [];
 				for i = 1:length(R)
-					% extract parameters of the affine control law u=F*x+G
 					for j = 1:length(Dom)
+                        % extract parameters of the affine control law u=F*x+G
                         F = R(i).Func{1}.F(1:obj.system.nu, :);
                         G = R(i).Func{1}.g(1:obj.system.nu);
+                        % check intersection with the j-th dynamics
+                        %   D_j = { [x; u] | H*[x; u] <= h }
                         Hx = Dom(j).A(:, 1:obj.system.nx);
                         Hu = Dom(j).A(:, obj.system.nx+1:end);
                         Dom_j = Polyhedron(Hx+Hu*F, Dom(j).b-Hu*G);
 						P = R(i).intersect(Dom_j);
 						if P.isFullDim
-							A{end+1} = obj.system.A + obj.system.B*F;
+                            if iscell(obj.system.A)
+                                sys_A = obj.system.A{j};
+                                sys_B = obj.system.B{j};
+                                sys_f = obj.system.f{j};
+                                sys_C = obj.system.C{j};
+                                sys_D = obj.system.D{j};
+                                sys_g = obj.system.g{j};
+                            else
+                                sys_A = obj.system.A;
+                                sys_B = obj.system.B;
+                                sys_f = obj.system.f;
+                                sys_C = obj.system.C;
+                                sys_D = obj.system.D;
+                                sys_g = obj.system.g;
+                            end
+                            A{end+1} = sys_A + sys_B*F;
 							B{end+1} = zeros(obj.system.nx, 0);
-							f{end+1} = obj.system.B*G;
-							C{end+1} = obj.system.C + obj.system.D*F;
+							f{end+1} = sys_B*G + sys_f;
+							C{end+1} = sys_C + sys_D*F;
 							D{end+1} = zeros(obj.system.nu, 0);
-							g{end+1} = obj.system.D*G;
+							g{end+1} = sys_D*G + sys_g;
 							Rn = [Rn, P];
 						end
 					end
